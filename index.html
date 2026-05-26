@@ -6,7 +6,14 @@
 <title>OXEFIT Sales Commitment Tracker</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<!-- Primary CDN: jsDelivr -->
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<!-- Fallback CDN: cdnjs (loads only if jsDelivr failed) -->
+<script>
+  if (typeof msal === 'undefined') {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/msal-browser/2.38.3/msal-browser.min.js"><\/script>');
+  }
+</script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap');
@@ -720,7 +727,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest5 / full-features + commitments-dashboard / 2026-05-26
+// BUILD: latest5 / msal-cdn-fix / 2026-05-26
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/common',
