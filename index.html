@@ -386,7 +386,7 @@
   .col-warm-bg { background: rgba(249,115,22,0.04); }
   .col-forecast-bg { background: rgba(37,99,235,0.04); }
 
-  .conf-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; <script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script> }
+  .conf-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
   .conf-high { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
   .conf-mid  { background: rgba(245,158,11,0.15); color: var(--gold-light); border: 1px solid rgba(245,158,11,0.3); }
   .conf-low  { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
@@ -698,7 +698,7 @@
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
 const ONEDRIVE_CONFIG = {
-  clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',                                  // ← PASTE YOUR AZURE APP CLIENT ID HERE
+  clientId   : '',                                  // ← PASTE YOUR AZURE APP CLIENT ID HERE
   authority  : 'https://login.microsoftonline.com/common',
   redirectUri: window.location.origin + window.location.pathname,
   filePath   : '/OXEFIT/sales-tracker.json',        // location inside the user's OneDrive
