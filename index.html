@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -491,6 +492,122 @@
   .setup-notice strong { color: var(--gold); }
   .setup-notice code { background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 4px; font-size: 11px; color: var(--text); }
 
+  /* ── STAGE BADGES (Discovery / Proposal / Negotiation) ── */
+  .stage-badge {
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+    border: 1px solid transparent; line-height: 1;
+  }
+  .stage-discovery {
+    background: rgba(59,130,246,0.12); color: #93c5fd;
+    border-color: rgba(59,130,246,0.35);
+  }
+  .stage-proposal {
+    background: rgba(245,158,11,0.12); color: #fcd34d;
+    border-color: rgba(245,158,11,0.35);
+  }
+  .stage-negotiation {
+    background: rgba(168,85,247,0.14); color: #d8b4fe;
+    border-color: rgba(168,85,247,0.4);
+  }
+  .stage-select {
+    background: rgba(255,255,255,0.04); color: var(--text);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+    padding: 4px 8px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ── STALE / AGING ROW WARNING ── */
+  .stale-row {
+    background: rgba(239,68,68,0.07) !important;
+    box-shadow: inset 3px 0 0 #ef4444;
+  }
+  .stale-row td { border-top-color: rgba(239,68,68,0.18) !important; }
+  .stale-row:hover { background: rgba(239,68,68,0.11) !important; }
+  .stale-flag {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: #fca5a5; font-size: 10px; font-weight: 700;
+    margin-left: 6px; letter-spacing: 0.3px;
+  }
+  .stale-flag::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: #ef4444; box-shadow: 0 0 6px #ef4444;
+  }
+  .age-pill {
+    display: inline-block; padding: 2px 7px; border-radius: 999px;
+    font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.05);
+    color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);
+  }
+  .age-pill.stale { background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.4); }
+
+  /* ── BLOCKED COLUMN ── */
+  .blocked-cell textarea {
+    width: 100%; min-height: 38px; resize: vertical;
+    background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 6px; padding: 6px 8px; color: var(--text);
+    font-family: inherit; font-size: 11px; line-height: 1.4;
+  }
+  .blocked-cell textarea:focus {
+    outline: none; border-color: rgba(239,68,68,0.5);
+    background: rgba(239,68,68,0.07);
+  }
+  .blocked-cell textarea::placeholder { color: rgba(252,165,165,0.4); }
+
+  /* ── HUBSPOT INTEGRATION CHIP ── */
+  .hubspot-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    background: rgba(255,122,89,0.08); border: 1px solid rgba(255,122,89,0.3);
+    color: #ff9a7a; font-size: 11px; font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .hubspot-chip:hover {
+    background: rgba(255,122,89,0.14); border-color: rgba(255,122,89,0.5);
+  }
+  .hubspot-chip.connected {
+    background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.35);
+    color: #6ee7b7;
+  }
+  .hubspot-chip .hs-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #ff7a59;
+  }
+  .hubspot-chip.connected .hs-dot { background: #10b981; box-shadow: 0 0 6px #10b981; }
+
+  /* HubSpot deal-picker modal */
+  .hs-modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; backdrop-filter: blur(4px);
+  }
+  .hs-modal-backdrop.show { display: flex; }
+  .hs-modal {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; width: min(720px, 92vw); max-height: 80vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .hs-modal-head {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .hs-modal-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .hs-modal-body { padding: 14px 20px; overflow-y: auto; flex: 1; }
+  .hs-modal-foot {
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .hs-deal-row {
+    display: grid; grid-template-columns: 28px 1fr 110px 130px 110px;
+    gap: 10px; align-items: center; padding: 10px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px;
+  }
+  .hs-deal-row:hover { background: rgba(255,255,255,0.02); }
+  .hs-deal-name { color: var(--text); font-weight: 600; }
+  .hs-deal-meta { color: var(--text-muted); font-size: 11px; }
+  .hs-empty {
+    text-align: center; padding: 40px 20px; color: var(--text-muted);
+    font-size: 13px;
+  }
+
   @media (max-width: 768px) {
     .content { padding: 14px; }
     .topbar { padding: 0 14px; }
@@ -599,6 +716,10 @@
         <div class="sync-dot" id="syncDot"></div>
         <span id="syncText">Offline</span>
       </div>
+      <div class="hubspot-chip" id="hubspotChip" onclick="hubspotConnectOrSync()" title="HubSpot CRM">
+        <div class="hs-dot"></div>
+        <span id="hubspotText">Connect HubSpot</span>
+      </div>
       <div class="role-badge" id="roleBadge"></div>
       <div class="user-chip">
         <div class="user-avatar" id="userAvatar">?</div>
@@ -699,6 +820,24 @@
 
 </div>
 
+<!-- HubSpot deal-picker modal -->
+<div class="hs-modal-backdrop" id="hsModal">
+  <div class="hs-modal">
+    <div class="hs-modal-head">
+      <div class="hs-modal-title">HubSpot Deals — <span id="hsModalOwner">(rep)</span></div>
+      <button class="signout-btn" onclick="closeHubspotModal()">Close</button>
+    </div>
+    <div class="hs-modal-body" id="hsModalBody">
+      <div class="hs-empty">Loading deals…</div>
+    </div>
+    <div class="hs-modal-foot">
+      <button class="signout-btn" onclick="hubspotDisconnect()" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#fca5a5;">Disconnect</button>
+      <button class="signout-btn" onclick="hubspotRefresh()">Refresh</button>
+      <button class="signout-btn" onclick="hubspotApplySelected()" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.4);color:#6ee7b7;">Import Selected → Tracker</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════════════════════════════
    ONEDRIVE / MICROSOFT GRAPH CONFIGURATION  ── (REQUIREMENT C)
@@ -727,10 +866,10 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest5 / msal-cdn-fix / 2026-05-26
+// BUILD: latest6 / commit-bestcase-pipeline-blocked + 3-stage-aging + hubspot-oauth / 2026-05-28
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
-  authority  : 'https://login.microsoftonline.com/common',
+  authority  : 'https://login.microsoftonline.com/core-velocity.com',
   redirectUri: window.location.origin + window.location.pathname,
   filePath   : '/OXEFIT/sales-tracker.json',        // location inside the user's OneDrive
   scopes     : ['Files.ReadWrite', 'User.Read']
@@ -775,8 +914,72 @@ async function verifyPassword(user, pw) {
 ════════════════════════════════════════ */
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
-const STAGES      = ['Demo Completed','Proposal Submitted','Negotiation','Closed Won'];
+const STAGES      = ['Discovery', 'Proposal', 'Negotiation'];
 const CONF_LEVELS = ['90%','70%','50%','30%'];
+
+// Health aging thresholds (days) — rows exceeding these go red + weight halved
+const STAGE_HEALTH_DAYS = { Discovery: 14, Proposal: 21, Negotiation: 30 };
+
+/**
+ * computeDealAge(dealName, rep, stage, weekKey)
+ * Walks backward through all stored weeks (oldest first) to find the earliest
+ * week where this exact deal name appears for this rep in the same stage.
+ * Returns the number of weeks it has persisted (× 7 as a day proxy).
+ */
+function computeDealAge(dealName, rep, stage, currentWeekKey) {
+  if (!dealName || !dealName.trim()) return 0;
+  const name = dealName.trim().toLowerCase();
+  let consecutiveWeeks = 1; // current week counts as 1
+
+  // Collect all [year, month, weekIdx] in chronological order
+  const allWeekSlots = [];
+  Object.keys(allData).sort().forEach(mk => {
+    const [y, m] = mk.split('-').map(Number);
+    const md = allData[mk];
+    if (md && md.weeks) {
+      md.weeks.forEach((wRows, wi) => {
+        allWeekSlots.push({ mk, y, m, wi, rows: wRows || [] });
+      });
+    }
+  });
+
+  // Find position of current week
+  const [cy, cm, cw] = currentWeekKey.split('-').map(Number);
+  const curIdx = allWeekSlots.findIndex(s => s.y===cy && s.m===cm && s.wi===cw);
+  if (curIdx <= 0) return 1;
+
+  // Walk backwards, count consecutive weeks the same deal+stage persists for this rep
+  for (let i = curIdx - 1; i >= 0; i--) {
+    const slot = allWeekSlots[i];
+    const match = slot.rows.find(r =>
+      r.rep === rep && r.stage === stage &&
+      (
+        (r.commitText  && r.commitText.trim().toLowerCase()  === name) ||
+        (r.bestCaseText && r.bestCaseText.trim().toLowerCase() === name)
+      )
+    );
+    if (match) {
+      consecutiveWeeks++;
+    } else {
+      break; // chain broken
+    }
+  }
+  return consecutiveWeeks * 7; // convert weeks → day estimate
+}
+
+/**
+ * isRowStale(row, weekKey) — true when at least one active deal has exceeded
+ * the aging threshold for that row's stage.
+ */
+function isRowStale(row, weekKey) {
+  const threshold = STAGE_HEALTH_DAYS[row.stage];
+  if (!threshold) return false;
+  const commitAge   = computeDealAge(row.commitText,   row.rep, row.stage, weekKey);
+  const bestCaseAge = computeDealAge(row.bestCaseText, row.rep, row.stage, weekKey);
+  const activeDealAge = (row.commitText   && row.commitText.trim())   ? commitAge   :
+                        (row.bestCaseText && row.bestCaseText.trim()) ? bestCaseAge : 0;
+  return activeDealAge > threshold;
+}
 
 let currentRole = null;          // 'admin' | 'rep' | 'viewer'
 let currentUser = '';
@@ -794,21 +997,23 @@ let driveItemId  = null;
 let syncStatus   = 'offline';     // offline | connected | syncing | error
 
 const defaultRow = (team, rep) => ({
-  team:        team || '',
-  rep:         rep  || '',
-  stage:       'Demo Completed',
-  hotText:     '',
-  hotValue:    '',
-  warmText:    '',
-  warmValue:   '',
-  forecastAED: '',
-  forecastXS1: '',
-  forecastXP1: '',
-  confidence:  '90%',
-  notes:       '',
-  locked:      false,
-  submittedBy: '',
-  submittedAt: ''
+  team:         team || '',
+  rep:          rep  || '',
+  stage:        'Discovery',
+  commitText:   '',
+  commitValue:  '',
+  commitAction: '',
+  bestCaseText: '',
+  bestCaseValue:'',
+  totalPipeline:'',
+  blocked:      '',
+  forecastXS1:  '',
+  forecastXP1:  '',
+  confidence:   '90%',
+  notes:        '',
+  locked:       false,
+  submittedBy:  '',
+  submittedAt:  ''
 });
 
 /* ════════════════════════════════════════
@@ -909,6 +1114,8 @@ async function initOneDrive() {
       cache: { cacheLocation: 'localStorage' }
     });
     await msalInstance.initialize();
+    // Clear any stale "interaction_in_progress" flag from a previous tab/session
+    try { await msalInstance.handleRedirectPromise(); } catch(_) {}
     const accts = msalInstance.getAllAccounts();
     if (accts.length) {
       msalAccount = accts[0];
@@ -931,9 +1138,22 @@ async function signInOneDrive() {
     await downloadFromOneDrive();
     showToast('Connected to OneDrive', 'success');
   } catch(e) {
-    console.error(e);
+    console.error('OneDrive sign-in error:', e);
+    // Self-heal stuck "interaction_in_progress" state and retry once
+    if (e && (e.errorCode === 'interaction_in_progress' ||
+              (e.message && e.message.includes('interaction_in_progress')))) {
+      try {
+        Object.keys(sessionStorage).filter(k => k.startsWith('msal.')).forEach(k => sessionStorage.removeItem(k));
+        Object.keys(localStorage).filter(k => k.includes('interaction.status')).forEach(k => localStorage.removeItem(k));
+        showToast('Clearing stuck session — click Connect again', 'info');
+        setSyncStatus('offline', 'Sign in to OneDrive');
+        return;
+      } catch(_) {}
+    }
     setSyncStatus('error', 'Sign-in failed');
-    showToast('OneDrive sign-in failed', 'error');
+    // Surface the real Azure error message so misconfig is obvious
+    const msg = (e && (e.errorMessage || e.message)) || 'unknown error';
+    showToast('OneDrive: ' + msg.slice(0, 120), 'error');
   }
 }
 
@@ -1123,6 +1343,7 @@ async function launchApp() {
   }
 
   await initOneDrive();
+  renderHubspotChip();
   renderAll();
 }
 
@@ -1142,7 +1363,7 @@ function renderModalMonths() {
   grid.innerHTML = '';
   MONTHS.forEach((mn,mi) => {
     const k = getMonthKey(modalYear, mi);
-    const hasData = allData[k] && allData[k].weeks.some(w => w && w.some(r => r.hotValue || r.warmValue || r.forecastAED));
+    const hasData = allData[k] && allData[k].weeks.some(w => w && w.some(r => r.commitValue || r.bestCaseValue || r.totalPipeline));
     const sel = (modalYear === curYear && mi === curMonth);
     const btn = document.createElement('button');
     btn.className = 'modal-month-btn' + (sel ? ' selected' : '');
@@ -1237,31 +1458,39 @@ function renderAll() {
 function renderCommitPanel() {
   const md = getCurMonthData();
   const agg = {
-    'Dubai':     { aed:0, xs1:0, xp1:0, count:0 },
-    'Abu Dhabi': { aed:0, xs1:0, xp1:0, count:0 }
+    'Dubai':     { commit:0, bestCase:0, pipeline:0, xs1:0, xp1:0, count:0 },
+    'Abu Dhabi': { commit:0, bestCase:0, pipeline:0, xs1:0, xp1:0, count:0 }
   };
-  md.weeks.forEach(w => {
+  md.weeks.forEach((w, wi) => {
     if (!w) return;
     w.forEach(r => {
       if (!r.locked) return;
       const t = agg[r.team]; if (!t) return;
-      t.aed += parseFloat(r.forecastAED) || 0;
-      t.xs1 += parseFloat(r.forecastXS1) || 0;
-      t.xp1 += parseFloat(r.forecastXP1) || 0;
+      const weekKey = `${curYear}-${curMonth}-${wi}`;
+      const ef = isRowStale(r, weekKey) ? 0.5 : 1.0;
+      t.commit   += (parseFloat(r.commitValue)    || 0) * ef;
+      t.bestCase += (parseFloat(r.bestCaseValue)  || 0) * ef;
+      t.pipeline += parseFloat(r.totalPipeline)   || 0;
+      t.xs1      += parseFloat(r.forecastXS1)     || 0;
+      t.xp1      += parseFloat(r.forecastXP1)     || 0;
       t.count++;
     });
   });
   const total = {
-    aed: agg['Dubai'].aed + agg['Abu Dhabi'].aed,
-    xs1: agg['Dubai'].xs1 + agg['Abu Dhabi'].xs1,
-    xp1: agg['Dubai'].xp1 + agg['Abu Dhabi'].xp1,
-    count: agg['Dubai'].count + agg['Abu Dhabi'].count
+    commit:   agg['Dubai'].commit   + agg['Abu Dhabi'].commit,
+    bestCase: agg['Dubai'].bestCase + agg['Abu Dhabi'].bestCase,
+    pipeline: agg['Dubai'].pipeline + agg['Abu Dhabi'].pipeline,
+    xs1:      agg['Dubai'].xs1      + agg['Abu Dhabi'].xs1,
+    xp1:      agg['Dubai'].xp1      + agg['Abu Dhabi'].xp1,
+    count:    agg['Dubai'].count    + agg['Abu Dhabi'].count
   };
   const card = (cls, label, d, totalCount) => `
     <div class="commit-card ${cls}">
       <div class="commit-card-label">${label}</div>
       <div class="commit-card-rows">
-        <div><div class="commit-metric-label">AED</div><div class="commit-metric-value">${fmtNum(d.aed)}</div></div>
+        <div><div class="commit-metric-label">Commit</div><div class="commit-metric-value">AED ${fmtNum(d.commit)}</div></div>
+        <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">AED ${fmtNum(d.bestCase)}</div></div>
+        <div><div class="commit-metric-label">Pipeline</div><div class="commit-metric-value">AED ${fmtNum(d.pipeline)}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)}</div></div>
       </div>
@@ -1280,7 +1509,7 @@ function renderMonthDots() {
   row.innerHTML = '';
   const md = getCurMonthData();
   for (let w = 0; w < 5; w++) {
-    const hasData = md.weeks[w] && md.weeks[w].some(r => r.hotValue || r.warmValue || r.forecastAED || r.locked);
+    const hasData = md.weeks[w] && md.weeks[w].some(r => r.commitValue || r.bestCaseValue || r.totalPipeline || r.locked);
     const item = document.createElement('div');
     item.className = 'month-dot-item';
     item.innerHTML = `<div class="month-dot ${w===curWeek ? 'current' : (hasData?'has-data':'')}"></div><span>W${w+1}</span>`;
@@ -1294,7 +1523,7 @@ function renderWeekTabs() {
   const ranges = getWeekRanges(curYear, curMonth);
   const md = getCurMonthData();
   for (let w = 0; w < 5; w++) {
-    const hasData = md.weeks[w] && md.weeks[w].some(r => r.hotValue || r.warmValue || r.forecastAED);
+    const hasData = md.weeks[w] && md.weeks[w].some(r => r.commitValue || r.bestCaseValue || r.totalPipeline);
     const r = ranges[w];
     const tab = document.createElement('div');
     tab.className = 'week-tab' + (w===curWeek?' active':'');
@@ -1308,7 +1537,7 @@ function renderSummaryBar() {
   const container = document.getElementById('summaryWeeks');
   container.innerHTML = '';
   const md = getCurMonthData();
-  const totals = md.weeks.map(w => (!w||!w.length) ? 0 : w.reduce((s,r) => s+(parseFloat(r.forecastAED)||0), 0));
+  const totals = md.weeks.map(w => (!w||!w.length) ? 0 : w.reduce((s,r) => s+(parseFloat(r.totalPipeline)||0), 0));
   const max = Math.max(...totals, 1);
   totals.forEach((val, wi) => {
     const pct = Math.round((val/max)*72);
@@ -1364,18 +1593,19 @@ function renderTable() {
   const thead = document.getElementById('mainThead');
   thead.innerHTML = '';
   const cols = [
-    {label:'Sales Rep', cls:''},
-    {label:'Stage', cls:''},
-    {label:'HOT Deal — Description', cls:'col-hot'},
-    {label:'HOT Value (AED)', cls:'col-hot'},
-    {label:'Warm Deal — Description', cls:'col-warm'},
-    {label:'Warm Value (AED)', cls:'col-warm'},
-    {label:'Forecast (AED)', cls:'col-forecast'},
-    {label:'Forecast XS1', cls:'col-forecast'},
-    {label:'Forecast XP1', cls:'col-forecast'},
-    {label:'Confidence', cls:''},
-    {label:'Notes', cls:''},
-    {label:'Submit / Status', cls:''}
+    {label:'Sales Rep',              cls:''},
+    {label:'Stage',                  cls:''},
+    {label:'Commit — Deal Name',     cls:'col-hot'},
+    {label:'Commit (AED)',           cls:'col-hot'},
+    {label:'Next Action',            cls:'col-hot'},
+    {label:'Best Case — Deal Name',  cls:'col-warm'},
+    {label:'Best Case (AED)',        cls:'col-warm'},
+    {label:'Total Pipeline (AED)',   cls:'col-forecast'},
+    {label:'Blocked',                cls:'col-blocked'},
+    {label:'Forecast XS1',           cls:'col-forecast'},
+    {label:'Forecast XP1',           cls:'col-forecast'},
+    {label:'Notes',                  cls:''},
+    {label:'Submit / Status',        cls:''}
   ];
   const tr = document.createElement('tr');
   cols.forEach(c => { const th = document.createElement('th'); th.textContent = c.label; th.className = c.cls; tr.appendChild(th); });
@@ -1407,11 +1637,28 @@ function renderTable() {
 }
 
 function renderRow(row, ri, tbody) {
+  const weekKey = `${curYear}-${curMonth}-${curWeek}`;
+  const stale   = isRowStale(row, weekKey);
+
   const tr = document.createElement('tr');
   tr.dataset.ri = ri;
   if (row.locked) tr.className = 'locked-row';
+  if (stale)      tr.classList.add('stale-row');
 
   const editable = canEditRow(row);
+
+  // Stale health warning banner inside the row (shown as a colspan overlay row just above)
+  if (stale && !tr._staleBannerAdded) {
+    const bannerTr = document.createElement('tr');
+    bannerTr.className = 'stale-banner-row';
+    const bannerTd = document.createElement('td');
+    bannerTd.colSpan = 13;
+    const threshold = STAGE_HEALTH_DAYS[row.stage] || '?';
+    bannerTd.innerHTML = `⚠️ <strong>${row.rep}</strong> — deal in <strong>${row.stage}</strong> stage has exceeded the ${threshold}-day health threshold. Forecast weight is halved. Update the deal or advance the stage.`;
+    bannerTr.appendChild(bannerTd);
+    tbody.appendChild(bannerTr);
+    tr._staleBannerAdded = true;
+  }
 
   // Rep name (read-only)
   const repTd = document.createElement('td');
@@ -1425,42 +1672,41 @@ function renderRow(row, ri, tbody) {
   const stageTd = document.createElement('td');
   if (editable) {
     const sel = document.createElement('select'); sel.className = 'cell-input';
-    STAGES.forEach(s => { const opt = document.createElement('option'); opt.value=s; opt.textContent=s; if(s===row.stage) opt.selected=true; sel.appendChild(opt); });
-    sel.addEventListener('change', e => updateField(ri, 'stage', e.target.value));
+    STAGES.forEach(s => {
+      const opt = document.createElement('option'); opt.value=s; opt.textContent=s;
+      if(s===row.stage) opt.selected=true; sel.appendChild(opt);
+    });
+    sel.addEventListener('change', e => { updateField(ri, 'stage', e.target.value); renderTable(); renderKPIs(); });
     stageTd.appendChild(sel);
   } else {
-    const sp = document.createElement('span'); sp.className = 'stage-badge'; sp.textContent = row.stage || '-';
+    const stageCls = row.stage === 'Discovery' ? 'stage-discovery'
+                   : row.stage === 'Proposal'  ? 'stage-proposal'
+                   : row.stage === 'Negotiation' ? 'stage-negotiation' : '';
+    const sp = document.createElement('span');
+    sp.className = `stage-badge ${stageCls}`;
+    sp.textContent = row.stage || '-';
     stageTd.appendChild(sp);
   }
   tr.appendChild(stageTd);
 
-  // HOT deal text + value
-  tr.appendChild(makeTextCell(ri, 'hotText', 'col-hot-bg deal-text-input', row.hotText, editable, 'e.g. ADNOC HQ - 5 units'));
-  tr.appendChild(makeNumCell (ri, 'hotValue',  'col-hot-bg',  row.hotValue,  editable));
+  // Commit: deal name + AED value + next action
+  tr.appendChild(makeTextCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'Deal name…'));
+  tr.appendChild(makeNumCell (ri, 'commitValue',  'col-hot-bg',                 row.commitValue,  editable));
+  tr.appendChild(makeTextCell(ri, 'commitAction', 'col-hot-bg action-text-input',row.commitAction, editable, 'Next action…'));
 
-  // Warm deal text + value
-  tr.appendChild(makeTextCell(ri, 'warmText', 'col-warm-bg deal-text-input', row.warmText, editable, 'e.g. Etihad Sports - exploring'));
-  tr.appendChild(makeNumCell (ri, 'warmValue', 'col-warm-bg', row.warmValue, editable));
+  // Best Case: deal name + AED value
+  tr.appendChild(makeTextCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'Deal name…'));
+  tr.appendChild(makeNumCell (ri, 'bestCaseValue', 'col-warm-bg',                 row.bestCaseValue, editable));
 
-  // Forecast
-  tr.appendChild(makeNumCell(ri, 'forecastAED', 'col-forecast-bg', row.forecastAED, editable));
+  // Total Pipeline
+  tr.appendChild(makeNumCell(ri, 'totalPipeline', 'col-forecast-bg', row.totalPipeline, editable));
+
+  // Blocked (text only)
+  tr.appendChild(makeTextCell(ri, 'blocked', 'col-blocked-bg blocked-text-input', row.blocked, editable, 'Any blockers…'));
+
+  // Forecast units
   tr.appendChild(makeNumCell(ri, 'forecastXS1', 'col-forecast-bg', row.forecastXS1, editable));
   tr.appendChild(makeNumCell(ri, 'forecastXP1', 'col-forecast-bg', row.forecastXP1, editable));
-
-  // Confidence
-  const confTd = document.createElement('td');
-  if (editable) {
-    const sel = document.createElement('select'); sel.className = 'cell-input';
-    CONF_LEVELS.forEach(c => { const opt = document.createElement('option'); opt.value=c; opt.textContent=c; if(c===row.confidence) opt.selected=true; sel.appendChild(opt); });
-    sel.addEventListener('change', e => { updateField(ri, 'confidence', e.target.value); renderKPIs(); });
-    confTd.appendChild(sel);
-  } else {
-    const lvl = row.confidence || '90%';
-    const num = parseInt(lvl);
-    const cls = num >= 70 ? 'conf-high' : num >= 50 ? 'conf-mid' : 'conf-low';
-    confTd.innerHTML = `<span class="conf-badge ${cls}">${lvl}</span>`;
-  }
-  tr.appendChild(confTd);
 
   // Notes
   const notesTd = document.createElement('td'); notesTd.className = 'notes-cell';
@@ -1556,15 +1802,26 @@ function openNotesEditor(td, ri, currentVal) {
 }
 
 function renderTotalsRow(rows, tbody, colCount) {
-  const totHot     = rows.reduce((s,r)=>s+(parseFloat(r.hotValue)||0),0);
-  const totWarm    = rows.reduce((s,r)=>s+(parseFloat(r.warmValue)||0),0);
-  const totForec   = rows.reduce((s,r)=>s+(parseFloat(r.forecastAED)||0),0);
-  const totXS1     = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
-  const totXP1     = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
+  const weekKey   = `${curYear}-${curMonth}-${curWeek}`;
+  // Apply stale halving: if a row is stale, count commit+bestCase at 50%
+  function effectiveCommit(r) {
+    const v = parseFloat(r.commitValue) || 0;
+    return isRowStale(r, weekKey) ? v * 0.5 : v;
+  }
+  function effectiveBestCase(r) {
+    const v = parseFloat(r.bestCaseValue) || 0;
+    return isRowStale(r, weekKey) ? v * 0.5 : v;
+  }
+
+  const totCommit   = rows.reduce((s,r)=>s+effectiveCommit(r),0);
+  const totBestCase = rows.reduce((s,r)=>s+effectiveBestCase(r),0);
+  const totPipeline = rows.reduce((s,r)=>s+(parseFloat(r.totalPipeline)||0),0);
+  const totXS1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
+  const totXP1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
 
   const tr = document.createElement('tr'); tr.className = 'totals-row';
-  // cols order: Rep, Stage, HOTtext, HOTval, WarmText, WarmVal, ForecastAED, XS1, XP1, Conf, Notes, Submit
-  const cells = ['TOTALS','','', fmtNum(totHot), '', fmtNum(totWarm), fmtNum(totForec), fmtNum(totXS1), fmtNum(totXP1), '', '', ''];
+  // cols: Rep, Stage, CommitText, CommitVal, NextAction, BestCaseText, BestCaseVal, TotalPipeline, Blocked, XS1, XP1, Notes, Submit
+  const cells = ['TOTALS','','', fmtNum(totCommit), '', '', fmtNum(totBestCase), fmtNum(totPipeline), '', fmtNum(totXS1), fmtNum(totXP1), '', ''];
   cells.forEach(c => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
   tbody.appendChild(tr);
 }
@@ -1573,29 +1830,31 @@ function renderTotalsRow(rows, tbody, colCount) {
    KPIs
 ════════════════════════════════════════ */
 function renderKPIs() {
-  const rows = getCurWeekRows();
-  const totHot   = rows.reduce((s,r)=>s+(parseFloat(r.hotValue)||0),0);
-  const totWarm  = rows.reduce((s,r)=>s+(parseFloat(r.warmValue)||0),0);
-  const totForec = rows.reduce((s,r)=>s+(parseFloat(r.forecastAED)||0),0);
-  const totXS1   = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
-  const totXP1   = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
+  const rows    = getCurWeekRows();
+  const weekKey = `${curYear}-${curMonth}-${curWeek}`;
 
-  const hotCount  = rows.filter(r => parseFloat(r.hotValue)  > 0 || (r.hotText  && r.hotText.trim())).length;
-  const warmCount = rows.filter(r => parseFloat(r.warmValue) > 0 || (r.warmText && r.warmText.trim())).length;
-  const submitted = rows.filter(r => r.locked).length;
+  // Effective values apply 50% weight reduction to stale rows
+  const eff = r => isRowStale(r, weekKey) ? 0.5 : 1.0;
 
-  const activeWithConf = rows.filter(r => r.rep);
-  const avgConf = activeWithConf.length
-    ? Math.round(activeWithConf.reduce((s,r)=>s+(parseInt(r.confidence)||50),0)/activeWithConf.length) : 0;
+  const totCommit   = rows.reduce((s,r)=>s+(parseFloat(r.commitValue)||0)*eff(r),0);
+  const totBestCase = rows.reduce((s,r)=>s+(parseFloat(r.bestCaseValue)||0)*eff(r),0);
+  const totPipeline = rows.reduce((s,r)=>s+(parseFloat(r.totalPipeline)||0),0);
+  const totXS1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
+  const totXP1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
 
-  document.getElementById('kpiHotAED').textContent     = 'AED ' + fmtNum(totHot);
-  document.getElementById('kpiHotCount').textContent   = hotCount + ' deals this week';
-  document.getElementById('kpiWarmAED').textContent    = 'AED ' + fmtNum(totWarm);
-  document.getElementById('kpiWarmCount').textContent  = warmCount + ' deals this week';
-  document.getElementById('kpiForecastAED').textContent= 'AED ' + fmtNum(totForec);
+  const commitCount   = rows.filter(r => parseFloat(r.commitValue) > 0 || (r.commitText   && r.commitText.trim())).length;
+  const bestCaseCount = rows.filter(r => parseFloat(r.bestCaseValue)> 0 || (r.bestCaseText && r.bestCaseText.trim())).length;
+  const staleCount    = rows.filter(r => isRowStale(r, weekKey)).length;
+  const submitted     = rows.filter(r => r.locked).length;
+
+  document.getElementById('kpiHotAED').textContent     = 'AED ' + fmtNum(totCommit);
+  document.getElementById('kpiHotCount').textContent   = commitCount + ' commit deals';
+  document.getElementById('kpiWarmAED').textContent    = 'AED ' + fmtNum(totBestCase);
+  document.getElementById('kpiWarmCount').textContent  = bestCaseCount + ' best-case deals';
+  document.getElementById('kpiForecastAED').textContent= 'AED ' + fmtNum(totPipeline);
   document.getElementById('kpiXS1').textContent        = fmtNum(totXS1);
   document.getElementById('kpiXP1').textContent        = fmtNum(totXP1);
-  document.getElementById('kpiConf').textContent       = avgConf + '%';
+  document.getElementById('kpiConf').textContent       = staleCount > 0 ? staleCount + ' stale' : '0 stale';
   document.getElementById('kpiSubmitted').textContent  = `${submitted} / ${ALL_REPS.length}`;
 }
 
@@ -1706,24 +1965,27 @@ function resetWeek() {
    EXPORT CSV
 ════════════════════════════════════════ */
 function exportCSV() {
-  const rows = getCurWeekRows();
-  const header = ['Team','Sales Rep','Stage','HOT Description','HOT Value (AED)',
-                  'Warm Description','Warm Value (AED)','Forecast (AED)',
-                  'Forecast XS1','Forecast XP1','Confidence','Notes',
-                  'Submitted','Submitted By','Submitted At'];
-  const lines  = [header.join(',')];
-  const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
+  const rows    = getCurWeekRows();
+  const weekKey = `${curYear}-${curMonth}-${curWeek}`;
+  const header  = ['Team','Sales Rep','Stage','Stale?',
+                   'Commit Deal','Commit Value (AED)','Next Action',
+                   'Best Case Deal','Best Case Value (AED)',
+                   'Total Pipeline (AED)','Blocked',
+                   'Forecast XS1','Forecast XP1','Notes',
+                   'Submitted','Submitted By','Submitted At'];
+  const lines = [header.join(',')];
+  const esc   = v => `"${String(v??'').replace(/"/g,'""')}"`;
   rows.forEach(r => {
     lines.push([
       esc(r.team), esc(r.rep), esc(r.stage),
-      esc(r.hotText), r.hotValue||0,
-      esc(r.warmText), r.warmValue||0,
-      r.forecastAED||0, r.forecastXS1||0, r.forecastXP1||0,
-      esc(r.confidence),
+      isRowStale(r, weekKey) ? 'YES' : 'NO',
+      esc(r.commitText),   r.commitValue||0,   esc(r.commitAction),
+      esc(r.bestCaseText), r.bestCaseValue||0,
+      r.totalPipeline||0,  esc(r.blocked),
+      r.forecastXS1||0, r.forecastXP1||0,
       esc((r.notes||'').replace(/\n/g,' | ')),
       r.locked ? 'YES' : 'NO',
-      esc(r.submittedBy),
-      esc(r.submittedAt)
+      esc(r.submittedBy), esc(r.submittedAt)
     ].join(','));
   });
   const blob = new Blob([lines.join('\n')],{type:'text/csv'});
@@ -1733,10 +1995,385 @@ function exportCSV() {
   a.click();
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   HUBSPOT CRM INTEGRATION  ── OAuth 2.0 (per-user)
+   ────────────────────────────────────────────────────────────────────
+   FLOW:
+     1. User clicks "Connect HubSpot" chip in the topbar.
+     2. We open the HubSpot OAuth authorize URL in a popup.
+     3. After the user grants access, HubSpot redirects to our
+        configured redirect URI (a small handler page on this same
+        domain that posts the code+state back via window.opener).
+     4. The popup posts { code } -> we exchange via a token endpoint.
+        Because HubSpot's token endpoint requires the client_secret
+        which can't live in this static page, you MUST host a tiny
+        token-exchange proxy (e.g. a Cloudflare Worker or Azure
+        Function). Set HUBSPOT_CONFIG.tokenProxy to its URL.
+     5. We store {access_token, refresh_token, expires_at} in
+        localStorage under HUBSPOT_STORE_KEY.
+     6. To pull deals for the current rep, we hit the v3 CRM API:
+          POST /crm/v3/objects/deals/search
+          body: filterGroups -> hubspot_owner_id = <rep owner id>
+        Owner ID is resolved once via /crm/v3/owners?email=...
+        and cached in localStorage.
+════════════════════════════════════════════════════════════════════ */
+const HUBSPOT_CONFIG = {
+  clientId    : '',                                              // <- paste HubSpot OAuth client id
+  redirectUri : window.location.origin + window.location.pathname + '?hs_oauth=1',
+  scopes      : 'oauth crm.objects.deals.read crm.objects.owners.read crm.schemas.deals.read',
+  tokenProxy  : '',                                              // <- your /hubspot/token proxy URL
+  refreshProxy: '',                                              // <- your /hubspot/refresh proxy URL (often same path)
+  // Map of OXEFIT rep name -> HubSpot user email (used to resolve owner_id)
+  repEmails   : {
+    'Ahmed'  : '',
+    'Fatima' : '',  'Marios'  : '',  'Hasan'  : '',  'Katy'    : '',  'Milene' : '',
+    'Wafiq'  : '',  'Jawdat'  : '',  'Hussein': '',  'Connor'  : ''
+  }
+};
+const HUBSPOT_STORE_KEY = 'oxefit_hubspot_tokens_v1';
+const HUBSPOT_OWNERS_KEY = 'oxefit_hubspot_owners_v1';
+
+let hubspotState = {
+  accessToken : null,
+  refreshToken: null,
+  expiresAt   : 0,
+  fetchedDeals: [],     // last-fetched deal list
+  selected    : new Set()
+};
+
+function hsLoadTokens() {
+  try {
+    const raw = localStorage.getItem(HUBSPOT_STORE_KEY);
+    if (!raw) return;
+    const t = JSON.parse(raw);
+    hubspotState.accessToken  = t.access_token  || null;
+    hubspotState.refreshToken = t.refresh_token || null;
+    hubspotState.expiresAt    = t.expires_at    || 0;
+  } catch(_) {}
+}
+function hsSaveTokens(t) {
+  const expiresAt = Date.now() + ((t.expires_in || 1800) * 1000) - 60000; // 60s safety
+  const blob = {
+    access_token : t.access_token,
+    refresh_token: t.refresh_token || hubspotState.refreshToken,
+    expires_at   : expiresAt
+  };
+  localStorage.setItem(HUBSPOT_STORE_KEY, JSON.stringify(blob));
+  hubspotState.accessToken  = blob.access_token;
+  hubspotState.refreshToken = blob.refresh_token;
+  hubspotState.expiresAt    = blob.expires_at;
+}
+function hsClearTokens() {
+  localStorage.removeItem(HUBSPOT_STORE_KEY);
+  hubspotState.accessToken = null;
+  hubspotState.refreshToken = null;
+  hubspotState.expiresAt = 0;
+}
+
+function hsIsConnected() {
+  return !!hubspotState.accessToken && Date.now() < hubspotState.expiresAt + 7*24*3600*1000;
+}
+
+function renderHubspotChip() {
+  const chip = document.getElementById('hubspotChip');
+  const txt  = document.getElementById('hubspotText');
+  if (!chip || !txt) return;
+  if (hsIsConnected()) {
+    chip.classList.add('connected');
+    txt.textContent = 'HubSpot Connected';
+  } else {
+    chip.classList.remove('connected');
+    txt.textContent = 'Connect HubSpot';
+  }
+}
+
+async function hubspotConnectOrSync() {
+  if (!HUBSPOT_CONFIG.clientId) {
+    showToast('HubSpot not configured — set HUBSPOT_CONFIG.clientId', 'error');
+    return;
+  }
+  if (hsIsConnected()) {
+    openHubspotModal();
+  } else {
+    hubspotStartOAuth();
+  }
+}
+
+function hubspotStartOAuth() {
+  const state = Math.random().toString(36).slice(2);
+  sessionStorage.setItem('hs_oauth_state', state);
+  const url = 'https://app.hubspot.com/oauth/authorize'
+    + '?client_id='    + encodeURIComponent(HUBSPOT_CONFIG.clientId)
+    + '&redirect_uri=' + encodeURIComponent(HUBSPOT_CONFIG.redirectUri)
+    + '&scope='        + encodeURIComponent(HUBSPOT_CONFIG.scopes)
+    + '&state='        + state;
+  const popup = window.open(url, 'hubspot_oauth', 'width=560,height=720');
+  if (!popup) { showToast('Popup blocked — allow popups for HubSpot', 'error'); return; }
+  // Listen for the code from the popup
+  const handler = async (ev) => {
+    if (!ev.data || ev.data.source !== 'hubspot_oauth') return;
+    window.removeEventListener('message', handler);
+    if (ev.data.state !== sessionStorage.getItem('hs_oauth_state')) {
+      showToast('OAuth state mismatch', 'error'); return;
+    }
+    if (ev.data.error) { showToast('HubSpot: ' + ev.data.error, 'error'); return; }
+    await hubspotExchangeCode(ev.data.code);
+  };
+  window.addEventListener('message', handler);
+}
+
+async function hubspotExchangeCode(code) {
+  if (!HUBSPOT_CONFIG.tokenProxy) {
+    showToast('Set HUBSPOT_CONFIG.tokenProxy to your token-exchange URL', 'error');
+    return;
+  }
+  try {
+    const r = await fetch(HUBSPOT_CONFIG.tokenProxy, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ code, redirect_uri: HUBSPOT_CONFIG.redirectUri })
+    });
+    if (!r.ok) throw new Error('Token exchange failed: ' + r.status);
+    const tok = await r.json();
+    hsSaveTokens(tok);
+    renderHubspotChip();
+    showToast('HubSpot connected', 'success');
+    openHubspotModal();
+  } catch(e) {
+    showToast(e.message || 'HubSpot connect failed', 'error');
+  }
+}
+
+async function hubspotRefreshIfNeeded() {
+  if (Date.now() < hubspotState.expiresAt) return true;
+  if (!hubspotState.refreshToken || !HUBSPOT_CONFIG.refreshProxy) return false;
+  try {
+    const r = await fetch(HUBSPOT_CONFIG.refreshProxy, {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ refresh_token: hubspotState.refreshToken })
+    });
+    if (!r.ok) return false;
+    const tok = await r.json();
+    hsSaveTokens(tok);
+    return true;
+  } catch(_) { return false; }
+}
+
+async function hubspotApi(path, opts = {}) {
+  if (!await hubspotRefreshIfNeeded()) throw new Error('HubSpot session expired — reconnect');
+  const url = path.startsWith('http') ? path : 'https://api.hubapi.com' + path;
+  const r = await fetch(url, {
+    ...opts,
+    headers: {
+      'Content-Type' : 'application/json',
+      ...(opts.headers || {}),
+      'Authorization': 'Bearer ' + hubspotState.accessToken
+    }
+  });
+  if (!r.ok) throw new Error('HubSpot ' + r.status + ': ' + await r.text());
+  return r.json();
+}
+
+async function hubspotResolveOwnerId(email) {
+  if (!email) return null;
+  const cache = (() => {
+    try { return JSON.parse(localStorage.getItem(HUBSPOT_OWNERS_KEY) || '{}'); }
+    catch(_) { return {}; }
+  })();
+  if (cache[email]) return cache[email];
+  const data = await hubspotApi('/crm/v3/owners?email=' + encodeURIComponent(email));
+  const id = data.results && data.results[0] && data.results[0].id;
+  if (id) {
+    cache[email] = id;
+    localStorage.setItem(HUBSPOT_OWNERS_KEY, JSON.stringify(cache));
+  }
+  return id || null;
+}
+
+// HubSpot stage label heuristic -> our 3 stages
+function hsMapStage(hsStageLabel) {
+  const s = (hsStageLabel || '').toLowerCase();
+  if (s.includes('closed'))     return 'Negotiation';
+  if (s.includes('contract'))   return 'Negotiation';
+  if (s.includes('negoti'))     return 'Negotiation';
+  if (s.includes('decision'))   return 'Negotiation';
+  if (s.includes('proposal'))   return 'Proposal';
+  if (s.includes('quote'))      return 'Proposal';
+  if (s.includes('present'))    return 'Proposal';
+  return 'Discovery';
+}
+
+async function hubspotFetchDealsForRep(repName) {
+  const email = HUBSPOT_CONFIG.repEmails[repName];
+  if (!email) throw new Error('No HubSpot email mapped for ' + repName);
+  const ownerId = await hubspotResolveOwnerId(email);
+  if (!ownerId) throw new Error('Owner not found in HubSpot for ' + email);
+
+  const body = {
+    filterGroups: [{ filters: [
+      { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId },
+      { propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }
+    ]}],
+    properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability'],
+    sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
+    limit: 100
+  };
+  const data = await hubspotApi('/crm/v3/objects/deals/search', {
+    method: 'POST', body: JSON.stringify(body)
+  });
+  return (data.results || []).map(d => ({
+    id      : d.id,
+    name    : d.properties.dealname || '(untitled)',
+    amount  : Number(d.properties.amount || 0),
+    stage   : hsMapStage(d.properties.dealstage),
+    rawStage: d.properties.dealstage || '',
+    close   : d.properties.closedate || '',
+    prob    : Number(d.properties.hs_deal_stage_probability || 0)
+  }));
+}
+
+let hsCurrentRep = null;
+
+async function openHubspotModal() {
+  // Determine which rep to import for. If current user is a rep, use them.
+  // Admin gets a picker. Viewer is blocked.
+  if (currentRole === 'viewer') { showToast('View-only mode', 'error'); return; }
+  hsCurrentRep = (currentRole === 'rep') ? currentUser : (ALL_REPS[0]);
+  document.getElementById('hsModalOwner').textContent = hsCurrentRep;
+  document.getElementById('hsModalBody').innerHTML = '<div class="hs-empty">Loading deals…</div>';
+  document.getElementById('hsModal').classList.add('show');
+  hubspotState.selected.clear();
+  await hubspotRefresh();
+}
+
+function closeHubspotModal() {
+  document.getElementById('hsModal').classList.remove('show');
+}
+
+async function hubspotRefresh() {
+  try {
+    const deals = await hubspotFetchDealsForRep(hsCurrentRep);
+    hubspotState.fetchedDeals = deals;
+    renderHubspotDealList();
+  } catch(e) {
+    document.getElementById('hsModalBody').innerHTML =
+      `<div class="hs-empty">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderHubspotDealList() {
+  const body = document.getElementById('hsModalBody');
+  const deals = hubspotState.fetchedDeals;
+  if (!deals.length) {
+    body.innerHTML = '<div class="hs-empty">No open deals found for this rep.</div>';
+    return;
+  }
+  // Header + admin rep-picker
+  let head = '';
+  if (currentRole === 'admin') {
+    head = '<div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;">'
+         + '<span style="font-size:11px;color:var(--text-muted);">Rep:</span>'
+         + '<select id="hsRepPicker" class="stage-select" style="min-width:140px;">'
+         + ALL_REPS.map(r => `<option value="${r}" ${r===hsCurrentRep?'selected':''}>${r}</option>`).join('')
+         + '</select></div>';
+  }
+  const rows = deals.map(d => `
+    <div class="hs-deal-row">
+      <input type="checkbox" data-id="${d.id}" ${hubspotState.selected.has(d.id)?'checked':''}>
+      <div>
+        <div class="hs-deal-name">${escapeHtml(d.name)}</div>
+        <div class="hs-deal-meta">${escapeHtml(d.rawStage)} • close ${escapeHtml(d.close || '—')}</div>
+      </div>
+      <div><span class="stage-badge stage-${d.stage.toLowerCase()}">${d.stage}</span></div>
+      <div style="text-align:right;font-weight:600;color:var(--text);">AED ${d.amount.toLocaleString()}</div>
+      <div style="text-align:right;color:var(--text-muted);font-size:11px;">prob ${d.prob}%</div>
+    </div>`).join('');
+  body.innerHTML = head + rows;
+  // Wire checkboxes
+  body.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) hubspotState.selected.add(cb.dataset.id);
+      else            hubspotState.selected.delete(cb.dataset.id);
+    });
+  });
+  // Wire rep-picker
+  const picker = document.getElementById('hsRepPicker');
+  if (picker) picker.addEventListener('change', async () => {
+    hsCurrentRep = picker.value;
+    document.getElementById('hsModalOwner').textContent = hsCurrentRep;
+    hubspotState.selected.clear();
+    await hubspotRefresh();
+  });
+}
+
+function hubspotApplySelected() {
+  if (!hubspotState.selected.size) { showToast('Nothing selected', 'error'); return; }
+  const deals = hubspotState.fetchedDeals.filter(d => hubspotState.selected.has(d.id));
+  // Find the current week's row for hsCurrentRep
+  const rows = getCurWeekRows();
+  let ri = rows.findIndex(r => r.rep === hsCurrentRep);
+  if (ri < 0) { showToast('No row for ' + hsCurrentRep + ' in this week', 'error'); return; }
+  const row = rows[ri];
+  if (row.locked && currentRole !== 'admin') {
+    showToast('Row is locked — admin override required', 'error'); return;
+  }
+  // Sort by stage priority: Negotiation > Proposal > Discovery; biggest first
+  const stageRank = { Negotiation: 3, Proposal: 2, Discovery: 1 };
+  deals.sort((a,b) => (stageRank[b.stage]-stageRank[a.stage]) || (b.amount-a.amount));
+  const commit   = deals[0];
+  const bestcase = deals[1];
+  if (commit) {
+    row.commitText  = commit.name;
+    row.commitValue = commit.amount;
+    row.stage       = commit.stage;
+    row.hubspotId   = commit.id;
+  }
+  if (bestcase) {
+    row.bestCaseText  = bestcase.name;
+    row.bestCaseValue = bestcase.amount;
+  }
+  row.totalPipeline = deals.reduce((s,d) => s + (d.amount||0), 0);
+  saveAll();
+  renderAll();
+  closeHubspotModal();
+  showToast(`Imported ${deals.length} deal${deals.length>1?'s':''} for ${hsCurrentRep}`, 'success');
+}
+
+function hubspotDisconnect() {
+  hsClearTokens();
+  renderHubspotChip();
+  closeHubspotModal();
+  showToast('HubSpot disconnected', 'success');
+}
+
+// Handle the OAuth popup landing on this same page (?hs_oauth=1)
+(function handleHubspotOAuthLanding() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('hs_oauth') !== '1') return;
+  const code  = params.get('code');
+  const state = params.get('state');
+  const err   = params.get('error') || params.get('error_description');
+  if (window.opener) {
+    window.opener.postMessage({
+      source: 'hubspot_oauth', code, state, error: err
+    }, window.location.origin);
+    window.close();
+  }
+})();
+
+// Small HTML-escape helper (in case the file doesn't already have one nearby)
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+
 /* ════════════════════════════════════════
    INIT
 ════════════════════════════════════════ */
 loadLocal();
+hsLoadTokens();
 
 // Restore session
 const savedRole = sessionStorage.getItem('oxefit_role');
