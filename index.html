@@ -1158,7 +1158,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest8.1 / gdrive-discovery-race-fix / 2026-05-29
+// BUILD: latest8.1 / gdrive-discovery-race-fix + verbose-error-extraction / 2026-05-29
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -3222,16 +3222,60 @@ async function gdListFolder(folderId, pushStack) {
       </div>
     `;
   } catch (err) {
-    console.error('Drive list error', err);
-    const msg = (err.result && err.result.error && err.result.error.message) || err.message || 'unknown';
-    if (/401|403|invalid/i.test(msg)) {
-      // Token expired — re-prompt
+    console.error('Drive list error (full object):', err);
+    console.error('Drive list error (JSON):', JSON.stringify(err, Object.getOwnPropertyNames(err || {})));
+
+    // Try every known shape gapi/GIS uses for error reporting
+    let msg = '';
+    let status = err && (err.status || (err.result && err.result.error && err.result.error.code));
+    if (err) {
+      if (err.result && err.result.error && err.result.error.message) {
+        msg = err.result.error.message;
+      } else if (err.body) {
+        // gapi sometimes returns the raw JSON body as a string
+        try {
+          const parsed = JSON.parse(err.body);
+          msg = (parsed.error && (parsed.error.message || parsed.error.status)) || err.body;
+        } catch(e) { msg = err.body; }
+      } else if (err.message) {
+        msg = err.message;
+      } else if (err.details) {
+        msg = err.details;
+      } else if (err.error) {
+        msg = typeof err.error === 'string' ? err.error : (err.error.message || JSON.stringify(err.error));
+      } else if (typeof err === 'string') {
+        msg = err;
+      } else {
+        msg = JSON.stringify(err) || 'unknown error shape';
+      }
+    }
+    if (status) msg = '[HTTP ' + status + '] ' + msg;
+
+    if (/401|invalid_token|expired/i.test(msg)) {
       gdAccessToken = null;
       sessionStorage.removeItem(GD_TOKEN_KEY);
       filesDiv.innerHTML = '<div class="gdrive-empty">Session expired — please sign in again.</div>';
       gdSignIn();
+    } else if (/403|permission|denied|disabled/i.test(msg)) {
+      filesDiv.innerHTML = `
+        <div class="gdrive-empty" style="text-align:left;">
+          <strong>Drive list failed (403):</strong> ${escapeHtml(msg)}
+          <br><br>
+          <strong>Likely fixes:</strong>
+          <ul style="margin:8px 0 0 18px;">
+            <li>Enable <em>Google Drive API</em> in Google Cloud Console → APIs & Services → Library</li>
+            <li>Add <code>https://ahmedcorev.github.io/*</code> to your API key's HTTP referrer restrictions</li>
+            <li>Make sure folder <code>${escapeHtml(GDRIVE_CONFIG.folderId || 'root')}</code> is shared with your Google account</li>
+          </ul>
+        </div>`;
+    } else if (/404|not.?found/i.test(msg)) {
+      filesDiv.innerHTML = `
+        <div class="gdrive-empty">
+          <strong>Folder not found:</strong> ${escapeHtml(GDRIVE_CONFIG.folderId)}<br>
+          Check that the folder ID is correct and that you have access to it.
+        </div>`;
     } else {
-      filesDiv.innerHTML = '<div class="gdrive-empty">Drive list failed: ' + escapeHtml(msg) + '</div>';
+      filesDiv.innerHTML = '<div class="gdrive-empty">Drive list failed: ' + escapeHtml(msg) + '<br><small style="opacity:.7">Open browser console (F12) for full error object.</small></div>';
     }
   }
 }
