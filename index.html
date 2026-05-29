@@ -1566,7 +1566,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest8.6 / hubspot-private-app-token + drive-list-fetch-fix / 2026-05-30
+// BUILD: latest8.7 / hubspot-cors-proxy + worker-template-modal / 2026-05-29
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -3017,6 +3017,13 @@ function exportCSV() {
      crm.schemas.deals.read
    ────────────────────────────────────────────────────────────── */
 const HUBSPOT_CONFIG = {
+  // CORS proxy — HubSpot's api.hubapi.com does not send CORS headers, so
+  // the browser refuses direct fetches. Point this at your Cloudflare
+  // Worker (or any pass-through that forwards Authorization to HubSpot
+  // and adds Access-Control-Allow-Origin: *). The Worker template is
+  // documented in /docs/hubspot-cors-worker.md alongside this file.
+  // Leave blank to fall back to direct (will fail with "Failed to fetch").
+  proxyBase   : 'https://oxefit-hubspot.YOUR-SUBDOMAIN.workers.dev',
   // Map of OXEFIT rep name -> HubSpot user email (used to resolve owner_id)
   repEmails   : {
     'Ahmed'  : '',
@@ -3026,6 +3033,27 @@ const HUBSPOT_CONFIG = {
 };
 const HUBSPOT_TOKEN_KEY  = 'oxefit_hubspot_pat_v1';
 const HUBSPOT_OWNERS_KEY = 'oxefit_hubspot_owners_v1';
+const HUBSPOT_PROXY_KEY  = 'oxefit_hubspot_proxy_v1';
+
+function hsGetProxyBase() {
+  try {
+    const v = (localStorage.getItem(HUBSPOT_PROXY_KEY) || '').trim();
+    if (v) return v.replace(/\/+$/, '');
+  } catch(_) {}
+  const fallback = (HUBSPOT_CONFIG.proxyBase || '').trim().replace(/\/+$/, '');
+  return fallback && !/YOUR-SUBDOMAIN/i.test(fallback) ? fallback : '';
+}
+function hsSaveProxyBase(v) {
+  const clean = String(v || '').trim().replace(/\/+$/, '');
+  if (clean) localStorage.setItem(HUBSPOT_PROXY_KEY, clean);
+  else       localStorage.removeItem(HUBSPOT_PROXY_KEY);
+}
+function hsBuildUrl(path) {
+  // path is "/crm/v3/..." -> proxyBase + path  (Worker rewrites to api.hubapi.com)
+  const base = hsGetProxyBase();
+  if (!base) return null;
+  return base + path;
+}
 
 let hubspotState = {
   accessToken : null,
@@ -3104,7 +3132,7 @@ function openHubspotTokenModal() {
           </ol>
           <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;">Access Token</label>
           <input type="password" id="hsTokenInput" class="hs-token-input"
-                 placeholder="pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                 placeholder="pat-eu1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                  value="${escapeHtml(existing)}" autocomplete="off" spellcheck="false">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
             <label style="font-size:11px;color:var(--text-muted);cursor:pointer;">
@@ -3112,6 +3140,19 @@ function openHubspotTokenModal() {
             </label>
             <a href="https://app.hubspot.com/private-apps/" target="_blank" rel="noopener"
                style="font-size:11px;color:var(--accent);">Open HubSpot Private Apps ↗</a>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);">
+            <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:6px;">
+              <span>CORS Proxy URL <span style="color:#ef4444;">*</span></span>
+              <a href="#" onclick="hsShowProxyHelp(event)" style="font-size:11px;font-weight:500;color:var(--accent);">Why do I need this?</a>
+            </label>
+            <input type="text" id="hsProxyInput" class="hs-token-input"
+                   placeholder="https://oxefit-hubspot.your-subdomain.workers.dev"
+                   value="${escapeHtml(hsGetProxyBase())}" autocomplete="off" spellcheck="false">
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">
+              HubSpot's API blocks browser requests (CORS). A tiny Cloudflare Worker forwards them. 5-min setup, free.
+              <a href="#" onclick="hsShowProxyHelp(event)" style="color:var(--accent);">Show me the Worker code →</a>
+            </div>
           </div>
           <div id="hsTokenErr" style="display:none;color:#dc2626;font-size:12px;margin-top:8px;"></div>
         </div>
@@ -3132,6 +3173,85 @@ function closeHubspotTokenModal() {
   if (o) o.remove();
 }
 
+function hsShowProxyHelp(ev) {
+  if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+  const workerCode = `// Cloudflare Worker — HubSpot CORS pass-through
+// Deploy: dash.cloudflare.com → Workers & Pages → Create → Hello World
+// Paste this in, click Deploy. Copy the *.workers.dev URL.
+
+export default {
+  async fetch(request) {
+    const cors = {
+      'Access-Control-Allow-Origin' : '*',
+      'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Authorization,Content-Type',
+      'Access-Control-Max-Age'      : '86400'
+    };
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: cors });
+    }
+    const url = new URL(request.url);
+    const target = 'https://api.hubapi.com' + url.pathname + url.search;
+    const upstream = await fetch(target, {
+      method : request.method,
+      headers: {
+        'Authorization': request.headers.get('Authorization') || '',
+        'Content-Type' : request.headers.get('Content-Type')  || 'application/json'
+      },
+      body: ['GET','HEAD'].includes(request.method) ? undefined : await request.text()
+    });
+    const body = await upstream.text();
+    return new Response(body, {
+      status : upstream.status,
+      headers: { ...cors, 'Content-Type': upstream.headers.get('Content-Type') || 'application/json' }
+    });
+  }
+};`;
+  const html = `
+    <div class="hs-token-modal-overlay" id="hsProxyHelpOverlay" style="z-index:1200;">
+      <div class="hs-token-modal" style="width:min(720px,94vw);">
+        <div class="hs-token-title">⚙ Cloudflare Worker — HubSpot CORS Proxy</div>
+        <div class="hs-token-body" style="max-height:65vh;overflow-y:auto;">
+          <p style="margin:0 0 12px 0;font-size:13px;color:var(--text-secondary);">
+            HubSpot's <code>api.hubapi.com</code> doesn't send CORS headers, so browsers refuse direct calls.
+            This 30-line Worker forwards your requests with the right headers. It's free, takes 5 minutes, and never sees your token (it just passes the <code>Authorization</code> header through).
+          </p>
+          <ol style="margin:0 0 14px 18px;font-size:12px;color:var(--text-secondary);line-height:1.8;">
+            <li>Go to <a href="https://dash.cloudflare.com/" target="_blank" style="color:var(--accent);">dash.cloudflare.com</a> (free sign-up, no credit card)</li>
+            <li><strong>Workers &amp; Pages</strong> → <strong>Create</strong> → <strong>Hello World</strong> → Deploy</li>
+            <li>Click <strong>Edit code</strong>, delete the placeholder, paste the code below, click <strong>Deploy</strong></li>
+            <li>Copy the URL (looks like <code>https://&lt;name&gt;.&lt;you&gt;.workers.dev</code>)</li>
+            <li>Paste it in the <strong>CORS Proxy URL</strong> field in the previous dialog</li>
+          </ol>
+          <div style="position:relative;">
+            <button onclick="hsCopyWorker(event)" style="position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;">Copy code</button>
+            <pre id="hsWorkerCode" style="background:#0d1117;color:#c9d1d9;border:1px solid var(--border);border-radius:8px;padding:14px;font-size:11px;line-height:1.55;overflow-x:auto;margin:0;font-family:'SF Mono',Monaco,monospace;">${escapeHtml(workerCode)}</pre>
+          </div>
+          <p style="margin:14px 0 0 0;font-size:11px;color:var(--text-muted);">
+            <strong>Free tier:</strong> 100,000 requests/day. Your tracker uses ~20 requests per HubSpot sync.
+          </p>
+        </div>
+        <div class="hs-token-actions">
+          <button class="btn-primary" onclick="document.getElementById('hsProxyHelpOverlay').remove()">Got it</button>
+        </div>
+      </div>
+    </div>`;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstElementChild);
+}
+
+function hsCopyWorker(ev) {
+  ev.preventDefault();
+  const txt = document.getElementById('hsWorkerCode').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = ev.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+
 async function hubspotSaveAndTestToken() {
   const val = (document.getElementById('hsTokenInput').value || '').trim();
   const err = document.getElementById('hsTokenErr');
@@ -3141,9 +3261,18 @@ async function hubspotSaveAndTestToken() {
     err.textContent = 'That doesn\'t look like a Private App token (should start with "pat-").';
     err.style.display = 'block'; return;
   }
-  // Test the token with a cheap call
+  // Persist proxy URL from the modal (if user pasted one)
+  const proxyVal = (document.getElementById('hsProxyInput').value || '').trim();
+  hsSaveProxyBase(proxyVal);
+  const testUrl = hsBuildUrl('/crm/v3/owners?limit=1');
+  if (!testUrl) {
+    err.innerHTML = '<strong>Proxy URL required.</strong> HubSpot\'s API does not accept browser requests directly (CORS). Paste your Cloudflare Worker URL in the Proxy field above, or see <a href="#" onclick="hsShowProxyHelp(event)" style="color:var(--accent);">how to deploy the Worker</a> (5 min, free).';
+    err.style.display = 'block';
+    return;
+  }
+  // Test the token with a cheap call (via proxy)
   try {
-    const r = await fetch('https://api.hubapi.com/crm/v3/owners?limit=1', {
+    const r = await fetch(testUrl, {
       headers: { 'Authorization': 'Bearer ' + val }
     });
     if (!r.ok) {
@@ -3153,7 +3282,9 @@ async function hubspotSaveAndTestToken() {
       return;
     }
   } catch (e) {
-    err.textContent = 'Network error testing token: ' + (e.message || e);
+    err.innerHTML = 'Network error: ' + (e.message || e) + '<br><br>' +
+      'Most likely your Proxy URL is wrong or the Worker isn\'t deployed yet. ' +
+      '<a href="#" onclick="hsShowProxyHelp(event)" style="color:var(--accent);">Show me the Worker template</a>.';
     err.style.display = 'block';
     return;
   }
@@ -3173,7 +3304,9 @@ function hubspotDisconnect() {
 
 async function hubspotApi(path, opts = {}) {
   if (!hubspotState.accessToken) throw new Error('HubSpot not connected — click the chip to connect');
-  const url = path.startsWith('http') ? path : 'https://api.hubapi.com' + path;
+  const url = path.startsWith('http')
+    ? path
+    : (hsBuildUrl(path) || (() => { throw new Error('HubSpot proxy URL not set — open Connect HubSpot → paste your Cloudflare Worker URL'); })());
   const r = await fetch(url, {
     ...opts,
     headers: {
