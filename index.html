@@ -357,6 +357,12 @@
   thead th.col-hot { color: #f87171; }
   thead th.col-warm { color: #fb923c; }
   thead th.col-forecast { color: var(--accent-glow); }
+  thead th.col-blocked { color: #fca5a5; min-width: 220px; }
+  thead th.col-stage   { color: var(--text-muted); min-width: 150px; }
+  /* widen the stage-select dropdown so 'Negotiation' isn't truncated */
+  td .stage-select, td select.cell-input { min-width: 138px; }
+  /* widen the blocked text input */
+  .blocked-text-input, .col-blocked-bg input, .col-blocked-bg textarea { min-width: 210px; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
   tbody tr:nth-child(even):not(.team-header):not(.totals-row) { background: var(--row-even); }
   tbody tr:hover:not(.team-header):not(.totals-row) { background: var(--row-hover); }
@@ -460,12 +466,26 @@
   /* SUMMARY BAR */
   .summary-bar { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
   .summary-bar-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
-  .summary-weeks { display: flex; gap: 10px; align-items: flex-end; height: 80px; }
+  .summary-weeks { display: flex; gap: 10px; align-items: flex-end; height: 110px; }
   .summary-week { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
-  .summary-bar-inner { width: 100%; background: linear-gradient(180deg, var(--accent2), var(--accent)); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.4s ease; }
+  .summary-bar-inner {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(180deg, var(--accent2), var(--accent));
+    border-radius: 4px 4px 0 0;
+    min-height: 22px;
+    transition: height 0.4s ease;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 4px;
+  }
   .summary-bar-inner.active-week { background: linear-gradient(180deg, var(--gold-light), var(--gold)); box-shadow: 0 0 12px rgba(245,158,11,0.4); }
   .summary-week-label { font-size: 10px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
-  .summary-week-val { font-size: 10px; color: var(--accent-glow); font-weight: 700; white-space: nowrap; }
+  .summary-week-val {
+    font-size: 10px; color: #fff; font-weight: 700; white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    pointer-events: none;
+  }
+  .summary-bar-inner.active-week .summary-week-val { color: #1a1a1a; text-shadow: 0 1px 2px rgba(255,255,255,0.25); }
 
   /* TOAST */
   .toast {
@@ -866,7 +886,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest6 / commit-bestcase-pipeline-blocked + 3-stage-aging + hubspot-oauth / 2026-05-28
+// BUILD: latest6.5 / stage-width + blocker-width + onedrive-popup-fix + bar-labels-inside + totals-fix / 2026-05-29 (rev2)
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -1114,8 +1134,16 @@ async function initOneDrive() {
       cache: { cacheLocation: 'localStorage' }
     });
     await msalInstance.initialize();
-    // Clear any stale "interaction_in_progress" flag from a previous tab/session
-    try { await msalInstance.handleRedirectPromise(); } catch(_) {}
+    // Capture redirect response (when returning from loginRedirect) and
+    // clear any stale "interaction_in_progress" flag from a previous tab/session
+    let redirectRes = null;
+    try { redirectRes = await msalInstance.handleRedirectPromise(); } catch(_) {}
+    if (redirectRes && redirectRes.account) {
+      msalAccount = redirectRes.account;
+      await downloadFromOneDrive();
+      showToast('Connected to OneDrive', 'success');
+      return;
+    }
     const accts = msalInstance.getAllAccounts();
     if (accts.length) {
       msalAccount = accts[0];
@@ -1129,17 +1157,47 @@ async function initOneDrive() {
   }
 }
 
+/* Detect whether THIS page is itself running inside a popup window.
+   MSAL refuses to open a popup-from-popup ("MSAL detected it was running
+   in a popup"). When that's the case we MUST use redirect flow instead. */
+function isRunningInPopup() {
+  try {
+    return !!(window.opener && window.opener !== window);
+  } catch(_) { return false; }
+}
+
 async function signInOneDrive() {
   if (!msalInstance) { showToast('OneDrive not configured', 'error'); return; }
   try {
     setSyncStatus('syncing', 'Connecting…');
+
+    // If the page is in a popup-style window, MSAL cannot open another popup.
+    // Fall back to the redirect flow which works in every context.
+    if (isRunningInPopup()) {
+      await msalInstance.loginRedirect({ scopes: ONEDRIVE_CONFIG.scopes });
+      return; // page will reload after redirect; handleRedirectPromise picks it up
+    }
+
     const res = await msalInstance.loginPopup({ scopes: ONEDRIVE_CONFIG.scopes });
     msalAccount = res.account;
     await downloadFromOneDrive();
     showToast('Connected to OneDrive', 'success');
   } catch(e) {
     console.error('OneDrive sign-in error:', e);
-    // Self-heal stuck "interaction_in_progress" state and retry once
+
+    // "MSAL detected it was running in a popup" → fall back to redirect
+    if (e && (e.errorCode === 'popup_window_error' ||
+              (e.message && /running in a popup|popup_window_error|popup window error/i.test(e.message)))) {
+      try {
+        showToast('Switching to redirect sign-in…', 'info');
+        await msalInstance.loginRedirect({ scopes: ONEDRIVE_CONFIG.scopes });
+        return;
+      } catch(re) {
+        console.error('Redirect fallback failed', re);
+      }
+    }
+
+    // Self-heal stuck "interaction_in_progress" state
     if (e && (e.errorCode === 'interaction_in_progress' ||
               (e.message && e.message.includes('interaction_in_progress')))) {
       try {
@@ -1163,8 +1221,20 @@ async function getAccessToken() {
     const r = await msalInstance.acquireTokenSilent(req);
     return r.accessToken;
   } catch(e) {
-    const r = await msalInstance.acquireTokenPopup(req);
-    return r.accessToken;
+    // In a popup window we can't open another popup — use redirect.
+    if (isRunningInPopup()) {
+      await msalInstance.acquireTokenRedirect(req);
+      // Page will navigate away; throw to abort current call cleanly.
+      throw new Error('Acquiring token via redirect');
+    }
+    try {
+      const r = await msalInstance.acquireTokenPopup(req);
+      return r.accessToken;
+    } catch(pe) {
+      // Final fallback: redirect
+      await msalInstance.acquireTokenRedirect(req);
+      throw pe;
+    }
   }
 }
 
@@ -1540,10 +1610,12 @@ function renderSummaryBar() {
   const totals = md.weeks.map(w => (!w||!w.length) ? 0 : w.reduce((s,r) => s+(parseFloat(r.totalPipeline)||0), 0));
   const max = Math.max(...totals, 1);
   totals.forEach((val, wi) => {
-    const pct = Math.round((val/max)*72);
+    const pct = Math.round((val/max)*88);
     const div = document.createElement('div');
     div.className = 'summary-week';
-    div.innerHTML = `<div class="summary-week-val">${val?'AED '+fmtNum(val):''}</div><div class="summary-bar-inner ${wi===curWeek?'active-week':''}" style="height:${Math.max(pct,4)}px;"></div><div class="summary-week-label">W${wi+1}</div>`;
+    const valLabel = val ? 'AED '+fmtNum(val) : '';
+    const barHeight = val ? Math.max(pct, 26) : 22; // ensure label fits inside
+    div.innerHTML = `<div class="summary-bar-inner ${wi===curWeek?'active-week':''}" style="height:${barHeight}px;"><span class="summary-week-val">${valLabel}</span></div><div class="summary-week-label">W${wi+1}</div>`;
     div.style.cursor = 'pointer';
     div.addEventListener('click', () => { curWeek = wi; renderAll(); });
     container.appendChild(div);
@@ -1594,7 +1666,7 @@ function renderTable() {
   thead.innerHTML = '';
   const cols = [
     {label:'Sales Rep',              cls:''},
-    {label:'Stage',                  cls:''},
+    {label:'Stage',                  cls:'col-stage'},
     {label:'Commit — Deal Name',     cls:'col-hot'},
     {label:'Commit (AED)',           cls:'col-hot'},
     {label:'Next Action',            cls:'col-hot'},
@@ -1802,27 +1874,44 @@ function openNotesEditor(td, ri, currentVal) {
 }
 
 function renderTotalsRow(rows, tbody, colCount) {
-  const weekKey   = `${curYear}-${curMonth}-${curWeek}`;
-  // Apply stale halving: if a row is stale, count commit+bestCase at 50%
-  function effectiveCommit(r) {
-    const v = parseFloat(r.commitValue) || 0;
-    return isRowStale(r, weekKey) ? v * 0.5 : v;
-  }
-  function effectiveBestCase(r) {
-    const v = parseFloat(r.bestCaseValue) || 0;
-    return isRowStale(r, weekKey) ? v * 0.5 : v;
-  }
+  // Totals row reflects the SUM of values exactly as entered (no halving),
+  // so the displayed numbers match what's typed in each column.
+  // The stale-halving adjustment is shown in the KPI cards instead.
+  const num = v => parseFloat(v) || 0;
 
-  const totCommit   = rows.reduce((s,r)=>s+effectiveCommit(r),0);
-  const totBestCase = rows.reduce((s,r)=>s+effectiveBestCase(r),0);
-  const totPipeline = rows.reduce((s,r)=>s+(parseFloat(r.totalPipeline)||0),0);
-  const totXS1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
-  const totXP1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
+  const totCommit   = rows.reduce((s,r)=>s+num(r.commitValue),   0);
+  const totBestCase = rows.reduce((s,r)=>s+num(r.bestCaseValue), 0);
+  const totPipeline = rows.reduce((s,r)=>s+num(r.totalPipeline), 0);
+  const totXS1      = rows.reduce((s,r)=>s+num(r.forecastXS1),   0);
+  const totXP1      = rows.reduce((s,r)=>s+num(r.forecastXP1),   0);
 
   const tr = document.createElement('tr'); tr.className = 'totals-row';
-  // cols: Rep, Stage, CommitText, CommitVal, NextAction, BestCaseText, BestCaseVal, TotalPipeline, Blocked, XS1, XP1, Notes, Submit
-  const cells = ['TOTALS','','', fmtNum(totCommit), '', '', fmtNum(totBestCase), fmtNum(totPipeline), '', fmtNum(totXS1), fmtNum(totXP1), '', ''];
-  cells.forEach(c => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+  // 13 cols → 13 cells:
+  // 0 Rep | 1 Stage | 2 CommitName | 3 CommitAED | 4 NextAction
+  // 5 BestCaseName | 6 BestCaseAED | 7 TotalPipeline | 8 Blocked
+  // 9 ForecastXS1 | 10 ForecastXP1 | 11 Notes | 12 Submit
+  const cells = [
+    'TOTALS',                  // 0  Rep
+    '',                        // 1  Stage
+    '',                        // 2  Commit Deal Name
+    fmtNum(totCommit),         // 3  Commit (AED)
+    '',                        // 4  Next Action
+    '',                        // 5  Best Case Deal Name
+    fmtNum(totBestCase),       // 6  Best Case (AED) ✓
+    fmtNum(totPipeline),       // 7  Total Pipeline ✓
+    '',                        // 8  Blocked
+    fmtNum(totXS1),            // 9  Forecast XS1 ✓
+    fmtNum(totXP1),            // 10 Forecast XP1 ✓
+    '',                        // 11 Notes
+    ''                         // 12 Submit / Status
+  ];
+  cells.forEach((c, idx) => {
+    const td = document.createElement('td');
+    td.textContent = c;
+    if (c && c !== 'TOTALS') td.style.textAlign = 'right';
+    if (idx === 0) td.style.textAlign = 'left';
+    tr.appendChild(td);
+  });
   tbody.appendChild(tr);
 }
 
