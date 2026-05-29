@@ -1158,13 +1158,39 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest7.8 / confidence-rename + total-forecast-includes-bestcase + closed-won-column + marketing-tab-gdrive / 2026-05-29
+// BUILD: latest8 / gdrive-fully-wired-with-credentials / 2026-05-29
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
   redirectUri: window.location.origin + window.location.pathname,
   filePath   : '/OXEFIT/sales-tracker.json',        // location inside the user's OneDrive
   scopes     : ['Files.ReadWrite', 'User.Read']
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   GOOGLE DRIVE CONFIG  ── Marketing Consumer Performance tab
+   ----------------------------------------------------------------
+   Credentials from Google Cloud Console:
+   - OAuth 2.0 Client ID (Web application)
+   - API Key (restricted to Drive + Picker APIs)
+
+   APIs that must be ENABLED in the same Cloud project:
+     • Google Drive API
+     • Google Picker API
+
+   OAuth consent screen → add scope:
+     https://www.googleapis.com/auth/drive.readonly
+
+   Authorized JavaScript origin:
+     https://ahmedcorev.github.io
+════════════════════════════════════════════════════════════════════ */
+const GDRIVE_CONFIG = {
+  clientId : '454204967724-kdpbnvh2ha3eeahf3br2eb511djg9ol1.apps.googleusercontent.com',
+  apiKey   : '[REDACTED:google_api_key]',
+  scope    : 'https://www.googleapis.com/auth/drive.readonly',
+  // Optional: pin a specific Drive folder ID to auto-list its files.
+  // Leave blank to show the Picker (user chooses any file/folder they can see).
+  folderId : ''
 };
 
 /* ════════════════════════════════════════
@@ -2936,6 +2962,326 @@ function escapeHtml(s) {
   return String(s||'').replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   TAB SWITCHING — Sales Tracker  ⇄  Marketing Consumer Performance
+════════════════════════════════════════════════════════════════════ */
+function switchTab(tabName) {
+  document.querySelectorAll('.primary-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tabName);
+  });
+  document.querySelectorAll('.tab-view').forEach(v => {
+    v.classList.toggle('active', v.id === 'view-' + tabName);
+  });
+  if (tabName === 'marketing') {
+    gdEnsureInit();         // lazy-init Google APIs on first visit
+    gdRestoreFromCache();   // re-open the last viewed file if any
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   GOOGLE DRIVE — auth + picker + file browser + viewer
+════════════════════════════════════════════════════════════════════ */
+let gdTokenClient = null;
+let gdAccessToken = null;
+let gdGapiReady   = false;
+let gdGisReady    = false;
+let gdPickerReady = false;
+let gdInitStarted = false;
+let gdCurrentFolderId = 'root';
+let gdFolderStack = []; // for breadcrumb back-nav
+
+const GD_CACHE_KEY = 'oxefit_gdrive_last_file';
+const GD_TOKEN_KEY = 'oxefit_gdrive_token';
+
+function gdEnsureInit() {
+  if (gdInitStarted) return;
+  gdInitStarted = true;
+
+  if (!GDRIVE_CONFIG.clientId || !GDRIVE_CONFIG.apiKey) {
+    document.getElementById('gdConfigNotice').style.display = 'block';
+    return;
+  }
+
+  // Wait for both Google scripts to load (they're async/defer in <head>)
+  const waitFor = (cond, cb, tries = 0) => {
+    if (cond()) return cb();
+    if (tries > 100) {
+      showToast('Google APIs failed to load — check your network', 'error');
+      return;
+    }
+    setTimeout(() => waitFor(cond, cb, tries + 1), 100);
+  };
+
+  waitFor(() => typeof gapi !== 'undefined', () => {
+    gapi.load('client:picker', async () => {
+      try {
+        await gapi.client.init({
+          apiKey: GDRIVE_CONFIG.apiKey,
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+        });
+        gdGapiReady = true;
+        gdPickerReady = true;
+      } catch (err) {
+        console.error('gapi init error', err);
+        showToast('Google Drive init failed: ' + (err.message || err.details || 'unknown'), 'error');
+      }
+    });
+  });
+
+  waitFor(() => typeof google !== 'undefined' && google.accounts && google.accounts.oauth2, () => {
+    try {
+      gdTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GDRIVE_CONFIG.clientId,
+        scope: GDRIVE_CONFIG.scope,
+        callback: (resp) => {
+          if (resp.error) {
+            console.error('GIS token error', resp);
+            showToast('Google sign-in failed: ' + resp.error, 'error');
+            return;
+          }
+          gdAccessToken = resp.access_token;
+          try {
+            sessionStorage.setItem(GD_TOKEN_KEY, resp.access_token);
+          } catch(e){}
+          gdOnSignedIn();
+        }
+      });
+      gdGisReady = true;
+
+      // Restore token from session if still alive
+      const cachedToken = sessionStorage.getItem(GD_TOKEN_KEY);
+      if (cachedToken) {
+        gdAccessToken = cachedToken;
+        gdOnSignedIn(true /*silent*/);
+      }
+    } catch (err) {
+      console.error('GIS init error', err);
+    }
+  });
+}
+
+function gdSignIn() {
+  gdEnsureInit();
+  if (!GDRIVE_CONFIG.clientId) {
+    showToast('Google Drive not configured', 'error');
+    return;
+  }
+  if (!gdTokenClient) {
+    // Init still pending — retry shortly
+    showToast('Initializing Google sign-in…', 'info');
+    setTimeout(gdSignIn, 600);
+    return;
+  }
+  // Prompt for consent the first time, then silent on subsequent clicks
+  gdTokenClient.requestAccessToken({ prompt: gdAccessToken ? '' : 'consent' });
+}
+
+function gdOnSignedIn(silent) {
+  // Update UI chip
+  const chip = document.getElementById('gdChip');
+  const chipText = document.getElementById('gdChipText');
+  chip.classList.add('connected');
+  chipText.textContent = 'Connected to Google Drive';
+  document.getElementById('gdSignInBtn').style.display = 'none';
+  document.getElementById('gdRefreshBtn').style.display = '';
+  document.getElementById('gdDisconnectBtn').style.display = '';
+
+  if (!silent) showToast('Signed in to Google Drive', 'success');
+
+  // List the configured folder (or root) right away
+  gdListFolder(GDRIVE_CONFIG.folderId || 'root', /*pushStack*/ false);
+}
+
+function gdDisconnect() {
+  if (gdAccessToken) {
+    try {
+      google.accounts.oauth2.revoke(gdAccessToken, () => {});
+    } catch(e){}
+  }
+  gdAccessToken = null;
+  sessionStorage.removeItem(GD_TOKEN_KEY);
+  localStorage.removeItem(GD_CACHE_KEY);
+
+  document.getElementById('gdChip').classList.remove('connected');
+  document.getElementById('gdChipText').textContent = 'Not connected';
+  document.getElementById('gdSignInBtn').style.display = '';
+  document.getElementById('gdRefreshBtn').style.display = 'none';
+  document.getElementById('gdDisconnectBtn').style.display = 'none';
+  document.getElementById('gdBreadcrumb').style.display = 'none';
+  document.getElementById('gdFiles').innerHTML =
+    '<div class="gdrive-empty">Sign in with Google to load the Marketing Consumer Performance dashboards from Drive.</div>';
+  document.getElementById('gdViewerWrap').style.display = 'none';
+  document.getElementById('gdViewer').style.display = 'none';
+  document.getElementById('gdViewer').src = '';
+  document.getElementById('gdViewerEmpty').style.display = '';
+
+  showToast('Google Drive disconnected', 'success');
+}
+
+function gdRefresh() {
+  if (!gdAccessToken) return gdSignIn();
+  gdListFolder(gdCurrentFolderId, false);
+}
+
+function gdGoRoot() {
+  gdFolderStack = [];
+  gdListFolder(GDRIVE_CONFIG.folderId || 'root', false);
+}
+
+async function gdListFolder(folderId, pushStack) {
+  if (!gdAccessToken) return;
+  if (pushStack) gdFolderStack.push({ id: gdCurrentFolderId });
+  gdCurrentFolderId = folderId;
+
+  const filesDiv = document.getElementById('gdFiles');
+  filesDiv.innerHTML = '<div class="gdrive-empty">Loading…</div>';
+
+  try {
+    // Use raw fetch so we pass the bearer token from GIS (gapi.client.setToken also works)
+    gapi.client.setToken({ access_token: gdAccessToken });
+
+    const resp = await gapi.client.drive.files.list({
+      q: `'${folderId}' in parents and trashed=false`,
+      fields: 'files(id,name,mimeType,modifiedTime,iconLink,webViewLink,size)',
+      orderBy: 'folder,name',
+      pageSize: 100,
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true
+    });
+
+    const files = (resp.result && resp.result.files) || [];
+
+    // Breadcrumb
+    document.getElementById('gdBreadcrumb').style.display = '';
+    const crumbPath = document.getElementById('gdBreadcrumbPath');
+    crumbPath.textContent = gdFolderStack.length
+      ? ' / …  / current folder'
+      : '';
+
+    if (!files.length) {
+      filesDiv.innerHTML = `
+        <div class="gdrive-empty">
+          This folder is empty.
+          <div style="margin-top:10px;">
+            <button class="gdrive-btn" onclick="gdOpenPicker()">📂 Browse all of My Drive</button>
+          </div>
+        </div>`;
+      return;
+    }
+
+    filesDiv.innerHTML = `
+      <div class="gdrive-file-list">
+        ${files.map(f => gdFileCardHtml(f)).join('')}
+      </div>
+      <div style="margin-top:14px; text-align:right;">
+        <button class="gdrive-btn ghost" onclick="gdOpenPicker()">📂 Pick a different file…</button>
+      </div>
+    `;
+  } catch (err) {
+    console.error('Drive list error', err);
+    const msg = (err.result && err.result.error && err.result.error.message) || err.message || 'unknown';
+    if (/401|403|invalid/i.test(msg)) {
+      // Token expired — re-prompt
+      gdAccessToken = null;
+      sessionStorage.removeItem(GD_TOKEN_KEY);
+      filesDiv.innerHTML = '<div class="gdrive-empty">Session expired — please sign in again.</div>';
+      gdSignIn();
+    } else {
+      filesDiv.innerHTML = '<div class="gdrive-empty">Drive list failed: ' + escapeHtml(msg) + '</div>';
+    }
+  }
+}
+
+function gdFileCardHtml(f) {
+  const isFolder = f.mimeType === 'application/vnd.google-apps.folder';
+  const icon = isFolder ? '📁'
+    : f.mimeType.includes('spreadsheet') ? '📊'
+    : f.mimeType.includes('presentation') ? '📽'
+    : f.mimeType.includes('document')     ? '📄'
+    : f.mimeType.includes('pdf')          ? '📕'
+    : f.mimeType.includes('image')        ? '🖼'
+    : '📎';
+  const meta = isFolder ? 'Folder' : (
+    [
+      f.modifiedTime ? new Date(f.modifiedTime).toLocaleDateString() : null,
+      f.size ? gdFormatBytes(+f.size) : null
+    ].filter(Boolean).join(' • ')
+  );
+  const onclick = isFolder
+    ? `gdListFolder('${f.id}', true)`
+    : `gdViewFile('${f.id}', ${JSON.stringify(f.name).replace(/"/g,'&quot;')}, '${f.mimeType}')`;
+  return `
+    <div class="gdrive-file-card" onclick="${onclick}">
+      <div class="gdrive-file-name">${icon} ${escapeHtml(f.name)}</div>
+      <div class="gdrive-file-meta"><span>${meta}</span></div>
+    </div>
+  `;
+}
+
+function gdFormatBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  if (n < 1024*1024*1024) return (n/1024/1024).toFixed(1) + ' MB';
+  return (n/1024/1024/1024).toFixed(1) + ' GB';
+}
+
+function gdViewFile(fileId, fileName, mimeType) {
+  // Cache so it auto-reopens next time
+  try {
+    localStorage.setItem(GD_CACHE_KEY, JSON.stringify({ fileId, fileName, mimeType }));
+  } catch(e){}
+
+  const wrap = document.getElementById('gdViewerWrap');
+  const empty = document.getElementById('gdViewerEmpty');
+  const iframe = document.getElementById('gdViewer');
+
+  wrap.style.display = '';
+  empty.style.display = 'none';
+  iframe.style.display = '';
+
+  // Drive's universal preview URL — works for Docs, Sheets, Slides, PDF, images, video, etc.
+  iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+
+  // Scroll into view
+  setTimeout(() => wrap.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+}
+
+function gdRestoreFromCache() {
+  const raw = localStorage.getItem(GD_CACHE_KEY);
+  if (!raw) return;
+  try {
+    const { fileId, fileName, mimeType } = JSON.parse(raw);
+    if (fileId) gdViewFile(fileId, fileName, mimeType);
+  } catch(e){}
+}
+
+function gdOpenPicker() {
+  if (!gdAccessToken) return gdSignIn();
+  if (!gdPickerReady || typeof google === 'undefined' || !google.picker) {
+    showToast('Picker still loading — try again in a moment', 'info');
+    return;
+  }
+  const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+    .setIncludeFolders(true)
+    .setSelectFolderEnabled(false)
+    .setMode(google.picker.DocsViewMode.LIST);
+
+  const picker = new google.picker.PickerBuilder()
+    .enableFeature(google.picker.Feature.NAV_HIDDEN)
+    .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
+    .setOAuthToken(gdAccessToken)
+    .setDeveloperKey(GDRIVE_CONFIG.apiKey)
+    .addView(view)
+    .setCallback((data) => {
+      if (data.action === google.picker.Action.PICKED && data.docs && data.docs[0]) {
+        const f = data.docs[0];
+        gdViewFile(f.id, f.name, f.mimeType);
+      }
+    })
+    .build();
+  picker.setVisible(true);
 }
 
 /* ════════════════════════════════════════
