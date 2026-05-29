@@ -1158,7 +1158,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest8 / gdrive-fully-wired-with-credentials / 2026-05-29
+// BUILD: latest8.1 / gdrive-discovery-race-fix / 2026-05-29
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -3017,15 +3017,23 @@ function gdEnsureInit() {
   waitFor(() => typeof gapi !== 'undefined', () => {
     gapi.load('client:picker', async () => {
       try {
-        await gapi.client.init({
-          apiKey: GDRIVE_CONFIG.apiKey,
-          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-        });
+        // Initialise WITHOUT discoveryDocs (some setups race the token callback).
+        // We load the Drive client explicitly inside gdListFolder() instead.
+        await gapi.client.init({ apiKey: GDRIVE_CONFIG.apiKey });
+
+        // Eagerly load Drive v3 so the first list call doesn't wait.
+        try {
+          await gapi.client.load('drive', 'v3');
+        } catch (driveErr) {
+          console.warn('Eager Drive v3 load failed (will retry on list):', driveErr);
+        }
+
         gdGapiReady = true;
         gdPickerReady = true;
       } catch (err) {
         console.error('gapi init error', err);
-        showToast('Google Drive init failed: ' + (err.message || err.details || 'unknown'), 'error');
+        const msg = (err && (err.message || err.details || err.error)) || 'unknown';
+        showToast('Google Drive init failed: ' + msg + ' — make sure the Drive API is enabled and your API key allows this origin.', 'error');
       }
     });
   });
@@ -3130,6 +3138,35 @@ function gdGoRoot() {
   gdListFolder(GDRIVE_CONFIG.folderId || 'root', false);
 }
 
+// Waits for gapi.client to exist AND for the Drive v3 discovery doc to be loaded.
+// Loads it explicitly if it isn't (handles the race where the OAuth token returns
+// before gapi.client.init's discoveryDocs promise resolves).
+async function gdWaitForDriveClient() {
+  // Step 1: wait for gapi.client to load (gapi.load('client', ...) finishes)
+  const start = Date.now();
+  while (!(window.gapi && gapi.client) && Date.now() - start < 15000) {
+    await new Promise(r => setTimeout(r, 100));
+  }
+  if (!(window.gapi && gapi.client)) {
+    throw new Error('gapi.client never loaded — check your network and that apis.google.com/js/api.js is reachable.');
+  }
+
+  // Step 2: if the Drive namespace isn't there yet, load it directly. This bypasses
+  // any stalled discoveryDocs promise from gapi.client.init.
+  if (!gapi.client.drive) {
+    try {
+      await gapi.client.load('drive', 'v3');
+    } catch (e) {
+      // Last-resort: try the explicit discovery doc URL
+      await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
+    }
+  }
+
+  if (!gapi.client.drive) {
+    throw new Error('Google Drive API discovery doc failed to load. Make sure the Google Drive API is enabled in your Cloud project and your API key referrer restriction allows this origin.');
+  }
+}
+
 async function gdListFolder(folderId, pushStack) {
   if (!gdAccessToken) return;
   if (pushStack) gdFolderStack.push({ id: gdCurrentFolderId });
@@ -3139,7 +3176,12 @@ async function gdListFolder(folderId, pushStack) {
   filesDiv.innerHTML = '<div class="gdrive-empty">Loading…</div>';
 
   try {
-    // Use raw fetch so we pass the bearer token from GIS (gapi.client.setToken also works)
+    // BELT-AND-SUSPENDERS: ensure gapi.client + Drive v3 discovery doc are ready
+    // before calling .files.list(). Fixes "Cannot read properties of undefined
+    // (reading 'files')" when the token callback fires before gapi.client.init resolves.
+    await gdWaitForDriveClient();
+
+    // Pass the bearer token from GIS into gapi.client
     gapi.client.setToken({ access_token: gdAccessToken });
 
     const resp = await gapi.client.drive.files.list({
