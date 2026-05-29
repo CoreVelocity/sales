@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +14,10 @@
     document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/msal-browser/2.38.3/msal-browser.min.js"><\/script>');
   }
 </script>
+
+<!-- Google APIs for Drive integration (Marketing Consumer Performance tab) -->
+<script src="https://apis.google.com/js/api.js" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap');
@@ -358,7 +361,9 @@
   thead th.col-warm { color: #fb923c; }
   thead th.col-forecast { color: var(--accent-glow); }
   thead th.col-blocked { color: #fca5a5; min-width: 220px; }
-  thead th.col-stage   { color: var(--text-muted); min-width: 150px; }
+  thead th.col-stage   { color: var(--text-muted); min-width: 170px; }
+  thead th.col-signals { color: #93c5fd; min-width: 200px; }
+  thead th.col-qual    { color: var(--gold-light); min-width: 90px; text-align:center; }
   /* widen the stage-select dropdown so 'Negotiation' isn't truncated */
   td .stage-select, td select.cell-input { min-width: 138px; }
   /* widen the blocked text input */
@@ -512,13 +517,16 @@
   .setup-notice strong { color: var(--gold); }
   .setup-notice code { background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 4px; font-size: 11px; color: var(--text); }
 
-  /* ── STAGE BADGES (Discovery / Proposal / Negotiation) ── */
+  /* ── STAGE BADGES (Qualified / Proposal / Negotiation) ── */
   .stage-badge {
     display: inline-block; padding: 3px 9px; border-radius: 999px;
     font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
     border: 1px solid transparent; line-height: 1;
   }
-  .stage-discovery {
+  .stage-badge .stage-weight {
+    margin-left: 6px; opacity: 0.75; font-weight: 600; font-size: 9px;
+  }
+  .stage-qualified {
     background: rgba(59,130,246,0.12); color: #93c5fd;
     border-color: rgba(59,130,246,0.35);
   }
@@ -558,6 +566,205 @@
     color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);
   }
   .age-pill.stale { background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.4); }
+
+  /* ── BUYER SIGNALS (6-checkbox grid) ── */
+  .buyer-signals-cell {
+    background: rgba(59,130,246,0.03);
+  }
+  .buyer-signals-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3px 6px;
+    min-width: 180px;
+  }
+  .buyer-signals-grid label {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; color: var(--text-muted); cursor: pointer;
+    line-height: 1.1; user-select: none;
+    padding: 2px 0;
+  }
+  .buyer-signals-grid input[type="checkbox"] {
+    margin: 0; width: 12px; height: 12px; cursor: pointer; accent-color: var(--accent-glow);
+  }
+  .buyer-signals-grid label.checked { color: #93c5fd; font-weight: 600; }
+  .buyer-signals-locked {
+    display: flex; flex-wrap: wrap; gap: 3px; min-width: 160px;
+  }
+  .buyer-signal-chip {
+    display: inline-flex; align-items: center;
+    padding: 2px 6px; border-radius: 4px;
+    font-size: 9px; font-weight: 600; letter-spacing: 0.3px;
+    background: rgba(59,130,246,0.15); color: #93c5fd;
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+  .buyer-signal-chip.muted {
+    background: rgba(255,255,255,0.03); color: var(--text-muted);
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  /* ── QUALIFICATION SCORE ── */
+  .qual-score-cell {
+    text-align: center; background: rgba(212,175,55,0.04);
+  }
+  .qual-score-wrap {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 3px;
+  }
+  .qual-score-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 800; line-height: 1;
+    color: var(--text);
+  }
+  .qual-score-value.tier-cold { color: #f87171; }
+  .qual-score-value.tier-warm { color: #fcd34d; }
+  .qual-score-value.tier-hot  { color: #34d399; }
+  .qual-score-bar {
+    width: 60px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.08); overflow: hidden;
+  }
+  .qual-score-bar-fill {
+    height: 100%; transition: width 0.25s ease;
+  }
+  .qual-score-tier {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+
+  /* ── AUTO FORECAST CELL (Total Forecast = Commit × Stage Weight) ── */
+  .auto-forecast-cell {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 2px; padding: 4px 6px;
+  }
+  .auto-forecast-value {
+    font-size: 13px; font-weight: 700; color: #60a5fa;
+    letter-spacing: 0.2px;
+  }
+  .auto-forecast-formula {
+    font-size: 9px; color: var(--text-muted);
+    font-family: 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── PRIMARY TAB BAR (Tracker / Marketing Consumer Performance) ── */
+  .primary-tabs {
+    display: flex; gap: 0; align-items: stretch;
+    background: var(--navy-mid); border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .primary-tab {
+    position: relative; padding: 14px 22px; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 14px;
+    font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--text-muted); border: none; background: transparent;
+    transition: color 0.15s ease;
+  }
+  .primary-tab:hover { color: var(--text); }
+  .primary-tab.active { color: #60a5fa; }
+  .primary-tab.active::after {
+    content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px;
+    height: 3px; border-radius: 3px 3px 0 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    box-shadow: 0 0 18px rgba(37,99,235,0.6);
+  }
+  .primary-tab-icon {
+    display: inline-block; margin-right: 8px; opacity: 0.85;
+    font-size: 13px; vertical-align: -1px;
+  }
+  .tab-view { display: none; }
+  .tab-view.active { display: block; }
+
+  /* ── MARKETING / GDRIVE VIEW ── */
+  .gdrive-panel {
+    background: var(--navy-mid); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 24px; margin: 20px 24px;
+  }
+  .gdrive-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 18px;
+  }
+  .gdrive-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 22px;
+    font-weight: 700; letter-spacing: 1.5px; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .gdrive-sub { font-size: 12px; color: var(--text-muted); }
+  .gdrive-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .gdrive-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;
+    background: rgba(66,133,244,0.10); border: 1px solid rgba(66,133,244,0.35);
+    color: #93c5fd;
+  }
+  .gdrive-chip .gd-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #f87171; box-shadow: 0 0 8px rgba(248,113,113,0.6);
+  }
+  .gdrive-chip.connected { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.4); color: #6ee7b7; }
+  .gdrive-chip.connected .gd-dot { background: #34d399; box-shadow: 0 0 10px rgba(52,211,153,0.7); }
+  .gdrive-btn {
+    background: linear-gradient(135deg, #4285F4 0%, #1a73e8 100%);
+    border: none; color: #fff; padding: 8px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.4px; cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .gdrive-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(66,133,244,0.35); }
+  .gdrive-btn.ghost {
+    background: transparent; color: #93c5fd; border: 1px solid rgba(66,133,244,0.35);
+  }
+  .gdrive-config-card {
+    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: var(--text);
+    font-size: 12px; line-height: 1.6;
+  }
+  .gdrive-config-card code {
+    background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;
+    font-size: 11px; color: #fbbf24;
+  }
+  .gdrive-file-list {
+    display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 12px;
+  }
+  .gdrive-file-card {
+    background: var(--navy-light); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.15s ease;
+  }
+  .gdrive-file-card:hover {
+    border-color: rgba(66,133,244,0.5);
+    background: rgba(66,133,244,0.08);
+    transform: translateY(-1px);
+  }
+  .gdrive-file-name {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    word-break: break-word; margin-bottom: 4px; line-height: 1.4;
+  }
+  .gdrive-file-meta { font-size: 11px; color: var(--text-muted); }
+  .gdrive-file-meta span { margin-right: 10px; }
+  .gdrive-empty {
+    text-align: center; padding: 32px 12px; color: var(--text-muted);
+    font-size: 13px; border: 1px dashed var(--border); border-radius: 12px;
+  }
+  .gdrive-viewer-wrap {
+    margin-top: 18px; background: #000; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; min-height: 600px;
+  }
+  .gdrive-viewer-wrap iframe { width: 100%; height: 720px; border: 0; display: block; background: #fff; }
+  .gdrive-viewer-empty {
+    padding: 60px 20px; text-align: center; color: var(--text-muted);
+    font-size: 13px;
+  }
+  .gdrive-breadcrumb {
+    display: flex; align-items: center; gap: 8px; font-size: 12px;
+    color: var(--text-muted); margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .gdrive-breadcrumb a { color: #93c5fd; cursor: pointer; text-decoration: none; }
+  .gdrive-breadcrumb a:hover { text-decoration: underline; }
+
+  /* ── CLOSED (WIN) COLUMN ── */
+  .col-closed { min-width: 130px; }
+  .col-closed-bg {
+    background: linear-gradient(180deg, rgba(245,158,11,0.08), rgba(245,158,11,0.04));
+    border-left: 2px solid rgba(245,158,11,0.35);
+  }
+  .col-closed-bg .cell-input.num-input {
+    color: #fbbf24; font-weight: 700;
+  }
+  .col-closed-bg .cell-input.num-input::placeholder { color: rgba(251,191,36,0.4); }
 
   /* ── BLOCKED COLUMN ── */
   .blocked-cell textarea {
@@ -758,6 +965,18 @@
     <div class="month-dot-row" id="monthDotRow"></div>
   </div>
 
+  <!-- PRIMARY TABS -->
+  <div class="primary-tabs" id="primaryTabs">
+    <button class="primary-tab active" data-tab="tracker" onclick="switchTab('tracker')">
+      <span class="primary-tab-icon">📊</span>Sales Tracker
+    </button>
+    <button class="primary-tab" data-tab="marketing" onclick="switchTab('marketing')">
+      <span class="primary-tab-icon">📈</span>Marketing Consumer Performance
+    </button>
+  </div>
+
+  <!-- TRACKER VIEW -->
+  <div class="tab-view active" id="view-tracker">
   <div class="content">
 
     <div class="setup-notice" id="setupNotice" style="display:none;">
@@ -779,9 +998,14 @@
         <div class="kpi-sub" id="kpiWarmCount">0 deals this week</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Forecast (AED)</div>
+        <div class="kpi-label">Total Forecast (AED)</div>
         <div class="kpi-value accent" id="kpiForecastAED">AED 0</div>
         <div class="kpi-sub">This week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Closed (Win) AED</div>
+        <div class="kpi-value gold" id="kpiClosedWon">AED 0</div>
+        <div class="kpi-sub" id="kpiClosedWonSub">0 reps closing</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Forecast XS1</div>
@@ -835,6 +1059,54 @@
     </div>
 
   </div>
+  </div><!-- /#view-tracker -->
+
+  <!-- MARKETING CONSUMER PERFORMANCE VIEW -->
+  <div class="tab-view" id="view-marketing">
+    <div class="gdrive-panel">
+      <div class="gdrive-head">
+        <div>
+          <div class="gdrive-title">Marketing Consumer Performance</div>
+          <div class="gdrive-sub">Live dashboards, reports and analytics from the Marketing team's Google Drive folder.</div>
+        </div>
+        <div class="gdrive-actions">
+          <div class="gdrive-chip" id="gdChip"><div class="gd-dot"></div><span id="gdChipText">Not connected</span></div>
+          <button class="gdrive-btn ghost" onclick="gdRefresh()" id="gdRefreshBtn" style="display:none;">↻ Refresh</button>
+          <button class="gdrive-btn ghost" onclick="gdDisconnect()" id="gdDisconnectBtn" style="display:none;">Disconnect</button>
+          <button class="gdrive-btn" onclick="gdSignIn()" id="gdSignInBtn">Sign in with Google</button>
+        </div>
+      </div>
+
+      <div class="gdrive-config-card" id="gdConfigNotice" style="display:none;">
+        <strong>⚙ Google Drive not configured.</strong> Open this HTML and set
+        <code>GDRIVE_CONFIG.clientId</code> and <code>GDRIVE_CONFIG.apiKey</code> at the top of the script.
+        Steps:
+        <ol style="margin:8px 0 0 18px; padding:0;">
+          <li>Go to <a href="https://console.cloud.google.com/" target="_blank" style="color:#93c5fd;">Google Cloud Console</a> → APIs &amp; Services → Credentials.</li>
+          <li>Create an <strong>OAuth 2.0 Client ID</strong> (type: Web application). Add this page's URL to Authorized JavaScript origins.</li>
+          <li>Create an <strong>API key</strong> (restrict to Google Drive API).</li>
+          <li>Enable the <strong>Google Drive API</strong> and the <strong>Picker API</strong>.</li>
+          <li>Paste both values into <code>GDRIVE_CONFIG</code>, save, refresh.</li>
+        </ol>
+      </div>
+
+      <div class="gdrive-breadcrumb" id="gdBreadcrumb" style="display:none;">
+        <a onclick="gdGoRoot()">🏠 Marketing Drive</a>
+        <span id="gdBreadcrumbPath"></span>
+      </div>
+
+      <div id="gdFiles">
+        <div class="gdrive-empty">
+          Sign in with Google to load the Marketing Consumer Performance dashboards from Drive.
+        </div>
+      </div>
+
+      <div class="gdrive-viewer-wrap" id="gdViewerWrap" style="display:none;">
+        <div class="gdrive-viewer-empty" id="gdViewerEmpty">Select a file above to preview it here.</div>
+        <iframe id="gdViewer" style="display:none;" allow="autoplay"></iframe>
+      </div>
+    </div>
+  </div><!-- /#view-marketing -->
 
   <div class="toast" id="toast"></div>
 
@@ -886,7 +1158,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest6.5 / stage-width + blocker-width + onedrive-popup-fix + bar-labels-inside + totals-fix / 2026-05-29 (rev2)
+// BUILD: latest7.8 / confidence-rename + total-forecast-includes-bestcase + closed-won-column + marketing-tab-gdrive / 2026-05-29
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -934,11 +1206,21 @@ async function verifyPassword(user, pw) {
 ════════════════════════════════════════ */
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
-const STAGES      = ['Discovery', 'Proposal', 'Negotiation'];
+const STAGES        = ['Qualified', 'Proposal', 'Negotiation'];
+const STAGE_WEIGHTS = { Qualified: 0.25, Proposal: 0.50, Negotiation: 0.75 };
+const BUYER_SIGNAL_KEYS = ['budget','timeline','champion','technicalFit','decisionMaker','competitorOut'];
+const BUYER_SIGNAL_LABELS = {
+  budget:        'Budget Confirmed',
+  timeline:      'Timeline Defined',
+  champion:      'Internal Champion',
+  technicalFit:  'Technical Fit Verified',
+  decisionMaker: 'Decision-Maker Engaged',
+  competitorOut: 'Competition Eliminated'
+};
 const CONF_LEVELS = ['90%','70%','50%','30%'];
 
 // Health aging thresholds (days) — rows exceeding these go red + weight halved
-const STAGE_HEALTH_DAYS = { Discovery: 14, Proposal: 21, Negotiation: 30 };
+const STAGE_HEALTH_DAYS = { Qualified: 14, Proposal: 21, Negotiation: 30 };
 
 /**
  * computeDealAge(dealName, rep, stage, weekKey)
@@ -1019,13 +1301,15 @@ let syncStatus   = 'offline';     // offline | connected | syncing | error
 const defaultRow = (team, rep) => ({
   team:         team || '',
   rep:          rep  || '',
-  stage:        'Discovery',
+  stage:        'Qualified',
   commitText:   '',
   commitValue:  '',
   commitAction: '',
+  buyerSignals: { budget:false, timeline:false, champion:false, technicalFit:false, decisionMaker:false, competitorOut:false },
   bestCaseText: '',
   bestCaseValue:'',
   totalPipeline:'',
+  closedWon:    '',
   blocked:      '',
   forecastXS1:  '',
   forecastXP1:  '',
@@ -1528,8 +1812,8 @@ function renderAll() {
 function renderCommitPanel() {
   const md = getCurMonthData();
   const agg = {
-    'Dubai':     { commit:0, bestCase:0, pipeline:0, xs1:0, xp1:0, count:0 },
-    'Abu Dhabi': { commit:0, bestCase:0, pipeline:0, xs1:0, xp1:0, count:0 }
+    'Dubai':     { commit:0, forecast:0, bestCase:0, closedWon:0, xs1:0, xp1:0, count:0 },
+    'Abu Dhabi': { commit:0, forecast:0, bestCase:0, closedWon:0, xs1:0, xp1:0, count:0 }
   };
   md.weeks.forEach((w, wi) => {
     if (!w) return;
@@ -1537,32 +1821,41 @@ function renderCommitPanel() {
       if (!r.locked) return;
       const t = agg[r.team]; if (!t) return;
       const weekKey = `${curYear}-${curMonth}-${wi}`;
-      const ef = isRowStale(r, weekKey) ? 0.5 : 1.0;
-      t.commit   += (parseFloat(r.commitValue)    || 0) * ef;
-      t.bestCase += (parseFloat(r.bestCaseValue)  || 0) * ef;
-      t.pipeline += parseFloat(r.totalPipeline)   || 0;
-      t.xs1      += parseFloat(r.forecastXS1)     || 0;
-      t.xp1      += parseFloat(r.forecastXP1)     || 0;
+      const stalePenalty = isRowStale(r, weekKey) ? 0.5 : 1.0;
+      const stageWeight  = STAGE_WEIGHTS[r.stage] || 0;
+      const commit       = parseFloat(r.commitValue)   || 0;
+      const bestCase     = parseFloat(r.bestCaseValue) || 0;
+      // Total Forecast = (Commit + Best Case) × Confidence Weight × stale-penalty (auto-derived, always fresh)
+      const forecast     = (commit + bestCase) * stageWeight * stalePenalty;
+      const closedWon    = parseFloat(r.closedWon) || 0;
+      t.commit   += commit;
+      t.forecast += forecast;
+      t.bestCase += bestCase;
+      t.xs1      += parseFloat(r.forecastXS1)   || 0;
+      t.xp1      += parseFloat(r.forecastXP1)   || 0;
+      t.closedWon = (t.closedWon || 0) + closedWon;
       t.count++;
     });
   });
   const total = {
-    commit:   agg['Dubai'].commit   + agg['Abu Dhabi'].commit,
-    bestCase: agg['Dubai'].bestCase + agg['Abu Dhabi'].bestCase,
-    pipeline: agg['Dubai'].pipeline + agg['Abu Dhabi'].pipeline,
-    xs1:      agg['Dubai'].xs1      + agg['Abu Dhabi'].xs1,
-    xp1:      agg['Dubai'].xp1      + agg['Abu Dhabi'].xp1,
-    count:    agg['Dubai'].count    + agg['Abu Dhabi'].count
+    commit:    agg['Dubai'].commit    + agg['Abu Dhabi'].commit,
+    forecast:  agg['Dubai'].forecast  + agg['Abu Dhabi'].forecast,
+    bestCase:  agg['Dubai'].bestCase  + agg['Abu Dhabi'].bestCase,
+    closedWon: agg['Dubai'].closedWon + agg['Abu Dhabi'].closedWon,
+    xs1:       agg['Dubai'].xs1       + agg['Abu Dhabi'].xs1,
+    xp1:       agg['Dubai'].xp1       + agg['Abu Dhabi'].xp1,
+    count:     agg['Dubai'].count     + agg['Abu Dhabi'].count
   };
   const card = (cls, label, d, totalCount) => `
     <div class="commit-card ${cls}">
       <div class="commit-card-label">${label}</div>
       <div class="commit-card-rows">
-        <div><div class="commit-metric-label">Commit</div><div class="commit-metric-value">AED ${fmtNum(d.commit)}</div></div>
-        <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">AED ${fmtNum(d.bestCase)}</div></div>
-        <div><div class="commit-metric-label">Pipeline</div><div class="commit-metric-value">AED ${fmtNum(d.pipeline)}</div></div>
-        <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)}</div></div>
-        <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)}</div></div>
+        <div><div class="commit-metric-label">Commit</div><div class="commit-metric-value">AED ${fmtNum(d.commit)||'0'}</div></div>
+        <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">AED ${fmtNum(d.forecast)||'0'}</div></div>
+        <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">AED ${fmtNum(d.bestCase)||'0'}</div></div>
+        <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value gold">AED ${fmtNum(d.closedWon)||'0'}</div></div>
+        <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
+        <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
       </div>
       <div class="commit-card-sub">${d.count} submitted entr${d.count===1?'y':'ies'}${totalCount?` of ${totalCount}`:''} · ${MONTHS[curMonth]} ${curYear}</div>
     </div>`;
@@ -1666,13 +1959,16 @@ function renderTable() {
   thead.innerHTML = '';
   const cols = [
     {label:'Sales Rep',              cls:''},
-    {label:'Stage',                  cls:'col-stage'},
     {label:'Commit — Deal Name',     cls:'col-hot'},
     {label:'Commit (AED)',           cls:'col-hot'},
+    {label:'Buyer Signals',          cls:'col-signals'},
+    {label:'Qual Score',             cls:'col-qual'},
     {label:'Next Action',            cls:'col-hot'},
     {label:'Best Case — Deal Name',  cls:'col-warm'},
     {label:'Best Case (AED)',        cls:'col-warm'},
-    {label:'Total Pipeline (AED)',   cls:'col-forecast'},
+    {label:'Confidence',             cls:'col-stage'},
+    {label:'Total Forecast (AED)',   cls:'col-forecast'},
+    {label:'Closed (Win) AED',       cls:'col-closed'},
     {label:'Blocked',                cls:'col-blocked'},
     {label:'Forecast XS1',           cls:'col-forecast'},
     {label:'Forecast XP1',           cls:'col-forecast'},
@@ -1724,7 +2020,7 @@ function renderRow(row, ri, tbody) {
     const bannerTr = document.createElement('tr');
     bannerTr.className = 'stale-banner-row';
     const bannerTd = document.createElement('td');
-    bannerTd.colSpan = 13;
+    bannerTd.colSpan = 16;
     const threshold = STAGE_HEALTH_DAYS[row.stage] || '?';
     bannerTd.innerHTML = `⚠️ <strong>${row.rep}</strong> — deal in <strong>${row.stage}</strong> stage has exceeded the ${threshold}-day health threshold. Forecast weight is halved. Update the deal or advance the stage.`;
     bannerTr.appendChild(bannerTd);
@@ -1740,38 +2036,76 @@ function renderRow(row, ri, tbody) {
     <span>${row.rep || '-'}</span>`;
   tr.appendChild(repTd);
 
-  // Stage
-  const stageTd = document.createElement('td');
-  if (editable) {
-    const sel = document.createElement('select'); sel.className = 'cell-input';
-    STAGES.forEach(s => {
-      const opt = document.createElement('option'); opt.value=s; opt.textContent=s;
-      if(s===row.stage) opt.selected=true; sel.appendChild(opt);
-    });
-    sel.addEventListener('change', e => { updateField(ri, 'stage', e.target.value); renderTable(); renderKPIs(); });
-    stageTd.appendChild(sel);
-  } else {
-    const stageCls = row.stage === 'Discovery' ? 'stage-discovery'
-                   : row.stage === 'Proposal'  ? 'stage-proposal'
-                   : row.stage === 'Negotiation' ? 'stage-negotiation' : '';
-    const sp = document.createElement('span');
-    sp.className = `stage-badge ${stageCls}`;
-    sp.textContent = row.stage || '-';
-    stageTd.appendChild(sp);
-  }
-  tr.appendChild(stageTd);
-
-  // Commit: deal name + AED value + next action
+  // Commit: deal name + AED value
   tr.appendChild(makeTextCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'Deal name…'));
   tr.appendChild(makeNumCell (ri, 'commitValue',  'col-hot-bg',                 row.commitValue,  editable));
-  tr.appendChild(makeTextCell(ri, 'commitAction', 'col-hot-bg action-text-input',row.commitAction, editable, 'Next action…'));
+
+  // Buyer Signals (6 checkboxes / chips)
+  const signalsTd = document.createElement('td');
+  signalsTd.className = 'buyer-signals-cell';
+  renderBuyerSignalsCell(signalsTd, ri, row, editable);
+  tr.appendChild(signalsTd);
+
+  // Qualification Score (auto, derived)
+  const qualTd = document.createElement('td');
+  qualTd.className = 'qual-score-cell';
+  renderQualScoreCell(qualTd, row);
+  tr.appendChild(qualTd);
+
+  // Next Action (moved out of Commit block, kept its hot styling for continuity)
+  tr.appendChild(makeTextCell(ri, 'commitAction', 'col-hot-bg action-text-input', row.commitAction, editable, 'Next action…'));
 
   // Best Case: deal name + AED value
   tr.appendChild(makeTextCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'Deal name…'));
   tr.appendChild(makeNumCell (ri, 'bestCaseValue', 'col-warm-bg',                 row.bestCaseValue, editable));
 
-  // Total Pipeline
-  tr.appendChild(makeNumCell(ri, 'totalPipeline', 'col-forecast-bg', row.totalPipeline, editable));
+  // Pipeline Stage (now positioned just before Total Pipeline so users set the stage that drives the forecast weight)
+  const stageTd = document.createElement('td');
+  if (editable) {
+    const sel = document.createElement('select'); sel.className = 'cell-input';
+    STAGES.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value=s;
+      opt.textContent = `${s}  (${Math.round((STAGE_WEIGHTS[s]||0)*100)}%)`;
+      if(s===row.stage) opt.selected=true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', e => { updateField(ri, 'stage', e.target.value); renderTable(); renderKPIs(); renderSummaryBar(); });
+    stageTd.appendChild(sel);
+  } else {
+    const stageCls = row.stage === 'Qualified'   ? 'stage-qualified'
+                   : row.stage === 'Proposal'    ? 'stage-proposal'
+                   : row.stage === 'Negotiation' ? 'stage-negotiation' : '';
+    const sp = document.createElement('span');
+    sp.className = `stage-badge ${stageCls}`;
+    const w = STAGE_WEIGHTS[row.stage];
+    sp.innerHTML = `${row.stage || '-'}${w!==undefined ? `<span class="stage-weight">${Math.round(w*100)}%</span>` : ''}`;
+    stageTd.appendChild(sp);
+  }
+  tr.appendChild(stageTd);
+
+  // Total Forecast (auto = (Commit + Best Case) × Confidence Weight × stale-penalty) — display-only
+  const fcstTd = document.createElement('td');
+  fcstTd.className = 'col-forecast-bg';
+  const commitVal   = parseFloat(row.commitValue)   || 0;
+  const bestCaseVal = parseFloat(row.bestCaseValue) || 0;
+  const dealBase    = commitVal + bestCaseVal;
+  const stageW      = STAGE_WEIGHTS[row.stage] || 0;
+  const stalePen    = stale ? 0.5 : 1.0;
+  const autoFcst    = dealBase * stageW * stalePen;
+  // keep row.totalPipeline in sync so totals row, summary bar and exports stay consistent
+  row.totalPipeline = autoFcst ? autoFcst : '';
+  const fcstWrap = document.createElement('div');
+  fcstWrap.className = 'auto-forecast-cell';
+  fcstWrap.innerHTML = `
+    <div class="auto-forecast-value">${autoFcst ? 'AED ' + fmtNum(autoFcst) : '—'}</div>
+    <div class="auto-forecast-formula">${dealBase ? '(' + fmtNum(commitVal) + ' + ' + fmtNum(bestCaseVal) + ') × ' + Math.round(stageW*100) + '%' + (stale?' × 50%':'') : 'enter commit / best case'}</div>
+  `;
+  fcstTd.appendChild(fcstWrap);
+  tr.appendChild(fcstTd);
+
+  // Closed (Win) AED — actual closed-won revenue captured for the rep this week
+  tr.appendChild(makeNumCell(ri, 'closedWon', 'col-closed-bg', row.closedWon, editable));
 
   // Blocked (text only)
   tr.appendChild(makeTextCell(ri, 'blocked', 'col-blocked-bg blocked-text-input', row.blocked, editable, 'Any blockers…'));
@@ -1842,6 +2176,106 @@ function makeNumCell(ri, field, bgClass, value, editable) {
   td.appendChild(inp); return td;
 }
 
+/* ════════════════════════════════════════
+   BUYER SIGNALS  (6-checkbox grid)
+   Editable mode: 2-col grid of checkboxes.
+   Locked mode:   chips for the ones that were checked.
+════════════════════════════════════════ */
+function ensureBuyerSignals(row) {
+  if (!row.buyerSignals || typeof row.buyerSignals !== 'object') {
+    row.buyerSignals = {};
+  }
+  BUYER_SIGNAL_KEYS.forEach(k => {
+    if (typeof row.buyerSignals[k] !== 'boolean') row.buyerSignals[k] = false;
+  });
+  return row.buyerSignals;
+}
+function renderBuyerSignalsCell(td, ri, row, editable) {
+  td.innerHTML = '';
+  const sig = ensureBuyerSignals(row);
+  if (editable) {
+    const grid = document.createElement('div');
+    grid.className = 'buyer-signals-grid';
+    BUYER_SIGNAL_KEYS.forEach(k => {
+      const lab = document.createElement('label');
+      if (sig[k]) lab.classList.add('checked');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!sig[k];
+      cb.addEventListener('change', e => {
+        const r = getCurWeekRows()[ri];
+        if (!r) return;
+        ensureBuyerSignals(r);
+        r.buyerSignals[k] = e.target.checked;
+        saveAll();
+        renderTable();
+        renderKPIs();
+        renderSummaryBar();
+      });
+      const sp = document.createElement('span');
+      sp.textContent = BUYER_SIGNAL_LABELS[k];
+      lab.appendChild(cb); lab.appendChild(sp);
+      grid.appendChild(lab);
+    });
+    td.appendChild(grid);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'buyer-signals-locked';
+    const checkedKeys = BUYER_SIGNAL_KEYS.filter(k => sig[k]);
+    if (!checkedKeys.length) {
+      const muted = document.createElement('span');
+      muted.className = 'buyer-signal-chip muted';
+      muted.textContent = 'No signals';
+      wrap.appendChild(muted);
+    } else {
+      checkedKeys.forEach(k => {
+        const chip = document.createElement('span');
+        chip.className = 'buyer-signal-chip';
+        chip.textContent = BUYER_SIGNAL_LABELS[k];
+        wrap.appendChild(chip);
+      });
+    }
+    td.appendChild(wrap);
+  }
+}
+
+/* ════════════════════════════════════════
+   QUALIFICATION SCORE
+   60% buyer signals (0-60) + 40% stage progress (0-40) = 0-100
+════════════════════════════════════════ */
+function computeQualScore(row) {
+  const sig = ensureBuyerSignals(row);
+  const sigCount = BUYER_SIGNAL_KEYS.reduce((s,k)=>s+(sig[k]?1:0),0);
+  const sigPart  = (sigCount / BUYER_SIGNAL_KEYS.length) * 60;     // 0-60
+  const stagePart = (STAGE_WEIGHTS[row.stage] || 0) * 40 / 0.75;   // Negotiation(0.75)→40, Proposal→26.7, Qualified→13.3
+  const score = Math.round(sigPart + stagePart);
+  let tier = 'cold', color = '#f87171';
+  if (score >= 70)      { tier = 'hot';  color = '#34d399'; }
+  else if (score >= 40) { tier = 'warm'; color = '#fcd34d'; }
+  return { score, tier, color };
+}
+function renderQualScoreCell(td, row) {
+  td.innerHTML = '';
+  const { score, tier, color } = computeQualScore(row);
+  const wrap = document.createElement('div');
+  wrap.className = 'qual-score-wrap';
+  const val = document.createElement('div');
+  val.className = `qual-score-value tier-${tier}`;
+  val.textContent = score;
+  const bar = document.createElement('div');
+  bar.className = 'qual-score-bar';
+  const fill = document.createElement('div');
+  fill.className = 'qual-score-bar-fill';
+  fill.style.width = score + '%';
+  fill.style.background = color;
+  bar.appendChild(fill);
+  const tierLabel = document.createElement('div');
+  tierLabel.className = 'qual-score-tier';
+  tierLabel.textContent = tier;
+  wrap.appendChild(val); wrap.appendChild(bar); wrap.appendChild(tierLabel);
+  td.appendChild(wrap);
+}
+
 function renderNotesCell(td, ri, notesVal, editable) {
   td.innerHTML = '';
   const lines = (notesVal||'').split('\n').map(l=>l.replace(/^-\s*/,'')).filter(l=>l.trim());
@@ -1879,31 +2313,36 @@ function renderTotalsRow(rows, tbody, colCount) {
   // The stale-halving adjustment is shown in the KPI cards instead.
   const num = v => parseFloat(v) || 0;
 
-  const totCommit   = rows.reduce((s,r)=>s+num(r.commitValue),   0);
-  const totBestCase = rows.reduce((s,r)=>s+num(r.bestCaseValue), 0);
-  const totPipeline = rows.reduce((s,r)=>s+num(r.totalPipeline), 0);
-  const totXS1      = rows.reduce((s,r)=>s+num(r.forecastXS1),   0);
-  const totXP1      = rows.reduce((s,r)=>s+num(r.forecastXP1),   0);
+  const totCommit    = rows.reduce((s,r)=>s+num(r.commitValue),   0);
+  const totBestCase  = rows.reduce((s,r)=>s+num(r.bestCaseValue), 0);
+  const totPipeline  = rows.reduce((s,r)=>s+num(r.totalPipeline), 0);
+  const totClosedWon = rows.reduce((s,r)=>s+num(r.closedWon),     0);
+  const totXS1       = rows.reduce((s,r)=>s+num(r.forecastXS1),   0);
+  const totXP1       = rows.reduce((s,r)=>s+num(r.forecastXP1),   0);
 
   const tr = document.createElement('tr'); tr.className = 'totals-row';
-  // 13 cols → 13 cells:
-  // 0 Rep | 1 Stage | 2 CommitName | 3 CommitAED | 4 NextAction
-  // 5 BestCaseName | 6 BestCaseAED | 7 TotalPipeline | 8 Blocked
-  // 9 ForecastXS1 | 10 ForecastXP1 | 11 Notes | 12 Submit
+  // 16 cols → 16 cells (latest7.8 layout):
+  // 0 Rep | 1 CommitName | 2 CommitAED | 3 BuyerSignals | 4 QualScore
+  // 5 NextAction | 6 BestCaseName | 7 BestCaseAED
+  // 8 Confidence | 9 TotalForecast | 10 ClosedWon | 11 Blocked
+  // 12 ForecastXS1 | 13 ForecastXP1 | 14 Notes | 15 Submit
   const cells = [
     'TOTALS',                  // 0  Rep
-    '',                        // 1  Stage
-    '',                        // 2  Commit Deal Name
-    fmtNum(totCommit),         // 3  Commit (AED)
-    '',                        // 4  Next Action
-    '',                        // 5  Best Case Deal Name
-    fmtNum(totBestCase),       // 6  Best Case (AED) ✓
-    fmtNum(totPipeline),       // 7  Total Pipeline ✓
-    '',                        // 8  Blocked
-    fmtNum(totXS1),            // 9  Forecast XS1 ✓
-    fmtNum(totXP1),            // 10 Forecast XP1 ✓
-    '',                        // 11 Notes
-    ''                         // 12 Submit / Status
+    '',                        // 1  Commit Deal Name
+    fmtNum(totCommit),         // 2  Commit (AED) ✓
+    '',                        // 3  Buyer Signals
+    '',                        // 4  Qual Score
+    '',                        // 5  Next Action
+    '',                        // 6  Best Case Deal Name
+    fmtNum(totBestCase),       // 7  Best Case (AED) ✓
+    '',                        // 8  Confidence
+    fmtNum(totPipeline),       // 9  Total Forecast ✓
+    fmtNum(totClosedWon),      // 10 Closed (Win) ✓
+    '',                        // 11 Blocked
+    fmtNum(totXS1),            // 12 Forecast XS1 ✓
+    fmtNum(totXP1),            // 13 Forecast XP1 ✓
+    '',                        // 14 Notes
+    ''                         // 15 Submit / Status
   ];
   cells.forEach((c, idx) => {
     const td = document.createElement('td');
@@ -1922,28 +2361,54 @@ function renderKPIs() {
   const rows    = getCurWeekRows();
   const weekKey = `${curYear}-${curMonth}-${curWeek}`;
 
-  // Effective values apply 50% weight reduction to stale rows
-  const eff = r => isRowStale(r, weekKey) ? 0.5 : 1.0;
+  // Effective multiplier: stage weight × stale penalty (halved if stale)
+  const stageMult = r => (STAGE_WEIGHTS[r.stage] || 0);
+  const staleMult = r => isRowStale(r, weekKey) ? 0.5 : 1.0;
+  // Weighted forecast = (Commit + Best Case) × confidence weight × stale-penalty
+  const weightedForecast = r => ((parseFloat(r.commitValue)||0) + (parseFloat(r.bestCaseValue)||0)) * stageMult(r) * staleMult(r);
 
-  const totCommit   = rows.reduce((s,r)=>s+(parseFloat(r.commitValue)||0)*eff(r),0);
-  const totBestCase = rows.reduce((s,r)=>s+(parseFloat(r.bestCaseValue)||0)*eff(r),0);
-  const totPipeline = rows.reduce((s,r)=>s+(parseFloat(r.totalPipeline)||0),0);
-  const totXS1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
-  const totXP1      = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
+  const totCommit       = rows.reduce((s,r)=>s+(parseFloat(r.commitValue)||0),0);
+  const totBestCase     = rows.reduce((s,r)=>s+(parseFloat(r.bestCaseValue)||0),0);
+  const totPipelineRaw  = rows.reduce((s,r)=>s+(parseFloat(r.totalPipeline)||0),0);
+  const totWeightedFcst = rows.reduce((s,r)=>s+weightedForecast(r),0);
+  const totClosedWon    = rows.reduce((s,r)=>s+(parseFloat(r.closedWon)||0),0);
+  const closingReps     = rows.filter(r => (parseFloat(r.closedWon)||0) > 0).length;
+  const totXS1          = rows.reduce((s,r)=>s+(parseFloat(r.forecastXS1)||0),0);
+  const totXP1          = rows.reduce((s,r)=>s+(parseFloat(r.forecastXP1)||0),0);
 
   const commitCount   = rows.filter(r => parseFloat(r.commitValue) > 0 || (r.commitText   && r.commitText.trim())).length;
   const bestCaseCount = rows.filter(r => parseFloat(r.bestCaseValue)> 0 || (r.bestCaseText && r.bestCaseText.trim())).length;
-  const staleCount    = rows.filter(r => isRowStale(r, weekKey)).length;
-  const submitted     = rows.filter(r => r.locked).length;
+  // Count submissions by unique rep (defensive against duplicate seeded rows for the same rep)
+  const submittedReps = new Set(rows.filter(r => r.locked && r.rep).map(r => r.rep));
+  const submitted     = submittedReps.size;
+
+  // Average confidence = mean qualification score across rows that have any deal activity
+  const scoredRows = rows.filter(r =>
+       (parseFloat(r.commitValue)||0) > 0
+    || (r.commitText && r.commitText.trim())
+    || (r.bestCaseText && r.bestCaseText.trim())
+  );
+  const avgConfidence = scoredRows.length
+    ? Math.round(scoredRows.reduce((s,r)=>s+computeQualScore(r).score,0) / scoredRows.length)
+    : 0;
 
   document.getElementById('kpiHotAED').textContent     = 'AED ' + fmtNum(totCommit);
   document.getElementById('kpiHotCount').textContent   = commitCount + ' commit deals';
   document.getElementById('kpiWarmAED').textContent    = 'AED ' + fmtNum(totBestCase);
   document.getElementById('kpiWarmCount').textContent  = bestCaseCount + ' best-case deals';
-  document.getElementById('kpiForecastAED').textContent= 'AED ' + fmtNum(totPipeline);
+  // Forecast KPI now reflects stage-weighted forecast (Commit × stage weight) not raw pipeline
+  document.getElementById('kpiForecastAED').textContent= 'AED ' + fmtNum(totWeightedFcst);
+  const fcstSub = document.querySelector('#kpiForecastAED + .kpi-sub');
+  if (fcstSub) fcstSub.textContent = `Pipeline AED ${fmtNum(totPipelineRaw)} · confidence-weighted`;
+  const cwEl = document.getElementById('kpiClosedWon');
+  if (cwEl) cwEl.textContent = 'AED ' + fmtNum(totClosedWon);
+  const cwSub = document.getElementById('kpiClosedWonSub');
+  if (cwSub) cwSub.textContent = `${closingReps} rep${closingReps===1?'':'s'} closing this week`;
   document.getElementById('kpiXS1').textContent        = fmtNum(totXS1);
   document.getElementById('kpiXP1').textContent        = fmtNum(totXP1);
-  document.getElementById('kpiConf').textContent       = staleCount > 0 ? staleCount + ' stale' : '0 stale';
+  document.getElementById('kpiConf').textContent       = avgConfidence + '%';
+  const confSub = document.querySelector('#kpiConf + .kpi-sub');
+  if (confSub) confSub.textContent = scoredRows.length ? `${scoredRows.length} active deal${scoredRows.length===1?'':'s'}` : 'No active deals';
   document.getElementById('kpiSubmitted').textContent  = `${submitted} / ${ALL_REPS.length}`;
 }
 
@@ -1984,9 +2449,7 @@ function doSubmit(ri) {
   row.submittedBy = currentUser;
   row.submittedAt = new Date().toISOString();
   saveAll();
-  renderTable();
-  renderKPIs();
-  renderCommitPanel();
+  renderAll();   // full rerender → KPIs, commit panel, summary bar all update
   showToast(`Entry submitted and locked for ${row.rep}`, 'success');
 }
 
@@ -2002,17 +2465,21 @@ function submitAllOrMine() {
     : `Submit ALL ${targets.length} unlocked entries for Week ${curWeek+1}? They will all be locked.`;
 
   openConfirmModal('Confirm submission', msg, () => {
-    targets.forEach(({i}) => {
-      const r = rows[i];
-      r.locked = true;
-      r.submittedBy = currentUser;
-      r.submittedAt = new Date().toISOString();
+    // Re-fetch rows fresh AFTER user confirms (defensive against any concurrent re-seed)
+    const freshRows = getCurWeekRows();
+    const nowIso = new Date().toISOString();
+    let lockedCount = 0;
+    freshRows.forEach(r => {
+      if (canSubmitRow(r)) {
+        r.locked = true;
+        r.submittedBy = currentUser;
+        r.submittedAt = nowIso;
+        lockedCount++;
+      }
     });
     saveAll();
-    renderTable();
-    renderKPIs();
-    renderCommitPanel();
-    showToast(`${targets.length} entr${targets.length===1?'y':'ies'} submitted`, 'success');
+    renderAll();                                  // full rerender so every panel reflects state
+    showToast(`${lockedCount} entr${lockedCount===1?'y':'ies'} submitted`, 'success');
   });
 }
 
@@ -2056,21 +2523,34 @@ function resetWeek() {
 function exportCSV() {
   const rows    = getCurWeekRows();
   const weekKey = `${curYear}-${curMonth}-${curWeek}`;
-  const header  = ['Team','Sales Rep','Stage','Stale?',
-                   'Commit Deal','Commit Value (AED)','Next Action',
+  const header  = ['Team','Sales Rep','Confidence','Confidence Weight %','Stale?',
+                   'Commit Deal','Commit Value (AED)','Weighted Forecast (AED)',
+                   'Qual Score','Qual Tier',
+                   'Buyer: Budget','Buyer: Timeline','Buyer: Champion',
+                   'Buyer: Tech Fit','Buyer: Decision-Maker','Buyer: Comp Out',
+                   'Next Action',
                    'Best Case Deal','Best Case Value (AED)',
-                   'Total Pipeline (AED)','Blocked',
+                   'Total Forecast (AED)','Closed (Win) AED','Blocked',
                    'Forecast XS1','Forecast XP1','Notes',
                    'Submitted','Submitted By','Submitted At'];
   const lines = [header.join(',')];
   const esc   = v => `"${String(v??'').replace(/"/g,'""')}"`;
   rows.forEach(r => {
+    const sig = ensureBuyerSignals(r);
+    const stageW = Math.round((STAGE_WEIGHTS[r.stage]||0)*100);
+    const stale  = isRowStale(r, weekKey);
+    const weighted = ((parseFloat(r.commitValue)||0) + (parseFloat(r.bestCaseValue)||0)) * (STAGE_WEIGHTS[r.stage]||0) * (stale?0.5:1);
+    const qs = computeQualScore(r);
     lines.push([
-      esc(r.team), esc(r.rep), esc(r.stage),
-      isRowStale(r, weekKey) ? 'YES' : 'NO',
-      esc(r.commitText),   r.commitValue||0,   esc(r.commitAction),
+      esc(r.team), esc(r.rep), esc(r.stage), stageW,
+      stale ? 'YES' : 'NO',
+      esc(r.commitText),   r.commitValue||0, Math.round(weighted),
+      qs.score, esc(qs.tier),
+      sig.budget?'Y':'N', sig.timeline?'Y':'N', sig.champion?'Y':'N',
+      sig.technicalFit?'Y':'N', sig.decisionMaker?'Y':'N', sig.competitorOut?'Y':'N',
+      esc(r.commitAction),
       esc(r.bestCaseText), r.bestCaseValue||0,
-      r.totalPipeline||0,  esc(r.blocked),
+      r.totalPipeline||0,  r.closedWon||0,  esc(r.blocked),
       r.forecastXS1||0, r.forecastXP1||0,
       esc((r.notes||'').replace(/\n/g,' | ')),
       r.locked ? 'YES' : 'NO',
@@ -2290,7 +2770,7 @@ function hsMapStage(hsStageLabel) {
   if (s.includes('proposal'))   return 'Proposal';
   if (s.includes('quote'))      return 'Proposal';
   if (s.includes('present'))    return 'Proposal';
-  return 'Discovery';
+  return 'Qualified';
 }
 
 async function hubspotFetchDealsForRep(repName) {
