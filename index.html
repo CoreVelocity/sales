@@ -799,6 +799,40 @@
   }
   .hubspot-chip.connected .hs-dot { background: #10b981; box-shadow: 0 0 6px #10b981; }
 
+  /* HubSpot Private App token modal */
+  .hs-token-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1100; backdrop-filter: blur(6px);
+  }
+  .hs-token-modal {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; width: min(560px, 92vw);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .hs-token-title {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    font-size: 15px; font-weight: 700; color: var(--text);
+    background: linear-gradient(135deg, rgba(255,122,57,0.12), transparent);
+  }
+  .hs-token-body { padding: 18px 20px; }
+  .hs-token-input {
+    width: 100%; padding: 10px 12px; font-family: 'SF Mono', Monaco, monospace;
+    font-size: 12px; background: var(--bg-elev); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    box-sizing: border-box;
+  }
+  .hs-token-input:focus { outline: none; border-color: var(--accent); }
+  .hs-token-actions {
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .hs-token-body code {
+    background: var(--bg-elev); padding: 1px 6px; border-radius: 4px;
+    font-size: 11px; color: var(--accent);
+  }
+
   /* HubSpot deal-picker modal */
   .hs-modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -1532,7 +1566,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest8.3 / sales-rep-performance + pipeline-coverage-ratio / 2026-05-30
+// BUILD: latest8.6 / hubspot-private-app-token + drive-list-fetch-fix / 2026-05-30
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -2968,33 +3002,21 @@ function exportCSV() {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   HUBSPOT CRM INTEGRATION  ── OAuth 2.0 (per-user)
-   ────────────────────────────────────────────────────────────────────
-   FLOW:
-     1. User clicks "Connect HubSpot" chip in the topbar.
-     2. We open the HubSpot OAuth authorize URL in a popup.
-     3. After the user grants access, HubSpot redirects to our
-        configured redirect URI (a small handler page on this same
-        domain that posts the code+state back via window.opener).
-     4. The popup posts { code } -> we exchange via a token endpoint.
-        Because HubSpot's token endpoint requires the client_secret
-        which can't live in this static page, you MUST host a tiny
-        token-exchange proxy (e.g. a Cloudflare Worker or Azure
-        Function). Set HUBSPOT_CONFIG.tokenProxy to its URL.
-     5. We store {access_token, refresh_token, expires_at} in
-        localStorage under HUBSPOT_STORE_KEY.
-     6. To pull deals for the current rep, we hit the v3 CRM API:
-          POST /crm/v3/objects/deals/search
-          body: filterGroups -> hubspot_owner_id = <rep owner id>
-        Owner ID is resolved once via /crm/v3/owners?email=...
-        and cached in localStorage.
-════════════════════════════════════════════════════════════════════ */
+   HUBSPOT CRM INTEGRATION  ── Private App token (admin-only)
+   ══════════════════════════════════════════════════════════════════ */
+/* ──────────────────────────────────────────────────────────────────
+   PRIVATE APP MODE (no OAuth, no proxy, no developer account)
+   ──────────────────────────────────────────────────────────────────
+   Admin opens "Connect HubSpot" → modal asks for a HubSpot
+   Private App access token (pat-na1-...). We store it ONLY in this
+   browser's localStorage under HUBSPOT_TOKEN_KEY. It is never sent
+   anywhere except api.hubapi.com.
+   Required Private App scopes:
+     crm.objects.deals.read
+     crm.objects.owners.read
+     crm.schemas.deals.read
+   ────────────────────────────────────────────────────────────── */
 const HUBSPOT_CONFIG = {
-  clientId    : '',                                              // <- paste HubSpot OAuth client id
-  redirectUri : window.location.origin + window.location.pathname + '?hs_oauth=1',
-  scopes      : 'oauth crm.objects.deals.read crm.objects.owners.read crm.schemas.deals.read',
-  tokenProxy  : '',                                              // <- your /hubspot/token proxy URL
-  refreshProxy: '',                                              // <- your /hubspot/refresh proxy URL (often same path)
   // Map of OXEFIT rep name -> HubSpot user email (used to resolve owner_id)
   repEmails   : {
     'Ahmed'  : '',
@@ -3002,48 +3024,34 @@ const HUBSPOT_CONFIG = {
     'Wafiq'  : '',  'Jawdat'  : '',  'Hussein': '',  'Connor'  : ''
   }
 };
-const HUBSPOT_STORE_KEY = 'oxefit_hubspot_tokens_v1';
+const HUBSPOT_TOKEN_KEY  = 'oxefit_hubspot_pat_v1';
 const HUBSPOT_OWNERS_KEY = 'oxefit_hubspot_owners_v1';
 
 let hubspotState = {
   accessToken : null,
-  refreshToken: null,
-  expiresAt   : 0,
-  fetchedDeals: [],     // last-fetched deal list
+  fetchedDeals: [],
   selected    : new Set()
 };
 
 function hsLoadTokens() {
   try {
-    const raw = localStorage.getItem(HUBSPOT_STORE_KEY);
-    if (!raw) return;
-    const t = JSON.parse(raw);
-    hubspotState.accessToken  = t.access_token  || null;
-    hubspotState.refreshToken = t.refresh_token || null;
-    hubspotState.expiresAt    = t.expires_at    || 0;
+    const t = localStorage.getItem(HUBSPOT_TOKEN_KEY);
+    if (t) hubspotState.accessToken = t;
   } catch(_) {}
 }
-function hsSaveTokens(t) {
-  const expiresAt = Date.now() + ((t.expires_in || 1800) * 1000) - 60000; // 60s safety
-  const blob = {
-    access_token : t.access_token,
-    refresh_token: t.refresh_token || hubspotState.refreshToken,
-    expires_at   : expiresAt
-  };
-  localStorage.setItem(HUBSPOT_STORE_KEY, JSON.stringify(blob));
-  hubspotState.accessToken  = blob.access_token;
-  hubspotState.refreshToken = blob.refresh_token;
-  hubspotState.expiresAt    = blob.expires_at;
+function hsSaveToken(token) {
+  const tok = String(token || '').trim();
+  if (!tok) return;
+  localStorage.setItem(HUBSPOT_TOKEN_KEY, tok);
+  hubspotState.accessToken = tok;
 }
 function hsClearTokens() {
-  localStorage.removeItem(HUBSPOT_STORE_KEY);
+  localStorage.removeItem(HUBSPOT_TOKEN_KEY);
   hubspotState.accessToken = null;
-  hubspotState.refreshToken = null;
-  hubspotState.expiresAt = 0;
 }
 
 function hsIsConnected() {
-  return !!hubspotState.accessToken && Date.now() < hubspotState.expiresAt + 7*24*3600*1000;
+  return !!hubspotState.accessToken;
 }
 
 function renderHubspotChip() {
@@ -3059,81 +3067,112 @@ function renderHubspotChip() {
   }
 }
 
-async function hubspotConnectOrSync() {
-  if (!HUBSPOT_CONFIG.clientId) {
-    showToast('HubSpot not configured — set HUBSPOT_CONFIG.clientId', 'error');
-    return;
-  }
+function hubspotConnectOrSync() {
   if (hsIsConnected()) {
     openHubspotModal();
   } else {
-    hubspotStartOAuth();
+    if (currentRole !== 'admin') {
+      showToast('Only admin can connect HubSpot', 'error');
+      return;
+    }
+    openHubspotTokenModal();
   }
 }
 
-function hubspotStartOAuth() {
-  const state = Math.random().toString(36).slice(2);
-  sessionStorage.setItem('hs_oauth_state', state);
-  const url = 'https://app.hubspot.com/oauth/authorize'
-    + '?client_id='    + encodeURIComponent(HUBSPOT_CONFIG.clientId)
-    + '&redirect_uri=' + encodeURIComponent(HUBSPOT_CONFIG.redirectUri)
-    + '&scope='        + encodeURIComponent(HUBSPOT_CONFIG.scopes)
-    + '&state='        + state;
-  const popup = window.open(url, 'hubspot_oauth', 'width=560,height=720');
-  if (!popup) { showToast('Popup blocked — allow popups for HubSpot', 'error'); return; }
-  // Listen for the code from the popup
-  const handler = async (ev) => {
-    if (!ev.data || ev.data.source !== 'hubspot_oauth') return;
-    window.removeEventListener('message', handler);
-    if (ev.data.state !== sessionStorage.getItem('hs_oauth_state')) {
-      showToast('OAuth state mismatch', 'error'); return;
-    }
-    if (ev.data.error) { showToast('HubSpot: ' + ev.data.error, 'error'); return; }
-    await hubspotExchangeCode(ev.data.code);
-  };
-  window.addEventListener('message', handler);
+function openHubspotTokenModal() {
+  const existing = hubspotState.accessToken || '';
+  const html = `
+    <div class="hs-token-modal-overlay" id="hsTokenOverlay">
+      <div class="hs-token-modal">
+        <div class="hs-token-title">🔑 Connect HubSpot — Private App Token</div>
+        <div class="hs-token-body">
+          <p style="margin:0 0 10px 0;font-size:13px;color:var(--text-secondary);">
+            Paste your HubSpot <strong>Private App access token</strong> below.
+            It is stored only in this browser's local storage and is never
+            transmitted anywhere except <code>api.hubapi.com</code>.
+          </p>
+          <ol style="margin:0 0 14px 18px;font-size:12px;color:var(--text-muted);line-height:1.7;">
+            <li>In HubSpot, go to <strong>Settings → Integrations → Private Apps</strong></li>
+            <li>Click <strong>Create a private app</strong></li>
+            <li>Under <strong>Scopes</strong>, enable:
+              <code>crm.objects.deals.read</code>,
+              <code>crm.objects.owners.read</code>,
+              <code>crm.schemas.deals.read</code>
+            </li>
+            <li>Click <strong>Create app</strong> → copy the access token (starts with <code>pat-na1-…</code>)</li>
+            <li>Paste it below</li>
+          </ol>
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;">Access Token</label>
+          <input type="password" id="hsTokenInput" class="hs-token-input"
+                 placeholder="pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                 value="${escapeHtml(existing)}" autocomplete="off" spellcheck="false">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+            <label style="font-size:11px;color:var(--text-muted);cursor:pointer;">
+              <input type="checkbox" id="hsTokenShow" onchange="document.getElementById('hsTokenInput').type=this.checked?'text':'password'"> Show token
+            </label>
+            <a href="https://app.hubspot.com/private-apps/" target="_blank" rel="noopener"
+               style="font-size:11px;color:var(--accent);">Open HubSpot Private Apps ↗</a>
+          </div>
+          <div id="hsTokenErr" style="display:none;color:#dc2626;font-size:12px;margin-top:8px;"></div>
+        </div>
+        <div class="hs-token-actions">
+          ${existing ? '<button class="btn-secondary" onclick="hubspotDisconnect()">Disconnect</button>' : ''}
+          <button class="btn-secondary" onclick="closeHubspotTokenModal()">Cancel</button>
+          <button class="btn-primary" onclick="hubspotSaveAndTestToken()">Save &amp; Test</button>
+        </div>
+      </div>
+    </div>`;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstElementChild);
 }
 
-async function hubspotExchangeCode(code) {
-  if (!HUBSPOT_CONFIG.tokenProxy) {
-    showToast('Set HUBSPOT_CONFIG.tokenProxy to your token-exchange URL', 'error');
+function closeHubspotTokenModal() {
+  const o = document.getElementById('hsTokenOverlay');
+  if (o) o.remove();
+}
+
+async function hubspotSaveAndTestToken() {
+  const val = (document.getElementById('hsTokenInput').value || '').trim();
+  const err = document.getElementById('hsTokenErr');
+  err.style.display = 'none';
+  if (!val) { err.textContent = 'Please paste your Private App token.'; err.style.display = 'block'; return; }
+  if (!/^pat-/i.test(val)) {
+    err.textContent = 'That doesn\'t look like a Private App token (should start with "pat-").';
+    err.style.display = 'block'; return;
+  }
+  // Test the token with a cheap call
+  try {
+    const r = await fetch('https://api.hubapi.com/crm/v3/owners?limit=1', {
+      headers: { 'Authorization': 'Bearer ' + val }
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      err.textContent = 'HubSpot rejected the token (' + r.status + '): ' + txt.slice(0, 200);
+      err.style.display = 'block';
+      return;
+    }
+  } catch (e) {
+    err.textContent = 'Network error testing token: ' + (e.message || e);
+    err.style.display = 'block';
     return;
   }
-  try {
-    const r = await fetch(HUBSPOT_CONFIG.tokenProxy, {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ code, redirect_uri: HUBSPOT_CONFIG.redirectUri })
-    });
-    if (!r.ok) throw new Error('Token exchange failed: ' + r.status);
-    const tok = await r.json();
-    hsSaveTokens(tok);
-    renderHubspotChip();
-    showToast('HubSpot connected', 'success');
-    openHubspotModal();
-  } catch(e) {
-    showToast(e.message || 'HubSpot connect failed', 'error');
-  }
+  hsSaveToken(val);
+  renderHubspotChip();
+  closeHubspotTokenModal();
+  showToast('HubSpot connected ✓', 'success');
+  openHubspotModal();
 }
 
-async function hubspotRefreshIfNeeded() {
-  if (Date.now() < hubspotState.expiresAt) return true;
-  if (!hubspotState.refreshToken || !HUBSPOT_CONFIG.refreshProxy) return false;
-  try {
-    const r = await fetch(HUBSPOT_CONFIG.refreshProxy, {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ refresh_token: hubspotState.refreshToken })
-    });
-    if (!r.ok) return false;
-    const tok = await r.json();
-    hsSaveTokens(tok);
-    return true;
-  } catch(_) { return false; }
+function hubspotDisconnect() {
+  hsClearTokens();
+  renderHubspotChip();
+  closeHubspotTokenModal();
+  showToast('HubSpot disconnected', 'success');
 }
 
 async function hubspotApi(path, opts = {}) {
-  if (!await hubspotRefreshIfNeeded()) throw new Error('HubSpot session expired — reconnect');
+  if (!hubspotState.accessToken) throw new Error('HubSpot not connected — click the chip to connect');
   const url = path.startsWith('http') ? path : 'https://api.hubapi.com' + path;
   const r = await fetch(url, {
     ...opts,
@@ -3143,6 +3182,10 @@ async function hubspotApi(path, opts = {}) {
       'Authorization': 'Bearer ' + hubspotState.accessToken
     }
   });
+  if (r.status === 401) {
+    hsClearTokens(); renderHubspotChip();
+    throw new Error('HubSpot token rejected — reconnect');
+  }
   if (!r.ok) throw new Error('HubSpot ' + r.status + ': ' + await r.text());
   return r.json();
 }
@@ -3319,20 +3362,7 @@ function hubspotDisconnect() {
   showToast('HubSpot disconnected', 'success');
 }
 
-// Handle the OAuth popup landing on this same page (?hs_oauth=1)
-(function handleHubspotOAuthLanding() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('hs_oauth') !== '1') return;
-  const code  = params.get('code');
-  const state = params.get('state');
-  const err   = params.get('error') || params.get('error_description');
-  if (window.opener) {
-    window.opener.postMessage({
-      source: 'hubspot_oauth', code, state, error: err
-    }, window.location.origin);
-    window.close();
-  }
-})();
+// (OAuth landing handler removed — Private App tokens don't need it.)
 
 // Small HTML-escape helper (in case the file doesn't already have one nearby)
 function escapeHtml(s) {
@@ -3541,28 +3571,33 @@ async function gdListFolder(folderId, pushStack) {
   filesDiv.innerHTML = '<div class="gdrive-empty">Loading…</div>';
 
   try {
-    await gdWaitForGapiClient();
+    if (!gdAccessToken) throw new Error('Not signed in to Google Drive');
 
-    // Pass the bearer token from GIS into gapi.client
-    gapi.client.setToken({ access_token: gdAccessToken });
-
-    // DIRECT REST CALL — bypasses content.googleapis.com entirely.
-    // Uses gapi.client.request() which only hits www.googleapis.com/drive/v3/files,
-    // covered by the "Google Drive API" allow-list in the key restriction.
-    const resp = await gapi.client.request({
-      path: 'https://www.googleapis.com/drive/v3/files',
-      method: 'GET',
-      params: {
-        q: `'${folderId}' in parents and trashed=false`,
-        fields: 'files(id,name,mimeType,modifiedTime,iconLink,webViewLink,size)',
-        orderBy: 'folder,name',
-        pageSize: 100,
-        supportsAllDrives: true,
-        includeItemsFromAllDrives: true
-      }
+    // DIRECT FETCH — bypass gapi.client entirely. The gapi.client.request()
+    // path was sending the API key together with the OAuth bearer, which
+    // Drive's files.list rejects with "API keys are not supported by this
+    // API. Expected OAuth2 access token" → 400. Plain fetch + Bearer works.
+    const qs = new URLSearchParams({
+      q: `'${folderId}' in parents and trashed=false`,
+      fields: 'files(id,name,mimeType,modifiedTime,iconLink,webViewLink,size)',
+      orderBy: 'folder,name',
+      pageSize: '100',
+      supportsAllDrives: 'true',
+      includeItemsFromAllDrives: 'true'
     });
-
-    const files = (resp.result && resp.result.files) || [];
+    const httpResp = await fetch(
+      'https://www.googleapis.com/drive/v3/files?' + qs.toString(),
+      { headers: { 'Authorization': 'Bearer ' + gdAccessToken } }
+    );
+    if (!httpResp.ok) {
+      const body = await httpResp.text();
+      const err = new Error('Drive ' + httpResp.status + ': ' + body);
+      err.status = httpResp.status;
+      try { err.result = JSON.parse(body); } catch(_) {}
+      throw err;
+    }
+    const respJson = await httpResp.json();
+    const files = respJson.files || [];
 
     // Breadcrumb
     document.getElementById('gdBreadcrumb').style.display = '';
