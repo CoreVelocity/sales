@@ -807,10 +807,46 @@
   }
   .hs-token-modal {
     background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 14px; width: min(560px, 92vw);
+    border-radius: 14px; width: min(620px, 94vw);
+    max-height: 92vh;
     box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-    overflow: hidden;
+    overflow: hidden; display: flex; flex-direction: column;
   }
+  .hs-token-body { overflow-y: auto; }
+  /* ── Owner Mapping Panel (latest9) ───────────────────────── */
+  .hs-ownermap-list {
+    display: flex; flex-direction: column; gap: 6px;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px;
+    max-height: 260px; overflow-y: auto;
+  }
+  .hs-ownermap-row {
+    display: grid; grid-template-columns: 110px 16px 1fr;
+    align-items: center; gap: 8px;
+    padding: 4px 6px;
+  }
+  .hs-ownermap-rep {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    white-space: nowrap;
+  }
+  .hs-ownermap-arrow {
+    color: var(--text-muted); font-size: 13px; text-align: center;
+  }
+  .hs-ownermap-select {
+    width: 100%; padding: 5px 8px;
+    background: var(--bg-card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    font-size: 11px; font-family: inherit;
+    cursor: pointer;
+  }
+  .hs-ownermap-select:focus { outline: none; border-color: var(--accent); }
+  .hs-spinner {
+    display: inline-block; width: 10px; height: 10px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: hsSpin 0.8s linear infinite;
+    vertical-align: middle; margin-right: 4px;
+  }
+  @keyframes hsSpin { to { transform: rotate(360deg); } }
   .hs-token-title {
     padding: 16px 20px; border-bottom: 1px solid var(--border);
     font-size: 15px; font-weight: 700; color: var(--text);
@@ -1566,7 +1602,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest8.7 / hubspot-cors-proxy + worker-template-modal / 2026-05-29
+// BUILD: latest9 / hubspot-owner-mapping-panel / 2026-05-29
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -3032,8 +3068,29 @@ const HUBSPOT_CONFIG = {
   }
 };
 const HUBSPOT_TOKEN_KEY  = 'oxefit_hubspot_pat_v1';
-const HUBSPOT_OWNERS_KEY = 'oxefit_hubspot_owners_v1';
+const HUBSPOT_OWNERS_KEY = 'oxefit_hubspot_owners_v1';   // legacy: email -> ownerId cache
 const HUBSPOT_PROXY_KEY  = 'oxefit_hubspot_proxy_v1';
+const HUBSPOT_OWNERMAP_KEY = 'oxefit_hubspot_ownermap_v1'; // NEW: rep-name -> ownerId
+
+/* ──────────────────────────────────────────────────────────────────
+   OWNER MAPPING (latest9) — admin picks the HubSpot user for each rep
+   from a dropdown auto-populated by GET /crm/v3/owners. Persists in
+   localStorage as { "Fatima": "12345678", "Marios": "23456789", ... }
+   ────────────────────────────────────────────────────────────── */
+function hsGetOwnerMap() {
+  try { return JSON.parse(localStorage.getItem(HUBSPOT_OWNERMAP_KEY) || '{}'); }
+  catch(_) { return {}; }
+}
+function hsSaveOwnerMap(map) {
+  localStorage.setItem(HUBSPOT_OWNERMAP_KEY, JSON.stringify(map || {}));
+}
+function hsGetOwnerIdForRep(repName) {
+  const map = hsGetOwnerMap();
+  return map[repName] || null;
+}
+
+// In-memory cache of full owner list fetched from HubSpot
+let hsAllOwners = []; // [{id, email, firstName, lastName, fullName}]
 
 function hsGetProxyBase() {
   try {
@@ -3097,7 +3154,13 @@ function renderHubspotChip() {
 
 function hubspotConnectOrSync() {
   if (hsIsConnected()) {
-    openHubspotModal();
+    // latest9: admin clicks chip → opens settings (token + owner-mapping panel).
+    // Reps click chip → straight to deal-picker for their row.
+    if (currentRole === 'admin') {
+      openHubspotTokenModal();
+    } else {
+      openHubspotModal();
+    }
   } else {
     if (currentRole !== 'admin') {
       showToast('Only admin can connect HubSpot', 'error');
@@ -3155,17 +3218,34 @@ function openHubspotTokenModal() {
             </div>
           </div>
           <div id="hsTokenErr" style="display:none;color:#dc2626;font-size:12px;margin-top:8px;"></div>
+
+          <!-- ── Owner Mapping Panel (latest9) ─────────────────────── -->
+          <div style="margin-top:18px;padding-top:14px;border-top:1px dashed var(--border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <label style="font-size:12px;font-weight:600;">👥 Rep ↔ HubSpot Owner Mapping</label>
+              <span style="font-size:10px;color:var(--text-muted);">Required before importing deals</span>
+            </div>
+            <div id="hsOwnerMapPanel">
+              <div style="font-size:12px;color:var(--text-muted);padding:10px 0;">
+                Save your token first to load the HubSpot owner list.
+              </div>
+            </div>
+          </div>
         </div>
         <div class="hs-token-actions">
           ${existing ? '<button class="btn-secondary" onclick="hubspotDisconnect()">Disconnect</button>' : ''}
-          <button class="btn-secondary" onclick="closeHubspotTokenModal()">Cancel</button>
-          <button class="btn-primary" onclick="hubspotSaveAndTestToken()">Save &amp; Test</button>
+          <button class="btn-secondary" onclick="closeHubspotTokenModal()">Close</button>
+          <button class="btn-primary" onclick="hubspotSaveAndTestToken()">Save Token &amp; Test</button>
         </div>
       </div>
     </div>`;
   const wrap = document.createElement('div');
   wrap.innerHTML = html;
   document.body.appendChild(wrap.firstElementChild);
+  // latest9: if we're already connected, render the mapping panel on open
+  if (hsIsConnected()) {
+    setTimeout(() => hsRenderOwnerMappingPanel(), 50);
+  }
 }
 
 function closeHubspotTokenModal() {
@@ -3290,9 +3370,11 @@ async function hubspotSaveAndTestToken() {
   }
   hsSaveToken(val);
   renderHubspotChip();
-  closeHubspotTokenModal();
   showToast('HubSpot connected ✓', 'success');
-  openHubspotModal();
+  // latest9: keep the modal open and reveal the Owner Mapping panel so
+  // the admin can immediately assign reps → HubSpot owners without
+  // re-opening the dialog.
+  hsRenderOwnerMappingPanel();
 }
 
 function hubspotDisconnect() {
@@ -3339,6 +3421,130 @@ async function hubspotResolveOwnerId(email) {
   return id || null;
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   OWNER MAPPING PANEL (latest9)
+   ────────────────────────────────────────────────────────────── */
+async function hsFetchAllOwners(force = false) {
+  if (!force && hsAllOwners.length) return hsAllOwners;
+  // Paginate through /crm/v3/owners (HubSpot returns up to 100 per page)
+  const all = [];
+  let after = null;
+  for (let safety = 0; safety < 10; safety++) {  // hard cap at 1000 owners
+    const path = '/crm/v3/owners?limit=100' + (after ? '&after=' + encodeURIComponent(after) : '');
+    const data = await hubspotApi(path);
+    (data.results || []).forEach(o => {
+      const first = o.firstName || '';
+      const last  = o.lastName  || '';
+      const full  = (first + ' ' + last).trim() || (o.email || '(unnamed)');
+      all.push({
+        id        : o.id,
+        email     : o.email || '',
+        firstName : first,
+        lastName  : last,
+        fullName  : full
+      });
+    });
+    after = data.paging && data.paging.next && data.paging.next.after;
+    if (!after) break;
+  }
+  // Sort by name for the dropdown
+  all.sort((a, b) => a.fullName.localeCompare(b.fullName));
+  hsAllOwners = all;
+  return all;
+}
+
+async function hsRenderOwnerMappingPanel() {
+  const container = document.getElementById('hsOwnerMapPanel');
+  if (!container) return;
+
+  // Need a token and proxy before we can call /owners
+  if (!hsIsConnected()) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">'
+      + 'Save a valid token first — then the rep ↔ HubSpot owner dropdowns will appear here.</div>';
+    return;
+  }
+  container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">'
+    + '<span class="hs-spinner"></span> Fetching HubSpot owner list…</div>';
+
+  let owners;
+  try {
+    owners = await hsFetchAllOwners(false);
+  } catch (e) {
+    container.innerHTML = '<div style="font-size:12px;color:#fca5a5;padding:10px 0;">'
+      + 'Could not fetch owners: ' + escapeHtml(e.message || String(e)) + '</div>';
+    return;
+  }
+
+  if (!owners.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">'
+      + 'HubSpot returned 0 owners. Make sure your Private App has scope <code>crm.objects.owners.read</code>.</div>';
+    return;
+  }
+
+  const map = hsGetOwnerMap();
+  const optBlank = '<option value="">— not mapped —</option>';
+  const opts = owners.map(o => {
+    const labelEmail = o.email ? ' (' + o.email + ')' : '';
+    return `<option value="${escapeHtml(o.id)}">${escapeHtml(o.fullName)}${escapeHtml(labelEmail)}</option>`;
+  }).join('');
+
+  const rows = ALL_REPS.map(rep => {
+    const selected = map[rep] || '';
+    // Build options with the correct one pre-selected
+    const optsWithSel = optBlank + owners.map(o => {
+      const sel = (o.id === selected) ? ' selected' : '';
+      const labelEmail = o.email ? ' (' + o.email + ')' : '';
+      return `<option value="${escapeHtml(o.id)}"${sel}>${escapeHtml(o.fullName)}${escapeHtml(labelEmail)}</option>`;
+    }).join('');
+    const statusBadge = selected
+      ? '<span style="color:#10b981;font-size:10px;font-weight:700;">●</span>'
+      : '<span style="color:var(--text-muted);font-size:10px;">○</span>';
+    return `
+      <div class="hs-ownermap-row">
+        <div class="hs-ownermap-rep">${statusBadge}&nbsp;${escapeHtml(rep)}</div>
+        <div class="hs-ownermap-arrow">→</div>
+        <select class="hs-ownermap-select" data-rep="${escapeHtml(rep)}">
+          ${optsWithSel}
+        </select>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">
+      For each OXEFIT rep, pick the matching HubSpot user. The tracker uses this to fetch the right deals.
+      Mappings save to this browser only.
+    </div>
+    <div class="hs-ownermap-list">${rows}</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button class="btn-secondary" onclick="hsRefreshOwnerList()" style="font-size:11px;padding:6px 12px;">↻ Refresh Owners</button>
+      <button class="btn-primary" onclick="hsSaveOwnerMapping()" style="font-size:11px;padding:6px 14px;">Save Mapping</button>
+    </div>
+    <div id="hsOwnerMapStatus" style="font-size:11px;text-align:right;margin-top:6px;color:var(--text-muted);"></div>
+  `;
+}
+
+async function hsRefreshOwnerList() {
+  hsAllOwners = [];
+  await hsRenderOwnerMappingPanel();
+  const s = document.getElementById('hsOwnerMapStatus');
+  if (s) { s.textContent = 'Owner list refreshed from HubSpot.'; s.style.color = '#10b981'; }
+}
+
+function hsSaveOwnerMapping() {
+  const map = {};
+  document.querySelectorAll('#hsOwnerMapPanel .hs-ownermap-select').forEach(sel => {
+    const rep = sel.dataset.rep;
+    const val = sel.value;
+    if (rep && val) map[rep] = val;
+  });
+  hsSaveOwnerMap(map);
+  // Re-render to update the green/grey dots
+  hsRenderOwnerMappingPanel();
+  const s = document.getElementById('hsOwnerMapStatus');
+  if (s) { s.textContent = '✓ Saved ' + Object.keys(map).length + ' mapping' + (Object.keys(map).length === 1 ? '' : 's') + '.'; s.style.color = '#10b981'; }
+  showToast('Owner mapping saved', 'success');
+}
+
 // HubSpot stage label heuristic -> our 3 stages
 function hsMapStage(hsStageLabel) {
   const s = (hsStageLabel || '').toLowerCase();
@@ -3353,10 +3559,18 @@ function hsMapStage(hsStageLabel) {
 }
 
 async function hubspotFetchDealsForRep(repName) {
-  const email = HUBSPOT_CONFIG.repEmails[repName];
-  if (!email) throw new Error('No HubSpot email mapped for ' + repName);
-  const ownerId = await hubspotResolveOwnerId(email);
-  if (!ownerId) throw new Error('Owner not found in HubSpot for ' + email);
+  // ── latest9: prefer the admin-configured owner-id map ─────────
+  let ownerId = hsGetOwnerIdForRep(repName);
+  // ── legacy fallback: email-based lookup from HUBSPOT_CONFIG ───
+  if (!ownerId) {
+    const email = HUBSPOT_CONFIG.repEmails[repName];
+    if (!email) {
+      throw new Error('No HubSpot owner mapped for ' + repName +
+        ' — open Connect HubSpot → Owner Mapping panel to assign one.');
+    }
+    ownerId = await hubspotResolveOwnerId(email);
+    if (!ownerId) throw new Error('Owner not found in HubSpot for ' + email);
+  }
 
   const body = {
     filterGroups: [{ filters: [
