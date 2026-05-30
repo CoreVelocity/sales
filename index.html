@@ -1763,6 +1763,11 @@
         <div class="kpi-sub" id="kpiClosedWonSub">0 reps closing</div>
       </div>
       <div class="kpi-card">
+        <div class="kpi-label">Total Pipeline <span style="font-size:9px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 5px;border-radius:3px;letter-spacing:0.5px;">HS</span></div>
+        <div class="kpi-value" id="kpiTotalPipeline" style="color:#fb923c;">AED 0</div>
+        <div class="kpi-sub" id="kpiTotalPipelineSub">From HubSpot</div>
+      </div>
+      <div class="kpi-card">
         <div class="kpi-label">Forecast XS1</div>
         <div class="kpi-value" id="kpiXS1">0</div>
         <div class="kpi-sub">Units</div>
@@ -2490,7 +2495,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest9 / m365-sso-login + hubspot-owner-mapping-panel / 2026-05-30
+// BUILD: latest11.3 / total-pipeline-hubspot-everywhere / 2026-05-30
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -3320,7 +3325,7 @@ function renderAll() {
    and a separate locked-vs-pending sub-count tells you how many are final. */
 function renderCommitPanel() {
   const md = getCurMonthData();
-  const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, xs1:0, xp1:0, count:0, locked:0, pending:0 });
+  const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, truePipeline:0, xs1:0, xp1:0, count:0, locked:0, pending:0, syncedReps:new Set() });
   const agg = { 'Dubai': blank(), 'Abu Dhabi': blank() };
   md.weeks.forEach((w, wi) => {
     if (!w) return;
@@ -3347,12 +3352,39 @@ function renderCommitPanel() {
       t.xp1       += xp1;
       t.count++;
       if (r.locked) t.locked++; else t.pending++;
+      // truePipeline is the HubSpot-sourced sum of open deals per rep;
+      // it is a per-rep snapshot — take the max across weeks (not summed) so we
+      // don't double-count the same CRM snapshot across multiple weeks.
+      if (r.hubspotSynced) t.syncedReps.add(r.rep);
     });
   });
+  // Per-team Total Pipeline (HubSpot): for each rep, take the LATEST non-zero
+  // truePipeline snapshot across the month (don't sum — each weekly snapshot
+  // represents the same CRM state at sync time).
+  ['Dubai', 'Abu Dhabi'].forEach(teamName => {
+    let teamTP = 0;
+    TEAMS[teamName].forEach(repName => {
+      let latestTP = 0;
+      md.weeks.forEach(w => {
+        if (!w) return;
+        w.forEach(r => {
+          if (r.rep === repName && r.hubspotSynced) {
+            const tp = parseFloat(r.truePipeline) || 0;
+            if (tp > 0) latestTP = tp; // overwrites with most recent week's snapshot
+          }
+        });
+      });
+      teamTP += latestTP;
+    });
+    agg[teamName].truePipeline = teamTP;
+  });
   const total = blank();
-  ['commit','forecast','bestCase','closedWon','xs1','xp1','count','locked','pending'].forEach(k => {
+  ['commit','forecast','bestCase','closedWon','truePipeline','xs1','xp1','count','locked','pending'].forEach(k => {
     total[k] = agg['Dubai'][k] + agg['Abu Dhabi'][k];
   });
+  // Combine synced rep sets
+  agg['Dubai'].syncedReps.forEach(r => total.syncedReps.add(r));
+  agg['Abu Dhabi'].syncedReps.forEach(r => total.syncedReps.add(r));
   const card = (cls, label, d, totalCount) => `
     <div class="commit-card ${cls}">
       <div class="commit-card-label">${label}</div>
@@ -3361,6 +3393,7 @@ function renderCommitPanel() {
         <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">AED ${fmtNum(d.forecast)||'0'}</div></div>
         <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">AED ${fmtNum(d.bestCase)||'0'}</div></div>
         <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value gold">AED ${fmtNum(d.closedWon)||'0'}</div></div>
+        <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value" style="color:#fb923c;">${d.truePipeline ? 'AED ' + fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? 'AED 0' : '—')}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
       </div>
@@ -3481,6 +3514,7 @@ function renderTable() {
     {label:'Confidence',             cls:'col-stage'},
     {label:'Total Forecast (AED)',   cls:'col-forecast'},
     {label:'Closed (Win) AED',       cls:'col-closed'},
+    {label:'Total Pipeline (HS)',    cls:'col-closed'},
     {label:'Blocked',                cls:'col-blocked'},
     {label:'Forecast XS1',           cls:'col-forecast'},
     {label:'Forecast XP1',           cls:'col-forecast'},
@@ -3637,6 +3671,29 @@ function renderRow(row, ri, tbody) {
         </div>`;
     }
     tr.appendChild(cwTd);
+  }
+
+  // Total Pipeline — sourced EXCLUSIVELY from HubSpot (sum of all open deals
+  // for the rep). Mirrors the Closed-Won pattern: read-only with HS badge,
+  // empty-state prompt when not yet synced.
+  {
+    const tpTd = document.createElement('td');
+    tpTd.className = 'col-closed-bg';
+    if (row.hubspotSynced) {
+      const tpVal = parseFloat(row.truePipeline) || 0;
+      tpTd.innerHTML = `
+        <div class="hs-sourced-cell" title="From HubSpot · open deals · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
+          <div class="hs-sourced-value">${tpVal ? 'AED ' + fmtNum(tpVal) : '—'}</div>
+          <div class="hs-sourced-badge">HubSpot</div>
+        </div>`;
+    } else {
+      tpTd.innerHTML = `
+        <div class="hs-empty-cell" title="Total Pipeline is sourced from HubSpot only. Click Sync HubSpot to pull figures.">
+          <div class="hs-empty-value">—</div>
+          <div class="hs-empty-badge">Sync HubSpot</div>
+        </div>`;
+    }
+    tr.appendChild(tpTd);
   }
 
   // Blocked (text only)
@@ -3871,32 +3928,35 @@ function renderTotalsRow(rows, tbody, colCount) {
   const totBestCase  = rows.reduce((s,r)=>s+num(r.bestCaseValue), 0);
   const totPipeline  = rows.reduce((s,r)=>s+num(r.totalPipeline), 0);
   const totClosedWon = rows.reduce((s,r)=>s+num(r.closedWon),     0);
+  const totTruePipeline = rows.reduce((s,r)=>s+num(r.truePipeline), 0);
+  const anyCrmSynced = rows.some(r => r.hubspotSynced);
   const totXS1       = rows.reduce((s,r)=>s+num(r.forecastXS1),   0);
   const totXP1       = rows.reduce((s,r)=>s+num(r.forecastXP1),   0);
 
   const tr = document.createElement('tr'); tr.className = 'totals-row';
-  // 16 cols → 16 cells (latest7.8 layout):
+  // 17 cols → 17 cells (latest11.3 layout, +Total Pipeline column):
   // 0 Rep | 1 CommitName | 2 CommitAED | 3 BuyerSignals | 4 QualScore
   // 5 NextAction | 6 BestCaseName | 7 BestCaseAED
-  // 8 Confidence | 9 TotalForecast | 10 ClosedWon | 11 Blocked
-  // 12 ForecastXS1 | 13 ForecastXP1 | 14 Notes | 15 Submit
+  // 8 Confidence | 9 TotalForecast | 10 ClosedWon | 11 TotalPipeline | 12 Blocked
+  // 13 ForecastXS1 | 14 ForecastXP1 | 15 Notes | 16 Submit
   const cells = [
-    'TOTALS',                  // 0  Rep
-    '',                        // 1  Commit Deal Name
-    fmtNum(totCommit),         // 2  Commit (AED) ✓
-    '',                        // 3  Buyer Signals
-    '',                        // 4  Qual Score
-    '',                        // 5  Next Action
-    '',                        // 6  Best Case Deal Name
-    fmtNum(totBestCase),       // 7  Best Case (AED) ✓
-    '',                        // 8  Confidence
-    fmtNum(totPipeline),       // 9  Total Forecast ✓
-    fmtNum(totClosedWon),      // 10 Closed (Win) ✓
-    '',                        // 11 Blocked
-    fmtNum(totXS1),            // 12 Forecast XS1 ✓
-    fmtNum(totXP1),            // 13 Forecast XP1 ✓
-    '',                        // 14 Notes
-    ''                         // 15 Submit / Status
+    'TOTALS',                                                            // 0  Rep
+    '',                                                                  // 1  Commit Deal Name
+    fmtNum(totCommit),                                                   // 2  Commit (AED) ✓
+    '',                                                                  // 3  Buyer Signals
+    '',                                                                  // 4  Qual Score
+    '',                                                                  // 5  Next Action
+    '',                                                                  // 6  Best Case Deal Name
+    fmtNum(totBestCase),                                                 // 7  Best Case (AED) ✓
+    '',                                                                  // 8  Confidence
+    fmtNum(totPipeline),                                                 // 9  Total Forecast ✓
+    fmtNum(totClosedWon),                                                // 10 Closed (Win) ✓
+    anyCrmSynced ? fmtNum(totTruePipeline) : '—',                        // 11 Total Pipeline (HS) ✓
+    '',                                                                  // 12 Blocked
+    fmtNum(totXS1),                                                      // 13 Forecast XS1 ✓
+    fmtNum(totXP1),                                                      // 14 Forecast XP1 ✓
+    '',                                                                  // 15 Notes
+    ''                                                                   // 16 Submit / Status
   ];
   cells.forEach((c, idx) => {
     const td = document.createElement('td');
@@ -3967,6 +4027,19 @@ function renderKPIs() {
   if (cwEl) cwEl.textContent = 'AED ' + fmtNum(totClosedWon);
   const cwSub = document.getElementById('kpiClosedWonSub');
   if (cwSub) cwSub.textContent = `${closingReps} rep${closingReps===1?'':'s'} closing this week`;
+  // Total Pipeline KPI (HubSpot-sourced — sum of all open deals owned by reps)
+  const tpEl    = document.getElementById('kpiTotalPipeline');
+  const tpSubEl = document.getElementById('kpiTotalPipelineSub');
+  if (tpEl) {
+    if (anyCrmSynced && totTruePipeline > 0) {
+      tpEl.textContent = 'AED ' + fmtNum(totTruePipeline);
+      const syncedReps = rows.filter(r => r.hubspotSynced).length;
+      if (tpSubEl) tpSubEl.textContent = `HubSpot · ${syncedReps} rep${syncedReps===1?'':'s'} synced`;
+    } else {
+      tpEl.textContent = 'AED 0';
+      if (tpSubEl) tpSubEl.textContent = 'Sync HubSpot to populate';
+    }
+  }
   document.getElementById('kpiXS1').textContent        = fmtNum(totXS1);
   document.getElementById('kpiXP1').textContent        = fmtNum(totXP1);
   document.getElementById('kpiConf').textContent       = avgConfidence + '%';
@@ -5711,6 +5784,10 @@ function renderPerfRepCards(repPerf) {
 
         <div class="rep-units">
           <div>
+            <div class="lbl">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;">HS</span></div>
+            <div class="val" style="color:#fb923c;">${p.pcrPipeline ? fmtAED(p.pcrPipeline) : '—'}</div>
+          </div>
+          <div>
             <div class="lbl">XS1 Forecast</div>
             <div class="val">${fmtNum(p.totals.xs1)}</div>
           </div>
@@ -5746,6 +5823,7 @@ function renderPerfLeaderboard(repPerf) {
     { key: 'accuracy',       label: 'Accuracy' },
     { key: 'commitVariance', label: 'Commit Δ' },
     { key: 'pcr',            label: 'PCR' },
+    { key: 'pcrPipeline',    label: 'Pipeline (HS)' },
     { key: 'totals.closed',  label: 'Closed Won', accessor: p => p.totals.closed }
   ];
 
@@ -5770,6 +5848,7 @@ function renderPerfLeaderboard(repPerf) {
       <td class="${accClass(p.accuracy)}">${fmtPct(p.accuracy)}</td>
       <td class="${varClass(p.commitVariance)}">${fmtSigned(p.commitVariance)}</td>
       <td class="${pcrClass(p.pcr)}">${p.pcr != null ? p.pcr.toFixed(2)+'×' : '—'}</td>
+      <td style="color:#fb923c;font-weight:600;">${p.pcrPipeline ? fmtAED(p.pcrPipeline) : '—'}</td>
       <td>${fmtAED(p.totals.closed)}</td>
     </tr>`).join('')}</tbody>`;
 
