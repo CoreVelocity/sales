@@ -124,6 +124,55 @@
   .login-btn:active { transform: scale(0.98); }
   .login-hint { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 18px; line-height: 1.6; }
 
+  /* MICROSOFT 365 SSO BUTTON — Microsoft brand guidelines:
+     white background, 1px #8C8C8C border, official 4-square logo */
+  .ms-signin-btn {
+    width: 100%;
+    background: #ffffff; color: #5e5e5e;
+    border: 1px solid #8c8c8c; border-radius: 10px;
+    font-family: 'Segoe UI', 'Barlow', system-ui, sans-serif;
+    font-size: 15px; font-weight: 600;
+    padding: 13px 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .ms-signin-btn:hover { background: #f5f5f5; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+  .ms-signin-btn:active { transform: scale(0.98); }
+  .ms-signin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .ms-signin-btn .ms-logo { flex-shrink: 0; }
+  .login-sso-hint {
+    text-align: center; font-size: 12px; color: var(--text-muted);
+    margin-top: 12px; margin-bottom: 4px;
+  }
+  .login-sso-hint b { color: var(--accent2); font-weight: 600; }
+
+  /* DIVIDER between SSO and viewer fallback */
+  .login-divider {
+    display: flex; align-items: center; margin: 24px 0 16px;
+    color: var(--text-muted); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .login-divider::before, .login-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .login-divider span { padding: 0 14px; }
+
+  /* VIEWER toggle (subtle link-style button) */
+  .viewer-toggle-btn {
+    width: 100%; background: transparent;
+    border: 1px dashed var(--border); border-radius: 10px;
+    color: var(--text-muted);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 11px 14px; cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .viewer-toggle-btn:hover {
+    border-color: var(--accent2); color: var(--text);
+    background: rgba(37,99,235,0.05);
+  }
+
   /* MAIN APP */
   #app { display: none; flex-direction: column; min-height: 100vh; }
   #app.visible { display: flex; }
@@ -1171,45 +1220,43 @@
            onerror="this.style.display='none'">
     </div>
     <div class="login-title">Sales Commitment Tracker</div>
-    <div class="login-field">
-      <label>Name</label>
-      <select id="loginUser">
-        <option value="">— Select your name —</option>
-        <optgroup label="Admin">
-          <option value="Ahmed">Ahmed (Admin)</option>
-        </optgroup>
-        <optgroup label="Dubai Team">
-          <option value="Fatima">Fatima</option>
-          <option value="Marios">Marios</option>
-          <option value="Hasan">Hasan</option>
-          <option value="Katy">Katy</option>
-          <option value="Milene">Milene</option>
-        </optgroup>
-        <optgroup label="Abu Dhabi Team">
-          <option value="Wafiq">Wafiq</option>
-          <option value="Jawdat">Jawdat</option>
-          <option value="Hussein">Hussein</option>
-          <option value="Connor">Connor</option>
-        </optgroup>
-        <optgroup label="Other">
-          <option value="__viewer__">View-only access</option>
-        </optgroup>
-      </select>
+
+    <!-- PRIMARY: Microsoft 365 SSO (sales reps + admin) -->
+    <button class="ms-signin-btn" onclick="handleMicrosoftLogin()" id="msSignInBtn">
+      <svg class="ms-logo" width="20" height="20" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="1"  y="1"  width="9" height="9" fill="#f25022"/>
+        <rect x="11" y="1"  width="9" height="9" fill="#7fba00"/>
+        <rect x="1"  y="11" width="9" height="9" fill="#00a4ef"/>
+        <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+      </svg>
+      <span>Sign in with Microsoft</span>
+    </button>
+    <div class="login-sso-hint">Use your <b>@core-velocity.com</b> work account</div>
+
+    <div class="login-divider"><span>or</span></div>
+
+    <!-- SECONDARY: Viewer access (external, read-only) -->
+    <button class="viewer-toggle-btn" onclick="toggleViewerForm()" id="viewerToggleBtn">
+      View-only access (external guest)
+    </button>
+
+    <div id="viewerForm" style="display:none; margin-top: 18px;">
+      <div class="login-field">
+        <label>Your Name</label>
+        <input type="text" id="viewerName" placeholder="Enter your name" autocomplete="off"/>
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password (min 8 chars)"/>
+      </div>
+      <button class="login-btn" onclick="handleViewerLogin()">Enter as Viewer</button>
     </div>
-    <div class="login-field" id="viewerNameWrap" style="display:none;">
-      <label>Your Name (for viewer access)</label>
-      <input type="text" id="viewerName" placeholder="Enter your name" autocomplete="off"/>
-    </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="loginPass" placeholder="Enter password"/>
-    </div>
+
     <div class="login-error" id="loginError">Incorrect password.</div>
-    <button class="login-btn" onclick="handleLogin()">Enter Tracker</button>
-    <div class="login-hint">
-      Admin: full edit rights.<br/>
-      Sales rep: can edit & submit own row.<br/>
-      Viewer: read-only access.
+
+    <div class="login-hint" style="margin-top: 24px;">
+      Sales reps &amp; admin: sign in with Microsoft.<br/>
+      External viewers: use the link above for read-only access.
     </div>
   </div>
 </div>
@@ -1602,7 +1649,7 @@
    If clientId is left blank the app falls back to local-storage
    only (offline mode) and a yellow banner appears.
 ════════════════════════════════════════════════════════════════════ */
-// BUILD: latest9 / hubspot-owner-mapping-panel / 2026-05-29
+// BUILD: latest9 / m365-sso-login + hubspot-owner-mapping-panel / 2026-05-30
 const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
@@ -1645,6 +1692,39 @@ const TEAMS = {
   'Abu Dhabi': ['Wafiq', 'Jawdat', 'Hussein', 'Connor']
 };
 const ALL_REPS = Object.values(TEAMS).flat();
+
+/* ── M365 SSO IDENTITY MAP ────────────────────────────────────────
+   Maps Microsoft 365 work email (core-velocity.com) → tracker rep name.
+   When a user signs in with Microsoft, MSAL returns the account's
+   `username` (= UPN / work email). We look it up here to decide:
+     • who they are (rep name shown in the UI)
+     • their role (admin if Ahmed, otherwise rep)
+   Anyone whose email is NOT in this map is rejected with a clear
+   "your Microsoft account is not authorized" message.
+   ──────────────────────────────────────────────────────────────── */
+const REP_EMAILS = {
+  // Admin
+  'ahmed@core-velocity.com'   : 'Ahmed',
+  // Dubai team
+  'fatima@core-velocity.com'  : 'Fatima',
+  'marios@core-velocity.com'  : 'Marios',
+  'hasan@core-velocity.com'   : 'Hasan',
+  'katy@core-velocity.com'    : 'Katy',
+  'milene@core-velocity.com'  : 'Milene',
+  // Abu Dhabi team
+  'wafiq@core-velocity.com'   : 'Wafiq',
+  'jawdat@core-velocity.com'  : 'Jawdat',
+  'hussein@core-velocity.com' : 'Hussein',
+  'connor@core-velocity.com'  : 'Connor'
+};
+// Reverse lookup: rep name -> email (case-preserved for display)
+const REP_TO_EMAIL = Object.fromEntries(
+  Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
+);
+function lookupRepByEmail(email) {
+  if (!email) return null;
+  return REP_EMAILS[email.toLowerCase().trim()] || null;
+}
 
 // Credentials — Ahmed has a hard-coded admin password.
 // All other reps & viewers self-register their own password on first login.
@@ -1872,42 +1952,57 @@ function setSyncStatus(status, text) {
                             : status === 'error'    ? 'Sync error' : 'Offline');
 }
 
-async function initOneDrive() {
+async function initOneDrive(opts) {
+  // opts.silent = true → init MSAL only, don't auto-download or update UI.
+  //                     Used at page bootstrap so the "Sign in with Microsoft"
+  //                     button is ready before the user clicks it.
+  // Returns the redirect-response account (if any) so callers can wire SSO.
+  const silent = opts && opts.silent;
   if (!ONEDRIVE_CONFIG.clientId) {
-    document.getElementById('setupNotice').style.display = 'block';
-    setSyncStatus('offline', 'Local only');
-    return;
+    if (!silent) {
+      document.getElementById('setupNotice').style.display = 'block';
+      setSyncStatus('offline', 'Local only');
+    }
+    return null;
   }
   try {
-    msalInstance = new msal.PublicClientApplication({
-      auth: {
-        clientId   : ONEDRIVE_CONFIG.clientId,
-        authority  : ONEDRIVE_CONFIG.authority,
-        redirectUri: ONEDRIVE_CONFIG.redirectUri
-      },
-      cache: { cacheLocation: 'localStorage' }
-    });
-    await msalInstance.initialize();
+    if (!msalInstance) {
+      msalInstance = new msal.PublicClientApplication({
+        auth: {
+          clientId   : ONEDRIVE_CONFIG.clientId,
+          authority  : ONEDRIVE_CONFIG.authority,
+          redirectUri: ONEDRIVE_CONFIG.redirectUri
+        },
+        cache: { cacheLocation: 'localStorage' }
+      });
+      await msalInstance.initialize();
+    }
+
     // Capture redirect response (when returning from loginRedirect) and
     // clear any stale "interaction_in_progress" flag from a previous tab/session
     let redirectRes = null;
     try { redirectRes = await msalInstance.handleRedirectPromise(); } catch(_) {}
     if (redirectRes && redirectRes.account) {
       msalAccount = redirectRes.account;
-      await downloadFromOneDrive();
-      showToast('Connected to OneDrive', 'success');
-      return;
+      if (!silent) {
+        await downloadFromOneDrive();
+        showToast('Connected to OneDrive', 'success');
+      }
+      return redirectRes.account;
     }
     const accts = msalInstance.getAllAccounts();
     if (accts.length) {
       msalAccount = accts[0];
-      await downloadFromOneDrive();
+      if (!silent) await downloadFromOneDrive();
+      return accts[0];
     } else {
-      setSyncStatus('offline', 'Sign in to OneDrive');
+      if (!silent) setSyncStatus('offline', 'Sign in to OneDrive');
+      return null;
     }
   } catch(e) {
     console.error('MSAL init failed', e);
-    setSyncStatus('error', 'Sync error');
+    if (!silent) setSyncStatus('error', 'Sync error');
+    return null;
   }
 }
 
@@ -2071,61 +2166,145 @@ function showToast(msg, type) {
 }
 
 /* ════════════════════════════════════════
-   LOGIN
+   LOGIN — Microsoft 365 SSO (primary) + Viewer fallback
 ════════════════════════════════════════ */
-document.getElementById('loginUser').addEventListener('change', e => {
-  const v = e.target.value;
-  document.getElementById('viewerNameWrap').style.display = (v === '__viewer__') ? 'block' : 'none';
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleViewerLogin();
 });
-document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
 
-async function handleLogin() {
-  const sel = document.getElementById('loginUser').value;
+function toggleViewerForm() {
+  const form = document.getElementById('viewerForm');
+  const btn  = document.getElementById('viewerToggleBtn');
+  const open = form.style.display === 'none';
+  form.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? '✕ Cancel viewer access' : 'View-only access (external guest)';
+  if (open) setTimeout(() => document.getElementById('viewerName').focus(), 50);
+  document.getElementById('loginError').style.display = 'none';
+}
+
+/* ──────────────────────────────────────────────────────────────
+   MICROSOFT 365 SSO  — sales reps & admin
+   Uses the same MSAL instance already configured for OneDrive
+   (single tenant: core-velocity.com). Email-to-rep mapping in
+   REP_EMAILS gates access — anyone outside that list is rejected.
+   After successful SSO, OneDrive is already authenticated (same
+   account) so no second sign-in is needed.
+   ──────────────────────────────────────────────────────────── */
+async function handleMicrosoftLogin() {
+  const btn = document.getElementById('msSignInBtn');
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  // Ensure MSAL is initialized (init happens on page load too — but if
+  // the user clicks before that resolves, await here).
+  if (!msalInstance) {
+    try {
+      await initOneDrive(/*silent*/ true);
+    } catch(_) {}
+  }
+  if (!msalInstance) {
+    showLoginError('Microsoft sign-in is not configured. Contact admin.');
+    return;
+  }
+
+  btn.disabled = true;
+  const lbl = btn.querySelector('span');
+  const origLbl = lbl.textContent;
+  lbl.textContent = 'Signing in…';
+
+  try {
+    // Prefer popup; fall back to redirect if popup blocked / popup-in-popup
+    let account = null;
+    try {
+      if (isRunningInPopup()) {
+        await msalInstance.loginRedirect({ scopes: ONEDRIVE_CONFIG.scopes });
+        return; // browser navigates away
+      }
+      const res = await msalInstance.loginPopup({
+        scopes: ONEDRIVE_CONFIG.scopes,
+        prompt: 'select_account'
+      });
+      account = res.account;
+    } catch(popupErr) {
+      // Popup blocked / running-in-popup → redirect fallback
+      const msg = (popupErr && (popupErr.errorCode || popupErr.message || '')) + '';
+      if (/popup_window_error|running in a popup|user_cancelled/i.test(msg)) {
+        if (/user_cancelled/i.test(msg)) {
+          throw popupErr; // user closed it — don't redirect
+        }
+        await msalInstance.loginRedirect({ scopes: ONEDRIVE_CONFIG.scopes });
+        return;
+      }
+      // Clear stuck interaction state
+      if (/interaction_in_progress/i.test(msg)) {
+        Object.keys(sessionStorage).filter(k => k.startsWith('msal.')).forEach(k => sessionStorage.removeItem(k));
+        throw new Error('Cleared a stuck sign-in session — please click Sign in with Microsoft again.');
+      }
+      throw popupErr;
+    }
+
+    if (!account || !account.username) {
+      throw new Error('Microsoft returned no account info.');
+    }
+
+    // Identify the rep from the work email
+    const email   = account.username;
+    const repName = lookupRepByEmail(email);
+
+    if (!repName) {
+      // Unauthorized — sign them out of MSAL silently and show error
+      try { await msalInstance.logoutPopup({ account, mainWindowRedirectUri: window.location.href }); } catch(_) {}
+      showLoginError(`Your Microsoft account (${email}) is not authorized for this tracker. Contact admin.`);
+      return;
+    }
+
+    // Set session
+    msalAccount  = account;
+    currentUser  = repName;
+    currentRole  = (repName === ADMIN_USER) ? 'admin' : 'rep';
+
+    sessionStorage.setItem('oxefit_role', currentRole);
+    sessionStorage.setItem('oxefit_user', currentUser);
+    sessionStorage.setItem('oxefit_email', email);
+
+    showToast(`Signed in as ${repName}`, 'success');
+    launchApp(/*alreadyAuthed*/ true);
+
+  } catch(e) {
+    console.error('Microsoft SSO error:', e);
+    const msg = (e && (e.errorMessage || e.message)) || 'Sign-in failed';
+    showLoginError(msg.slice(0, 180));
+  } finally {
+    btn.disabled = false;
+    lbl.textContent = origLbl;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────
+   VIEWER LOGIN — external read-only guests, name + self-set pw
+   ──────────────────────────────────────────────────────────── */
+async function handleViewerLogin() {
+  const vn  = document.getElementById('viewerName').value.trim();
   const pwd = document.getElementById('loginPass').value;
-  if (!sel) { showLoginError('Please select your name.'); return; }
+  if (!vn)  { showLoginError('Please enter your name.'); return; }
   if (!pwd) { showLoginError('Please enter a password.'); return; }
 
-  // Admin (hard-coded)
-  if (sel === ADMIN_USER) {
-    if (pwd !== ADMIN_PASS) { showLoginError('Incorrect admin password.'); return; }
-    currentRole = 'admin'; currentUser = ADMIN_USER;
-  }
-  // Viewer (free-text name, self-registered password keyed by viewer name)
-  else if (sel === '__viewer__') {
-    const vn = document.getElementById('viewerName').value.trim();
-    if (!vn) { showLoginError('Please enter your name.'); return; }
-    const key = 'viewer:' + vn.toLowerCase();
-    const result = await verifyPassword(key, pwd);
-    if (result === null) {
-      if (pwd.length < MIN_PW_LEN) {
-        showLoginError(`First login — set a password (min ${MIN_PW_LEN} chars) for "${vn}".`); return;
-      }
-      await registerPassword(key, pwd);
-      showToast(`Password registered for ${vn}`, 'success');
-    } else if (!result) {
-      showLoginError('Incorrect password.'); return;
+  const key    = 'viewer:' + vn.toLowerCase();
+  const result = await verifyPassword(key, pwd);
+  if (result === null) {
+    if (pwd.length < MIN_PW_LEN) {
+      showLoginError(`First login — set a password (min ${MIN_PW_LEN} chars) for "${vn}".`); return;
     }
-    currentRole = 'viewer'; currentUser = vn;
+    await registerPassword(key, pwd);
+    showToast(`Password registered for ${vn}`, 'success');
+  } else if (!result) {
+    showLoginError('Incorrect password.'); return;
   }
-  // Sales rep — self-registered password keyed by rep name
-  else if (ALL_REPS.includes(sel)) {
-    const result = await verifyPassword(sel, pwd);
-    if (result === null) {
-      if (pwd.length < MIN_PW_LEN) {
-        showLoginError(`First login — set a password (min ${MIN_PW_LEN} chars) for ${sel}.`); return;
-      }
-      await registerPassword(sel, pwd);
-      showToast(`Password registered for ${sel}`, 'success');
-    } else if (!result) {
-      showLoginError('Incorrect password.'); return;
-    }
-    currentRole = 'rep'; currentUser = sel;
-  } else {
-    showLoginError('Unknown user.'); return;
-  }
-
+  currentRole = 'viewer';
+  currentUser = vn;
   sessionStorage.setItem('oxefit_role', currentRole);
   sessionStorage.setItem('oxefit_user', currentUser);
+  sessionStorage.removeItem('oxefit_email');
   launchApp();
 }
 
@@ -2134,20 +2313,36 @@ function showLoginError(msg) {
   el.textContent = msg; el.style.display = 'block';
 }
 
-function signOut() {
+async function signOut() {
+  const wasRep = (currentRole === 'admin' || currentRole === 'rep');
   sessionStorage.removeItem('oxefit_role');
   sessionStorage.removeItem('oxefit_user');
+  sessionStorage.removeItem('oxefit_email');
   currentRole = null; currentUser = '';
   document.getElementById('loginError').style.display = 'none';
-  document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('viewerName').value = '';
-  document.getElementById('viewerNameWrap').style.display = 'none';
+  const vForm = document.getElementById('viewerForm');
+  if (vForm) vForm.style.display = 'none';
+  const vBtn  = document.getElementById('viewerToggleBtn');
+  if (vBtn)  vBtn.textContent = 'View-only access (external guest)';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('app').classList.remove('visible');
+
+  // Also sign out of Microsoft so the next click presents the account chooser
+  if (wasRep && msalInstance && msalAccount) {
+    try {
+      msalInstance.logoutPopup({
+        account: msalAccount,
+        mainWindowRedirectUri: window.location.href,
+        postLogoutRedirectUri: window.location.href
+      }).catch(()=>{});
+    } catch(_) {}
+    msalAccount = null;
+  }
 }
 
-async function launchApp() {
+async function launchApp(alreadyAuthed) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
 
@@ -2166,7 +2361,15 @@ async function launchApp() {
       `Sales Rep Mode — ${currentUser}: you can only edit your own row.`;
   }
 
-  await initOneDrive();
+  // OneDrive: when SSO already provided the account, just pull the file.
+  // Otherwise (viewer flow), do the standard init which will show "Sign in
+  // to OneDrive" if no cached account is found.
+  if (alreadyAuthed && msalAccount) {
+    setSyncStatus('syncing', 'Syncing…');
+    try { await downloadFromOneDrive(); } catch(_) { setSyncStatus('error', 'Sync error'); }
+  } else {
+    await initOneDrive();
+  }
   renderHubspotChip();
   renderAll();
 }
@@ -4679,13 +4882,55 @@ function saveThresh() {
 loadLocal();
 hsLoadTokens();
 
-// Restore session
-const savedRole = sessionStorage.getItem('oxefit_role');
-const savedUser = sessionStorage.getItem('oxefit_user');
-if (savedRole && savedUser) {
-  currentRole = savedRole; currentUser = savedUser;
-  launchApp();
-}
+/* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
+(async function bootstrap() {
+  // 1. Restore an existing session (admin / rep / viewer)
+  const savedRole  = sessionStorage.getItem('oxefit_role');
+  const savedUser  = sessionStorage.getItem('oxefit_user');
+  const savedEmail = sessionStorage.getItem('oxefit_email');
+
+  // Pre-initialize MSAL silently. This (a) makes the "Sign in with Microsoft"
+  // button respond instantly when clicked, (b) processes any pending
+  // loginRedirect response, and (c) detects an already-signed-in MS account.
+  let redirectAccount = null;
+  try {
+    redirectAccount = await initOneDrive({ silent: true });
+  } catch(_) {}
+
+  if (savedRole && savedUser) {
+    currentRole = savedRole;
+    currentUser = savedUser;
+    // For admin/rep, ensure MSAL account is still attached (it normally is,
+    // because cacheLocation: 'localStorage' survives reloads).
+    if ((savedRole === 'admin' || savedRole === 'rep') && !msalAccount && redirectAccount) {
+      msalAccount = redirectAccount;
+    }
+    launchApp((savedRole === 'admin' || savedRole === 'rep') && !!msalAccount);
+    return;
+  }
+
+  // 2. Returning from a Microsoft loginRedirect (mobile / popup-blocked flow)
+  if (redirectAccount && redirectAccount.username) {
+    const email   = redirectAccount.username;
+    const repName = lookupRepByEmail(email);
+    if (repName) {
+      msalAccount = redirectAccount;
+      currentUser = repName;
+      currentRole = (repName === ADMIN_USER) ? 'admin' : 'rep';
+      sessionStorage.setItem('oxefit_role', currentRole);
+      sessionStorage.setItem('oxefit_user', currentUser);
+      sessionStorage.setItem('oxefit_email', email);
+      showToast(`Signed in as ${repName}`, 'success');
+      launchApp(true);
+      return;
+    } else {
+      // Unauthorized account returned — log them out and surface error
+      try { await msalInstance.logoutPopup({ account: redirectAccount, mainWindowRedirectUri: window.location.href }); } catch(_) {}
+      showLoginError(`Your Microsoft account (${email}) is not authorized for this tracker.`);
+    }
+  }
+  // Else: stay on login screen, MSAL is now warm and ready
+})();
 </script>
 </body>
 </html>
