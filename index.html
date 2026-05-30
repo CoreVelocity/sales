@@ -210,6 +210,7 @@
   .role-badge.admin { background: rgba(30,51,112,0.5); border: 1px solid rgba(37,99,235,0.5); color: #93c5fd; }
   .role-badge.viewer { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); color: #93c5fd; }
   .role-badge.rep { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+  .role-badge.office { background: rgba(168,85,247,0.18); border: 1px solid rgba(168,85,247,0.4); color: #d8b4fe; }
   .user-chip {
     display: flex; align-items: center; gap: 8px;
     background: var(--card); border: 1px solid var(--border);
@@ -1369,6 +1370,265 @@
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
+  /* ════════════ DEMO TRACKER (v13) ════════════ */
+  .demo-hero {
+    background: linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(59,130,246,0.10) 100%);
+    border: 1px solid rgba(168,85,247,0.3); border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .demo-hero-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700;
+    letter-spacing: 1px; margin: 0; color: var(--text);
+  }
+  .demo-hero-sub { margin: 6px 0 0; color: var(--text-muted); font-size: 14px; max-width: 640px; }
+  .demo-hero-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .demo-select {
+    background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit;
+    cursor: pointer; min-width: 140px;
+  }
+  .demo-search {
+    background: rgba(0,0,0,0.3); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit;
+    min-width: 220px;
+  }
+  .demo-btn {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .demo-btn:hover { background: rgba(255,255,255,0.05); }
+  .demo-btn.primary {
+    background: linear-gradient(135deg, #a855f7, #6366f1); border-color: transparent;
+    color: white; font-weight: 700;
+  }
+  .demo-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(168,85,247,0.4); }
+  .demo-btn.ghost { background: transparent; }
+  .demo-btn.danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+  .demo-btn.danger:hover { background: rgba(239,68,68,0.25); }
+
+  .demo-perm-banner {
+    padding: 10px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px;
+    display: none;
+  }
+  .demo-perm-banner.office {
+    background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); color: #d8b4fe;
+    display: block;
+  }
+  .demo-perm-banner.rep {
+    background: rgba(16,185,129,0.10); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7;
+    display: block;
+  }
+  .demo-perm-banner.viewer {
+    background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd;
+    display: block;
+  }
+
+  /* KPI strip */
+  .demo-kpi-strip {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .demo-kpi {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; position: relative; overflow: hidden;
+  }
+  .demo-kpi::before {
+    content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%;
+    background: var(--kpi-color, #a855f7);
+  }
+  .demo-kpi-label {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
+  }
+  .demo-kpi-value {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700;
+    color: var(--text); margin-top: 4px;
+  }
+  .demo-kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Charts grid */
+  .demo-charts-grid {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px;
+  }
+  @media (max-width: 1100px) { .demo-charts-grid { grid-template-columns: 1fr; } }
+  .demo-chart-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .demo-chart-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .demo-chart-head h3 { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
+  .demo-chart-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* Horizontal bar chart */
+  .demo-bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .demo-bar-row {
+    display: grid; grid-template-columns: 90px 1fr 50px; gap: 10px; align-items: center;
+    cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.15s;
+  }
+  .demo-bar-row:hover { background: rgba(255,255,255,0.04); }
+  .demo-bar-row.active { background: rgba(168,85,247,0.15); }
+  .demo-bar-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .demo-bar-name .team-tag {
+    display: inline-block; font-size: 9px; padding: 1px 6px; border-radius: 4px;
+    margin-left: 4px; vertical-align: middle; color: var(--text-muted); background: rgba(255,255,255,0.05);
+  }
+  .demo-bar-track {
+    background: rgba(255,255,255,0.06); height: 22px; border-radius: 6px; overflow: hidden; position: relative;
+  }
+  .demo-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #a855f7, #6366f1);
+    border-radius: 6px; transition: width 0.4s ease;
+    display: flex; align-items: center; padding-left: 8px;
+  }
+  .demo-bar-fill-converted {
+    background: linear-gradient(90deg, #10b981, #059669);
+  }
+  .demo-bar-segments {
+    display: flex; height: 100%; width: 100%;
+  }
+  .demo-bar-seg { height: 100%; transition: width 0.4s ease; }
+  .demo-bar-seg.converted { background: linear-gradient(90deg, #10b981, #059669); }
+  .demo-bar-seg.pending   { background: linear-gradient(90deg, #f59e0b, #d97706); }
+  .demo-bar-seg.lost      { background: linear-gradient(90deg, #ef4444, #b91c1c); }
+  .demo-bar-count { font-size: 14px; font-weight: 700; color: var(--text); text-align: right; }
+
+  /* Funnel */
+  .demo-funnel { display: flex; flex-direction: column; gap: 8px; }
+  .demo-funnel-step {
+    background: rgba(255,255,255,0.04); border-radius: 8px;
+    padding: 14px 16px; position: relative;
+    border-left: 3px solid var(--step-color, #a855f7);
+  }
+  .demo-funnel-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+  .demo-funnel-value { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-top: 2px; }
+  .demo-funnel-pct { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
+  .demo-funnel-step.step-demos    { --step-color: #a855f7; }
+  .demo-funnel-step.step-converted { --step-color: #10b981; }
+  .demo-funnel-step.step-won      { --step-color: #fbbf24; }
+
+  /* Per-rep grid */
+  .demo-rep-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .demo-rep-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .demo-rep-card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .demo-rep-card-name { font-weight: 700; font-size: 13px; }
+  .demo-rep-card-team { font-size: 10px; color: var(--text-muted); }
+  .demo-rep-card-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .demo-rep-stat { text-align: center; padding: 6px; background: rgba(255,255,255,0.03); border-radius: 6px; }
+  .demo-rep-stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; }
+  .demo-rep-stat-val.converted { color: #6ee7b7; }
+  .demo-rep-stat-val.lost      { color: #fca5a5; }
+  .demo-rep-stat-val.pending   { color: #fcd34d; }
+  .demo-rep-stat-lbl { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+  .demo-rep-card-conv-rate {
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; font-size: 11px;
+  }
+
+  /* Log table */
+  .demo-log-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .demo-log-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 10px;
+  }
+  .demo-log-head h3 { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; }
+  .demo-log-filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .demo-log-wrap { overflow-x: auto; }
+  .demo-log-table {
+    width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px;
+  }
+  .demo-log-table th {
+    text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted);
+    border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2);
+    position: sticky; top: 0;
+  }
+  .demo-log-table td {
+    padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top; color: var(--text);
+  }
+  .demo-log-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .demo-outcome-pill {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .demo-outcome-pill.pending   { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+  .demo-outcome-pill.converted { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+  .demo-outcome-pill.lost      { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  .demo-reason-textarea {
+    width: 100%; min-width: 200px; min-height: 50px;
+    background: rgba(255,255,255,0.03); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 8px; font-family: inherit; font-size: 12px; resize: vertical;
+  }
+  .demo-reason-textarea:focus { outline: none; border-color: rgba(168,85,247,0.5); }
+  .demo-reason-textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+  .demo-reason-static {
+    font-size: 12px; color: var(--text); white-space: pre-wrap;
+    padding: 4px 0;
+  }
+  .demo-reason-empty { color: var(--text-muted); font-style: italic; font-size: 11px; }
+  .demo-row-actions { display: flex; gap: 4px; }
+  .demo-icon-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: var(--text); width: 28px; height: 28px; border-radius: 6px;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .demo-icon-btn:hover { background: rgba(255,255,255,0.1); }
+  .demo-icon-btn.danger:hover { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
+  .demo-log-empty {
+    text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px;
+  }
+
+  /* Modal form */
+  .demo-modal { max-width: 580px; width: 100%; }
+  .demo-modal .modal-foot {
+    display: flex; justify-content: flex-end; gap: 8px;
+    padding: 14px 20px; border-top: 1px solid var(--border);
+  }
+  .demo-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; }
+  .demo-form-row { display: flex; flex-direction: column; gap: 6px; }
+  .demo-form-row-full { grid-column: 1 / -1; }
+  .demo-form-row label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+  .demo-form-row .req { color: #fca5a5; }
+  .demo-form-row .optional { color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .demo-form-row input, .demo-form-row select, .demo-form-row textarea {
+    background: rgba(0,0,0,0.3); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-family: inherit; font-size: 13px;
+  }
+  .demo-form-row input:focus, .demo-form-row select:focus, .demo-form-row textarea:focus {
+    outline: none; border-color: rgba(168,85,247,0.5);
+  }
+
+  /* role-based show/hide */
+  body[data-role="rep"]    .office-only,
+  body[data-role="viewer"] .office-only,
+  body[data-role="rep"]    .office-only-th,
+  body[data-role="viewer"] .office-only-th { display: none !important; }
+
   /* ════════════ SALES REP PERFORMANCE ════════════ */
   .perf-toolbar {
     display:flex; justify-content:space-between; align-items:center;
@@ -1656,7 +1916,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 12.4.html
+      version 13.html
     </div>
   </div>
 </div>
@@ -1736,6 +1996,9 @@
     </button>
     <button class="primary-tab" data-tab="performance" onclick="switchTab('performance')">
       <span class="primary-tab-icon">🎯</span>Sales Rep Performance
+    </button>
+    <button class="primary-tab" data-tab="demos" onclick="switchTab('demos')">
+      <span class="primary-tab-icon">🎬</span>Demo Tracker
     </button>
     <button class="primary-tab" data-tab="marketing" onclick="switchTab('marketing')">
       <span class="primary-tab-icon">📈</span>Marketing Consumer Performance
@@ -1955,6 +2218,160 @@
           <button class="perf-btn ghost" onclick="closeThreshModal()">Cancel</button>
           <button class="perf-btn primary" onclick="saveThresh()">Save</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       DEMO TRACKER VIEW  (v13)
+       Owned by Office Admin (Gladys). Sales reps can only edit the
+       "Why not converted?" comment on their own demo rows.
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="tab-view" id="view-demos">
+    <div class="content">
+
+      <!-- Hero / header strip -->
+      <div class="demo-hero">
+        <div class="demo-hero-left">
+          <h1 class="demo-hero-title">🎬 Demo Tracker</h1>
+          <p class="demo-hero-sub">Weekly log of every product demo run by the sales team — owned by the Office Admin, with conversion tracking back into HubSpot deals.</p>
+        </div>
+        <div class="demo-hero-actions">
+          <select id="demoWeekSel" class="demo-select" onchange="renderDemoDashboard()"></select>
+          <select id="demoRepFilter" class="demo-select" onchange="renderDemoDashboard()">
+            <option value="">All Sales Reps</option>
+          </select>
+          <button class="demo-btn primary office-only" id="demoAddBtn" onclick="openDemoModal()" style="display:none;">+ New Demo</button>
+        </div>
+      </div>
+
+      <!-- Permissions banner -->
+      <div class="demo-perm-banner" id="demoPermBanner"></div>
+
+      <!-- KPI strip -->
+      <div class="demo-kpi-strip" id="demoKpiStrip"></div>
+
+      <!-- Two-column dashboard: demos per rep + conversion funnel -->
+      <div class="demo-charts-grid">
+        <div class="demo-chart-card">
+          <div class="demo-chart-head">
+            <h3>Demos per Sales Rep</h3>
+            <span class="demo-chart-sub">This week · click bar to filter table</span>
+          </div>
+          <div class="demo-bar-chart" id="demoBarChart"></div>
+        </div>
+        <div class="demo-chart-card">
+          <div class="demo-chart-head">
+            <h3>Conversion Funnel</h3>
+            <span class="demo-chart-sub">Demo → Deal → Closed Won</span>
+          </div>
+          <div class="demo-funnel" id="demoFunnel"></div>
+        </div>
+      </div>
+
+      <!-- Per-rep performance breakdown -->
+      <div class="demo-rep-grid" id="demoRepGrid"></div>
+
+      <!-- Master log table -->
+      <div class="demo-log-card">
+        <div class="demo-log-head">
+          <h3>Demo Log</h3>
+          <div class="demo-log-filters">
+            <input type="text" id="demoSearch" class="demo-search" placeholder="🔍 Search client name…" oninput="renderDemoLog()">
+            <select id="demoOutcomeFilter" class="demo-select" onchange="renderDemoLog()">
+              <option value="">All Outcomes</option>
+              <option value="Pending">Pending</option>
+              <option value="Converted">Converted</option>
+              <option value="Lost">Lost</option>
+            </select>
+          </div>
+        </div>
+        <div class="demo-log-wrap">
+          <table class="demo-log-table" id="demoLogTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Sales Rep</th>
+                <th>Client</th>
+                <th>Demo Type</th>
+                <th>Location</th>
+                <th>Outcome</th>
+                <th>HubSpot Deal</th>
+                <th>Reason / Notes</th>
+                <th class="office-only-th">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="demoLogBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /#view-demos -->
+
+  <!-- DEMO ENTRY MODAL (office admin only) -->
+  <div class="modal-backdrop" id="demoModal">
+    <div class="modal demo-modal">
+      <div class="modal-head">
+        <h3 id="demoModalTitle">New Demo Entry</h3>
+        <button class="modal-close" onclick="closeDemoModal()">×</button>
+      </div>
+      <div class="demo-form">
+        <div class="demo-form-row">
+          <label>Date <span class="req">*</span></label>
+          <input type="date" id="demoFormDate">
+        </div>
+        <div class="demo-form-row">
+          <label>Sales Rep <span class="req">*</span></label>
+          <select id="demoFormRep"></select>
+        </div>
+        <div class="demo-form-row">
+          <label>Client Name <span class="req">*</span></label>
+          <input type="text" id="demoFormClient" placeholder="e.g. Emirates Sports Council">
+        </div>
+        <div class="demo-form-row">
+          <label>Demo Type</label>
+          <select id="demoFormType">
+            <option value="On-site">On-site</option>
+            <option value="Showroom">Showroom</option>
+            <option value="Virtual">Virtual</option>
+            <option value="Trade Show">Trade Show</option>
+          </select>
+        </div>
+        <div class="demo-form-row">
+          <label>Location</label>
+          <input type="text" id="demoFormLocation" placeholder="e.g. Dubai Marina">
+        </div>
+        <div class="demo-form-row">
+          <label>Product Demoed</label>
+          <select id="demoFormProduct">
+            <option value="XS1">XS1</option>
+            <option value="XP1">XP1</option>
+            <option value="XS1 + XP1">XS1 + XP1</option>
+            <option value="Full Range">Full Range</option>
+          </select>
+        </div>
+        <div class="demo-form-row">
+          <label>Outcome</label>
+          <select id="demoFormOutcome" onchange="demoToggleReasonField()">
+            <option value="Pending">⏳ Pending — too early to call</option>
+            <option value="Converted">✅ Converted to deal</option>
+            <option value="Lost">❌ Lost — no deal</option>
+          </select>
+        </div>
+        <div class="demo-form-row">
+          <label>HubSpot Deal ID <span class="optional">(if Converted)</span></label>
+          <input type="text" id="demoFormDealId" placeholder="e.g. 14523678901">
+        </div>
+        <div class="demo-form-row demo-form-row-full">
+          <label>Notes <span class="optional">(initial context — rep can add reason later)</span></label>
+          <textarea id="demoFormNotes" rows="3" placeholder="Anything Gladys wants to log up front…"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="demo-btn ghost" onclick="closeDemoModal()">Cancel</button>
+        <button class="demo-btn danger" id="demoDeleteBtn" onclick="deleteDemoEntry()" style="display:none;">Delete</button>
+        <button class="demo-btn primary" onclick="saveDemoEntry()">Save Demo</button>
       </div>
     </div>
   </div>
@@ -2594,6 +3011,8 @@ const ALL_REPS = Object.values(TEAMS).flat();
 const REP_EMAILS = {
   // Admin
   'ahmed@core-velocity.com'   : 'Ahmed',
+  // Office Admin (v13 — owns Demo Tracker)
+  'gladys@core-velocity.com'  : 'Gladys',
   // Dubai team
   'fatima@core-velocity.com'  : 'Fatima',
   'marios@core-velocity.com'  : 'Marios',
@@ -2606,6 +3025,11 @@ const REP_EMAILS = {
   'hussein@core-velocity.com' : 'Hussein',
   'connor@core-velocity.com'  : 'Connor'
 };
+// v13: Office Admin role — Gladys owns the Demo Tracker tab.
+//   - Full CRUD on demo entries
+//   - Read-only on Sales Tracker / Performance
+//   - Sales reps can ONLY edit the "Why not converted?" comment on their own demo rows
+const OFFICE_ADMIN = 'Gladys';
 // Reverse lookup: rep name -> email (case-preserved for display)
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
@@ -2895,7 +3319,7 @@ async function initOneDrive(opts) {
           return null;
         }
         currentUser = repName;
-        currentRole = (repName === ADMIN_USER) ? 'admin' : 'rep';
+        currentRole = (repName === ADMIN_USER) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
         sessionStorage.setItem('oxefit_role',  currentRole);
         sessionStorage.setItem('oxefit_user',  currentUser);
         sessionStorage.setItem('oxefit_email', email);
@@ -3167,7 +3591,7 @@ async function handleMicrosoftLogin() {
     // Set session
     msalAccount  = account;
     currentUser  = repName;
-    currentRole  = (repName === ADMIN_USER) ? 'admin' : 'rep';
+    currentRole  = (repName === ADMIN_USER) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
 
     sessionStorage.setItem('oxefit_role', currentRole);
     sessionStorage.setItem('oxefit_user', currentUser);
@@ -3219,8 +3643,13 @@ async function launchApp(alreadyAuthed) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
 
+  // v13: drive role-based CSS visibility (office-only buttons / columns)
+  document.body.setAttribute('data-role', currentRole || 'viewer');
+
   const badge = document.getElementById('roleBadge');
-  badge.textContent = currentRole === 'admin'  ? 'Admin' : 'Sales Rep';
+  badge.textContent = currentRole === 'admin'  ? 'Admin'
+                    : currentRole === 'office' ? 'Office Admin'
+                    : 'Sales Rep';
   badge.className = 'role-badge ' + currentRole;
   document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
   document.getElementById('userNameDisplay').textContent = currentUser;
@@ -5238,6 +5667,461 @@ function switchTab(tabName) {
   if (tabName === 'performance') {
     renderPerformance();
   }
+  if (tabName === 'demos') {
+    renderDemoTab();
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   DEMO TRACKER  (v13) — owned by Office Admin (Gladys)
+   Storage: localStorage key 'oxefit_demos_v1' (mirrored to OneDrive
+   inside the main payload so the team shares one source of truth).
+
+   Roles:
+     • admin (Ahmed)  → full CRUD
+     • office (Gladys) → full CRUD
+     • rep            → can only edit "reason" on demos for their OWN name
+     • viewer         → read-only
+════════════════════════════════════════════════════════════════════ */
+const DEMO_STORE_KEY = 'oxefit_demos_v1';
+let demoEntries = [];     // [{id, date, weekKey, rep, client, type, location, product, outcome, dealId, notes, reason, createdAt, updatedAt}]
+let demoEditingId = null;
+let demoBarRepFilter = '';
+
+function loadDemos() {
+  try {
+    const raw = localStorage.getItem(DEMO_STORE_KEY);
+    demoEntries = raw ? JSON.parse(raw) : [];
+  } catch(e) { demoEntries = []; }
+}
+function saveDemos() {
+  localStorage.setItem(DEMO_STORE_KEY, JSON.stringify(demoEntries));
+  // Best-effort: trigger OneDrive sync of main payload so demos travel with it
+  if (typeof scheduleOneDriveSync === 'function') {
+    try { scheduleOneDriveSync(); } catch(_) {}
+  } else if (typeof uploadToOneDrive === 'function') {
+    try { uploadToOneDrive(); } catch(_) {}
+  }
+}
+
+/* ── Week-key helpers (ISO week starting Monday) ─────────────── */
+function demoWeekKey(dateStr) {
+  const d = new Date(dateStr);
+  if (isNaN(d)) return '';
+  // Snap to Monday of that ISO week
+  const day = (d.getDay() + 6) % 7; // Mon=0..Sun=6
+  d.setDate(d.getDate() - day);
+  d.setHours(0,0,0,0);
+  return d.toISOString().slice(0,10); // YYYY-MM-DD (Monday)
+}
+function demoWeekLabel(weekKey) {
+  if (!weekKey) return '';
+  const start = new Date(weekKey);
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+  return `Week of ${fmt(start)} – ${fmt(end)}`;
+}
+function demoCurrentWeekKey() {
+  return demoWeekKey(new Date().toISOString().slice(0,10));
+}
+
+/* ── Permissions ─────────────────────────────────────────────── */
+function demoCanManage() {
+  return currentRole === 'admin' || currentRole === 'office';
+}
+function demoCanEditReason(entry) {
+  if (demoCanManage()) return true;
+  if (currentRole === 'rep' && entry.rep === currentUser) return true;
+  return false;
+}
+
+/* ── Entry-point: called when tab opens ──────────────────────── */
+function renderDemoTab() {
+  document.body.setAttribute('data-role', currentRole || 'viewer');
+  loadDemos();
+  demoPopulateWeekSelect();
+  demoPopulateRepSelects();
+  demoRenderPermBanner();
+  // show "+ New Demo" only for office/admin
+  const addBtn = document.getElementById('demoAddBtn');
+  if (addBtn) addBtn.style.display = demoCanManage() ? 'inline-block' : 'none';
+  renderDemoDashboard();
+}
+
+function demoRenderPermBanner() {
+  const el = document.getElementById('demoPermBanner');
+  if (!el) return;
+  el.className = 'demo-perm-banner';
+  if (currentRole === 'admin') {
+    el.classList.add('office');
+    el.innerHTML = '🔐 <strong>Admin mode</strong> — you can create, edit, and delete demos for any sales rep.';
+  } else if (currentRole === 'office') {
+    el.classList.add('office');
+    el.innerHTML = '🔐 <strong>Office Admin mode</strong> — you (Gladys) own the demo log. Sales reps can only add their reason notes on their own demos.';
+  } else if (currentRole === 'rep') {
+    el.classList.add('rep');
+    el.innerHTML = `✏️ <strong>Sales Rep mode</strong> — you can only add the "Why not converted?" reason on demos logged under <strong>${currentUser}</strong>. New demos are logged by Gladys.`;
+  } else {
+    el.classList.add('viewer');
+    el.innerHTML = '👁 <strong>Viewer mode</strong> — read-only access to the demo log.';
+  }
+}
+
+function demoPopulateWeekSelect() {
+  const sel = document.getElementById('demoWeekSel');
+  if (!sel) return;
+  // Build a set of all weeks that exist in the log + the current week
+  const weekSet = new Set(demoEntries.map(e => e.weekKey).filter(Boolean));
+  weekSet.add(demoCurrentWeekKey());
+  const weeks = [...weekSet].sort().reverse(); // newest first
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">All Weeks</option>' +
+    weeks.map(wk => `<option value="${wk}">${demoWeekLabel(wk)}${wk === demoCurrentWeekKey() ? ' · This Week' : ''}</option>`).join('');
+  sel.value = prev || demoCurrentWeekKey();
+}
+function demoPopulateRepSelects() {
+  const filter = document.getElementById('demoRepFilter');
+  const form   = document.getElementById('demoFormRep');
+  const opts = ALL_REPS.map(r => `<option value="${r}">${r}</option>`).join('');
+  if (filter) {
+    const prev = filter.value;
+    filter.innerHTML = '<option value="">All Sales Reps</option>' + opts;
+    filter.value = prev;
+  }
+  if (form) form.innerHTML = opts;
+}
+
+/* ── Filter the demos according to the active selectors ──────── */
+function demoGetFiltered() {
+  const wk     = document.getElementById('demoWeekSel')?.value || '';
+  const rep    = document.getElementById('demoRepFilter')?.value || '';
+  return demoEntries.filter(e => {
+    if (wk  && e.weekKey !== wk) return false;
+    if (rep && e.rep !== rep)    return false;
+    return true;
+  });
+}
+
+/* ── Main render — calls all sub-renderers ────────────────────── */
+function renderDemoDashboard() {
+  const filtered = demoGetFiltered();
+  renderDemoKpis(filtered);
+  renderDemoBarChart(filtered);
+  renderDemoFunnel(filtered);
+  renderDemoRepGrid(filtered);
+  renderDemoLog();
+}
+
+function renderDemoKpis(rows) {
+  const el = document.getElementById('demoKpiStrip');
+  if (!el) return;
+  const total     = rows.length;
+  const converted = rows.filter(r => r.outcome === 'Converted').length;
+  const pending   = rows.filter(r => r.outcome === 'Pending').length;
+  const lost      = rows.filter(r => r.outcome === 'Lost').length;
+  const convRate  = total ? Math.round((converted / total) * 100) : 0;
+  const uniqueReps   = new Set(rows.map(r => r.rep)).size;
+  const uniqueClients= new Set(rows.map(r => (r.client||'').toLowerCase().trim()).filter(Boolean)).size;
+
+  el.innerHTML = [
+    { lbl: 'Total Demos',      val: total,        sub: uniqueReps + ' reps active',  c: '#a855f7' },
+    { lbl: 'Converted',        val: converted,    sub: convRate + '% conversion',    c: '#10b981' },
+    { lbl: 'Pending',          val: pending,      sub: 'Awaiting outcome',           c: '#f59e0b' },
+    { lbl: 'Lost',             val: lost,         sub: 'No deal',                    c: '#ef4444' },
+    { lbl: 'Unique Clients',   val: uniqueClients,sub: 'Distinct accounts demoed',   c: '#60a5fa' }
+  ].map(k => `
+    <div class="demo-kpi" style="--kpi-color:${k.c}">
+      <div class="demo-kpi-label">${k.lbl}</div>
+      <div class="demo-kpi-value">${k.val}</div>
+      <div class="demo-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+function renderDemoBarChart(rows) {
+  const el = document.getElementById('demoBarChart');
+  if (!el) return;
+  // Aggregate per rep
+  const byRep = {};
+  ALL_REPS.forEach(r => byRep[r] = { total: 0, converted: 0, pending: 0, lost: 0 });
+  rows.forEach(r => {
+    if (!byRep[r.rep]) byRep[r.rep] = { total: 0, converted: 0, pending: 0, lost: 0 };
+    byRep[r.rep].total++;
+    if (r.outcome === 'Converted') byRep[r.rep].converted++;
+    else if (r.outcome === 'Pending') byRep[r.rep].pending++;
+    else if (r.outcome === 'Lost')    byRep[r.rep].lost++;
+  });
+  const max = Math.max(1, ...Object.values(byRep).map(v => v.total));
+  // Sort by total desc; show reps with 0 too (greyed)
+  const sorted = Object.entries(byRep).sort((a,b) => b[1].total - a[1].total);
+  el.innerHTML = sorted.map(([rep, v]) => {
+    const team = TEAMS['Dubai'].includes(rep) ? 'Dubai' : TEAMS['Abu Dhabi'].includes(rep) ? 'Abu Dhabi' : '';
+    const pct = (v.total / max) * 100;
+    const wConv = v.total ? (v.converted / v.total) * pct : 0;
+    const wPend = v.total ? (v.pending   / v.total) * pct : 0;
+    const wLost = v.total ? (v.lost      / v.total) * pct : 0;
+    const activeCls = demoBarRepFilter === rep ? ' active' : '';
+    return `
+      <div class="demo-bar-row${activeCls}" onclick="demoBarClick('${rep}')" title="Converted: ${v.converted} · Pending: ${v.pending} · Lost: ${v.lost}">
+        <div class="demo-bar-name">${rep}<span class="team-tag">${team}</span></div>
+        <div class="demo-bar-track">
+          <div class="demo-bar-segments">
+            <div class="demo-bar-seg converted" style="width:${wConv}%"></div>
+            <div class="demo-bar-seg pending"   style="width:${wPend}%"></div>
+            <div class="demo-bar-seg lost"      style="width:${wLost}%"></div>
+          </div>
+        </div>
+        <div class="demo-bar-count">${v.total}</div>
+      </div>`;
+  }).join('');
+}
+
+function demoBarClick(rep) {
+  // Toggle: clicking same rep again clears filter
+  demoBarRepFilter = (demoBarRepFilter === rep) ? '' : rep;
+  // Sync to the rep dropdown so the rest of the dashboard updates
+  const sel = document.getElementById('demoRepFilter');
+  if (sel) { sel.value = demoBarRepFilter; }
+  renderDemoDashboard();
+}
+
+function renderDemoFunnel(rows) {
+  const el = document.getElementById('demoFunnel');
+  if (!el) return;
+  const demos     = rows.length;
+  const converted = rows.filter(r => r.outcome === 'Converted').length;
+  // Closed-won = converted demos whose dealId resolves to a closed-won HubSpot deal
+  // (best-effort — falls back to converted count if HubSpot cache unavailable)
+  let won = 0;
+  try {
+    const hsClosedSet = new Set((window._hsClosedDealIds || []).map(String));
+    won = rows.filter(r => r.outcome === 'Converted' && hsClosedSet.has(String(r.dealId||''))).length;
+    if (won === 0 && converted > 0) won = converted; // no HS data — assume converted == won
+  } catch(_) { won = converted; }
+
+  const pct = (n, d) => d ? Math.round(n / d * 100) + '%' : '—';
+  el.innerHTML = `
+    <div class="demo-funnel-step step-demos">
+      <div class="demo-funnel-label">1 · Demos Run</div>
+      <div class="demo-funnel-value">${demos}</div>
+    </div>
+    <div class="demo-funnel-step step-converted">
+      <div class="demo-funnel-label">2 · Converted to Deal</div>
+      <div class="demo-funnel-value">${converted}<span class="demo-funnel-pct">${pct(converted, demos)} of demos</span></div>
+    </div>
+    <div class="demo-funnel-step step-won">
+      <div class="demo-funnel-label">3 · Closed Won</div>
+      <div class="demo-funnel-value">${won}<span class="demo-funnel-pct">${pct(won, demos)} of demos</span></div>
+    </div>`;
+}
+
+function renderDemoRepGrid(rows) {
+  const el = document.getElementById('demoRepGrid');
+  if (!el) return;
+  const byRep = {};
+  rows.forEach(r => {
+    if (!byRep[r.rep]) byRep[r.rep] = { total:0, converted:0, pending:0, lost:0 };
+    byRep[r.rep].total++;
+    if (r.outcome === 'Converted') byRep[r.rep].converted++;
+    else if (r.outcome === 'Pending') byRep[r.rep].pending++;
+    else if (r.outcome === 'Lost')    byRep[r.rep].lost++;
+  });
+  const entries = Object.entries(byRep)
+    .filter(([_, v]) => v.total > 0)
+    .sort((a, b) => b[1].converted - a[1].converted || b[1].total - a[1].total);
+  if (!entries.length) { el.innerHTML = ''; return; }
+  el.innerHTML = entries.map(([rep, v]) => {
+    const team = TEAMS['Dubai'].includes(rep) ? 'Dubai' : TEAMS['Abu Dhabi'].includes(rep) ? 'Abu Dhabi' : '';
+    const convRate = v.total ? Math.round((v.converted / v.total) * 100) : 0;
+    return `
+      <div class="demo-rep-card">
+        <div class="demo-rep-card-head">
+          <div>
+            <div class="demo-rep-card-name">${rep}</div>
+            <div class="demo-rep-card-team">${team}</div>
+          </div>
+          <div class="demo-rep-card-team"><strong>${v.total}</strong> demos</div>
+        </div>
+        <div class="demo-rep-card-stats">
+          <div class="demo-rep-stat"><div class="demo-rep-stat-val converted">${v.converted}</div><div class="demo-rep-stat-lbl">Won</div></div>
+          <div class="demo-rep-stat"><div class="demo-rep-stat-val pending">${v.pending}</div><div class="demo-rep-stat-lbl">Pend</div></div>
+          <div class="demo-rep-stat"><div class="demo-rep-stat-val lost">${v.lost}</div><div class="demo-rep-stat-lbl">Lost</div></div>
+        </div>
+        <div class="demo-rep-card-conv-rate">
+          <span>Conversion rate</span><strong>${convRate}%</strong>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Master log table ────────────────────────────────────────── */
+function renderDemoLog() {
+  const tbody = document.getElementById('demoLogBody');
+  if (!tbody) return;
+  const filtered = demoGetFiltered();
+  const search   = (document.getElementById('demoSearch')?.value || '').toLowerCase().trim();
+  const outcome  = document.getElementById('demoOutcomeFilter')?.value || '';
+  const rows = filtered.filter(r => {
+    if (outcome && r.outcome !== outcome) return false;
+    if (search && !(r.client||'').toLowerCase().includes(search)) return false;
+    return true;
+  }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="demo-log-empty">No demos logged for this filter. ${demoCanManage() ? 'Click <strong>+ New Demo</strong> to add one.' : 'Ask Gladys to log a demo.'}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const canEditReason = demoCanEditReason(r);
+    const canManage     = demoCanManage();
+    const reasonCell = canEditReason
+      ? `<textarea class="demo-reason-textarea" data-id="${r.id}" placeholder="${r.outcome === 'Converted' ? 'Notes (optional)…' : 'Why didn\\'t this convert? Add your reason…'}" onchange="demoUpdateReason('${r.id}', this.value)">${escapeHtml(r.reason || '')}</textarea>`
+      : (r.reason
+          ? `<div class="demo-reason-static">${escapeHtml(r.reason)}</div>`
+          : `<div class="demo-reason-empty">${r.outcome === 'Pending' ? '— pending —' : 'No reason logged'}</div>`);
+    const dealLink = r.dealId
+      ? `<a href="https://app.hubspot.com/contacts/_/deal/${escapeHtml(r.dealId)}" target="_blank" style="color:#60a5fa;">#${escapeHtml(r.dealId)}</a>`
+      : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+    return `
+      <tr>
+        <td>${formatDemoDate(r.date)}</td>
+        <td>${escapeHtml(r.rep)}</td>
+        <td><strong>${escapeHtml(r.client || '—')}</strong></td>
+        <td>${escapeHtml(r.type || '—')}${r.product ? `<br><span style="font-size:10px;color:var(--text-muted);">${escapeHtml(r.product)}</span>` : ''}</td>
+        <td>${escapeHtml(r.location || '—')}</td>
+        <td><span class="demo-outcome-pill ${r.outcome.toLowerCase()}">${r.outcome}</span></td>
+        <td>${dealLink}</td>
+        <td>${reasonCell}</td>
+        <td class="office-only-th">
+          ${canManage ? `
+            <div class="demo-row-actions">
+              <button class="demo-icon-btn" title="Edit" onclick="editDemoEntry('${r.id}')">✏</button>
+              <button class="demo-icon-btn danger" title="Delete" onclick="deleteDemoEntry('${r.id}')">🗑</button>
+            </div>` : ''}
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function formatDemoDate(d) {
+  if (!d) return '—';
+  try {
+    return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' });
+  } catch(_) { return d; }
+}
+
+/* ── Update reason inline (rep flow) ─────────────────────────── */
+function demoUpdateReason(id, value) {
+  const e = demoEntries.find(x => x.id === id);
+  if (!e) return;
+  if (!demoCanEditReason(e)) return;
+  e.reason = value;
+  e.updatedAt = new Date().toISOString();
+  saveDemos();
+}
+
+/* ── Modal: add / edit / delete ──────────────────────────────── */
+function openDemoModal(prefilledId) {
+  if (!demoCanManage()) {
+    alert('Only Gladys (Office Admin) or Ahmed (Admin) can add or edit demos.');
+    return;
+  }
+  demoEditingId = prefilledId || null;
+  demoPopulateRepSelects();
+  const title  = document.getElementById('demoModalTitle');
+  const delBtn = document.getElementById('demoDeleteBtn');
+
+  if (prefilledId) {
+    const e = demoEntries.find(x => x.id === prefilledId);
+    if (!e) return;
+    title.textContent = 'Edit Demo Entry';
+    document.getElementById('demoFormDate').value     = e.date || '';
+    document.getElementById('demoFormRep').value      = e.rep || ALL_REPS[0];
+    document.getElementById('demoFormClient').value   = e.client || '';
+    document.getElementById('demoFormType').value     = e.type || 'On-site';
+    document.getElementById('demoFormLocation').value = e.location || '';
+    document.getElementById('demoFormProduct').value  = e.product || 'XS1';
+    document.getElementById('demoFormOutcome').value  = e.outcome || 'Pending';
+    document.getElementById('demoFormDealId').value   = e.dealId || '';
+    document.getElementById('demoFormNotes').value    = e.notes || '';
+    delBtn.style.display = 'inline-block';
+  } else {
+    title.textContent = 'New Demo Entry';
+    document.getElementById('demoFormDate').value     = new Date().toISOString().slice(0, 10);
+    document.getElementById('demoFormRep').value      = ALL_REPS[0];
+    document.getElementById('demoFormClient').value   = '';
+    document.getElementById('demoFormType').value     = 'On-site';
+    document.getElementById('demoFormLocation').value = '';
+    document.getElementById('demoFormProduct').value  = 'XS1';
+    document.getElementById('demoFormOutcome').value  = 'Pending';
+    document.getElementById('demoFormDealId').value   = '';
+    document.getElementById('demoFormNotes').value    = '';
+    delBtn.style.display = 'none';
+  }
+  demoToggleReasonField();
+  document.getElementById('demoModal').classList.add('open');
+}
+function closeDemoModal() {
+  document.getElementById('demoModal').classList.remove('open');
+  demoEditingId = null;
+}
+function demoToggleReasonField() {
+  // Toggle visibility of dealId field based on outcome
+  const outcome = document.getElementById('demoFormOutcome').value;
+  const dealRow = document.getElementById('demoFormDealId').closest('.demo-form-row');
+  if (dealRow) dealRow.style.opacity = (outcome === 'Converted') ? '1' : '0.5';
+}
+function saveDemoEntry() {
+  if (!demoCanManage()) return;
+  const date     = document.getElementById('demoFormDate').value;
+  const rep      = document.getElementById('demoFormRep').value;
+  const client   = document.getElementById('demoFormClient').value.trim();
+  if (!date)   { alert('Please pick a demo date.'); return; }
+  if (!rep)    { alert('Please pick a sales rep.'); return; }
+  if (!client) { alert('Please enter a client name.'); return; }
+
+  const payload = {
+    date,
+    weekKey: demoWeekKey(date),
+    rep,
+    client,
+    type:     document.getElementById('demoFormType').value,
+    location: document.getElementById('demoFormLocation').value.trim(),
+    product:  document.getElementById('demoFormProduct').value,
+    outcome:  document.getElementById('demoFormOutcome').value,
+    dealId:   document.getElementById('demoFormDealId').value.trim(),
+    notes:    document.getElementById('demoFormNotes').value.trim(),
+    updatedAt: new Date().toISOString()
+  };
+  if (demoEditingId) {
+    const idx = demoEntries.findIndex(x => x.id === demoEditingId);
+    if (idx >= 0) demoEntries[idx] = { ...demoEntries[idx], ...payload };
+  } else {
+    payload.id        = 'd_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    payload.reason    = '';
+    payload.createdAt = new Date().toISOString();
+    demoEntries.push(payload);
+  }
+  saveDemos();
+  closeDemoModal();
+  demoPopulateWeekSelect();
+  renderDemoDashboard();
+}
+function editDemoEntry(id) { openDemoModal(id); }
+function deleteDemoEntry(id) {
+  const targetId = id || demoEditingId;
+  if (!targetId || !demoCanManage()) return;
+  const e = demoEntries.find(x => x.id === targetId);
+  if (!e) return;
+  if (!confirm(`Delete demo for ${e.client} on ${formatDemoDate(e.date)}? This can't be undone.`)) return;
+  demoEntries = demoEntries.filter(x => x.id !== targetId);
+  saveDemos();
+  closeDemoModal();
+  renderDemoDashboard();
 }
 
 /* ════════════════════════════════════════════════════════════════════
@@ -6314,7 +7198,7 @@ hsLoadTokens();
     if (repName) {
       msalAccount = redirectAccount;
       currentUser = repName;
-      currentRole = (repName === ADMIN_USER) ? 'admin' : 'rep';
+      currentRole = (repName === ADMIN_USER) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
       sessionStorage.setItem('oxefit_role', currentRole);
       sessionStorage.setItem('oxefit_user', currentUser);
       sessionStorage.setItem('oxefit_email', email);
