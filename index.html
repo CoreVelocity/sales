@@ -1916,7 +1916,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 13.5.html
+      version 13.6.html
     </div>
   </div>
 </div>
@@ -5975,7 +5975,7 @@ function renderDemoLog() {
     const canEditReason = demoCanEditReason(r);
     const canManage     = demoCanManage();
     const reasonCell = canEditReason
-      ? `<textarea class="demo-reason-textarea" data-id="${r.id}" placeholder="${r.outcome === 'Converted' ? 'Notes (optional)…' : 'Why didn\\'t this convert? Add your reason…'}" onchange="demoUpdateReason('${r.id}', this.value)">${escapeHtml(r.reason || '')}</textarea>`
+      ? `<textarea class="demo-reason-textarea" data-id="${r.id}" placeholder="${r.outcome === 'Converted' ? 'Notes (optional)…' : 'Why didn’t this convert? Add your reason…'}" onchange="demoUpdateReason('${r.id}', this.value)">${escapeHtml(r.reason || '')}</textarea>`
       : (r.reason
           ? `<div class="demo-reason-static">${escapeHtml(r.reason)}</div>`
           : `<div class="demo-reason-empty">${r.outcome === 'Pending' ? '— pending —' : 'No reason logged'}</div>`);
