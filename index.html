@@ -429,6 +429,13 @@
   tbody tr.totals-row { background: rgba(37,99,235,0.1) !important; border-top: 2px solid var(--accent); }
   tbody tr.totals-row td { font-weight: 700; color: var(--accent-glow); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; }
   td { padding: 10px 12px; vertical-align: middle; }
+  /* v12.2: sales tracker — align ALL cells upper-left (matches deal-name behavior) */
+  #mainTable tbody td { vertical-align: top; text-align: left; }
+  #mainTable tbody td.team-header-cell, #mainTable tr.team-header td { vertical-align: middle; }
+  #mainTable tbody td input.cell-input,
+  #mainTable tbody td select.cell-input,
+  #mainTable tbody td textarea.cell-input { text-align: left; }
+  #mainTable tbody td .lock-btn, #mainTable tbody td .submit-btn { margin-top: 0; }
 
   .cell-input {
     background: transparent; border: 1px solid transparent; border-radius: 6px;
@@ -1649,7 +1656,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 12.1.html
+      version 12.2.html
     </div>
   </div>
 </div>
