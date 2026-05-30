@@ -1782,11 +1782,6 @@
         <div class="kpi-value gold" id="kpiConf">0%</div>
         <div class="kpi-sub">Across reps</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Submitted</div>
-        <div class="kpi-value success" id="kpiSubmitted">0 / 9</div>
-        <div class="kpi-sub">Reps this week</div>
-      </div>
     </div>
 
     <div class="summary-bar">
@@ -3502,8 +3497,11 @@ function renderTable() {
   // HEADERS
   const thead = document.getElementById('mainThead');
   thead.innerHTML = '';
+  // latest11.9: Total Pipeline (HS) moved to be the FIRST data column
+  // (immediately after Sales Rep, before Commit — Deal Name).
   const cols = [
     {label:'Sales Rep',              cls:''},
+    {label:'Total Pipeline (HS)',    cls:'col-closed'},
     {label:'Commit — Deal Name',     cls:'col-hot'},
     {label:'Commit (AED)',           cls:'col-hot'},
     {label:'Buyer Signals',          cls:'col-signals'},
@@ -3514,7 +3512,6 @@ function renderTable() {
     {label:'Confidence',             cls:'col-stage'},
     {label:'Total Forecast (AED)',   cls:'col-forecast'},
     {label:'Closed (Win) AED',       cls:'col-closed'},
-    {label:'Total Pipeline (HS)',    cls:'col-closed'},
     {label:'Blocked',                cls:'col-blocked'},
     {label:'Forecast XS1',           cls:'col-forecast'},
     {label:'Forecast XP1',           cls:'col-forecast'},
@@ -3566,7 +3563,7 @@ function renderRow(row, ri, tbody) {
     const bannerTr = document.createElement('tr');
     bannerTr.className = 'stale-banner-row';
     const bannerTd = document.createElement('td');
-    bannerTd.colSpan = 16;
+    bannerTd.colSpan = 17;
     const threshold = STAGE_HEALTH_DAYS[row.stage] || '?';
     bannerTd.innerHTML = `⚠️ <strong>${row.rep}</strong> — deal in <strong>${row.stage}</strong> stage has exceeded the ${threshold}-day health threshold. Forecast weight is halved. Update the deal or advance the stage.`;
     bannerTr.appendChild(bannerTd);
@@ -3581,6 +3578,30 @@ function renderRow(row, ri, tbody) {
     <span class="team-badge ${row.team === 'Abu Dhabi' ? 'abu-dhabi' : 'dubai'}">${row.team || '-'}</span>
     <span>${row.rep || '-'}</span>`;
   tr.appendChild(repTd);
+
+  // latest11.9: Total Pipeline (HubSpot) — moved to the FIRST data column,
+  // immediately after Sales Rep. Sourced EXCLUSIVELY from HubSpot (sum of all
+  // open deals for the rep). Read-only with HS badge; empty-state prompt
+  // when not yet synced.
+  {
+    const tpTd = document.createElement('td');
+    tpTd.className = 'col-closed-bg';
+    if (row.hubspotSynced) {
+      const tpVal = parseFloat(row.truePipeline) || 0;
+      tpTd.innerHTML = `
+        <div class="hs-sourced-cell" title="From HubSpot · open deals · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
+          <div class="hs-sourced-value">${tpVal ? 'AED ' + fmtNum(tpVal) : '—'}</div>
+          <div class="hs-sourced-badge">HubSpot</div>
+        </div>`;
+    } else {
+      tpTd.innerHTML = `
+        <div class="hs-empty-cell" title="Total Pipeline is sourced from HubSpot only. Click Sync HubSpot to pull figures.">
+          <div class="hs-empty-value">—</div>
+          <div class="hs-empty-badge">Sync HubSpot</div>
+        </div>`;
+    }
+    tr.appendChild(tpTd);
+  }
 
   // Commit: deal name (multi-line textarea like Notes) + AED value
   tr.appendChild(makeTextareaCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'Deal name(s)…\nOne per line'));
@@ -3598,8 +3619,10 @@ function renderRow(row, ri, tbody) {
   renderQualScoreCell(qualTd, row);
   tr.appendChild(qualTd);
 
-  // Next Action (moved out of Commit block, kept its hot styling for continuity)
-  tr.appendChild(makeTextCell(ri, 'commitAction', 'col-hot-bg action-text-input', row.commitAction, editable, 'Next action…'));
+  // Next Action (latest11.9: multi-line textarea — same UX as Commit /
+  // Best Case deal-name cells, so reps can list multiple action steps
+  // on separate lines).
+  tr.appendChild(makeTextareaCell(ri, 'commitAction', 'col-hot-bg action-text-input', row.commitAction, editable, 'Next action(s)…\nOne per line'));
 
   // Best Case: deal name (multi-line textarea like Notes) + AED value
   tr.appendChild(makeTextareaCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'Deal name(s)…\nOne per line'));
@@ -3671,29 +3694,6 @@ function renderRow(row, ri, tbody) {
         </div>`;
     }
     tr.appendChild(cwTd);
-  }
-
-  // Total Pipeline — sourced EXCLUSIVELY from HubSpot (sum of all open deals
-  // for the rep). Mirrors the Closed-Won pattern: read-only with HS badge,
-  // empty-state prompt when not yet synced.
-  {
-    const tpTd = document.createElement('td');
-    tpTd.className = 'col-closed-bg';
-    if (row.hubspotSynced) {
-      const tpVal = parseFloat(row.truePipeline) || 0;
-      tpTd.innerHTML = `
-        <div class="hs-sourced-cell" title="From HubSpot · open deals · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
-          <div class="hs-sourced-value">${tpVal ? 'AED ' + fmtNum(tpVal) : '—'}</div>
-          <div class="hs-sourced-badge">HubSpot</div>
-        </div>`;
-    } else {
-      tpTd.innerHTML = `
-        <div class="hs-empty-cell" title="Total Pipeline is sourced from HubSpot only. Click Sync HubSpot to pull figures.">
-          <div class="hs-empty-value">—</div>
-          <div class="hs-empty-badge">Sync HubSpot</div>
-        </div>`;
-    }
-    tr.appendChild(tpTd);
   }
 
   // Blocked (text only)
@@ -3934,24 +3934,25 @@ function renderTotalsRow(rows, tbody, colCount) {
   const totXP1       = rows.reduce((s,r)=>s+num(r.forecastXP1),   0);
 
   const tr = document.createElement('tr'); tr.className = 'totals-row';
-  // 17 cols → 17 cells (latest11.3 layout, +Total Pipeline column):
-  // 0 Rep | 1 CommitName | 2 CommitAED | 3 BuyerSignals | 4 QualScore
-  // 5 NextAction | 6 BestCaseName | 7 BestCaseAED
-  // 8 Confidence | 9 TotalForecast | 10 ClosedWon | 11 TotalPipeline | 12 Blocked
+  // latest11.9 column order (17 cells):
+  // 0 Rep | 1 TotalPipeline(HS) | 2 CommitName | 3 CommitAED
+  // 4 BuyerSignals | 5 QualScore | 6 NextAction
+  // 7 BestCaseName | 8 BestCaseAED
+  // 9 Confidence | 10 TotalForecast | 11 ClosedWon | 12 Blocked
   // 13 ForecastXS1 | 14 ForecastXP1 | 15 Notes | 16 Submit
   const cells = [
     'TOTALS',                                                            // 0  Rep
-    '',                                                                  // 1  Commit Deal Name
-    fmtNum(totCommit),                                                   // 2  Commit (AED) ✓
-    '',                                                                  // 3  Buyer Signals
-    '',                                                                  // 4  Qual Score
-    '',                                                                  // 5  Next Action
-    '',                                                                  // 6  Best Case Deal Name
-    fmtNum(totBestCase),                                                 // 7  Best Case (AED) ✓
-    '',                                                                  // 8  Confidence
-    fmtNum(totPipeline),                                                 // 9  Total Forecast ✓
-    fmtNum(totClosedWon),                                                // 10 Closed (Win) ✓
-    anyCrmSynced ? fmtNum(totTruePipeline) : '—',                        // 11 Total Pipeline (HS) ✓
+    anyCrmSynced ? fmtNum(totTruePipeline) : '—',                        // 1  Total Pipeline (HS) ✓
+    '',                                                                  // 2  Commit Deal Name
+    fmtNum(totCommit),                                                   // 3  Commit (AED) ✓
+    '',                                                                  // 4  Buyer Signals
+    '',                                                                  // 5  Qual Score
+    '',                                                                  // 6  Next Action
+    '',                                                                  // 7  Best Case Deal Name
+    fmtNum(totBestCase),                                                 // 8  Best Case (AED) ✓
+    '',                                                                  // 9  Confidence
+    fmtNum(totPipeline),                                                 // 10 Total Forecast ✓
+    fmtNum(totClosedWon),                                                // 11 Closed (Win) ✓
     '',                                                                  // 12 Blocked
     fmtNum(totXS1),                                                      // 13 Forecast XS1 ✓
     fmtNum(totXP1),                                                      // 14 Forecast XP1 ✓
@@ -4045,7 +4046,9 @@ function renderKPIs() {
   document.getElementById('kpiConf').textContent       = avgConfidence + '%';
   const confSub = document.querySelector('#kpiConf + .kpi-sub');
   if (confSub) confSub.textContent = scoredRows.length ? `${scoredRows.length} active deal${scoredRows.length===1?'':'s'}` : 'No active deals';
-  document.getElementById('kpiSubmitted').textContent  = `${submitted} / ${ALL_REPS.length}`;
+  // kpiSubmitted card was removed in latest11.9 — guard against missing element
+  const kpiSubEl = document.getElementById('kpiSubmitted');
+  if (kpiSubEl) kpiSubEl.textContent = `${submitted} / ${ALL_REPS.length}`;
 }
 
 /* ════════════════════════════════════════
