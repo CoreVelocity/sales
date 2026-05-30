@@ -1916,7 +1916,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 13.6.html
+      version 13.7.html
     </div>
   </div>
 </div>
@@ -2733,21 +2733,26 @@
       <!-- ============== PERFORMANCE SCORE ============== -->
       <section id="gd-score" class="gd-section">
         <h2><span class="gd-num">7</span>Composite Performance Score (0–100)</h2>
-        <p>The single number in the circular badge on each rep card and the primary sort key on the Leaderboard. <strong>v12.4 rebalance: closing deals is now the dominant driver of rank.</strong> Goal Attainment weighs 65% of the base score, and reps who exceed 100% goal earn an additional <em>Closer Bonus</em> of up to +10 points — so the rep who actually brings in the AED beats the rep with the prettiest forecast.</p>
+        <p>The single number in the circular badge on each rep card and the primary sort key on the Leaderboard. <strong>v13.7 rebalance: Demo Effectiveness joins the formula.</strong> Goal Attainment still dominates at 55% of the base score, with Forecast Accuracy, Pipeline Coverage, and the new <em>Demo Effectiveness</em> component each weighing 15%. Reps who exceed 100% goal earn an additional <em>Closer Bonus</em> of up to +10 points — so the rep who actually brings in the AED still beats the rep with the prettiest forecast, but the rep who never runs demos no longer gets a free ride.</p>
         <div class="gd-formula">
-          <div class="gd-formula-lbl">Performance Score (v12.4)</div>
+          <div class="gd-formula-lbl">Performance Score (v13.7)</div>
           <code>goalComp     = min(1, goalAttain)</code> <span class="gd-formula-side">— base cap; overachievement handled by bonus</span><br/>
           <code>accComp      = forecastAccuracy</code><br/>
           <code>pcrComp      = min(1, PCR ÷ greenThreshold)</code> <span class="gd-formula-side">— 1.0 at 4.0× coverage</span><br/>
-          <code>baseScore    = (goalComp × 0.65 + accComp × 0.20 + pcrComp × 0.15) × 100</code><br/>
+          <code>demoTarget   = max(1, monthsInPeriod × 4)</code> <span class="gd-formula-side">— 4 demos per active month</span><br/>
+          <code>volComp      = min(1, demosRun ÷ demoTarget)</code><br/>
+          <code>convComp     = convRate  (= converted ÷ (converted + lost), or 0 if none decided)</code><br/>
+          <code>demoComp     = volComp × 0.40 + convComp × 0.60</code> <span class="gd-formula-side">— quality &gt; quantity</span><br/>
+          <code>baseScore    = (goalComp × 0.55 + accComp × 0.15 + pcrComp × 0.15 + demoComp × 0.15) × 100</code><br/>
           <code>overGoal     = max(0, goalAttain − 1)</code> <span class="gd-formula-side">— fraction above 100%</span><br/>
           <code>closerBonus  = min(10, overGoal × 50)</code> <span class="gd-formula-side">— +1 pt per 2% over, capped at +10</span><br/>
           <code>score        = min(100, round(baseScore + closerBonus))</code>
         </div>
         <div class="gd-weight-grid score-weights">
-          <div class="gd-weight-card"><div class="gd-weight-stage">Goal Attainment</div><div class="gd-weight-val">65%</div><div class="gd-weight-sub">Did they close?</div></div>
-          <div class="gd-weight-card"><div class="gd-weight-stage">Forecast Accuracy</div><div class="gd-weight-val">20%</div><div class="gd-weight-sub">Did they call it right?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Goal Attainment</div><div class="gd-weight-val">55%</div><div class="gd-weight-sub">Did they close?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Forecast Accuracy</div><div class="gd-weight-val">15%</div><div class="gd-weight-sub">Did they call it right?</div></div>
           <div class="gd-weight-card"><div class="gd-weight-stage">Pipeline Coverage</div><div class="gd-weight-val">15%</div><div class="gd-weight-sub">Is their future safe?</div></div>
+          <div class="gd-weight-card" style="border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.08);"><div class="gd-weight-stage">Demo Effectiveness</div><div class="gd-weight-val">15%</div><div class="gd-weight-sub">Are they at the front line?</div></div>
           <div class="gd-weight-card" style="border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.08);"><div class="gd-weight-stage">Closer Bonus</div><div class="gd-weight-val">+10</div><div class="gd-weight-sub">Reward for &gt;100% goal</div></div>
         </div>
         <div class="gd-thresh">
@@ -2756,44 +2761,52 @@
           <span class="gd-chip bad">&lt; 60 Needs attention</span>
         </div>
         <div class="gd-callout info">
-          <strong>Why the rebalance?</strong> Under the old 50/30/20 split, a rep at 90% goal with great accuracy could outrank a rep at 110% goal with average accuracy — even though the second rep brought more AED through the door. The new 65/20/15 split + Closer Bonus makes the Leaderboard answer the question every sales leader actually asks: <em>who closed the most against their target?</em>
+          <strong>Why bring demos into the score?</strong> Demos are the leading indicator of pipeline. A rep who closes 100% of goal this month but ran zero demos is mortgaging next month's number — and a rep who runs 12 demos with a 50% conversion rate is building a pipeline the AED hasn't caught up with yet. Goal Attainment still dominates at 55%, but Demo Effectiveness (15%) now ensures the Leaderboard rewards both <em>what they closed this month</em> and <em>what they're queueing up for next month</em>.
         </div>
         <div class="gd-example">
-          <div class="gd-example-head">📌 Worked Example A — Milene (hits goal)</div>
+          <div class="gd-example-head">📌 Worked Example A — Milene (hits goal, decent demos)</div>
           <ul>
-            <li>Goal attainment 95%, Forecast accuracy 88%, PCR 3.2× (green threshold 4.0×)</li>
+            <li>Goal attainment 95%, Forecast accuracy 88%, PCR 3.2× (green 4.0×)</li>
+            <li>1-month period · 5 demos run · 3 converted · 1 lost · 1 pending</li>
             <li><code>goalComp = min(1, 0.95) = 0.95</code></li>
             <li><code>accComp  = 0.88</code></li>
             <li><code>pcrComp  = min(1, 3.2 ÷ 4.0) = 0.80</code></li>
-            <li><code>baseScore = (0.95×0.65 + 0.88×0.20 + 0.80×0.15) × 100</code></li>
-            <li><code>          = (0.6175 + 0.176 + 0.120) × 100 = 91.35</code></li>
+            <li><code>demoTarget = 1×4 = 4 → volComp = min(1, 5÷4) = 1.00</code></li>
+            <li><code>convComp = 3 ÷ (3+1) = 0.75 → demoComp = 1.00×0.40 + 0.75×0.60 = 0.85</code></li>
+            <li><code>baseScore = (0.95×0.55 + 0.88×0.15 + 0.80×0.15 + 0.85×0.15) × 100</code></li>
+            <li><code>          = (0.5225 + 0.132 + 0.120 + 0.1275) × 100 = 90.2</code></li>
             <li><code>closerBonus = 0</code> (didn't exceed goal)</li>
-            <li><code>score = round(91.35) = <strong>91 → Excellent</strong></code></li>
+            <li><code>score = round(90.2) = <strong>90 → Excellent</strong></code></li>
           </ul>
         </div>
         <div class="gd-example">
-          <div class="gd-example-head">📌 Worked Example B — Hasan (overachieves goal)</div>
+          <div class="gd-example-head">📌 Worked Example B — Hasan (overachieves goal, strong demos)</div>
           <ul>
             <li>Goal attainment 118%, Forecast accuracy 75%, PCR 2.8×</li>
+            <li>1-month period · 6 demos run · 4 converted · 1 lost · 1 pending</li>
             <li><code>goalComp = min(1, 1.18) = 1.00</code></li>
-            <li><code>accComp  = 0.75</code></li>
-            <li><code>pcrComp  = min(1, 2.8 ÷ 4.0) = 0.70</code></li>
-            <li><code>baseScore = (1.00×0.65 + 0.75×0.20 + 0.70×0.15) × 100</code></li>
-            <li><code>          = (0.65 + 0.15 + 0.105) × 100 = 90.5</code></li>
-            <li><code>overGoal = 0.18 → closerBonus = min(10, 0.18×50) = min(10, 9) = <strong>+9</strong></code></li>
-            <li><code>score = min(100, round(90.5 + 9)) = <strong>99 → Excellent</strong></code></li>
+            <li><code>accComp  = 0.75</code> · <code>pcrComp = 0.70</code></li>
+            <li><code>volComp = min(1, 6÷4) = 1.00 · convComp = 4 ÷ (4+1) = 0.80</code></li>
+            <li><code>demoComp = 1.00×0.40 + 0.80×0.60 = 0.88</code></li>
+            <li><code>baseScore = (1.00×0.55 + 0.75×0.15 + 0.70×0.15 + 0.88×0.15) × 100</code></li>
+            <li><code>          = (0.55 + 0.1125 + 0.105 + 0.132) × 100 = 89.95</code></li>
+            <li><code>overGoal = 0.18 → closerBonus = min(10, 0.18×50) = <strong>+9</strong></code></li>
+            <li><code>score = min(100, round(89.95 + 9)) = <strong>99 → Excellent</strong></code></li>
           </ul>
-          <p class="gd-fineprint" style="margin-top:8px;">Under the old formula Hasan would have scored ~85 (capped goalComp + lower accuracy weight). The Closer Bonus now properly rewards him for beating target by 18%.</p>
+          <p class="gd-fineprint" style="margin-top:8px;">Hasan stays at the top — he closed past goal AND he's feeding the funnel. The Closer Bonus still does the heavy lifting that puts him over Milene.</p>
         </div>
         <div class="gd-example">
-          <div class="gd-example-head">📌 Worked Example C — Connor (misses goal but accurate)</div>
+          <div class="gd-example-head">📌 Worked Example C — Connor (misses goal, accurate, no demos)</div>
           <ul>
-            <li>Goal attainment 70%, Forecast accuracy 95%, PCR 4.2×</li>
-            <li><code>baseScore = (0.70×0.65 + 0.95×0.20 + 1.00×0.15) × 100 = 79.5</code></li>
+            <li>Goal attainment 70%, Forecast accuracy 95%, PCR 4.2×, <strong>0 demos logged</strong></li>
+            <li><code>goalComp = 0.70 · accComp = 0.95 · pcrComp = min(1, 4.2÷4.0) = 1.00</code></li>
+            <li><code>volComp = 0 · convComp = 0 → demoComp = 0</code></li>
+            <li><code>baseScore = (0.70×0.55 + 0.95×0.15 + 1.00×0.15 + 0.00×0.15) × 100</code></li>
+            <li><code>          = (0.385 + 0.1425 + 0.150 + 0.000) × 100 = 67.75</code></li>
             <li><code>closerBonus = 0</code></li>
-            <li><code>score = <strong>80 → Excellent</strong> (just barely)</code></li>
+            <li><code>score = <strong>68 → Solid</strong></code></li>
           </ul>
-          <p class="gd-fineprint" style="margin-top:8px;">Under the old 50/30/20 formula Connor would have scored ~83 — so accuracy-without-closing is now penalised more heavily, which is the intent. He still ranks below Hasan (99) and Milene (91), which is correct: they brought in more revenue.</p>
+          <p class="gd-fineprint" style="margin-top:8px;">Under v12.4 (no demo component) Connor would have scored ~80. Under v13.7, logging zero demos costs him ~12 points — which is the point. Forecast accuracy without front-line activity is no longer enough to score Excellent.</p>
         </div>
       </section>
 
@@ -6649,6 +6662,33 @@ function aggregateRepMonth(year, month, rep) {
   return out;
 }
 
+/* v13.7 — Demo activity within the performance window.
+   Reads from demoEntries (loaded by loadDemos on tab open / init).
+   Returns counts that feed the rep card, KPI strip, leaderboard, and
+   the new "Demo Effectiveness" component of the composite score.    */
+function computeRepDemoStats(rep, monthsList) {
+  // Ensure demos are loaded even if the Demo Tracker tab hasn't been opened.
+  if ((!demoEntries || !demoEntries.length) && typeof loadDemos === 'function') {
+    try { loadDemos(); } catch(_) {}
+  }
+  const inRange = (dateStr) => {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    if (isNaN(d)) return false;
+    return monthsList.some(m => d.getFullYear() === m.year && d.getMonth() === m.month);
+  };
+  const mine = (demoEntries || []).filter(e => e && e.rep === rep && inRange(e.date));
+  const total     = mine.length;
+  const converted = mine.filter(e => e.outcome === 'Converted').length;
+  const pending   = mine.filter(e => e.outcome === 'Pending').length;
+  const lost      = mine.filter(e => e.outcome === 'Lost').length;
+  // Conversion rate: only counts decided demos (Converted / (Converted+Lost))
+  // so a wall of "Pending" demos doesn't artificially crater the rate.
+  const decided   = converted + lost;
+  const convRate  = decided > 0 ? converted / decided : null;
+  return { total, converted, pending, lost, convRate };
+}
+
 /* Compute the rep "Performance" object for a range of months. */
 function computeRepPerformance(rep, monthsList) {
   // monthsList = [{year, month}, ...]
@@ -6657,6 +6697,7 @@ function computeRepPerformance(rep, monthsList) {
     const goal = getGoal(year, month, rep);
     return { year, month, goal, ...agg };
   });
+  const demoStats = computeRepDemoStats(rep, monthsList);
 
   let totGoal = 0, totClosed = 0, totCommit = 0, totFcst = 0,
       totPipeline = 0, totXS1 = 0, totXP1 = 0, monthsWithData = 0;
@@ -6694,17 +6735,33 @@ function computeRepPerformance(rep, monthsList) {
   const pcrGoal        = latestWithData ? latestWithData.goal     : 0;
   const pcr            = pcrGoal > 0 ? (pcrPipeline / pcrGoal) : null;
 
-  // Composite "Performance Score" 0-100  (v12.4: rebalanced to reward closers)
-  //   65% goal attainment  (was 50%) — capped at 1.0 for the base
-  //   20% forecast accuracy (was 30%)
-  //   15% pipeline coverage (was 20%)
+  // Composite "Performance Score" 0-100  (v13.7: demo effectiveness added)
+  //   55% goal attainment      (was 65%) — capped at 1.0 for the base
+  //   15% forecast accuracy    (was 20%)
+  //   15% pipeline coverage    (was 15%)
+  //   15% demo effectiveness   (NEW) — blends demo volume + conversion rate
   // + Closer Bonus: up to +10 points for exceeding 100% goal
   //   (+1 pt per 2% over goal, capped at +10 at 120%+ attainment)
+  //
+  // Demo Effectiveness component:
+  //   volComp  = min(1, demos / DEMO_TARGET)    — rewards activity
+  //   convComp = convRate (0..1) or 0 if no decided demos yet
+  //   demoComp = volComp * 0.4 + convComp * 0.6
+  //   (i.e. quality of conversion weighted higher than raw count, but a rep
+  //    who logs zero demos in the period still gets 0 — no free credit.)
   const thresh = getThresh();
   const goalComp     = goalAttain != null ? Math.min(1, goalAttain) : 0;
   const accComp      = accuracy;
   const pcrComp      = pcr != null ? Math.min(1, pcr / thresh.green) : 0;
-  const baseScore    = (goalComp * 0.65 + accComp * 0.20 + pcrComp * 0.15) * 100;
+
+  // Target volume: 4 demos per active month in the window (configurable).
+  const DEMO_TARGET_PER_MONTH = 4;
+  const demoTarget = Math.max(1, monthsList.length * DEMO_TARGET_PER_MONTH);
+  const volComp    = Math.min(1, demoStats.total / demoTarget);
+  const convComp   = demoStats.convRate != null ? demoStats.convRate : 0;
+  const demoComp   = volComp * 0.4 + convComp * 0.6;
+
+  const baseScore    = (goalComp * 0.55 + accComp * 0.15 + pcrComp * 0.15 + demoComp * 0.15) * 100;
   const overGoal     = goalAttain != null ? Math.max(0, goalAttain - 1) : 0;
   const closerBonus  = Math.min(10, overGoal * 50); // +1 pt per 2% over, cap +10
   const score        = Math.min(100, Math.round(baseScore + closerBonus));
@@ -6720,6 +6777,7 @@ function computeRepPerformance(rep, monthsList) {
     },
     accuracy, commitVariance, commitAttain, goalAttain,
     pcrPipeline, pcrGoal, pcr,
+    demoStats, demoComp,
     score, monthsWithData
   };
 }
@@ -6783,6 +6841,12 @@ function varClass(v) {
 function scoreClass(s) {
   if (s >= 75) return 'good';
   if (s >= 50) return 'warn';
+  return 'bad';
+}
+function demoConvClass(c) {  // v13.7 — demo conversion rate
+  if (c == null) return 'bad';
+  if (c >= 0.5)  return 'good';
+  if (c >= 0.25) return 'warn';
   return 'bad';
 }
 
@@ -6938,11 +7002,19 @@ function renderPerfKpiStrip(repPerf, months, singleRepName) {
     };
   }
 
+  // v13.7 — Demo Conversion KPI (aggregate across reps in view)
+  const sumDemos     = repPerf.reduce((s,p) => s + (p.demoStats?.total     || 0), 0);
+  const sumConverted = repPerf.reduce((s,p) => s + (p.demoStats?.converted || 0), 0);
+  const sumLost      = repPerf.reduce((s,p) => s + (p.demoStats?.lost      || 0), 0);
+  const decidedDemos = sumConverted + sumLost;
+  const groupConv    = decidedDemos > 0 ? sumConverted / decidedDemos : null;
+
   const accSub = singleRepName ? `${singleRepName} · weighted-fcst vs closed` : 'aggregate, weighted-fcst vs closed';
   const kpis = [
     { lbl: 'Forecast Accuracy', val: fmtPct(acc),                cls: accClass(acc),    sub: accSub },
     { lbl: 'Goal Achievement',  val: fmtPct(attain),             cls: goalClass(attain),sub: `${fmtAED(sumClosed)} of ${fmtAED(sumGoal)}` },
     { lbl: 'Pipeline Coverage', val: pcr != null ? pcr.toFixed(2)+'×' : '—', cls: pcrClass(pcr), sub: `target ≥ ${getThresh().green}× · floor ${getThresh().amber}×` },
+    { lbl: 'Demo Conversion',   val: groupConv != null ? fmtPct(groupConv) : '—', cls: demoConvClass(groupConv), sub: `${sumConverted} converted · ${sumDemos} demos run` },
     fourthKpi
   ];
   document.getElementById('perfKpiStrip').innerHTML = kpis.map(k => `
@@ -7016,6 +7088,16 @@ function renderPerfRepCards(repPerf) {
             <div class="val ${pcrClass(p.pcr)}">${p.pcr != null ? p.pcr.toFixed(2)+'×' : '—'}</div>
             <div class="sub">${fmtAED(p.pcrPipeline)} ÷ ${fmtAED(p.pcrGoal)}</div>
           </div>
+          <div class="rep-metric">
+            <div class="lbl">Demo Effectiveness</div>
+            <div class="val ${demoConvClass(p.demoStats.convRate)}">${p.demoStats.convRate != null ? fmtPct(p.demoStats.convRate) : '—'}</div>
+            <div class="sub">${p.demoStats.converted} of ${p.demoStats.converted + p.demoStats.lost} decided · ${p.demoStats.total} total</div>
+          </div>
+          <div class="rep-metric">
+            <div class="lbl">Demos Run</div>
+            <div class="val">${p.demoStats.total}</div>
+            <div class="sub">${p.demoStats.converted} converted · ${p.demoStats.pending} pending · ${p.demoStats.lost} lost</div>
+          </div>
         </div>
 
         <div class="rep-bar">
@@ -7048,15 +7130,17 @@ function renderPerfRepCards(repPerf) {
 
 function renderPerfLeaderboard(repPerf) {
   const cols = [
-    { key: 'rep',            label: 'Rep' },
-    { key: 'team',           label: 'Team' },
-    { key: 'score',          label: 'Score' },
-    { key: 'goalAttain',     label: 'Goal %' },
-    { key: 'accuracy',       label: 'Accuracy' },
-    { key: 'commitVariance', label: 'Commit Δ' },
-    { key: 'pcr',            label: 'PCR' },
-    { key: 'pcrPipeline',    label: 'Pipeline (HS)' },
-    { key: 'totals.closed',  label: 'Closed Won', accessor: p => p.totals.closed }
+    { key: 'rep',                  label: 'Rep' },
+    { key: 'team',                 label: 'Team' },
+    { key: 'score',                label: 'Score' },
+    { key: 'goalAttain',           label: 'Goal %' },
+    { key: 'accuracy',             label: 'Accuracy' },
+    { key: 'commitVariance',       label: 'Commit Δ' },
+    { key: 'pcr',                  label: 'PCR' },
+    { key: 'demoStats.total',      label: 'Demos',     accessor: p => p.demoStats?.total || 0 },
+    { key: 'demoStats.convRate',   label: 'Demo Conv', accessor: p => p.demoStats?.convRate },
+    { key: 'pcrPipeline',          label: 'Pipeline (HS)' },
+    { key: 'totals.closed',        label: 'Closed Won', accessor: p => p.totals.closed }
   ];
 
   // v12.3: null/blank values always sink to the bottom (regardless of asc/desc) so
@@ -7101,6 +7185,8 @@ function renderPerfLeaderboard(repPerf) {
       <td class="${accClass(p.accuracy)}">${fmtPct(p.accuracy)}</td>
       <td class="${varClass(p.commitVariance)}">${fmtSigned(p.commitVariance)}</td>
       <td class="${pcrClass(p.pcr)}">${p.pcr != null ? p.pcr.toFixed(2)+'×' : '—'}</td>
+      <td>${p.demoStats?.total ?? 0}</td>
+      <td class="${demoConvClass(p.demoStats?.convRate)}">${p.demoStats?.convRate != null ? fmtPct(p.demoStats.convRate) : '—'}</td>
       <td style="color:#fb923c;font-weight:600;">${p.pcrPipeline ? fmtAED(p.pcrPipeline) : '—'}</td>
       <td>${fmtAED(p.totals.closed)}</td>
     </tr>`).join('')}</tbody>`;
@@ -7197,6 +7283,7 @@ function saveThresh() {
    INIT
 ════════════════════════════════════════ */
 loadLocal();
+loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 hsLoadTokens();
 
 /* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
