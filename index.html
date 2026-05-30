@@ -1656,7 +1656,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 12.2.html
+      version 12.3.html
     </div>
   </div>
 </div>
@@ -5839,7 +5839,7 @@ function fmtSigned(x, digits = 0) {
 function fmtAED(n) { return 'AED ' + fmtNum(Math.round(n || 0)); }
 
 /* ────────── RENDER ────────── */
-let perfSortCol = 'goalAttain';
+let perfSortCol = 'score';     // v12.3: default ranks BEST → WORST by composite Score
 let perfSortDir = 'desc';
 
 function renderPerformance() {
@@ -6088,15 +6088,6 @@ function renderPerfRepCards(repPerf) {
 }
 
 function renderPerfLeaderboard(repPerf) {
-  // Sort
-  const dir = perfSortDir === 'asc' ? 1 : -1;
-  const sorted = [...repPerf].sort((a, b) => {
-    const av = a[perfSortCol] == null ? -Infinity : a[perfSortCol];
-    const bv = b[perfSortCol] == null ? -Infinity : b[perfSortCol];
-    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
-    return String(av).localeCompare(String(bv)) * dir;
-  });
-
   const cols = [
     { key: 'rep',            label: 'Rep' },
     { key: 'team',           label: 'Team' },
@@ -6108,6 +6099,27 @@ function renderPerfLeaderboard(repPerf) {
     { key: 'pcrPipeline',    label: 'Pipeline (HS)' },
     { key: 'totals.closed',  label: 'Closed Won', accessor: p => p.totals.closed }
   ];
+
+  // v12.3: null/blank values always sink to the bottom (regardless of asc/desc) so
+  //         "worst" is genuinely last and not contaminated by reps with no data yet.
+  const dir = perfSortDir === 'asc' ? 1 : -1;
+  const accessor = (p) => {
+    const col = cols.find(c => c.key === perfSortCol);
+    if (col && typeof col.accessor === 'function') return col.accessor(p);
+    // dotted keys (e.g. "totals.closed") — graceful walk
+    return perfSortCol.split('.').reduce((o, k) => (o == null ? o : o[k]), p);
+  };
+  const isBlank = (v) => v == null || (typeof v === 'number' && !isFinite(v)) || v === '';
+
+  const sorted = [...repPerf].sort((a, b) => {
+    const av = accessor(a), bv = accessor(b);
+    const aBlank = isBlank(av), bBlank = isBlank(bv);
+    if (aBlank && bBlank) return 0;
+    if (aBlank) return  1;   // a sinks
+    if (bBlank) return -1;   // b sinks
+    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+    return String(av).localeCompare(String(bv)) * dir;
+  });
 
   const thead = `<thead><tr>${cols.map((c,i) => {
     const arrow = (perfSortCol === c.key) ? (perfSortDir === 'asc' ? 'sort-asc' : 'sort-desc') : '';
