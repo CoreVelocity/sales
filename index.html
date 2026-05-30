@@ -1656,7 +1656,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 12.3.html
+      version 12.4.html
     </div>
   </div>
 </div>
@@ -2316,34 +2316,67 @@
       <!-- ============== PERFORMANCE SCORE ============== -->
       <section id="gd-score" class="gd-section">
         <h2><span class="gd-num">7</span>Composite Performance Score (0–100)</h2>
-        <p>The single number in the circular badge on each rep card. Blends the three most important behaviours into one weighted score.</p>
+        <p>The single number in the circular badge on each rep card and the primary sort key on the Leaderboard. <strong>v12.4 rebalance: closing deals is now the dominant driver of rank.</strong> Goal Attainment weighs 65% of the base score, and reps who exceed 100% goal earn an additional <em>Closer Bonus</em> of up to +10 points — so the rep who actually brings in the AED beats the rep with the prettiest forecast.</p>
         <div class="gd-formula">
-          <div class="gd-formula-lbl">Performance Score</div>
-          <code>goalComp     = min(1, goalAttain)</code> <span class="gd-formula-side">— capped so over-achievers don't dwarf others</span><br/>
+          <div class="gd-formula-lbl">Performance Score (v12.4)</div>
+          <code>goalComp     = min(1, goalAttain)</code> <span class="gd-formula-side">— base cap; overachievement handled by bonus</span><br/>
           <code>accComp      = forecastAccuracy</code><br/>
           <code>pcrComp      = min(1, PCR ÷ greenThreshold)</code> <span class="gd-formula-side">— 1.0 at 4.0× coverage</span><br/>
-          <code>score = round( (goalComp × 0.5 + accComp × 0.3 + pcrComp × 0.2) × 100 )</code>
+          <code>baseScore    = (goalComp × 0.65 + accComp × 0.20 + pcrComp × 0.15) × 100</code><br/>
+          <code>overGoal     = max(0, goalAttain − 1)</code> <span class="gd-formula-side">— fraction above 100%</span><br/>
+          <code>closerBonus  = min(10, overGoal × 50)</code> <span class="gd-formula-side">— +1 pt per 2% over, capped at +10</span><br/>
+          <code>score        = min(100, round(baseScore + closerBonus))</code>
         </div>
         <div class="gd-weight-grid score-weights">
-          <div class="gd-weight-card"><div class="gd-weight-stage">Goal Attainment</div><div class="gd-weight-val">50%</div><div class="gd-weight-sub">Did they deliver?</div></div>
-          <div class="gd-weight-card"><div class="gd-weight-stage">Forecast Accuracy</div><div class="gd-weight-val">30%</div><div class="gd-weight-sub">Did they call it right?</div></div>
-          <div class="gd-weight-card"><div class="gd-weight-stage">Pipeline Coverage</div><div class="gd-weight-val">20%</div><div class="gd-weight-sub">Is their future safe?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Goal Attainment</div><div class="gd-weight-val">65%</div><div class="gd-weight-sub">Did they close?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Forecast Accuracy</div><div class="gd-weight-val">20%</div><div class="gd-weight-sub">Did they call it right?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Pipeline Coverage</div><div class="gd-weight-val">15%</div><div class="gd-weight-sub">Is their future safe?</div></div>
+          <div class="gd-weight-card" style="border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.08);"><div class="gd-weight-stage">Closer Bonus</div><div class="gd-weight-val">+10</div><div class="gd-weight-sub">Reward for &gt;100% goal</div></div>
         </div>
         <div class="gd-thresh">
           <span class="gd-chip good">≥ 80 Excellent</span>
           <span class="gd-chip warn">60 – 79 Solid</span>
           <span class="gd-chip bad">&lt; 60 Needs attention</span>
         </div>
+        <div class="gd-callout info">
+          <strong>Why the rebalance?</strong> Under the old 50/30/20 split, a rep at 90% goal with great accuracy could outrank a rep at 110% goal with average accuracy — even though the second rep brought more AED through the door. The new 65/20/15 split + Closer Bonus makes the Leaderboard answer the question every sales leader actually asks: <em>who closed the most against their target?</em>
+        </div>
         <div class="gd-example">
-          <div class="gd-example-head">📌 Worked Example — Milene</div>
+          <div class="gd-example-head">📌 Worked Example A — Milene (hits goal)</div>
           <ul>
             <li>Goal attainment 95%, Forecast accuracy 88%, PCR 3.2× (green threshold 4.0×)</li>
             <li><code>goalComp = min(1, 0.95) = 0.95</code></li>
             <li><code>accComp  = 0.88</code></li>
             <li><code>pcrComp  = min(1, 3.2 ÷ 4.0) = 0.80</code></li>
-            <li><code>score = round( (0.95×0.5 + 0.88×0.3 + 0.80×0.2) × 100 )</code></li>
-            <li><code>      = round( (0.475 + 0.264 + 0.160) × 100 ) = round(89.9) = <strong>90 → Excellent</strong></code></li>
+            <li><code>baseScore = (0.95×0.65 + 0.88×0.20 + 0.80×0.15) × 100</code></li>
+            <li><code>          = (0.6175 + 0.176 + 0.120) × 100 = 91.35</code></li>
+            <li><code>closerBonus = 0</code> (didn't exceed goal)</li>
+            <li><code>score = round(91.35) = <strong>91 → Excellent</strong></code></li>
           </ul>
+        </div>
+        <div class="gd-example">
+          <div class="gd-example-head">📌 Worked Example B — Hasan (overachieves goal)</div>
+          <ul>
+            <li>Goal attainment 118%, Forecast accuracy 75%, PCR 2.8×</li>
+            <li><code>goalComp = min(1, 1.18) = 1.00</code></li>
+            <li><code>accComp  = 0.75</code></li>
+            <li><code>pcrComp  = min(1, 2.8 ÷ 4.0) = 0.70</code></li>
+            <li><code>baseScore = (1.00×0.65 + 0.75×0.20 + 0.70×0.15) × 100</code></li>
+            <li><code>          = (0.65 + 0.15 + 0.105) × 100 = 90.5</code></li>
+            <li><code>overGoal = 0.18 → closerBonus = min(10, 0.18×50) = min(10, 9) = <strong>+9</strong></code></li>
+            <li><code>score = min(100, round(90.5 + 9)) = <strong>99 → Excellent</strong></code></li>
+          </ul>
+          <p class="gd-fineprint" style="margin-top:8px;">Under the old formula Hasan would have scored ~85 (capped goalComp + lower accuracy weight). The Closer Bonus now properly rewards him for beating target by 18%.</p>
+        </div>
+        <div class="gd-example">
+          <div class="gd-example-head">📌 Worked Example C — Connor (misses goal but accurate)</div>
+          <ul>
+            <li>Goal attainment 70%, Forecast accuracy 95%, PCR 4.2×</li>
+            <li><code>baseScore = (0.70×0.65 + 0.95×0.20 + 1.00×0.15) × 100 = 79.5</code></li>
+            <li><code>closerBonus = 0</code></li>
+            <li><code>score = <strong>80 → Excellent</strong> (just barely)</code></li>
+          </ul>
+          <p class="gd-fineprint" style="margin-top:8px;">Under the old 50/30/20 formula Connor would have scored ~83 — so accuracy-without-closing is now penalised more heavily, which is the intent. He still ranks below Hasan (99) and Milene (91), which is correct: they brought in more revenue.</p>
         </div>
       </section>
 
@@ -5742,13 +5775,20 @@ function computeRepPerformance(rep, monthsList) {
   const pcrGoal        = latestWithData ? latestWithData.goal     : 0;
   const pcr            = pcrGoal > 0 ? (pcrPipeline / pcrGoal) : null;
 
-  // Composite "Performance Score" 0-100
-  // 50% goal attainment (capped at 1.0) + 30% accuracy + 20% PCR-vs-target
+  // Composite "Performance Score" 0-100  (v12.4: rebalanced to reward closers)
+  //   65% goal attainment  (was 50%) — capped at 1.0 for the base
+  //   20% forecast accuracy (was 30%)
+  //   15% pipeline coverage (was 20%)
+  // + Closer Bonus: up to +10 points for exceeding 100% goal
+  //   (+1 pt per 2% over goal, capped at +10 at 120%+ attainment)
   const thresh = getThresh();
   const goalComp     = goalAttain != null ? Math.min(1, goalAttain) : 0;
   const accComp      = accuracy;
   const pcrComp      = pcr != null ? Math.min(1, pcr / thresh.green) : 0;
-  const score        = Math.round((goalComp * 0.5 + accComp * 0.3 + pcrComp * 0.2) * 100);
+  const baseScore    = (goalComp * 0.65 + accComp * 0.20 + pcrComp * 0.15) * 100;
+  const overGoal     = goalAttain != null ? Math.max(0, goalAttain - 1) : 0;
+  const closerBonus  = Math.min(10, overGoal * 50); // +1 pt per 2% over, cap +10
+  const score        = Math.min(100, Math.round(baseScore + closerBonus));
 
   return {
     rep,
