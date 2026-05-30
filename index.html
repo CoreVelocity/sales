@@ -1623,6 +1623,68 @@
     outline: none; border-color: rgba(168,85,247,0.5);
   }
 
+  /* Supporting-reps multi-select grid (v13.8) */
+  .demo-support-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px;
+  }
+  .demo-support-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 8px; cursor: pointer;
+    font-size: 12px; color: var(--text);
+    transition: all 0.12s;
+  }
+  .demo-support-chip:hover { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.4); }
+  .demo-support-chip input[type="checkbox"] { accent-color: #a855f7; cursor: pointer; }
+  .demo-support-chip.is-primary {
+    opacity: 0.45; cursor: not-allowed;
+    background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.3);
+  }
+  .demo-support-chip.is-primary input { pointer-events: none; }
+  .demo-support-chip-team {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-muted); margin-left: auto;
+  }
+
+  /* Support-rep credit pills in the log table (v13.8) */
+  .demo-support-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .demo-support-pill {
+    display: inline-block;
+    font-size: 10px;
+    background: rgba(168,85,247,0.12);
+    color: #c4b5fd;
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 4px;
+    padding: 1px 6px;
+    line-height: 1.4;
+  }
+
+  /* Discoverable delete button on each row (v13.8) — text + icon, danger-styled */
+  .demo-row-actions { display: flex; gap: 6px; align-items: center; }
+  .demo-action-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 5px 9px;
+    transition: all 0.12s;
+  }
+  .demo-action-btn:hover { background: rgba(255,255,255,0.1); }
+  .demo-action-btn.danger {
+    color: #fca5a5; border-color: rgba(239,68,68,0.35);
+    background: rgba(239,68,68,0.08);
+  }
+  .demo-action-btn.danger:hover {
+    color: #fff;
+    background: rgba(239,68,68,0.85);
+    border-color: rgba(239,68,68,1);
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
+  }
+
   /* role-based show/hide */
   body[data-role="rep"]    .office-only,
   body[data-role="viewer"] .office-only,
@@ -1916,7 +1978,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 13.7.html
+      version 13.9.html
     </div>
   </div>
 </div>
@@ -2322,8 +2384,14 @@
           <input type="date" id="demoFormDate">
         </div>
         <div class="demo-form-row">
-          <label>Sales Rep <span class="req">*</span></label>
+          <label>Primary Sales Rep <span class="req">*</span></label>
           <select id="demoFormRep"></select>
+        </div>
+        <div class="demo-form-row demo-form-row-full">
+          <label>
+            Supporting Reps <span class="optional">(optional — credit also goes to anyone who helped run the demo)</span>
+          </label>
+          <div id="demoFormSupportReps" class="demo-support-grid"></div>
         </div>
         <div class="demo-form-row">
           <label>Client Name <span class="req">*</span></label>
@@ -2370,7 +2438,7 @@
       </div>
       <div class="modal-foot">
         <button class="demo-btn ghost" onclick="closeDemoModal()">Cancel</button>
-        <button class="demo-btn danger" id="demoDeleteBtn" onclick="deleteDemoEntry()" style="display:none;">Delete</button>
+        <button class="demo-btn danger" id="demoDeleteBtn" onclick="deleteDemoEntry()" style="display:none;" title="Permanently delete this demo entry">🗑 Delete Demo</button>
         <button class="demo-btn primary" onclick="saveDemoEntry()">Save Demo</button>
       </div>
     </div>
@@ -2763,6 +2831,9 @@
         <div class="gd-callout info">
           <strong>Why bring demos into the score?</strong> Demos are the leading indicator of pipeline. A rep who closes 100% of goal this month but ran zero demos is mortgaging next month's number — and a rep who runs 12 demos with a 50% conversion rate is building a pipeline the AED hasn't caught up with yet. Goal Attainment still dominates at 55%, but Demo Effectiveness (15%) now ensures the Leaderboard rewards both <em>what they closed this month</em> and <em>what they're queueing up for next month</em>.
         </div>
+        <div class="gd-callout info" style="border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08);">
+          <strong>v13.8 — Shared demo credit.</strong> Many demos are joint efforts: one rep books the meeting, another runs the technical demonstration on-site. When Gladys logs a demo, she now picks a <em>primary rep</em> AND optionally tags <em>supporting reps</em>. Every credited rep gets the demo counted toward their Demo Effectiveness score, their Demo Tracker rep card, and the KPI strip — the demo itself is still one row in the log, but it powers multiple reps' scores. Supporting credits are shown as <span style="color:#a855f7;">+ Rep Name</span> chips under the primary in the log table, and as a <span style="color:#a855f7;">(+N supporting)</span> badge on the rep card. The <strong>Edit</strong> and <strong>Delete</strong> actions are now full text buttons in the Actions column (no more guessing what the 🗑 icon does).
+        </div>
         <div class="gd-example">
           <div class="gd-example-head">📌 Worked Example A — Milene (hits goal, decent demos)</div>
           <ul>
@@ -2820,7 +2891,6 @@
             <tr><td>Forecast Accuracy</td><td><code>1 − |Σ weightedFcst − Σ closed| ÷ max(Σ weightedFcst, Σ closed)</code></td></tr>
             <tr><td>Goal Achievement</td><td><code>Σ closed ÷ Σ goals</code></td></tr>
             <tr><td>Pipeline Coverage</td><td><code>Σ pipeline ÷ Σ goals</code></td></tr>
-            <tr><td>Reps On-Track</td><td>count of reps whose <code>goalAttain ≥ 85%</code></td></tr>
           </tbody>
         </table></div>
       </section>
@@ -5805,14 +5875,35 @@ function demoPopulateRepSelects() {
 }
 
 /* ── Filter the demos according to the active selectors ──────── */
+/* v13.8 — rep filter matches either the primary rep OR any rep listed
+   in the supportReps array, so supporters see "their" demos too.    */
+function demoCreditsRep(entry, rep) {
+  if (!entry || !rep) return false;
+  if (entry.rep === rep) return true;
+  return Array.isArray(entry.supportReps) && entry.supportReps.includes(rep);
+}
 function demoGetFiltered() {
   const wk     = document.getElementById('demoWeekSel')?.value || '';
   const rep    = document.getElementById('demoRepFilter')?.value || '';
   return demoEntries.filter(e => {
-    if (wk  && e.weekKey !== wk) return false;
-    if (rep && e.rep !== rep)    return false;
+    if (wk  && e.weekKey !== wk)        return false;
+    if (rep && !demoCreditsRep(e, rep)) return false;
     return true;
   });
+}
+/* Expand a demo into (rep, entry) credit pairs — primary + each
+   supporting rep. Used by per-rep aggregations (bar chart, rep grid,
+   KPI uniqueReps) so supporters get credit for assisting.            */
+function demoExpandToCredits(rows) {
+  const out = [];
+  rows.forEach(e => {
+    const seen = new Set();
+    if (e.rep) { out.push({ rep: e.rep, entry: e, role: 'primary' }); seen.add(e.rep); }
+    (Array.isArray(e.supportReps) ? e.supportReps : []).forEach(s => {
+      if (s && !seen.has(s)) { out.push({ rep: s, entry: e, role: 'support' }); seen.add(s); }
+    });
+  });
+  return out;
 }
 
 /* ── Main render — calls all sub-renderers ────────────────────── */
@@ -5833,7 +5924,13 @@ function renderDemoKpis(rows) {
   const pending   = rows.filter(r => r.outcome === 'Pending').length;
   const lost      = rows.filter(r => r.outcome === 'Lost').length;
   const convRate  = total ? Math.round((converted / total) * 100) : 0;
-  const uniqueReps   = new Set(rows.map(r => r.rep)).size;
+  // v13.8 — uniqueReps includes supporting reps, not just primaries
+  const repSet = new Set();
+  rows.forEach(r => {
+    if (r.rep) repSet.add(r.rep);
+    (Array.isArray(r.supportReps) ? r.supportReps : []).forEach(s => s && repSet.add(s));
+  });
+  const uniqueReps   = repSet.size;
   const uniqueClients= new Set(rows.map(r => (r.client||'').toLowerCase().trim()).filter(Boolean)).size;
 
   el.innerHTML = [
@@ -5853,15 +5950,15 @@ function renderDemoKpis(rows) {
 function renderDemoBarChart(rows) {
   const el = document.getElementById('demoBarChart');
   if (!el) return;
-  // Aggregate per rep
+  // Aggregate per rep — v13.8: credit primary + supporting reps
   const byRep = {};
   ALL_REPS.forEach(r => byRep[r] = { total: 0, converted: 0, pending: 0, lost: 0 });
-  rows.forEach(r => {
-    if (!byRep[r.rep]) byRep[r.rep] = { total: 0, converted: 0, pending: 0, lost: 0 };
-    byRep[r.rep].total++;
-    if (r.outcome === 'Converted') byRep[r.rep].converted++;
-    else if (r.outcome === 'Pending') byRep[r.rep].pending++;
-    else if (r.outcome === 'Lost')    byRep[r.rep].lost++;
+  demoExpandToCredits(rows).forEach(({ rep, entry }) => {
+    if (!byRep[rep]) byRep[rep] = { total: 0, converted: 0, pending: 0, lost: 0 };
+    byRep[rep].total++;
+    if      (entry.outcome === 'Converted') byRep[rep].converted++;
+    else if (entry.outcome === 'Pending')   byRep[rep].pending++;
+    else if (entry.outcome === 'Lost')      byRep[rep].lost++;
   });
   const max = Math.max(1, ...Object.values(byRep).map(v => v.total));
   // Sort by total desc; show reps with 0 too (greyed)
@@ -5931,12 +6028,15 @@ function renderDemoRepGrid(rows) {
   const el = document.getElementById('demoRepGrid');
   if (!el) return;
   const byRep = {};
-  rows.forEach(r => {
-    if (!byRep[r.rep]) byRep[r.rep] = { total:0, converted:0, pending:0, lost:0 };
-    byRep[r.rep].total++;
-    if (r.outcome === 'Converted') byRep[r.rep].converted++;
-    else if (r.outcome === 'Pending') byRep[r.rep].pending++;
-    else if (r.outcome === 'Lost')    byRep[r.rep].lost++;
+  // v13.8 — credit primary + supporting reps and track how many came in
+  // as supporting credits so the card can show e.g. "+2 supporting".
+  demoExpandToCredits(rows).forEach(({ rep, entry, role }) => {
+    if (!byRep[rep]) byRep[rep] = { total:0, converted:0, pending:0, lost:0, asSupport:0 };
+    byRep[rep].total++;
+    if (role === 'support') byRep[rep].asSupport++;
+    if      (entry.outcome === 'Converted') byRep[rep].converted++;
+    else if (entry.outcome === 'Pending')   byRep[rep].pending++;
+    else if (entry.outcome === 'Lost')      byRep[rep].lost++;
   });
   const entries = Object.entries(byRep)
     .filter(([_, v]) => v.total > 0)
@@ -5952,7 +6052,7 @@ function renderDemoRepGrid(rows) {
             <div class="demo-rep-card-name">${rep}</div>
             <div class="demo-rep-card-team">${team}</div>
           </div>
-          <div class="demo-rep-card-team"><strong>${v.total}</strong> demos</div>
+          <div class="demo-rep-card-team"><strong>${v.total}</strong> demos${v.asSupport ? ` <span style="color:#a855f7;font-size:10px;">(+${v.asSupport} supporting)</span>` : ''}</div>
         </div>
         <div class="demo-rep-card-stats">
           <div class="demo-rep-stat"><div class="demo-rep-stat-val converted">${v.converted}</div><div class="demo-rep-stat-lbl">Won</div></div>
@@ -5980,7 +6080,7 @@ function renderDemoLog() {
   }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="demo-log-empty">No demos logged for this filter. ${demoCanManage() ? 'Click <strong>+ New Demo</strong> to add one.' : 'Ask Gladys to log a demo.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="demo-log-empty">No demos logged for this filter. ${demoCanManage() ? 'Click <strong>+ New Demo</strong> to add one. (Existing entries can be edited or deleted from the Actions column.)' : 'Ask Gladys to log a demo.'}</td></tr>`;
     return;
   }
 
@@ -5998,7 +6098,7 @@ function renderDemoLog() {
     return `
       <tr>
         <td>${formatDemoDate(r.date)}</td>
-        <td>${escapeHtml(r.rep)}</td>
+        <td>${escapeHtml(r.rep)}${(Array.isArray(r.supportReps) && r.supportReps.length) ? `<br><span style="font-size:10px;color:#a855f7;" title="Supporting reps — also credited">+ ${r.supportReps.map(escapeHtml).join(', ')}</span>` : ''}</td>
         <td><strong>${escapeHtml(r.client || '—')}</strong></td>
         <td>${escapeHtml(r.type || '—')}${r.product ? `<br><span style="font-size:10px;color:var(--text-muted);">${escapeHtml(r.product)}</span>` : ''}</td>
         <td>${escapeHtml(r.location || '—')}</td>
@@ -6008,8 +6108,8 @@ function renderDemoLog() {
         <td class="office-only-th">
           ${canManage ? `
             <div class="demo-row-actions">
-              <button class="demo-icon-btn" title="Edit" onclick="editDemoEntry('${r.id}')">✏</button>
-              <button class="demo-icon-btn danger" title="Delete" onclick="deleteDemoEntry('${r.id}')">🗑</button>
+              <button class="demo-action-btn" title="Edit this demo entry" onclick="editDemoEntry('${r.id}')">✏ Edit</button>
+              <button class="demo-action-btn danger" title="Permanently delete this demo entry" onclick="deleteDemoEntry('${r.id}')">🗑 Delete</button>
             </div>` : ''}
         </td>
       </tr>`;
@@ -6061,6 +6161,7 @@ function openDemoModal(prefilledId) {
     document.getElementById('demoFormOutcome').value  = e.outcome || 'Pending';
     document.getElementById('demoFormDealId').value   = e.dealId || '';
     document.getElementById('demoFormNotes').value    = e.notes || '';
+    demoRenderSupportReps(Array.isArray(e.supportReps) ? e.supportReps : []);
     delBtn.style.display = 'inline-block';
   } else {
     title.textContent = 'New Demo Entry';
@@ -6073,10 +6174,45 @@ function openDemoModal(prefilledId) {
     document.getElementById('demoFormOutcome').value  = 'Pending';
     document.getElementById('demoFormDealId').value   = '';
     document.getElementById('demoFormNotes').value    = '';
+    demoRenderSupportReps([]);
     delBtn.style.display = 'none';
   }
   demoToggleReasonField();
+  // Re-render the support-rep grid whenever the primary changes so the primary stays disabled there.
+  const primarySel = document.getElementById('demoFormRep');
+  if (primarySel && !primarySel.dataset.supportBound) {
+    primarySel.addEventListener('change', () => {
+      const checked = demoCollectSupportReps();
+      demoRenderSupportReps(checked);
+    });
+    primarySel.dataset.supportBound = '1';
+  }
   document.getElementById('demoModal').classList.add('open');
+}
+
+/* v13.8 — Supporting-reps multi-select. The primary rep is shown disabled
+   so Gladys can't accidentally double-credit the same person. */
+function demoRenderSupportReps(checkedList) {
+  const host = document.getElementById('demoFormSupportReps');
+  if (!host) return;
+  const primary = document.getElementById('demoFormRep')?.value || '';
+  const checked = new Set((checkedList || []).filter(r => r && r !== primary));
+  host.innerHTML = ALL_REPS.map(r => {
+    const isPrimary = (r === primary);
+    const team = TEAMS['Dubai'].includes(r) ? 'DXB' : 'AUH';
+    const isChecked = checked.has(r);
+    return `
+      <label class="demo-support-chip ${isPrimary ? 'is-primary' : ''}" title="${isPrimary ? 'This rep is the primary — already credited.' : 'Credit this rep as a supporter on the demo.'}">
+        <input type="checkbox" value="${escapeHtml(r)}" ${isChecked ? 'checked' : ''} ${isPrimary ? 'disabled' : ''}>
+        <span>${escapeHtml(r)}</span>
+        <span class="demo-support-chip-team">${team}</span>
+      </label>`;
+  }).join('');
+}
+function demoCollectSupportReps() {
+  const host = document.getElementById('demoFormSupportReps');
+  if (!host) return [];
+  return Array.from(host.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
 }
 function closeDemoModal() {
   document.getElementById('demoModal').classList.remove('open');
@@ -6097,10 +6233,13 @@ function saveDemoEntry() {
   if (!rep)    { alert('Please pick a sales rep.'); return; }
   if (!client) { alert('Please enter a client name.'); return; }
 
+  // v13.8 — supporting reps (de-duped, primary excluded)
+  const supportReps = demoCollectSupportReps().filter(r => r && r !== rep);
   const payload = {
     date,
     weekKey: demoWeekKey(date),
     rep,
+    supportReps,
     client,
     type:     document.getElementById('demoFormType').value,
     location: document.getElementById('demoFormLocation').value.trim(),
@@ -6665,7 +6804,13 @@ function aggregateRepMonth(year, month, rep) {
 /* v13.7 — Demo activity within the performance window.
    Reads from demoEntries (loaded by loadDemos on tab open / init).
    Returns counts that feed the rep card, KPI strip, leaderboard, and
-   the new "Demo Effectiveness" component of the composite score.    */
+   the new "Demo Effectiveness" component of the composite score.
+
+   v13.8 — A rep is credited if they are EITHER the primary rep OR a
+   supporting rep on the demo. Each demo still counts only once toward
+   that rep's totals (no double counting if somehow listed in both
+   slots — primary always takes precedence). We also expose how many
+   came in as primary vs. as a supporter for the rep card breakdown. */
 function computeRepDemoStats(rep, monthsList) {
   // Ensure demos are loaded even if the Demo Tracker tab hasn't been opened.
   if ((!demoEntries || !demoEntries.length) && typeof loadDemos === 'function') {
@@ -6677,7 +6822,12 @@ function computeRepDemoStats(rep, monthsList) {
     if (isNaN(d)) return false;
     return monthsList.some(m => d.getFullYear() === m.year && d.getMonth() === m.month);
   };
-  const mine = (demoEntries || []).filter(e => e && e.rep === rep && inRange(e.date));
+  const credits = (e) =>
+    e && (e.rep === rep || (Array.isArray(e.supportReps) && e.supportReps.includes(rep)));
+
+  const mine = (demoEntries || []).filter(e => credits(e) && inRange(e.date));
+  const asPrimary = mine.filter(e => e.rep === rep).length;
+  const asSupport = mine.length - asPrimary;
   const total     = mine.length;
   const converted = mine.filter(e => e.outcome === 'Converted').length;
   const pending   = mine.filter(e => e.outcome === 'Pending').length;
@@ -6686,7 +6836,7 @@ function computeRepDemoStats(rep, monthsList) {
   // so a wall of "Pending" demos doesn't artificially crater the rate.
   const decided   = converted + lost;
   const convRate  = decided > 0 ? converted / decided : null;
-  return { total, converted, pending, lost, convRate };
+  return { total, converted, pending, lost, convRate, asPrimary, asSupport };
 }
 
 /* Compute the rep "Performance" object for a range of months. */
@@ -6981,9 +7131,12 @@ function renderPerfKpiStrip(repPerf, months, singleRepName) {
   const acc       = accDenom > 0 ? Math.max(0, 1 - Math.abs(sumFcst - sumClosed) / accDenom) : 0;
   const pcr       = sumGoal > 0 ? sumPipe / sumGoal : null;
 
-  let fourthKpi;
+  // v13.9 — "Reps On-Track" KPI removed from the aggregate strip per
+  // user request. In single-rep view we still surface Commit Variance
+  // (a rep-specific metric that has no cross-rep equivalent); in the
+  // aggregate view the strip is just the four core KPIs.
+  let fourthKpi = null;
   if (singleRepName) {
-    // Scoped to a single rep — show their personal commit-variance instead of cross-rep stat
     const p = repPerf[0];
     const cv = p ? p.commitVariance : null;
     fourthKpi = {
@@ -6991,14 +7144,6 @@ function renderPerfKpiStrip(repPerf, months, singleRepName) {
       val: cv != null ? fmtSigned(cv, 1) : '—',
       cls: varClass(cv),
       sub: 'closed vs committed (your own commits)'
-    };
-  } else {
-    const onTrack = repPerf.filter(p => p.goalAttain != null && p.goalAttain >= 0.85).length;
-    fourthKpi = {
-      lbl: 'Reps On-Track',
-      val: `${onTrack} / ${ALL_REPS.length}`,
-      cls: onTrack >= ALL_REPS.length * 0.7 ? 'good' : onTrack >= ALL_REPS.length * 0.4 ? 'warn' : 'bad',
-      sub: '≥85% of goal'
     };
   }
 
@@ -7016,7 +7161,7 @@ function renderPerfKpiStrip(repPerf, months, singleRepName) {
     { lbl: 'Pipeline Coverage', val: pcr != null ? pcr.toFixed(2)+'×' : '—', cls: pcrClass(pcr), sub: `target ≥ ${getThresh().green}× · floor ${getThresh().amber}×` },
     { lbl: 'Demo Conversion',   val: groupConv != null ? fmtPct(groupConv) : '—', cls: demoConvClass(groupConv), sub: `${sumConverted} converted · ${sumDemos} demos run` },
     fourthKpi
-  ];
+  ].filter(Boolean);
   document.getElementById('perfKpiStrip').innerHTML = kpis.map(k => `
     <div class="perf-kpi">
       <div class="perf-kpi-lbl">${k.lbl}</div>
