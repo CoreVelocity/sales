@@ -541,6 +541,332 @@
   }
   .summary-bar-inner.active-week .summary-week-val { color: #1a1a1a; text-shadow: 0 1px 2px rgba(255,255,255,0.25); }
 
+  /* ════════════════════════════════════════════════════════════════
+     GUIDELINES TAB
+     ════════════════════════════════════════════════════════════════ */
+  #view-guidelines .content { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  .gd-toc {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(13, 22, 41, 0.92); backdrop-filter: blur(10px);
+    margin: -24px -20px 28px; padding: 12px 20px;
+    border-bottom: 1px solid rgba(37,99,235,0.18);
+    display: flex; gap: 6px; flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .gd-toc a {
+    color: var(--text-muted); text-decoration: none;
+    padding: 5px 11px; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.15s ease;
+    font-weight: 500;
+  }
+  .gd-toc a:hover {
+    color: var(--text); border-color: var(--accent2);
+    background: rgba(37,99,235,0.08);
+  }
+
+  .gd-hero {
+    display: flex; align-items: center; gap: 22px;
+    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(124,58,237,0.08));
+    border: 1px solid rgba(37,99,235,0.25);
+    padding: 24px 28px; border-radius: 14px; margin-bottom: 32px;
+  }
+  .gd-hero-icon {
+    font-size: 44px; line-height: 1;
+    background: rgba(255,255,255,0.06);
+    width: 72px; height: 72px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 14px; flex-shrink: 0;
+  }
+  .gd-hero h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 800; letter-spacing: 1.5px;
+    margin: 0 0 6px; color: var(--text);
+  }
+  .gd-hero p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  .gd-section {
+    background: var(--navy-light);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 28px 30px;
+    margin-bottom: 22px;
+    scroll-margin-top: 70px;
+  }
+  .gd-section h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 700; letter-spacing: 1px;
+    color: var(--text);
+    margin: 0 0 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .gd-section h2 .gd-num {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    width: 32px; height: 32px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0;
+  }
+  .gd-section p { font-size: 13.5px; color: var(--text-muted); line-height: 1.7; margin: 0 0 12px; }
+  .gd-section p strong { color: var(--text); }
+  .gd-section ul, .gd-section ol { font-size: 13px; color: var(--text-muted); line-height: 1.8; padding-left: 22px; margin: 8px 0; }
+  .gd-section ul li strong, .gd-section ol li strong { color: var(--text); }
+  .gd-section code {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12.5px;
+    background: rgba(37,99,235,0.10);
+    color: #93c5fd;
+    padding: 2px 7px; border-radius: 4px;
+    border: 1px solid rgba(37,99,235,0.18);
+  }
+
+  /* Pill row */
+  .gd-pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+  .gd-pill {
+    padding: 6px 14px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    border: 1px solid;
+  }
+  .gd-pill.commit { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.35); color: #6ee7b7; }
+  .gd-pill.best   { background: rgba(251,191,36,0.10); border-color: rgba(251,191,36,0.35); color: #fcd34d; }
+  .gd-pill.pipe   { background: rgba(124,58,237,0.10); border-color: rgba(124,58,237,0.35); color: #c4b5fd; }
+  .gd-pill.closed { background: rgba(37,99,235,0.10); border-color: rgba(37,99,235,0.35); color: #93c5fd; }
+
+  /* Callout */
+  .gd-callout {
+    margin: 14px 0;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+    border-left: 3px solid;
+  }
+  .gd-callout.info { background: rgba(37,99,235,0.06); border-left-color: #2563eb; color: #c7d2fe; }
+  .gd-callout strong { color: var(--text); }
+
+  /* Tables */
+  .gd-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px; margin: 14px 0 8px;
+  }
+  .gd-table th {
+    text-align: left; padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    color: var(--text); font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 11.5px; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .gd-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text-muted); vertical-align: top;
+    line-height: 1.6;
+  }
+  .gd-table td strong { color: var(--text); display: block; margin-bottom: 2px; }
+  .gd-tag {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border-radius: 10px; margin-left: 6px;
+    font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .gd-tag.commit  { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .gd-tag.best    { background: rgba(251,191,36,0.15); color: #fcd34d; }
+  .gd-tag.pipe    { background: rgba(124,58,237,0.15); color: #c4b5fd; }
+  .gd-tag.closed  { background: rgba(37,99,235,0.15); color: #93c5fd; }
+  .gd-tag.blocked { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+
+  /* Stage weight cards */
+  .gd-weight-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin: 16px 0;
+  }
+  .gd-weight-grid.score-weights { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .gd-weight-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 18px;
+    text-align: center;
+  }
+  .gd-weight-card.stage-qualified  { border-top: 3px solid #f87171; }
+  .gd-weight-card.stage-proposal   { border-top: 3px solid #fcd34d; }
+  .gd-weight-card.stage-negotiation{ border-top: 3px solid #34d399; }
+  .gd-weight-stage {
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 6px;
+  }
+  .gd-weight-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 38px; font-weight: 800; color: var(--text);
+    line-height: 1;
+  }
+  .gd-weight-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Formula box */
+  .gd-formula {
+    background: rgba(13,22,41,0.6);
+    border: 1px solid rgba(37,99,235,0.20);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    color: #cbd5e1;
+    overflow-x: auto;
+  }
+  .gd-formula-lbl {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px; font-weight: 600;
+  }
+  .gd-formula code {
+    background: transparent !important; border: none !important;
+    color: inherit !important; padding: 0 !important;
+    font-size: inherit; font-family: inherit;
+  }
+  .gd-formula-side {
+    color: #64748b; font-family: 'Inter', sans-serif;
+    font-size: 11px; margin-left: 6px;
+  }
+
+  /* Example box */
+  .gd-example {
+    background: rgba(16,185,129,0.04);
+    border: 1px solid rgba(16,185,129,0.20);
+    border-radius: 10px;
+    padding: 14px 16px 14px 18px;
+    margin: 14px 0;
+    border-left: 3px solid #10b981;
+  }
+  .gd-example-head {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    color: #6ee7b7; margin-bottom: 6px;
+  }
+  .gd-example ul { margin: 0; padding-left: 20px; }
+  .gd-example li { color: var(--text-muted); margin-bottom: 4px; }
+
+  /* Threshold chips */
+  .gd-thresh { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .gd-chip {
+    padding: 5px 12px; border-radius: 14px;
+    font-size: 11.5px; font-weight: 700;
+    border: 1px solid;
+  }
+  .gd-chip.good { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.35); color: #6ee7b7; }
+  .gd-chip.warn { background: rgba(251,191,36,0.10); border-color: rgba(251,191,36,0.35); color: #fcd34d; }
+  .gd-chip.bad  { background: rgba(239,68,68,0.10);  border-color: rgba(239,68,68,0.35);  color: #fca5a5; }
+
+  /* Qualification tier cards */
+  .gd-tier-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin: 14px 0;
+  }
+  .gd-tier {
+    text-align: center; padding: 14px; border-radius: 10px;
+    border: 1px solid;
+  }
+  .gd-tier.hot  { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.30); }
+  .gd-tier.warm { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.30); }
+  .gd-tier.cold { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.30); }
+  .gd-tier-lbl {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 800; letter-spacing: 1.5px;
+  }
+  .gd-tier.hot  .gd-tier-lbl { color: #34d399; }
+  .gd-tier.warm .gd-tier-lbl { color: #fcd34d; }
+  .gd-tier.cold .gd-tier-lbl { color: #f87171; }
+  .gd-tier-range { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Metric card */
+  .gd-metric-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin: 16px 0;
+  }
+  .gd-metric-head {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .gd-metric-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 700; letter-spacing: 0.8px;
+    color: var(--text);
+  }
+  .gd-metric-tag {
+    font-size: 10.5px; font-weight: 700; padding: 3px 10px;
+    border-radius: 12px; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .gd-metric-tag.good { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+  .gd-metric-tag.info { background: rgba(37,99,235,0.15); color: #93c5fd; }
+  .gd-fineprint { font-size: 11.5px; color: var(--text-muted); font-style: italic; margin: 4px 0 0; }
+
+  /* Color legend */
+  .gd-legend-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; margin: 12px 0;
+  }
+  .gd-legend-card {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+  }
+  .gd-legend-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 3px;
+  }
+  .gd-legend-card.good .gd-legend-dot { background: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.5); }
+  .gd-legend-card.warn .gd-legend-dot { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+  .gd-legend-card.bad  .gd-legend-dot { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+  .gd-legend-card strong { color: var(--text); font-size: 13px; display: block; margin-bottom: 4px; }
+  .gd-legend-card p { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  /* FAQ */
+  .gd-faq {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 0;
+    margin: 8px 0;
+    overflow: hidden;
+  }
+  .gd-faq summary {
+    cursor: pointer; padding: 12px 16px;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    list-style: none; user-select: none;
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.15s ease;
+  }
+  .gd-faq summary::-webkit-details-marker { display: none; }
+  .gd-faq summary::before {
+    content: '+';
+    font-size: 18px; font-weight: 700; color: var(--accent2);
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s ease;
+  }
+  .gd-faq[open] summary::before { content: '−'; }
+  .gd-faq summary:hover { background: rgba(255,255,255,0.02); }
+  .gd-faq p {
+    margin: 0; padding: 0 16px 14px 44px;
+    font-size: 12.5px; color: var(--text-muted); line-height: 1.6;
+  }
+
+  .gd-footer {
+    text-align: center; padding: 24px 0 0;
+    font-size: 12px; color: var(--text-muted);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 22px;
+  }
+  .gd-footer strong { color: var(--text); }
+
   /* TOAST */
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
@@ -1340,6 +1666,9 @@
     <button class="primary-tab" data-tab="marketing" onclick="switchTab('marketing')">
       <span class="primary-tab-icon">📈</span>Marketing Consumer Performance
     </button>
+    <button class="primary-tab" data-tab="guidelines" onclick="switchTab('guidelines')">
+      <span class="primary-tab-icon">📖</span>Guidelines
+    </button>
   </div>
 
   <!-- TRACKER VIEW -->
@@ -1598,6 +1927,450 @@
       </div>
     </div>
   </div><!-- /#view-marketing -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       GUIDELINES VIEW — equations, terminology, examples
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="tab-view" id="view-guidelines">
+    <div class="content">
+
+      <!-- Sticky in-page navigation -->
+      <div class="gd-toc">
+        <a href="#gd-overview">Overview</a>
+        <a href="#gd-deal-entry">Deal Entry</a>
+        <a href="#gd-stage-weights">Stage Weights</a>
+        <a href="#gd-aging">Aging & Stale Deals</a>
+        <a href="#gd-qual">Qualification Score</a>
+        <a href="#gd-perf">Performance Metrics</a>
+        <a href="#gd-score">Performance Score</a>
+        <a href="#gd-pcr">Pipeline Coverage</a>
+        <a href="#gd-period">Period Selector</a>
+        <a href="#gd-colors">Color Legend</a>
+        <a href="#gd-faq">FAQ</a>
+      </div>
+
+      <!-- HERO -->
+      <section class="gd-hero">
+        <div class="gd-hero-icon">📖</div>
+        <div>
+          <h1>Guidelines &amp; Methodology</h1>
+          <p>How every number on the <strong>Sales Rep Performance</strong> dashboard is calculated. Use this page as the single source of truth when reviewing a rep's scorecard, the leaderboard, or the team-level KPIs.</p>
+        </div>
+      </section>
+
+      <!-- ============== OVERVIEW ============== -->
+      <section id="gd-overview" class="gd-section">
+        <h2><span class="gd-num">1</span>Overview</h2>
+        <p>The tracker captures, for every rep, four pieces of weekly forecast data plus actual closed revenue:</p>
+        <div class="gd-pill-row">
+          <span class="gd-pill commit">Commit</span>
+          <span class="gd-pill best">Best Case</span>
+          <span class="gd-pill pipe">Total Pipeline</span>
+          <span class="gd-pill closed">Closed Won</span>
+        </div>
+        <p>Each of these flows into one or more performance metrics. The dashboard then rolls them up per rep, per team, and aggregated across whatever <em>Period</em> you select (current month, last 3, last 6, YTD).</p>
+        <div class="gd-callout info">
+          <strong>Rule of thumb:</strong> all forecast metrics use the <em>latest week with activity</em> as a month-end snapshot. <em>Closed Won</em> uses the maximum value reported across weeks (because closed-won is cumulative — it only ever goes up within a month).
+        </div>
+      </section>
+
+      <!-- ============== DEAL ENTRY ============== -->
+      <section id="gd-deal-entry" class="gd-section">
+        <h2><span class="gd-num">2</span>Deal Entry Terminology</h2>
+        <table class="gd-table">
+          <thead><tr><th>Field</th><th>What it means</th><th>Used by</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Commit</strong><span class="gd-tag commit">High Confidence</span></td>
+              <td>Deals the rep is <strong>personally committing</strong> to close this month. Includes deal name, AED amount, and the next concrete action.</td>
+              <td>Forecast Accuracy, Commit Variance, Weighted Forecast</td>
+            </tr>
+            <tr>
+              <td><strong>Best Case</strong><span class="gd-tag best">Upside</span></td>
+              <td>Deals that <em>could</em> close this month if everything breaks the right way. Lower probability than Commit but still in active pursuit.</td>
+              <td>Weighted Forecast, Total Pipeline</td>
+            </tr>
+            <tr>
+              <td><strong>Total Pipeline</strong><span class="gd-tag pipe">Snapshot</span></td>
+              <td>Sum of all open opportunities the rep is working on, regardless of stage. Used as the numerator in Pipeline Coverage Ratio.</td>
+              <td>Pipeline Coverage Ratio</td>
+            </tr>
+            <tr>
+              <td><strong>Closed Won</strong><span class="gd-tag closed">Actuals</span></td>
+              <td>Revenue actually booked this month. The single source of truth for "what did the rep deliver".</td>
+              <td>Goal Attainment, Forecast Accuracy, Commit Variance</td>
+            </tr>
+            <tr>
+              <td><strong>Blocked</strong><span class="gd-tag blocked">Text only</span></td>
+              <td>Free-text note describing deals that are stuck. Not used in any calculation — purely qualitative for management review.</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong>XS1 / XP1 Forecast</strong></td>
+              <td>Unit-count forecasts (not AED) for the two flagship product lines. Tracked separately from revenue.</td>
+              <td>Rep Scorecard units row</td>
+            </tr>
+            <tr>
+              <td><strong>Stage</strong></td>
+              <td>One of <code>Qualified</code>, <code>Proposal</code>, <code>Negotiation</code>. Determines the forecast weight (see §3).</td>
+              <td>Weighted Forecast, Qualification Score</td>
+            </tr>
+            <tr>
+              <td><strong>Confidence</strong></td>
+              <td>Rep's self-rated probability (90 / 70 / 50 / 30%). Currently informational; not multiplied into the forecast.</td>
+              <td>Display only</td>
+            </tr>
+            <tr>
+              <td><strong>Buyer Signals</strong></td>
+              <td>6 checkboxes: Budget, Timeline, Champion, Technical Fit, Decision-Maker, Competition Out. Drives the Qualification Score (§4).</td>
+              <td>Qualification Score</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============== STAGE WEIGHTS ============== -->
+      <section id="gd-stage-weights" class="gd-section">
+        <h2><span class="gd-num">3</span>Stage Weights</h2>
+        <p>Every deal's forecast contribution is multiplied by a stage-based probability factor. These weights are the heart of the Weighted Forecast calculation.</p>
+        <div class="gd-weight-grid">
+          <div class="gd-weight-card stage-qualified">
+            <div class="gd-weight-stage">Qualified</div>
+            <div class="gd-weight-val">0.25</div>
+            <div class="gd-weight-sub">25% probability</div>
+          </div>
+          <div class="gd-weight-card stage-proposal">
+            <div class="gd-weight-stage">Proposal</div>
+            <div class="gd-weight-val">0.50</div>
+            <div class="gd-weight-sub">50% probability</div>
+          </div>
+          <div class="gd-weight-card stage-negotiation">
+            <div class="gd-weight-stage">Negotiation</div>
+            <div class="gd-weight-val">0.75</div>
+            <div class="gd-weight-sub">75% probability</div>
+          </div>
+        </div>
+        <div class="gd-formula">
+          <div class="gd-formula-lbl">Weighted Forecast (per row)</div>
+          <code>weightedForecast = (Commit + BestCase) × StageWeight × StalePenalty</code>
+        </div>
+        <div class="gd-example">
+          <div class="gd-example-head">📌 Example — Fatima</div>
+          <ul>
+            <li>Commit AED <strong>200,000</strong>, Best Case AED <strong>100,000</strong>, Stage = <strong>Proposal</strong>, deal is fresh (not stale).</li>
+            <li><code>weightedForecast = (200,000 + 100,000) × 0.50 × 1.0 = <strong>AED 150,000</strong></code></li>
+            <li>If the same row were in Negotiation: <code>300,000 × 0.75 = AED 225,000</code></li>
+            <li>If still in Qualified: <code>300,000 × 0.25 = AED 75,000</code></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============== AGING ============== -->
+      <section id="gd-aging" class="gd-section">
+        <h2><span class="gd-num">4</span>Aging &amp; Stale-Deal Penalty</h2>
+        <p>A deal is "stale" when it has stayed in the same stage for the same rep across consecutive weekly submissions for too long. The tracker walks backwards through your weekly history and counts how many consecutive weeks the same <code>dealName + stage + rep</code> combination has persisted.</p>
+        <div class="gd-formula">
+          <div class="gd-formula-lbl">Stale thresholds (per stage)</div>
+          <code>Qualified &gt; 14 days · Proposal &gt; 21 days · Negotiation &gt; 30 days</code>
+        </div>
+        <p>When a row crosses its threshold:</p>
+        <ol>
+          <li>The row highlights <span class="gd-chip bad">red</span> in the tracker grid.</li>
+          <li>That row's Weighted Forecast is <strong>halved</strong> (<code>StalePenalty = 0.5</code>) — penalising rep optimism on deals that aren't moving.</li>
+        </ol>
+        <div class="gd-example">
+          <div class="gd-example-head">📌 Example — Connor</div>
+          <ul>
+            <li>"Aldar Properties" Commit appears in Negotiation for 5 consecutive weeks → ageEstimate = 5 × 7 = 35 days &gt; 30 → <strong>stale</strong>.</li>
+            <li>Commit AED 500,000 in Negotiation: <code>500,000 × 0.75 × <strong>0.5</strong> = AED 187,500</code> instead of AED 375,000.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============== QUALIFICATION SCORE ============== -->
+      <section id="gd-qual" class="gd-section">
+        <h2><span class="gd-num">5</span>Qualification Score (0–100)</h2>
+        <p>Shown in the tracker grid next to each deal row. Combines the buyer-signal checkboxes (60% of the score) with stage progression (40% of the score).</p>
+        <div class="gd-formula">
+          <div class="gd-formula-lbl">Qualification Score</div>
+          <code>signalsPart  = (checkedSignals ÷ 6) × 60</code><br/>
+          <code>stagePart    = (StageWeight ÷ 0.75) × 40</code><br/>
+          <code>qualScore    = round( signalsPart + stagePart )</code>
+        </div>
+        <p>Stage maps to: Qualified → 13.3, Proposal → 26.7, Negotiation → 40.</p>
+        <div class="gd-tier-grid">
+          <div class="gd-tier hot">
+            <div class="gd-tier-lbl">HOT</div>
+            <div class="gd-tier-range">≥ 70</div>
+          </div>
+          <div class="gd-tier warm">
+            <div class="gd-tier-lbl">WARM</div>
+            <div class="gd-tier-range">40 – 69</div>
+          </div>
+          <div class="gd-tier cold">
+            <div class="gd-tier-lbl">COLD</div>
+            <div class="gd-tier-range">&lt; 40</div>
+          </div>
+        </div>
+        <div class="gd-example">
+          <div class="gd-example-head">📌 Example — Hasan</div>
+          <ul>
+            <li>Deal in <strong>Negotiation</strong>, 5 of 6 buyer signals checked.</li>
+            <li><code>signalsPart = (5 ÷ 6) × 60 = 50.0</code></li>
+            <li><code>stagePart   = (0.75 ÷ 0.75) × 40 = 40.0</code></li>
+            <li><code>qualScore   = round(50 + 40) = <strong>90 → HOT</strong></code></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============== PERFORMANCE METRICS ============== -->
+      <section id="gd-perf" class="gd-section">
+        <h2><span class="gd-num">6</span>Sales Rep Performance Metrics</h2>
+        <p>Every rep scorecard on the Performance tab shows four metrics. Each one answers a different question.</p>
+
+        <!-- 6.1 Forecast Accuracy -->
+        <div class="gd-metric-card">
+          <div class="gd-metric-head">
+            <div class="gd-metric-name">6.1 · Forecast Accuracy</div>
+            <div class="gd-metric-tag good">Higher is better</div>
+          </div>
+          <p>How close the rep's <strong>Weighted Forecast</strong> ended up being to their actual <strong>Closed Won</strong>. Uses a symmetric formula so both over-forecasting and under-forecasting are penalised equally.</p>
+          <div class="gd-formula">
+            <code>denom    = max(weightedForecast, closedWon)</code><br/>
+            <code>accuracy = 1 − |weightedForecast − closedWon| ÷ denom</code>
+          </div>
+          <div class="gd-thresh">
+            <span class="gd-chip good">≥ 85% Healthy</span>
+            <span class="gd-chip warn">70 – 84% Watch</span>
+            <span class="gd-chip bad">&lt; 70% Off-target</span>
+          </div>
+          <div class="gd-example">
+            <div class="gd-example-head">📌 Example — Marios</div>
+            <ul>
+              <li>Weighted forecast (end of May): AED 420,000 · Closed Won: AED 380,000</li>
+              <li><code>denom = max(420k, 380k) = 420,000</code></li>
+              <li><code>accuracy = 1 − |420k − 380k| ÷ 420k = 1 − 0.0952 = <strong>90.5% → Healthy</strong></code></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 6.2 Commit Variance -->
+        <div class="gd-metric-card">
+          <div class="gd-metric-head">
+            <div class="gd-metric-name">6.2 · Commit Variance</div>
+            <div class="gd-metric-tag info">Signed</div>
+          </div>
+          <p>The rep's actual closed revenue versus what they <strong>committed</strong> to. Positive means they beat their commit; negative means they missed it.</p>
+          <div class="gd-formula">
+            <code>commitVariance = (closedWon − totalCommit) ÷ totalCommit</code>
+          </div>
+          <div class="gd-thresh">
+            <span class="gd-chip good">≥ 0% Beat / Met</span>
+            <span class="gd-chip warn">−15% to 0% Slight miss</span>
+            <span class="gd-chip bad">&lt; −15% Big miss</span>
+          </div>
+          <div class="gd-example">
+            <div class="gd-example-head">📌 Example — Katy</div>
+            <ul>
+              <li>Committed AED 300,000 in week 4 · Closed AED 345,000</li>
+              <li><code>commitVariance = (345k − 300k) ÷ 300k = +15.0%</code> → <strong>beat commit by 15%</strong></li>
+              <li>If she had closed AED 240,000: <code>(240k − 300k) ÷ 300k = −20%</code> → big miss</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 6.3 Goal Attainment -->
+        <div class="gd-metric-card">
+          <div class="gd-metric-head">
+            <div class="gd-metric-name">6.3 · Goal Attainment</div>
+            <div class="gd-metric-tag info">Vs. admin-set target</div>
+          </div>
+          <p>Closed revenue divided by the admin-set monthly goal. Goals are configured per rep per month in <em>Manage Goals</em>.</p>
+          <div class="gd-formula">
+            <code>goalAttain = closedWon ÷ monthlyGoal</code>
+          </div>
+          <div class="gd-thresh">
+            <span class="gd-chip good">≥ 100% Goal hit</span>
+            <span class="gd-chip warn">85 – 99% Close</span>
+            <span class="gd-chip bad">&lt; 85% Behind</span>
+          </div>
+          <div class="gd-example">
+            <div class="gd-example-head">📌 Example — Wafiq</div>
+            <ul>
+              <li>Monthly goal (admin-set): AED 500,000 · Closed Won: AED 440,000</li>
+              <li><code>goalAttain = 440k ÷ 500k = <strong>88% → Watch</strong></code></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 6.4 Pipeline Coverage Ratio -->
+        <div class="gd-metric-card">
+          <div class="gd-metric-head">
+            <div class="gd-metric-name">6.4 · Pipeline Coverage Ratio (PCR)</div>
+            <div class="gd-metric-tag info">Forward-looking</div>
+          </div>
+          <p>How many times the rep's open pipeline covers their monthly goal. The classic SaaS rule of thumb is 3–4× coverage for healthy quota attainment. Always uses the <strong>latest month with activity</strong>, never summed.</p>
+          <div class="gd-formula">
+            <code>PCR = totalPipeline ÷ monthlyGoal</code>
+          </div>
+          <div class="gd-thresh">
+            <span class="gd-chip good">≥ 4.0× Healthy</span>
+            <span class="gd-chip warn">2.5 – 3.9× Watch</span>
+            <span class="gd-chip bad">&lt; 2.5× At Risk</span>
+          </div>
+          <p class="gd-fineprint">Thresholds are admin-configurable in <em>⚙ Coverage Thresholds</em>.</p>
+          <div class="gd-example">
+            <div class="gd-example-head">📌 Example — Jawdat</div>
+            <ul>
+              <li>Total open pipeline: AED 1,800,000 · Monthly goal: AED 500,000</li>
+              <li><code>PCR = 1,800k ÷ 500k = <strong>3.6× → Watch</strong></code> (close to but below the 4.0× green floor)</li>
+              <li>To move into healthy: pipeline ≥ 4.0 × 500k = <strong>AED 2,000,000</strong></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== PERFORMANCE SCORE ============== -->
+      <section id="gd-score" class="gd-section">
+        <h2><span class="gd-num">7</span>Composite Performance Score (0–100)</h2>
+        <p>The single number in the circular badge on each rep card. Blends the three most important behaviours into one weighted score.</p>
+        <div class="gd-formula">
+          <div class="gd-formula-lbl">Performance Score</div>
+          <code>goalComp     = min(1, goalAttain)</code> <span class="gd-formula-side">— capped so over-achievers don't dwarf others</span><br/>
+          <code>accComp      = forecastAccuracy</code><br/>
+          <code>pcrComp      = min(1, PCR ÷ greenThreshold)</code> <span class="gd-formula-side">— 1.0 at 4.0× coverage</span><br/>
+          <code>score = round( (goalComp × 0.5 + accComp × 0.3 + pcrComp × 0.2) × 100 )</code>
+        </div>
+        <div class="gd-weight-grid score-weights">
+          <div class="gd-weight-card"><div class="gd-weight-stage">Goal Attainment</div><div class="gd-weight-val">50%</div><div class="gd-weight-sub">Did they deliver?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Forecast Accuracy</div><div class="gd-weight-val">30%</div><div class="gd-weight-sub">Did they call it right?</div></div>
+          <div class="gd-weight-card"><div class="gd-weight-stage">Pipeline Coverage</div><div class="gd-weight-val">20%</div><div class="gd-weight-sub">Is their future safe?</div></div>
+        </div>
+        <div class="gd-thresh">
+          <span class="gd-chip good">≥ 80 Excellent</span>
+          <span class="gd-chip warn">60 – 79 Solid</span>
+          <span class="gd-chip bad">&lt; 60 Needs attention</span>
+        </div>
+        <div class="gd-example">
+          <div class="gd-example-head">📌 Worked Example — Milene</div>
+          <ul>
+            <li>Goal attainment 95%, Forecast accuracy 88%, PCR 3.2× (green threshold 4.0×)</li>
+            <li><code>goalComp = min(1, 0.95) = 0.95</code></li>
+            <li><code>accComp  = 0.88</code></li>
+            <li><code>pcrComp  = min(1, 3.2 ÷ 4.0) = 0.80</code></li>
+            <li><code>score = round( (0.95×0.5 + 0.88×0.3 + 0.80×0.2) × 100 )</code></li>
+            <li><code>      = round( (0.475 + 0.264 + 0.160) × 100 ) = round(89.9) = <strong>90 → Excellent</strong></code></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============== PCR TEAM ============== -->
+      <section id="gd-pcr" class="gd-section">
+        <h2><span class="gd-num">8</span>Team-Level Roll-ups</h2>
+        <p>The KPI strip at the top of the Performance tab uses the same formulas as the rep cards, but applied to the <strong>summed totals across all reps</strong> in the current period:</p>
+        <table class="gd-table">
+          <thead><tr><th>Team KPI</th><th>Formula (over all reps in period)</th></tr></thead>
+          <tbody>
+            <tr><td>Forecast Accuracy</td><td><code>1 − |Σ weightedFcst − Σ closed| ÷ max(Σ weightedFcst, Σ closed)</code></td></tr>
+            <tr><td>Goal Achievement</td><td><code>Σ closed ÷ Σ goals</code></td></tr>
+            <tr><td>Pipeline Coverage</td><td><code>Σ pipeline ÷ Σ goals</code></td></tr>
+            <tr><td>Reps On-Track</td><td>count of reps whose <code>goalAttain ≥ 85%</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============== PERIOD ============== -->
+      <section id="gd-period" class="gd-section">
+        <h2><span class="gd-num">9</span>Period Selector</h2>
+        <p>The dropdown at the top of the Performance tab controls which months are summed into every metric.</p>
+        <table class="gd-table">
+          <thead><tr><th>Option</th><th>Months included</th></tr></thead>
+          <tbody>
+            <tr><td>Current Month</td><td>Just this month</td></tr>
+            <tr><td>Last 3 Months</td><td>This month + 2 prior</td></tr>
+            <tr><td>Last 6 Months</td><td>This month + 5 prior</td></tr>
+            <tr><td>Year to Date</td><td>January 1 of current year through today</td></tr>
+          </tbody>
+        </table>
+        <div class="gd-callout info">
+          <strong>Important:</strong> Pipeline Coverage Ratio always uses the <em>latest month with activity</em>, not summed across the period — because PCR is a forward-looking snapshot of "is your pipe big enough for next month".
+        </div>
+      </section>
+
+      <!-- ============== COLOR LEGEND ============== -->
+      <section id="gd-colors" class="gd-section">
+        <h2><span class="gd-num">10</span>Color Legend</h2>
+        <div class="gd-legend-grid">
+          <div class="gd-legend-card good">
+            <div class="gd-legend-dot"></div>
+            <div>
+              <strong>Green / Good</strong>
+              <p>Above the healthy threshold for this metric. No action needed.</p>
+            </div>
+          </div>
+          <div class="gd-legend-card warn">
+            <div class="gd-legend-dot"></div>
+            <div>
+              <strong>Amber / Watch</strong>
+              <p>Within the watch range. Worth a quick conversation with the rep.</p>
+            </div>
+          </div>
+          <div class="gd-legend-card bad">
+            <div class="gd-legend-dot"></div>
+            <div>
+              <strong>Red / At Risk</strong>
+              <p>Below the floor. Coaching, deal review, or goal recalibration required.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============== FAQ ============== -->
+      <section id="gd-faq" class="gd-section">
+        <h2><span class="gd-num">11</span>FAQ</h2>
+
+        <details class="gd-faq" open>
+          <summary>Why doesn't my Best Case roll up into Goal Attainment?</summary>
+          <p>Goal Attainment compares <em>actual</em> Closed Won against the admin-set goal. Best Case is a forecast value — it lives in Weighted Forecast and Pipeline Coverage, not in Goal Attainment.</p>
+        </details>
+
+        <details class="gd-faq">
+          <summary>Why does my Forecast Accuracy show 0% in a month I haven't started yet?</summary>
+          <p>If both Weighted Forecast and Closed Won are zero, accuracy is undefined and displays as 0% or "—". As soon as either value moves above zero, the formula activates.</p>
+        </details>
+
+        <details class="gd-faq">
+          <summary>I committed AED 200k and closed AED 350k. Why is my Forecast Accuracy below 100%?</summary>
+          <p>Because the formula is symmetric — over-forecasting <em>and</em> under-forecasting both reduce accuracy. Closing way above commit means the rep was sandbagging. The score rewards calling it correctly, not just over-delivering.</p>
+        </details>
+
+        <details class="gd-faq">
+          <summary>Where do the PCR thresholds (4.0× green, 2.5× amber) come from?</summary>
+          <p>They're SaaS-industry defaults that have proven reliable for B2B sales teams. Admins can change them in <em>⚙ Coverage Thresholds</em> on the Performance tab if your business model warrants different numbers.</p>
+        </details>
+
+        <details class="gd-faq">
+          <summary>Why does my stale deal still appear on the scorecard?</summary>
+          <p>Stale deals stay visible — they're not deleted. The aging penalty (×0.5) only reduces the Weighted Forecast contribution. The row turns red in the tracker to flag it for review.</p>
+        </details>
+
+        <details class="gd-faq">
+          <summary>How is my XS1 / XP1 forecast scored?</summary>
+          <p>Currently XS1 and XP1 are shown as unit totals on the scorecard but are not factored into the composite Performance Score. They're displayed for trend tracking; an XS1/XP1 actuals-vs-forecast metric is planned.</p>
+        </details>
+
+        <details class="gd-faq">
+          <summary>Where do I edit my monthly goal?</summary>
+          <p>Admin opens the Performance tab → <em>⚙ Manage Goals</em> → enter the AED target per rep per month. Reps cannot edit their own goal.</p>
+        </details>
+      </section>
+
+      <div class="gd-footer">
+        <p>Last updated: <strong>May 30, 2026</strong> · Questions or proposed changes? Message Ahmed.</p>
+      </div>
+
+    </div>
+  </div><!-- /#view-guidelines -->
 
   <div class="toast" id="toast"></div>
 
@@ -1984,6 +2757,33 @@ async function initOneDrive(opts) {
     try { redirectRes = await msalInstance.handleRedirectPromise(); } catch(_) {}
     if (redirectRes && redirectRes.account) {
       msalAccount = redirectRes.account;
+
+      // Did the user start this redirect from the LOGIN SCREEN (rep SSO)?
+      // If so, finish the rep login here: lookup rep by email, set session,
+      // and launch the app. (Otherwise this was just an OneDrive connect.)
+      const pendingLogin = sessionStorage.getItem('oxefit_pending_ms_login') === '1';
+      if (pendingLogin) {
+        sessionStorage.removeItem('oxefit_pending_ms_login');
+        const email   = redirectRes.account.username || '';
+        const repName = (typeof lookupRepByEmail === 'function') ? lookupRepByEmail(email) : null;
+        if (!repName) {
+          // Unauthorized account — sign out silently and surface error on login screen
+          try { await msalInstance.logoutRedirect({ account: redirectRes.account, postLogoutRedirectUri: window.location.href }); } catch(_) {}
+          try { showLoginError(`Your Microsoft account (${email}) is not authorized for this tracker. Contact admin.`); } catch(_) {}
+          return null;
+        }
+        currentUser = repName;
+        currentRole = (repName === ADMIN_USER) ? 'admin' : 'rep';
+        sessionStorage.setItem('oxefit_role',  currentRole);
+        sessionStorage.setItem('oxefit_user',  currentUser);
+        sessionStorage.setItem('oxefit_email', email);
+        try { showToast(`Signed in as ${repName}`, 'success'); } catch(_) {}
+        try { launchApp(/*alreadyAuthed*/ true); } catch(_) {}
+        // Continue: also pull OneDrive data in background
+        try { await downloadFromOneDrive(); } catch(_) {}
+        return redirectRes.account;
+      }
+
       if (!silent) {
         await downloadFromOneDrive();
         showToast('Connected to OneDrive', 'success');
@@ -2210,39 +3010,36 @@ async function handleMicrosoftLogin() {
   btn.disabled = true;
   const lbl = btn.querySelector('span');
   const origLbl = lbl.textContent;
-  lbl.textContent = 'Signing in…';
+  lbl.textContent = 'Redirecting…';
 
   try {
-    // Prefer popup; fall back to redirect if popup blocked / popup-in-popup
-    let account = null;
-    try {
-      if (isRunningInPopup()) {
-        await msalInstance.loginRedirect({ scopes: ONEDRIVE_CONFIG.scopes });
-        return; // browser navigates away
-      }
-      const res = await msalInstance.loginPopup({
-        scopes: ONEDRIVE_CONFIG.scopes,
-        prompt: 'select_account'
-      });
-      account = res.account;
-    } catch(popupErr) {
-      // Popup blocked / running-in-popup → redirect fallback
-      const msg = (popupErr && (popupErr.errorCode || popupErr.message || '')) + '';
-      if (/popup_window_error|running in a popup|user_cancelled/i.test(msg)) {
-        if (/user_cancelled/i.test(msg)) {
-          throw popupErr; // user closed it — don't redirect
-        }
-        await msalInstance.loginRedirect({ scopes: ONEDRIVE_CONFIG.scopes });
-        return;
-      }
-      // Clear stuck interaction state
-      if (/interaction_in_progress/i.test(msg)) {
-        Object.keys(sessionStorage).filter(k => k.startsWith('msal.')).forEach(k => sessionStorage.removeItem(k));
-        throw new Error('Cleared a stuck sign-in session — please click Sign in with Microsoft again.');
-      }
-      throw popupErr;
-    }
+    // PRIMARY FLOW: loginRedirect (avoids Cross-Origin-Opener-Policy errors
+    // that break loginPopup on GitHub Pages + Microsoft login.microsoftonline.com).
+    // The browser navigates away to Microsoft, the user signs in there,
+    // then returns to this page where handleRedirectPromise() (called on
+    // page load inside initOneDrive) picks up the result and completes
+    // the rep lookup + session setup.
+    //
+    // Cache the intent so the redirect-return path knows to finish the
+    // rep login flow (not just an OneDrive connect).
+    sessionStorage.setItem('oxefit_pending_ms_login', '1');
 
+    // Clear any stuck interaction flag from a prior aborted attempt
+    try {
+      Object.keys(sessionStorage)
+        .filter(k => k.startsWith('msal.') && k.includes('interaction.status'))
+        .forEach(k => sessionStorage.removeItem(k));
+    } catch(_) {}
+
+    await msalInstance.loginRedirect({
+      scopes: ONEDRIVE_CONFIG.scopes,
+      prompt: 'select_account'
+    });
+    return; // browser navigates away — code below does not run on this path
+
+    /* eslint-disable no-unreachable */
+    // (Fallback popup flow kept for reference only — disabled because of COOP)
+    let account = null;
     if (!account || !account.username) {
       throw new Error('Microsoft returned no account info.');
     }
