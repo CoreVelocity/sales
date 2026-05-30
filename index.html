@@ -1916,7 +1916,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 13.html
+      version 13.5.html
     </div>
   </div>
 </div>
@@ -6564,52 +6564,87 @@ function aggregateRepMonth(year, month, rep) {
   };
   if (!md) return out;
 
-  // Closed Won is cumulative across the month — take MAX across weeks per rep
-  // (reps often update closed-won upward as deals close, so MAX is safest)
+  // v13.5 FIX: per-metric "last-known-value" scan across all weeks.
+  //
+  // Old behavior picked a single "latest snapshot week" and read every metric
+  // from that one row. That broke whenever a rep updated only closedWon in a
+  // later week (which marks the week as "has activity" but leaves
+  // commitValue / bestCaseValue / forecastXS1 / forecastXP1 as 0), causing
+  // those forecast fields to be read as zero and zeroing out Commit Variance,
+  // Forecast Accuracy, and the XS1 / XP1 totals on the Performance tab.
+  //
+  // New behavior: for EACH forecast metric we walk the weeks chronologically
+  // and remember the most recent NON-ZERO value, plus which week it came
+  // from (for stage / confidence / stale-penalty bookkeeping).
   let maxClosed = 0;
-  let lastSnapshotIdx = -1;
+  let latestCommit = 0, latestCommitWeek = -1;
+  let latestBest   = 0, latestBestWeek   = -1;
+  let latestPipe   = 0;
+  let latestTrue   = 0;
+  let latestXS1    = 0;
+  let latestXP1    = 0;
+  let latestStage  = '', latestStageWeek = -1;
+  let latestConf   = '';
+
   for (let w = 0; w < md.weeks.length; w++) {
     const rows = md.weeks[w] || [];
     const r = rows.find(x => x.rep === rep);
     if (!r) continue;
-    const cw = parseFloat(r.closedWon) || 0;
+
+    const cw       = parseFloat(r.closedWon)      || 0;
+    const commit   = parseFloat(r.commitValue)    || 0;
+    const bestCase = parseFloat(r.bestCaseValue)  || 0;
+    const totalPipe= parseFloat(r.totalPipeline)  || 0;
+    const truePipe = parseFloat(r.truePipeline)   || 0;
+    const xs1      = parseFloat(r.forecastXS1)    || 0;
+    const xp1      = parseFloat(r.forecastXP1)    || 0;
+    const cText    = (r.commitText   || '').trim();
+    const bText    = (r.bestCaseText || '').trim();
+
     if (cw > maxClosed) maxClosed = cw;
-    const hasAny = cw > 0
-                || (parseFloat(r.commitValue)   || 0) > 0
-                || (parseFloat(r.bestCaseValue) || 0) > 0
-                || (parseFloat(r.totalPipeline) || 0) > 0
-                || (parseFloat(r.truePipeline)  || 0) > 0
-                || (r.commitText   && r.commitText.trim())
-                || (r.bestCaseText && r.bestCaseText.trim());
-    if (hasAny) { lastSnapshotIdx = w; out.anyActivity = true; }
+
+    // Per-metric carry-forward: keep latest week with a non-zero value
+    if (commit   > 0) { latestCommit = commit;   latestCommitWeek = w;
+                        latestStage  = r.stage || latestStage;
+                        latestStageWeek = w;
+                        latestConf   = r.confidence || latestConf; }
+    if (bestCase > 0) { latestBest   = bestCase; latestBestWeek = w; }
+    if (totalPipe> 0) { latestPipe   = totalPipe; }
+    if (truePipe > 0) { latestTrue   = truePipe; }
+    if (xs1      > 0) { latestXS1    = xs1; }
+    if (xp1      > 0) { latestXP1    = xp1; }
+
+    const hasAny = cw > 0 || commit > 0 || bestCase > 0 || totalPipe > 0
+                || truePipe > 0 || xs1 > 0 || xp1 > 0 || cText || bText;
+    if (hasAny) out.anyActivity = true;
     if (r.locked) out.lockedWeeks++;
   }
-  out.closedWon = maxClosed;
 
-  // Forecast snapshot from the latest week with activity
-  if (lastSnapshotIdx >= 0) {
-    const rows = md.weeks[lastSnapshotIdx] || [];
-    const r = rows.find(x => x.rep === rep);
-    if (r) {
-      const commit   = parseFloat(r.commitValue)   || 0;
-      const bestCase = parseFloat(r.bestCaseValue) || 0;
-      out.commit   = commit;
-      out.bestCase = bestCase;
-      // True pipeline (basis for PCR) = sum of all open HubSpot deals when
-      // CRM-synced; otherwise fall back to Commit + Best Case as a proxy.
-      out.pipeline = parseFloat(r.truePipeline)
-                  || parseFloat(r.totalPipeline)
-                  || (commit + bestCase);
-      out.xs1Fcst  = parseFloat(r.forecastXS1)   || 0;
-      out.xp1Fcst  = parseFloat(r.forecastXP1)   || 0;
-      out.stage    = r.stage || '';
-      out.confidence = r.confidence || '';
-      const sw = STAGE_WEIGHTS[r.stage] || 0;
-      const weekKey = `${year}-${month}-${lastSnapshotIdx}`;
-      const stale = (typeof isRowStale === 'function') ? isRowStale(r, weekKey) : false;
-      out.weightedForecast = (commit + bestCase) * sw * (stale ? 0.5 : 1.0);
-      out.hasData = true;
+  out.closedWon = maxClosed;
+  out.commit    = latestCommit;
+  out.bestCase  = latestBest;
+  // True pipeline = HubSpot-sourced sum when present, else totalPipeline,
+  // else Commit + BestCase as a proxy.
+  out.pipeline  = latestTrue || latestPipe || (latestCommit + latestBest);
+  out.xs1Fcst   = latestXS1;
+  out.xp1Fcst   = latestXP1;
+  out.stage     = latestStage;
+  out.confidence= latestConf;
+
+  // Weighted forecast uses the stage from the week that produced the latest
+  // commit value, and applies stale-penalty against THAT week's row.
+  if (latestCommit > 0 || latestBest > 0) {
+    const wIdx = latestStageWeek >= 0 ? latestStageWeek
+               : Math.max(latestCommitWeek, latestBestWeek);
+    let stageRow = null;
+    if (wIdx >= 0 && md.weeks[wIdx]) {
+      stageRow = (md.weeks[wIdx] || []).find(x => x.rep === rep) || null;
     }
+    const sw = STAGE_WEIGHTS[(stageRow && stageRow.stage) || latestStage] || 0;
+    const weekKey = `${year}-${month}-${wIdx}`;
+    const stale = (typeof isRowStale === 'function' && stageRow) ? isRowStale(stageRow, weekKey) : false;
+    out.weightedForecast = (latestCommit + latestBest) * sw * (stale ? 0.5 : 1.0);
+    out.hasData = true;
   }
   return out;
 }
