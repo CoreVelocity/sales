@@ -4878,15 +4878,93 @@ function hubspotApplySelected() {
   }
   // CRM-sourced fields (read-only in UI):
   //  • truePipeline = sum of ALL open deals (basis for Pipeline Coverage Ratio)
-  //  • closedWon    = sum of ALL closed-won deals this month
+  //    — applied to the CURRENTLY VIEWED week (it's a "now" snapshot).
   row.truePipeline   = allOpen.reduce((s,d) => s + (d.amount||0), 0);
-  row.closedWon      = allWon.reduce((s,d) => s + (d.amount||0), 0);
   row.hubspotSynced  = true;
   row.hubspotSyncedAt= new Date().toISOString();
+
+  // ── latest11.5: CLOSED-WON ATTRIBUTION BY ACTUAL CLOSE DATE ────────
+  // BEFORE: every won deal was dumped into the currently-viewed week, regardless
+  //   of when it actually closed in HubSpot. A May-closed deal viewed from
+  //   June (or vice-versa) ended up in the wrong bucket — and was overwritten
+  //   on every sync. That's why Fatima's May-closed deal wasn't showing in
+  //   May's Closed (Win) totals.
+  // AFTER: group won deals by their HubSpot `closedate` month, then write
+  //   each month's sum into the rep's row for THAT month (week 0). Clear stale
+  //   closed-won snapshots in other weeks of those months so the monthly MAX
+  //   aggregation in renderCommitPanel / aggregateRepMonth doesn't double-count.
+  const wonByMonth = {}; // "YYYY-M" → sum
+  const monthsTouched = new Set();
+  allWon.forEach(d => {
+    if (!d.close) return;                          // skip deals without a close date
+    const dt = new Date(d.close);
+    if (isNaN(dt.getTime())) return;
+    const y = dt.getFullYear(), m = dt.getMonth();
+    const k = `${y}-${m}`;
+    wonByMonth[k] = (wonByMonth[k] || 0) + (d.amount || 0);
+    monthsTouched.add(k);
+  });
+
+  // Also clear closedWon on ALL historical months for this rep where HubSpot
+  // hasn't seen a deal — so a deal that was previously closed and is now
+  // closed-lost (or moved months) doesn't linger as a phantom number.
+  // Strategy: for any month with EXISTING closedWon for this rep, if HubSpot
+  // didn't return a won deal for that month, also flag it for reset to 0.
+  Object.keys(allData).forEach(monthKey => {
+    const md = allData[monthKey];
+    if (!md || !md.weeks) return;
+    let hasExistingClosed = false;
+    md.weeks.forEach(w => {
+      if (!w) return;
+      w.forEach(r => {
+        if (r.rep === hsCurrentRep && (parseFloat(r.closedWon) || 0) > 0) {
+          hasExistingClosed = true;
+        }
+      });
+    });
+    if (hasExistingClosed) monthsTouched.add(monthKey);
+  });
+
+  // Apply per month: write the won total to week 0's row (or the currently-
+  // viewed week if it's the current month), and zero it out elsewhere.
+  let writtenCount = 0;
+  monthsTouched.forEach(monthKey => {
+    const [yStr, mStr] = monthKey.split('-');
+    const y = parseInt(yStr, 10), m = parseInt(mStr, 10);
+    const md = getMonthData(y, m);
+    const wonTotal = wonByMonth[monthKey] || 0;
+    // Decide which week to write the closedWon into:
+    //   • current month being synced from → use the currently-viewed week
+    //   • any other month → use week 0 (consistent home for the rollup)
+    const targetWeek = (y === curYear && m === curMonth) ? curWeek : 0;
+    ensureWeekSeeded(md, targetWeek);
+    // Zero out closedWon in EVERY week of this month for this rep, then write
+    // the total once into the target week. Avoids double-counting via the MAX
+    // aggregation logic and prevents stale snapshots in skipped weeks.
+    for (let w = 0; w < md.weeks.length; w++) {
+      const wk = md.weeks[w];
+      if (!wk) continue;
+      const tr = wk.find(r => r.rep === hsCurrentRep);
+      if (!tr) continue;
+      if (w === targetWeek) {
+        tr.closedWon       = wonTotal;
+        tr.hubspotSynced   = true;
+        tr.hubspotSyncedAt = new Date().toISOString();
+      } else {
+        // Only clear if it was a HubSpot-written value, leave manual entries alone
+        if (tr.hubspotSynced) tr.closedWon = 0;
+      }
+    }
+    if (wonTotal > 0) writtenCount++;
+  });
+
   saveAll();
   renderAll();
   closeHubspotModal();
-  const summary = `${deals.length} selected · ${allOpen.length} open · ${allWon.length} won`;
+  const wonMonthsLabel = Object.keys(wonByMonth)
+    .map(k => { const [y,m] = k.split('-'); return `${MONTHS[parseInt(m,10)].slice(0,3)} ${y}`; })
+    .join(', ') || 'none';
+  const summary = `${deals.length} selected · ${allOpen.length} open · ${allWon.length} won across ${writtenCount} month(s): ${wonMonthsLabel}`;
   showToast(`HubSpot synced for ${hsCurrentRep} (${summary})`, 'success');
 }
 
