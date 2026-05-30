@@ -1373,7 +1373,14 @@
   .perf-period select {
     background: var(--input-bg); border:1px solid var(--border); color:var(--text);
     padding:7px 10px; border-radius:8px; font-size:13px; font-family:inherit; cursor:pointer;
+    min-width: 150px;
   }
+  .perf-period select:disabled {
+    opacity: 0.75; cursor: not-allowed;
+    background: rgba(255,255,255,0.03);
+  }
+  .perf-period select optgroup { color: var(--text-muted); font-style: normal; font-weight: 600; }
+  .perf-period select option { background: var(--card); color: var(--text); }
   .perf-period-label { font-size:12px; color:var(--text-muted); margin-left:6px; }
   .perf-toolbar-actions { display:flex; gap:8px; flex-wrap:wrap; }
   .perf-btn {
@@ -1824,6 +1831,10 @@
             <option value="ytd">Year to Date</option>
           </select>
           <span class="perf-period-label" id="perfPeriodLabel"></span>
+        </div>
+        <div class="perf-period">
+          <label>Rep</label>
+          <select id="perfRepSel" onchange="renderPerformance()"></select>
         </div>
         <div class="perf-toolbar-actions">
           <button class="perf-btn ghost" onclick="renderPerformance()">↻ Refresh</button>
@@ -5486,17 +5497,64 @@ function renderPerformance() {
     el.style.display = isAdmin ? 'inline-flex' : 'none';
   });
 
+  // Populate rep filter dropdown (per-role)
+  const repSel = document.getElementById('perfRepSel');
+  if (repSel) {
+    const prevValue = repSel.value;
+    let opts = '';
+    if (isAdmin) {
+      opts += `<option value="__ALL__">All Reps</option>`;
+      ['Dubai', 'Abu Dhabi'].forEach(team => {
+        opts += `<optgroup label="${team}">`;
+        (TEAMS[team] || []).forEach(r => {
+          opts += `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`;
+        });
+        opts += `</optgroup>`;
+      });
+      repSel.innerHTML = opts;
+      repSel.disabled = false;
+      // Restore previous selection if still valid, else default to All Reps
+      if (prevValue && (prevValue === '__ALL__' || ALL_REPS.includes(prevValue))) {
+        repSel.value = prevValue;
+      } else {
+        repSel.value = '__ALL__';
+      }
+    } else {
+      // Rep: locked to themselves
+      opts = `<option value="${escapeHtml(currentUser)}">${escapeHtml(currentUser)} (you)</option>`;
+      repSel.innerHTML = opts;
+      repSel.value = currentUser;
+      repSel.disabled = true;
+    }
+  }
+  const selectedRep = repSel ? repSel.value : '__ALL__';
+  const filterSingle = (selectedRep && selectedRep !== '__ALL__');
+
   const months = getPerfMonths();
   document.getElementById('perfPeriodLabel').textContent = perfPeriodDesc(months);
 
   // Compute per rep
-  const repPerf = ALL_REPS.map(rep => computeRepPerformance(rep, months));
+  const allRepPerf = ALL_REPS.map(rep => computeRepPerformance(rep, months));
+  const repPerf = filterSingle
+    ? allRepPerf.filter(p => p.rep === selectedRep)
+    : allRepPerf;
 
-  renderPerfTeamRow(repPerf);
-  renderPerfKpiStrip(repPerf, months);
+  // Hide team rollup row when scoped to a single rep
+  const teamRow = document.getElementById('perfTeamRow');
+  if (teamRow) teamRow.style.display = filterSingle ? 'none' : '';
+
+  // Hide leaderboard section when scoped to a single rep (one row isn't a leaderboard)
+  const leaderboardWrap = document.getElementById('perfLeaderboard');
+  if (leaderboardWrap) {
+    const lbSection = leaderboardWrap.closest('.perf-section');
+    if (lbSection) lbSection.style.display = filterSingle ? 'none' : '';
+  }
+
+  if (!filterSingle) renderPerfTeamRow(repPerf);
+  renderPerfKpiStrip(repPerf, months, filterSingle ? selectedRep : null);
   renderPerfPcrGrid(repPerf);
   renderPerfRepCards(repPerf);
-  renderPerfLeaderboard(repPerf);
+  if (!filterSingle) renderPerfLeaderboard(repPerf);
 }
 
 function renderPerfTeamRow(repPerf) {
@@ -5534,7 +5592,7 @@ function renderPerfTeamRow(repPerf) {
     + cardHTML('combined',  'Combined Total',  tot, ALL_REPS.length);
 }
 
-function renderPerfKpiStrip(repPerf, months) {
+function renderPerfKpiStrip(repPerf, months, singleRepName) {
   const sumGoal   = repPerf.reduce((s,p) => s + p.totals.goal,     0);
   const sumClosed = repPerf.reduce((s,p) => s + p.totals.closed,   0);
   const sumFcst   = repPerf.reduce((s,p) => s + p.totals.forecast, 0);
@@ -5544,13 +5602,34 @@ function renderPerfKpiStrip(repPerf, months) {
   const accDenom  = Math.max(sumFcst, sumClosed);
   const acc       = accDenom > 0 ? Math.max(0, 1 - Math.abs(sumFcst - sumClosed) / accDenom) : 0;
   const pcr       = sumGoal > 0 ? sumPipe / sumGoal : null;
-  const onTrack   = repPerf.filter(p => p.goalAttain != null && p.goalAttain >= 0.85).length;
 
+  let fourthKpi;
+  if (singleRepName) {
+    // Scoped to a single rep — show their personal commit-variance instead of cross-rep stat
+    const p = repPerf[0];
+    const cv = p ? p.commitVariance : null;
+    fourthKpi = {
+      lbl: 'Commit Variance',
+      val: cv != null ? fmtSigned(cv, 1) : '—',
+      cls: varClass(cv),
+      sub: 'closed vs committed (your own commits)'
+    };
+  } else {
+    const onTrack = repPerf.filter(p => p.goalAttain != null && p.goalAttain >= 0.85).length;
+    fourthKpi = {
+      lbl: 'Reps On-Track',
+      val: `${onTrack} / ${ALL_REPS.length}`,
+      cls: onTrack >= ALL_REPS.length * 0.7 ? 'good' : onTrack >= ALL_REPS.length * 0.4 ? 'warn' : 'bad',
+      sub: '≥85% of goal'
+    };
+  }
+
+  const accSub = singleRepName ? `${singleRepName} · weighted-fcst vs closed` : 'aggregate, weighted-fcst vs closed';
   const kpis = [
-    { lbl: 'Forecast Accuracy', val: fmtPct(acc),                cls: accClass(acc),    sub: 'aggregate, weighted-fcst vs closed' },
+    { lbl: 'Forecast Accuracy', val: fmtPct(acc),                cls: accClass(acc),    sub: accSub },
     { lbl: 'Goal Achievement',  val: fmtPct(attain),             cls: goalClass(attain),sub: `${fmtAED(sumClosed)} of ${fmtAED(sumGoal)}` },
     { lbl: 'Pipeline Coverage', val: pcr != null ? pcr.toFixed(2)+'×' : '—', cls: pcrClass(pcr), sub: `target ≥ ${getThresh().green}× · floor ${getThresh().amber}×` },
-    { lbl: 'Reps On-Track',     val: `${onTrack} / ${ALL_REPS.length}`, cls: onTrack >= ALL_REPS.length * 0.7 ? 'good' : onTrack >= ALL_REPS.length * 0.4 ? 'warn' : 'bad', sub: '≥85% of goal' }
+    fourthKpi
   ];
   document.getElementById('perfKpiStrip').innerHTML = kpis.map(k => `
     <div class="perf-kpi">
