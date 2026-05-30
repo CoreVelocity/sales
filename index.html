@@ -324,11 +324,15 @@
   /* CONTENT */
   .content { flex: 1; padding: 28px; max-width: 1700px; margin: 0 auto; width: 100%; }
 
-  /* KPI CARDS */
+  /* KPI CARDS — 4 boxes per row × 2 rows = 8 cards total. Forced 4-column
+     grid on desktop for a clean 2-row professional layout; gracefully
+     collapses to 2 columns on tablet and 1 on mobile. */
   .kpi-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 16px; margin-bottom: 28px;
   }
+  @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
   .kpi-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
     padding: 20px 18px; position: relative; overflow: hidden;
@@ -461,6 +465,18 @@
   .stage-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: 600; background: rgba(37,99,235,0.15); color: var(--accent-glow); border: 1px solid rgba(37,99,235,0.3); }
 
   .notes-cell { min-width: 160px; max-width: 220px; }
+  /* Multi-line deal name cells (Commit / Best Case) — same look as notes textarea */
+  .deal-multiline-cell { min-width: 180px; max-width: 240px; vertical-align: top; }
+  .deal-multiline-input {
+    width: 100%; min-height: 32px; resize: vertical;
+    font-family: 'Barlow', sans-serif; font-size: 12px; line-height: 1.5;
+    padding: 6px 8px; border-radius: 6px;
+    background: var(--input-bg); border: 1px solid var(--border);
+    color: var(--text); overflow: hidden; box-sizing: border-box;
+    white-space: pre-wrap;
+  }
+  .deal-multiline-input:focus { outline: none; border-color: var(--accent2); background: rgba(37,99,235,0.08); }
+  .deal-multiline-input.locked-field { background: transparent; border-color: transparent; cursor: default; resize: none; }
   .notes-display { cursor: pointer; min-height: 32px; padding: 4px 8px; border-radius: 6px; border: 1px solid transparent; transition: border-color 0.15s, background 0.15s; font-size: 12px; line-height: 1.5; }
   .notes-display:hover { border-color: var(--border); background: var(--input-bg); }
   .notes-placeholder { color: var(--text-muted); font-style: italic; font-size: 11px; }
@@ -514,7 +530,10 @@
   .commit-metric-value { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
   .commit-card.abu-dhabi .commit-metric-value { color: var(--gold-light); }
   .commit-card.total     .commit-metric-value { color: var(--success); }
-  .commit-card-sub { font-size: 10px; color: var(--text-muted); margin-top: 8px; }
+  .commit-card-sub { font-size: 10px; color: var(--text-muted); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .commit-locked-pill  { background: rgba(34,197,94,0.12);  color: #4ade80; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
+  .commit-pending-pill { background: rgba(251,191,36,0.12); color: #fbbf24; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
+  .commit-of-pill      { background: rgba(255,255,255,0.04); color: var(--text-muted); padding: 2px 8px; border-radius: 10px; font-weight: 600; font-size: 10px; }
   @media (max-width: 800px) { .commit-grid { grid-template-columns: 1fr; } }
 
   /* SUMMARY BAR */
@@ -1760,7 +1779,7 @@
 
     <!-- Monthly Commitments dashboard (locked / submitted entries only) -->
     <div class="commit-panel" id="commitPanel">
-      <div class="commit-title">Monthly Commitments — Submitted &amp; Locked</div>
+      <div class="commit-title">Monthly Commitments — All Entries (Locked + In Progress)</div>
       <div class="commit-grid" id="commitGrid"></div>
     </div>
 
@@ -3315,44 +3334,46 @@ function renderAll() {
   if (perfView && perfView.classList.contains('active')) renderPerformance();
 }
 
-/* Monthly Commitments — aggregates only LOCKED rows across all 5 weeks of curMonth */
+/* Monthly Commitments — aggregates ALL rows with data across all 5 weeks of curMonth.
+   Previously only locked rows were counted, which caused the panel to show 0
+   when reps had entered data but not yet clicked Submit & Lock. Now any row
+   with a non-zero commit / best case / closed-won / unit value is included,
+   and a separate locked-vs-pending sub-count tells you how many are final. */
 function renderCommitPanel() {
   const md = getCurMonthData();
-  const agg = {
-    'Dubai':     { commit:0, forecast:0, bestCase:0, closedWon:0, xs1:0, xp1:0, count:0 },
-    'Abu Dhabi': { commit:0, forecast:0, bestCase:0, closedWon:0, xs1:0, xp1:0, count:0 }
-  };
+  const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, xs1:0, xp1:0, count:0, locked:0, pending:0 });
+  const agg = { 'Dubai': blank(), 'Abu Dhabi': blank() };
   md.weeks.forEach((w, wi) => {
     if (!w) return;
     w.forEach(r => {
-      if (!r.locked) return;
       const t = agg[r.team]; if (!t) return;
+      const commit    = parseFloat(r.commitValue)   || 0;
+      const bestCase  = parseFloat(r.bestCaseValue) || 0;
+      const closedWon = parseFloat(r.closedWon)     || 0;
+      const xs1       = parseFloat(r.forecastXS1)   || 0;
+      const xp1       = parseFloat(r.forecastXP1)   || 0;
+      const hasText   = (r.commitText && r.commitText.trim()) || (r.bestCaseText && r.bestCaseText.trim());
+      const hasData   = commit || bestCase || closedWon || xs1 || xp1 || hasText || r.locked;
+      if (!hasData) return;
       const weekKey = `${curYear}-${curMonth}-${wi}`;
       const stalePenalty = isRowStale(r, weekKey) ? 0.5 : 1.0;
       const stageWeight  = STAGE_WEIGHTS[r.stage] || 0;
-      const commit       = parseFloat(r.commitValue)   || 0;
-      const bestCase     = parseFloat(r.bestCaseValue) || 0;
-      // Total Forecast = (Commit + Best Case) × Confidence Weight × stale-penalty (auto-derived, always fresh)
-      const forecast     = (commit + bestCase) * stageWeight * stalePenalty;
-      const closedWon    = parseFloat(r.closedWon) || 0;
-      t.commit   += commit;
-      t.forecast += forecast;
-      t.bestCase += bestCase;
-      t.xs1      += parseFloat(r.forecastXS1)   || 0;
-      t.xp1      += parseFloat(r.forecastXP1)   || 0;
-      t.closedWon = (t.closedWon || 0) + closedWon;
+      // Total Forecast = (Commit + Best Case) × Confidence Weight × stale-penalty
+      const forecast = (commit + bestCase) * stageWeight * stalePenalty;
+      t.commit    += commit;
+      t.forecast  += forecast;
+      t.bestCase  += bestCase;
+      t.closedWon += closedWon;
+      t.xs1       += xs1;
+      t.xp1       += xp1;
       t.count++;
+      if (r.locked) t.locked++; else t.pending++;
     });
   });
-  const total = {
-    commit:    agg['Dubai'].commit    + agg['Abu Dhabi'].commit,
-    forecast:  agg['Dubai'].forecast  + agg['Abu Dhabi'].forecast,
-    bestCase:  agg['Dubai'].bestCase  + agg['Abu Dhabi'].bestCase,
-    closedWon: agg['Dubai'].closedWon + agg['Abu Dhabi'].closedWon,
-    xs1:       agg['Dubai'].xs1       + agg['Abu Dhabi'].xs1,
-    xp1:       agg['Dubai'].xp1       + agg['Abu Dhabi'].xp1,
-    count:     agg['Dubai'].count     + agg['Abu Dhabi'].count
-  };
+  const total = blank();
+  ['commit','forecast','bestCase','closedWon','xs1','xp1','count','locked','pending'].forEach(k => {
+    total[k] = agg['Dubai'][k] + agg['Abu Dhabi'][k];
+  });
   const card = (cls, label, d, totalCount) => `
     <div class="commit-card ${cls}">
       <div class="commit-card-label">${label}</div>
@@ -3364,7 +3385,12 @@ function renderCommitPanel() {
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
       </div>
-      <div class="commit-card-sub">${d.count} submitted entr${d.count===1?'y':'ies'}${totalCount?` of ${totalCount}`:''} · ${MONTHS[curMonth]} ${curYear}</div>
+      <div class="commit-card-sub">
+        <span class="commit-locked-pill">🔒 ${d.locked} locked</span>
+        <span class="commit-pending-pill">✎ ${d.pending} in progress</span>
+        ${totalCount?`<span class="commit-of-pill">of ${totalCount} possible</span>`:''}
+        · ${MONTHS[curMonth]} ${curYear}
+      </div>
     </div>`;
   document.getElementById('commitGrid').innerHTML =
     card('dubai',     'Dubai Team',     agg['Dubai'],     TEAMS['Dubai'].length     * 5) +
@@ -3543,8 +3569,8 @@ function renderRow(row, ri, tbody) {
     <span>${row.rep || '-'}</span>`;
   tr.appendChild(repTd);
 
-  // Commit: deal name + AED value
-  tr.appendChild(makeTextCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'Deal name…'));
+  // Commit: deal name (multi-line textarea like Notes) + AED value
+  tr.appendChild(makeTextareaCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'Deal name(s)…\nOne per line'));
   tr.appendChild(makeNumCell (ri, 'commitValue',  'col-hot-bg',                 row.commitValue,  editable));
 
   // Buyer Signals (6 checkboxes / chips)
@@ -3562,8 +3588,8 @@ function renderRow(row, ri, tbody) {
   // Next Action (moved out of Commit block, kept its hot styling for continuity)
   tr.appendChild(makeTextCell(ri, 'commitAction', 'col-hot-bg action-text-input', row.commitAction, editable, 'Next action…'));
 
-  // Best Case: deal name + AED value
-  tr.appendChild(makeTextCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'Deal name…'));
+  // Best Case: deal name (multi-line textarea like Notes) + AED value
+  tr.appendChild(makeTextareaCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'Deal name(s)…\nOne per line'));
   tr.appendChild(makeNumCell (ri, 'bestCaseValue', 'col-warm-bg',                 row.bestCaseValue, editable));
 
   // Pipeline Stage (now positioned just before Total Pipeline so users set the stage that drives the forecast weight)
@@ -3683,6 +3709,28 @@ function makeTextCell(ri, field, extraClass, value, editable, placeholder) {
   if (!editable) { inp.readOnly = true; inp.className += ' locked-field'; }
   else { inp.addEventListener('input', e => updateField(ri, field, e.target.value)); }
   td.appendChild(inp); return td;
+}
+/* Multi-line textarea cell — used for Commit / Best Case deal name columns so
+   reps can list multiple deals on separate lines (similar to the Notes cell). */
+function makeTextareaCell(ri, field, extraClass, value, editable, placeholder) {
+  const td = document.createElement('td');
+  td.className = (extraClass.split(' ').filter(c => c.endsWith('-bg')).join(' ')) + ' deal-multiline-cell';
+  const ta = document.createElement('textarea');
+  ta.className = 'cell-input deal-multiline-input ' + extraClass.split(' ').filter(c => !c.endsWith('-bg')).join(' ');
+  ta.rows = 1;
+  if (placeholder) ta.placeholder = placeholder;
+  if (value) ta.value = value;
+  // Auto-grow to fit content
+  const autoGrow = () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(32, ta.scrollHeight) + 'px';
+  };
+  if (!editable) { ta.readOnly = true; ta.className += ' locked-field'; }
+  else { ta.addEventListener('input', e => { updateField(ri, field, e.target.value); autoGrow(); }); }
+  td.appendChild(ta);
+  // Defer auto-grow until in DOM so scrollHeight is accurate
+  setTimeout(autoGrow, 0);
+  return td;
 }
 function makeNumCell(ri, field, bgClass, value, editable) {
   const td = document.createElement('td');
