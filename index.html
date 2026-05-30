@@ -648,10 +648,20 @@
   .gd-callout strong { color: var(--text); }
 
   /* Tables */
+  .gd-table-wrap {
+    width: 100%; overflow-x: auto;
+    margin: 14px 0 8px;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
   .gd-table {
     width: 100%; border-collapse: collapse;
-    font-size: 13px; margin: 14px 0 8px;
+    font-size: 13px; margin: 0;
+    table-layout: fixed;
   }
+  .gd-table th:first-child, .gd-table td:first-child { width: 22%; }
+  .gd-table th:last-child,  .gd-table td:last-child  { width: 28%; }
+  .gd-table td, .gd-table th { word-wrap: break-word; overflow-wrap: anywhere; }
   .gd-table th {
     text-align: left; padding: 10px 12px;
     background: rgba(255,255,255,0.03);
@@ -1000,6 +1010,24 @@
   .qual-score-tier {
     font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
     text-transform: uppercase; color: var(--text-muted);
+  }
+
+  /* ── HUBSPOT-SOURCED READ-ONLY CELL (Closed Won, True Pipeline) ── */
+  .hs-sourced-cell {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    padding: 4px 2px;
+  }
+  .hs-sourced-value {
+    font-weight: 700; color: var(--text); font-size: 13px;
+  }
+  .hs-sourced-badge {
+    display: inline-block;
+    font-size: 9px; letter-spacing: 0.6px; text-transform: uppercase;
+    font-weight: 700;
+    padding: 2px 6px; border-radius: 8px;
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px solid rgba(249, 115, 22, 0.35);
+    color: #fdba74;
   }
 
   /* ── AUTO FORECAST CELL (Total Forecast = Commit × Stage Weight) ── */
@@ -1977,7 +2005,7 @@
       <!-- ============== DEAL ENTRY ============== -->
       <section id="gd-deal-entry" class="gd-section">
         <h2><span class="gd-num">2</span>Deal Entry Terminology</h2>
-        <table class="gd-table">
+        <div class="gd-table-wrap"><table class="gd-table">
           <thead><tr><th>Field</th><th>What it means</th><th>Used by</th></tr></thead>
           <tbody>
             <tr>
@@ -1991,13 +2019,13 @@
               <td>Weighted Forecast, Total Pipeline</td>
             </tr>
             <tr>
-              <td><strong>Total Pipeline</strong><span class="gd-tag pipe">Snapshot</span></td>
-              <td>Sum of all open opportunities the rep is working on, regardless of stage. Used as the numerator in Pipeline Coverage Ratio.</td>
+              <td><strong>Total Pipeline</strong><span class="gd-tag pipe">HubSpot</span></td>
+              <td>Sum of <strong>all open HubSpot deals</strong> owned by the rep this month — pulled directly from CRM, not typed by the rep. Updates whenever the rep clicks <em>Sync HubSpot</em>. Falls back to (Commit + Best Case) if CRM isn't connected.</td>
               <td>Pipeline Coverage Ratio</td>
             </tr>
             <tr>
-              <td><strong>Closed Won</strong><span class="gd-tag closed">Actuals</span></td>
-              <td>Revenue actually booked this month. The single source of truth for "what did the rep deliver".</td>
+              <td><strong>Closed Won</strong><span class="gd-tag closed">HubSpot</span></td>
+              <td>Sum of all <strong>Closed-Won deals in HubSpot</strong> for the rep this month — the single source of truth for "what did the rep deliver". CRM-sourced and read-only when HubSpot is synced. Falls back to manual entry if CRM isn't connected.</td>
               <td>Goal Attainment, Forecast Accuracy, Commit Variance</td>
             </tr>
             <tr>
@@ -2026,7 +2054,7 @@
               <td>Qualification Score</td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
       </section>
 
       <!-- ============== STAGE WEIGHTS ============== -->
@@ -2268,7 +2296,7 @@
       <section id="gd-pcr" class="gd-section">
         <h2><span class="gd-num">8</span>Team-Level Roll-ups</h2>
         <p>The KPI strip at the top of the Performance tab uses the same formulas as the rep cards, but applied to the <strong>summed totals across all reps</strong> in the current period:</p>
-        <table class="gd-table">
+        <div class="gd-table-wrap"><table class="gd-table">
           <thead><tr><th>Team KPI</th><th>Formula (over all reps in period)</th></tr></thead>
           <tbody>
             <tr><td>Forecast Accuracy</td><td><code>1 − |Σ weightedFcst − Σ closed| ÷ max(Σ weightedFcst, Σ closed)</code></td></tr>
@@ -2276,14 +2304,14 @@
             <tr><td>Pipeline Coverage</td><td><code>Σ pipeline ÷ Σ goals</code></td></tr>
             <tr><td>Reps On-Track</td><td>count of reps whose <code>goalAttain ≥ 85%</code></td></tr>
           </tbody>
-        </table>
+        </table></div>
       </section>
 
       <!-- ============== PERIOD ============== -->
       <section id="gd-period" class="gd-section">
         <h2><span class="gd-num">9</span>Period Selector</h2>
         <p>The dropdown at the top of the Performance tab controls which months are summed into every metric.</p>
-        <table class="gd-table">
+        <div class="gd-table-wrap"><table class="gd-table">
           <thead><tr><th>Option</th><th>Months included</th></tr></thead>
           <tbody>
             <tr><td>Current Month</td><td>Just this month</td></tr>
@@ -2291,7 +2319,7 @@
             <tr><td>Last 6 Months</td><td>This month + 5 prior</td></tr>
             <tr><td>Year to Date</td><td>January 1 of current year through today</td></tr>
           </tbody>
-        </table>
+        </table></div>
         <div class="gd-callout info">
           <strong>Important:</strong> Pipeline Coverage Ratio always uses the <em>latest month with activity</em>, not summed across the period — because PCR is a forward-looking snapshot of "is your pipe big enough for next month".
         </div>
@@ -2632,7 +2660,13 @@ const defaultRow = (team, rep) => ({
   bestCaseText: '',
   bestCaseValue:'',
   totalPipeline:'',
+  // truePipeline = sum of ALL open HubSpot deals for this rep (NOT just the
+  // imported Commit/BestCase). Used for Pipeline Coverage Ratio. HubSpot-sourced.
+  truePipeline: '',
   closedWon:    '',
+  // When true, closedWon + truePipeline are CRM-sourced (read-only in UI)
+  hubspotSynced: false,
+  hubspotSyncedAt: '',
   blocked:      '',
   forecastXS1:  '',
   forecastXP1:  '',
@@ -3577,8 +3611,21 @@ function renderRow(row, ri, tbody) {
   fcstTd.appendChild(fcstWrap);
   tr.appendChild(fcstTd);
 
-  // Closed (Win) AED — actual closed-won revenue captured for the rep this week
-  tr.appendChild(makeNumCell(ri, 'closedWon', 'col-closed-bg', row.closedWon, editable));
+  // Closed (Win) AED — sourced from HubSpot when synced (read-only), else
+  // manual entry as a fallback.
+  if (row.hubspotSynced) {
+    const cwTd = document.createElement('td');
+    cwTd.className = 'col-closed-bg';
+    const cwVal = parseFloat(row.closedWon) || 0;
+    cwTd.innerHTML = `
+      <div class="hs-sourced-cell" title="From HubSpot · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
+        <div class="hs-sourced-value">${cwVal ? 'AED ' + fmtNum(cwVal) : '—'}</div>
+        <div class="hs-sourced-badge">HubSpot</div>
+      </div>`;
+    tr.appendChild(cwTd);
+  } else {
+    tr.appendChild(makeNumCell(ri, 'closedWon', 'col-closed-bg', row.closedWon, editable));
+  }
 
   // Blocked (text only)
   tr.appendChild(makeTextCell(ri, 'blocked', 'col-blocked-bg blocked-text-input', row.blocked, editable, 'Any blockers…'));
@@ -3843,6 +3890,9 @@ function renderKPIs() {
   const totCommit       = rows.reduce((s,r)=>s+(parseFloat(r.commitValue)||0),0);
   const totBestCase     = rows.reduce((s,r)=>s+(parseFloat(r.bestCaseValue)||0),0);
   const totPipelineRaw  = rows.reduce((s,r)=>s+(parseFloat(r.totalPipeline)||0),0);
+  // True pipeline (CRM-sourced sum of open deals) — used in PCR upstream
+  const totTruePipeline = rows.reduce((s,r)=>s+(parseFloat(r.truePipeline)||0),0);
+  const anyCrmSynced    = rows.some(r => r.hubspotSynced);
   const totWeightedFcst = rows.reduce((s,r)=>s+weightedForecast(r),0);
   const totClosedWon    = rows.reduce((s,r)=>s+(parseFloat(r.closedWon)||0),0);
   const closingReps     = rows.filter(r => (parseFloat(r.closedWon)||0) > 0).length;
@@ -3872,7 +3922,13 @@ function renderKPIs() {
   // Forecast KPI now reflects stage-weighted forecast (Commit × stage weight) not raw pipeline
   document.getElementById('kpiForecastAED').textContent= 'AED ' + fmtNum(totWeightedFcst);
   const fcstSub = document.querySelector('#kpiForecastAED + .kpi-sub');
-  if (fcstSub) fcstSub.textContent = `Pipeline AED ${fmtNum(totPipelineRaw)} · confidence-weighted`;
+  if (fcstSub) {
+    if (anyCrmSynced && totTruePipeline > 0) {
+      fcstSub.textContent = `Pipeline AED ${fmtNum(totTruePipeline)} · CRM-sourced · confidence-weighted`;
+    } else {
+      fcstSub.textContent = `Pipeline AED ${fmtNum(totPipelineRaw)} · confidence-weighted`;
+    }
+  }
   const cwEl = document.getElementById('kpiClosedWon');
   if (cwEl) cwEl.textContent = 'AED ' + fmtNum(totClosedWon);
   const cwSub = document.getElementById('kpiClosedWonSub');
@@ -4572,27 +4628,37 @@ async function hubspotFetchDealsForRep(repName) {
     if (!ownerId) throw new Error('Owner not found in HubSpot for ' + email);
   }
 
+  // Pull EVERYTHING not Closed-Lost. We split open vs closed-won client-side
+  // so we can populate Closed Won (CRM actuals) AND Total Pipeline (true open
+  // pipeline sum) in addition to Commit/BestCase picks.
   const body = {
     filterGroups: [{ filters: [
       { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId },
       { propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }
     ]}],
-    properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability'],
+    properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won'],
     sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
     limit: 100
   };
   const data = await hubspotApi('/crm/v3/objects/deals/search', {
     method: 'POST', body: JSON.stringify(body)
   });
-  return (data.results || []).map(d => ({
-    id      : d.id,
-    name    : d.properties.dealname || '(untitled)',
-    amount  : Number(d.properties.amount || 0),
-    stage   : hsMapStage(d.properties.dealstage),
-    rawStage: d.properties.dealstage || '',
-    close   : d.properties.closedate || '',
-    prob    : Number(d.properties.hs_deal_stage_probability || 0)
-  }));
+  return (data.results || []).map(d => {
+    const rawStage = (d.properties.dealstage || '').toLowerCase();
+    const isWon    = d.properties.hs_is_closed_won === 'true'
+                  || rawStage === 'closedwon'
+                  || rawStage.includes('closed won');
+    return {
+      id      : d.id,
+      name    : d.properties.dealname || '(untitled)',
+      amount  : Number(d.properties.amount || 0),
+      stage   : hsMapStage(d.properties.dealstage),
+      rawStage: d.properties.dealstage || '',
+      close   : d.properties.closedate || '',
+      prob    : Number(d.properties.hs_deal_stage_probability || 0),
+      isClosedWon: isWon
+    };
+  });
 }
 
 let hsCurrentRep = null;
@@ -4680,11 +4746,19 @@ function hubspotApplySelected() {
   if (row.locked && currentRole !== 'admin') {
     showToast('Row is locked — admin override required', 'error'); return;
   }
-  // Sort by stage priority: Negotiation > Proposal > Discovery; biggest first
-  const stageRank = { Negotiation: 3, Proposal: 2, Discovery: 1 };
-  deals.sort((a,b) => (stageRank[b.stage]-stageRank[a.stage]) || (b.amount-a.amount));
-  const commit   = deals[0];
-  const bestcase = deals[1];
+  // Split into open vs closed-won. Closed Won + True Pipeline come from
+  // the FULL fetched list (not just user selection) so they reflect the
+  // CRM's source of truth, while Commit/BestCase come from picks.
+  const allFetched = hubspotState.fetchedDeals || [];
+  const allOpen   = allFetched.filter(d => !d.isClosedWon);
+  const allWon    = allFetched.filter(d =>  d.isClosedWon);
+
+  // From the user's SELECTION, pick Commit + BestCase among open deals.
+  const openSelected = deals.filter(d => !d.isClosedWon);
+  const stageRank = { Negotiation: 3, Proposal: 2, Discovery: 1, Qualified: 0 };
+  openSelected.sort((a,b) => (stageRank[b.stage]-stageRank[a.stage]) || (b.amount-a.amount));
+  const commit   = openSelected[0];
+  const bestcase = openSelected[1];
   if (commit) {
     row.commitText  = commit.name;
     row.commitValue = commit.amount;
@@ -4695,11 +4769,18 @@ function hubspotApplySelected() {
     row.bestCaseText  = bestcase.name;
     row.bestCaseValue = bestcase.amount;
   }
-  row.totalPipeline = deals.reduce((s,d) => s + (d.amount||0), 0);
+  // CRM-sourced fields (read-only in UI):
+  //  • truePipeline = sum of ALL open deals (basis for Pipeline Coverage Ratio)
+  //  • closedWon    = sum of ALL closed-won deals this month
+  row.truePipeline   = allOpen.reduce((s,d) => s + (d.amount||0), 0);
+  row.closedWon      = allWon.reduce((s,d) => s + (d.amount||0), 0);
+  row.hubspotSynced  = true;
+  row.hubspotSyncedAt= new Date().toISOString();
   saveAll();
   renderAll();
   closeHubspotModal();
-  showToast(`Imported ${deals.length} deal${deals.length>1?'s':''} for ${hsCurrentRep}`, 'success');
+  const summary = `${deals.length} selected · ${allOpen.length} open · ${allWon.length} won`;
+  showToast(`HubSpot synced for ${hsCurrentRep} (${summary})`, 'success');
 }
 
 function hubspotDisconnect() {
@@ -5191,6 +5272,7 @@ function aggregateRepMonth(year, month, rep) {
                 || (parseFloat(r.commitValue)   || 0) > 0
                 || (parseFloat(r.bestCaseValue) || 0) > 0
                 || (parseFloat(r.totalPipeline) || 0) > 0
+                || (parseFloat(r.truePipeline)  || 0) > 0
                 || (r.commitText   && r.commitText.trim())
                 || (r.bestCaseText && r.bestCaseText.trim());
     if (hasAny) { lastSnapshotIdx = w; out.anyActivity = true; }
@@ -5207,7 +5289,11 @@ function aggregateRepMonth(year, month, rep) {
       const bestCase = parseFloat(r.bestCaseValue) || 0;
       out.commit   = commit;
       out.bestCase = bestCase;
-      out.pipeline = parseFloat(r.totalPipeline) || (commit + bestCase);
+      // True pipeline (basis for PCR) = sum of all open HubSpot deals when
+      // CRM-synced; otherwise fall back to Commit + Best Case as a proxy.
+      out.pipeline = parseFloat(r.truePipeline)
+                  || parseFloat(r.totalPipeline)
+                  || (commit + bestCase);
       out.xs1Fcst  = parseFloat(r.forecastXS1)   || 0;
       out.xp1Fcst  = parseFloat(r.forecastXP1)   || 0;
       out.stage    = r.stage || '';
