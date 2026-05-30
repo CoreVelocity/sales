@@ -678,9 +678,21 @@
     font-size: 13px; margin: 0;
     table-layout: fixed;
   }
-  .gd-table th:first-child, .gd-table td:first-child { width: 22%; }
-  .gd-table th:last-child,  .gd-table td:last-child  { width: 28%; }
-  .gd-table td, .gd-table th { word-wrap: break-word; overflow-wrap: anywhere; }
+  /* 3-column tables: Field | Meaning | Used by */
+  .gd-table th:first-child, .gd-table td:first-child { width: 20%; min-width: 140px; }
+  .gd-table th:nth-child(2), .gd-table td:nth-child(2) { width: 55%; }
+  .gd-table th:last-child,  .gd-table td:last-child  { width: 25%; min-width: 140px; }
+  .gd-table td, .gd-table th {
+    word-wrap: break-word; overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  /* "Field" cell: tag should drop to its own line so the heading doesn't get
+     squeezed against the badge in narrow viewports */
+  .gd-table td:first-child .gd-tag { margin-left: 0; margin-top: 4px; display: inline-block; }
+  @media (max-width: 900px) {
+    .gd-table { font-size: 12.5px; }
+    .gd-table td, .gd-table th { padding: 9px 8px; }
+  }
   .gd-table th {
     text-align: left; padding: 10px 12px;
     background: rgba(255,255,255,0.03);
@@ -1047,6 +1059,22 @@
     background: rgba(249, 115, 22, 0.12);
     border: 1px solid rgba(249, 115, 22, 0.35);
     color: #fdba74;
+  }
+  /* HubSpot-required empty state — shows when the rep's row has not been
+     synced yet. Manual Closed-Won entry is intentionally disabled. */
+  .hs-empty-cell {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    padding: 4px 2px; cursor: help;
+  }
+  .hs-empty-value { font-weight: 700; color: var(--text-muted); font-size: 13px; }
+  .hs-empty-badge {
+    display: inline-block;
+    font-size: 9px; letter-spacing: 0.6px; text-transform: uppercase;
+    font-weight: 700;
+    padding: 2px 6px; border-radius: 8px;
+    background: rgba(148,163,184,0.08);
+    border: 1px dashed rgba(148,163,184,0.35);
+    color: #94a3b8;
   }
 
   /* ── AUTO FORECAST CELL (Total Forecast = Commit × Stage Weight) ── */
@@ -1606,30 +1634,11 @@
     </button>
     <div class="login-sso-hint">Use your <b>@core-velocity.com</b> work account</div>
 
-    <div class="login-divider"><span>or</span></div>
-
-    <!-- SECONDARY: Viewer access (external, read-only) -->
-    <button class="viewer-toggle-btn" onclick="toggleViewerForm()" id="viewerToggleBtn">
-      View-only access (external guest)
-    </button>
-
-    <div id="viewerForm" style="display:none; margin-top: 18px;">
-      <div class="login-field">
-        <label>Your Name</label>
-        <input type="text" id="viewerName" placeholder="Enter your name" autocomplete="off"/>
-      </div>
-      <div class="login-field">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="Enter password (min 8 chars)"/>
-      </div>
-      <button class="login-btn" onclick="handleViewerLogin()">Enter as Viewer</button>
-    </div>
-
-    <div class="login-error" id="loginError">Incorrect password.</div>
+    <div class="login-error" id="loginError">Sign-in failed.</div>
 
     <div class="login-hint" style="margin-top: 24px;">
-      Sales reps &amp; admin: sign in with Microsoft.<br/>
-      External viewers: use the link above for read-only access.
+      Sign in with your Microsoft 365 work account.<br/>
+      Access is restricted to the OXEFIT sales team and admin.
     </div>
   </div>
 </div>
@@ -1661,10 +1670,6 @@
 <!-- MAIN APP -->
 <div id="app">
 
-  <div class="view-banner" id="viewBanner" style="display:none;">
-    <div class="view-banner-dot"></div>
-    <span>View Only Mode — Editing Disabled</span>
-  </div>
   <div class="rep-banner" id="repBanner" style="display:none;">
     <div class="view-banner-dot" style="background:#10b981;"></div>
     <span id="repBannerText">Sales Rep Mode — You can only edit your own row</span>
@@ -2038,13 +2043,18 @@
               <td>Weighted Forecast, Total Pipeline</td>
             </tr>
             <tr>
-              <td><strong>Total Pipeline</strong><span class="gd-tag pipe">HubSpot</span></td>
-              <td>Sum of <strong>all open HubSpot deals</strong> owned by the rep this month — pulled directly from CRM, not typed by the rep. Updates whenever the rep clicks <em>Sync HubSpot</em>. Falls back to (Commit + Best Case) if CRM isn't connected.</td>
+              <td><strong>Total Forecast</strong><span class="gd-tag pipe">Auto</span></td>
+              <td>Auto-computed inside the tracker as <code>(Commit + Best Case) × Stage Weight</code> (× 50% if the deal is stale). Updates live as the rep edits their row — never typed manually.</td>
+              <td>Weighted Forecast, Forecast Accuracy</td>
+            </tr>
+            <tr>
+              <td><strong>True Pipeline</strong><span class="gd-tag pipe">HubSpot</span></td>
+              <td>Sum of <strong>all open HubSpot deals</strong> owned by the rep this month — pulled directly from CRM, not typed by the rep. Updates whenever the rep clicks <em>Sync HubSpot</em>. Used as the basis for Pipeline Coverage Ratio (PCR) and falls back to the auto-forecast if CRM is not connected.</td>
               <td>Pipeline Coverage Ratio</td>
             </tr>
             <tr>
               <td><strong>Closed Won</strong><span class="gd-tag closed">HubSpot</span></td>
-              <td>Sum of all <strong>Closed-Won deals in HubSpot</strong> for the rep this month — the single source of truth for "what did the rep deliver". CRM-sourced and read-only when HubSpot is synced. Falls back to manual entry if CRM isn't connected.</td>
+              <td>Sum of all <strong>Closed-Won deals in HubSpot</strong> for the rep this month — the single source of truth for "what did the rep deliver". <strong>CRM-sourced and read-only.</strong> Manual entry is disabled by design. If HubSpot has not been synced yet, the cell shows a <em>Sync HubSpot</em> prompt.</td>
               <td>Goal Attainment, Forecast Accuracy, Commit Variance</td>
             </tr>
             <tr>
@@ -2653,7 +2663,7 @@ function isRowStale(row, weekKey) {
   return activeDealAge > threshold;
 }
 
-let currentRole = null;          // 'admin' | 'rep' | 'viewer'
+let currentRole = null;          // 'admin' | 'rep'
 let currentUser = '';
 let allData     = {};
 let curYear     = new Date().getFullYear();
@@ -3019,21 +3029,8 @@ function showToast(msg, type) {
 }
 
 /* ════════════════════════════════════════
-   LOGIN — Microsoft 365 SSO (primary) + Viewer fallback
+   LOGIN — Microsoft 365 SSO only
 ════════════════════════════════════════ */
-document.getElementById('loginPass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleViewerLogin();
-});
-
-function toggleViewerForm() {
-  const form = document.getElementById('viewerForm');
-  const btn  = document.getElementById('viewerToggleBtn');
-  const open = form.style.display === 'none';
-  form.style.display = open ? 'block' : 'none';
-  btn.textContent = open ? '✕ Cancel viewer access' : 'View-only access (external guest)';
-  if (open) setTimeout(() => document.getElementById('viewerName').focus(), 50);
-  document.getElementById('loginError').style.display = 'none';
-}
 
 /* ──────────────────────────────────────────────────────────────
    MICROSOFT 365 SSO  — sales reps & admin
@@ -3130,34 +3127,6 @@ async function handleMicrosoftLogin() {
   }
 }
 
-/* ──────────────────────────────────────────────────────────────
-   VIEWER LOGIN — external read-only guests, name + self-set pw
-   ──────────────────────────────────────────────────────────── */
-async function handleViewerLogin() {
-  const vn  = document.getElementById('viewerName').value.trim();
-  const pwd = document.getElementById('loginPass').value;
-  if (!vn)  { showLoginError('Please enter your name.'); return; }
-  if (!pwd) { showLoginError('Please enter a password.'); return; }
-
-  const key    = 'viewer:' + vn.toLowerCase();
-  const result = await verifyPassword(key, pwd);
-  if (result === null) {
-    if (pwd.length < MIN_PW_LEN) {
-      showLoginError(`First login — set a password (min ${MIN_PW_LEN} chars) for "${vn}".`); return;
-    }
-    await registerPassword(key, pwd);
-    showToast(`Password registered for ${vn}`, 'success');
-  } else if (!result) {
-    showLoginError('Incorrect password.'); return;
-  }
-  currentRole = 'viewer';
-  currentUser = vn;
-  sessionStorage.setItem('oxefit_role', currentRole);
-  sessionStorage.setItem('oxefit_user', currentUser);
-  sessionStorage.removeItem('oxefit_email');
-  launchApp();
-}
-
 function showLoginError(msg) {
   const el = document.getElementById('loginError');
   el.textContent = msg; el.style.display = 'block';
@@ -3169,13 +3138,8 @@ async function signOut() {
   sessionStorage.removeItem('oxefit_user');
   sessionStorage.removeItem('oxefit_email');
   currentRole = null; currentUser = '';
-  document.getElementById('loginError').style.display = 'none';
-  document.getElementById('loginPass').value = '';
-  document.getElementById('viewerName').value = '';
-  const vForm = document.getElementById('viewerForm');
-  if (vForm) vForm.style.display = 'none';
-  const vBtn  = document.getElementById('viewerToggleBtn');
-  if (vBtn)  vBtn.textContent = 'View-only access (external guest)';
+  const errEl = document.getElementById('loginError');
+  if (errEl) errEl.style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('app').classList.remove('visible');
 
@@ -3197,15 +3161,12 @@ async function launchApp(alreadyAuthed) {
   document.getElementById('app').classList.add('visible');
 
   const badge = document.getElementById('roleBadge');
-  badge.textContent = currentRole === 'admin'  ? 'Admin'
-                    : currentRole === 'rep'    ? 'Sales Rep'
-                    : 'View Only';
+  badge.textContent = currentRole === 'admin'  ? 'Admin' : 'Sales Rep';
   badge.className = 'role-badge ' + currentRole;
   document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
   document.getElementById('userNameDisplay').textContent = currentUser;
 
-  document.getElementById('viewBanner').style.display = (currentRole === 'viewer') ? 'flex' : 'none';
-  document.getElementById('repBanner').style.display  = (currentRole === 'rep')    ? 'flex' : 'none';
+  document.getElementById('repBanner').style.display  = (currentRole === 'rep') ? 'flex' : 'none';
   if (currentRole === 'rep') {
     document.getElementById('repBannerText').textContent =
       `Sales Rep Mode — ${currentUser}: you can only edit your own row.`;
@@ -3265,7 +3226,14 @@ function openConfirmModal(title, body, onOk) {
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmBody').textContent  = body;
   pendingConfirm = onOk;
-  document.getElementById('confirmOkBtn').onclick = () => { closeConfirmModal(); if (pendingConfirm) pendingConfirm(); };
+  // Capture the callback in a local var BEFORE closing, because
+  // closeConfirmModal() nullifies pendingConfirm. Previous code lost
+  // the callback → "Reset Week to Default" silently no-op'd.
+  document.getElementById('confirmOkBtn').onclick = () => {
+    const cb = pendingConfirm;
+    closeConfirmModal();
+    if (typeof cb === 'function') cb();
+  };
   document.getElementById('confirmModal').classList.add('open');
 }
 function closeConfirmModal(e) {
@@ -3637,20 +3605,27 @@ function renderRow(row, ri, tbody) {
   fcstTd.appendChild(fcstWrap);
   tr.appendChild(fcstTd);
 
-  // Closed (Win) AED — sourced from HubSpot when synced (read-only), else
-  // manual entry as a fallback.
-  if (row.hubspotSynced) {
+  // Closed (Win) AED — sourced EXCLUSIVELY from HubSpot. Manual entry is
+  // disabled by design. If HubSpot has not been synced yet, show a clear
+  // empty-state prompting admin to sync the CRM.
+  {
     const cwTd = document.createElement('td');
     cwTd.className = 'col-closed-bg';
-    const cwVal = parseFloat(row.closedWon) || 0;
-    cwTd.innerHTML = `
-      <div class="hs-sourced-cell" title="From HubSpot · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
-        <div class="hs-sourced-value">${cwVal ? 'AED ' + fmtNum(cwVal) : '—'}</div>
-        <div class="hs-sourced-badge">HubSpot</div>
-      </div>`;
+    if (row.hubspotSynced) {
+      const cwVal = parseFloat(row.closedWon) || 0;
+      cwTd.innerHTML = `
+        <div class="hs-sourced-cell" title="From HubSpot · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
+          <div class="hs-sourced-value">${cwVal ? 'AED ' + fmtNum(cwVal) : '—'}</div>
+          <div class="hs-sourced-badge">HubSpot</div>
+        </div>`;
+    } else {
+      cwTd.innerHTML = `
+        <div class="hs-empty-cell" title="Closed Won is sourced from HubSpot only. Click Sync HubSpot to pull figures.">
+          <div class="hs-empty-value">—</div>
+          <div class="hs-empty-badge">Sync HubSpot</div>
+        </div>`;
+    }
     tr.appendChild(cwTd);
-  } else {
-    tr.appendChild(makeNumCell(ri, 'closedWon', 'col-closed-bg', row.closedWon, editable));
   }
 
   // Blocked (text only)
