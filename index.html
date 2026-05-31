@@ -1408,6 +1408,79 @@
   .demo-btn.ghost { background: transparent; }
   .demo-btn.danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
   .demo-btn.danger:hover { background: rgba(239,68,68,0.25); }
+  /* v14.0 — Outlook sync button */
+  .demo-btn.outlook {
+    background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+    border-color: rgba(0,120,212,0.6); color: #fff;
+  }
+  .demo-btn.outlook:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,120,212,0.45); }
+
+  /* v14.0 — Outlook sync modal */
+  .outlook-modal { max-width: 760px; width: 100%; }
+  .outlook-modal-body { padding: 18px 22px; max-height: 60vh; overflow-y: auto; }
+  .outlook-controls {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .outlook-controls label { font-size: 13px; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
+  .outlook-controls select {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text); border-radius: 8px; padding: 6px 10px; font-size: 13px;
+  }
+  .outlook-controls-right { display: flex; gap: 8px; }
+  .outlook-status {
+    padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  }
+  .outlook-status.ok { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); color: #86efac; }
+  .outlook-status.err { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+  .outlook-list { display: flex; flex-direction: column; gap: 10px; }
+  .outlook-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 14px; border-radius: 10px; cursor: pointer;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.15s;
+  }
+  .outlook-row:hover { background: rgba(0,120,212,0.06); border-color: rgba(0,120,212,0.35); }
+  .outlook-row.is-imported { opacity: 0.55; cursor: not-allowed; }
+  .outlook-row input[type="checkbox"] { accent-color: #0078d4; margin-top: 4px; cursor: pointer; }
+  .outlook-row-body { flex: 1; min-width: 0; }
+  .outlook-row-head {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 6px;
+  }
+  .outlook-row-head strong { font-size: 14px; color: var(--text); }
+  .outlook-row-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .outlook-row-mapping { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+  .outlook-chip {
+    padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  }
+  .outlook-chip.primary { background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.4); color: #d8b4fe; }
+  .outlook-chip.primary em { font-style: normal; opacity: 0.7; font-size: 9px; margin-left: 4px; }
+  .outlook-chip.support { background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.25); color: #c4b5fd; }
+  .outlook-chip.client  { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #86efac; }
+  .outlook-chip.warn    { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+  .outlook-arrow { color: var(--text-muted); padding: 0 4px; }
+  .outlook-pill {
+    padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .outlook-pill.new  { background: rgba(34,197,94,0.18); color: #86efac; }
+  .outlook-pill.done { background: rgba(148,163,184,0.18); color: #94a3b8; }
+  .outlook-pill.warn { background: rgba(245,158,11,0.2);  color: #fbbf24; }
+  .outlook-row.has-warn { border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.04); }
+  .outlook-row.has-warn:hover { background: rgba(245,158,11,0.08); }
+  .outlook-warnings {
+    margin-top: 8px; padding: 6px 10px; border-radius: 6px; font-size: 11px;
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); color: #fbbf24;
+    line-height: 1.5;
+  }
+  .outlook-helper {
+    margin-top: 14px; padding: 10px 12px; border-radius: 8px; font-size: 12px;
+    background: rgba(0,120,212,0.06); border: 1px solid rgba(0,120,212,0.2); color: #93c5fd;
+    line-height: 1.55;
+  }
 
   .demo-perm-banner {
     padding: 10px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px;
@@ -1978,7 +2051,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 13.9.html
+      version 14.2.html
     </div>
   </div>
 </div>
@@ -2303,6 +2376,7 @@
           <select id="demoRepFilter" class="demo-select" onchange="renderDemoDashboard()">
             <option value="">All Sales Reps</option>
           </select>
+          <button class="demo-btn outlook office-only" id="demoOutlookBtn" onclick="openOutlookSyncModal()" style="display:none;" title="Pull every event from the shared demo@core-velocity.com calendar">📅 Sync from demo@</button>
           <button class="demo-btn primary office-only" id="demoAddBtn" onclick="openDemoModal()" style="display:none;">+ New Demo</button>
         </div>
       </div>
@@ -2440,6 +2514,49 @@
         <button class="demo-btn ghost" onclick="closeDemoModal()">Cancel</button>
         <button class="demo-btn danger" id="demoDeleteBtn" onclick="deleteDemoEntry()" style="display:none;" title="Permanently delete this demo entry">🗑 Delete Demo</button>
         <button class="demo-btn primary" onclick="saveDemoEntry()">Save Demo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- v14.0 — OUTLOOK CALENDAR SYNC MODAL -->
+  <div class="modal-backdrop" id="outlookSyncModal">
+    <div class="modal outlook-modal">
+      <div class="modal-head">
+        <h3>📅 Sync Demos from <span style="color:#60a5fa;">demo@core-velocity.com</span></h3>
+        <button class="modal-close" onclick="closeOutlookSyncModal()">×</button>
+      </div>
+      <div class="outlook-modal-body">
+        <div class="outlook-controls">
+          <label>Lookback window:
+            <select id="outlookLookback" onchange="openOutlookSyncModal()">
+              <option value="7">Last 7 days</option>
+              <option value="14" selected>Last 14 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="60">Last 60 days</option>
+              <option value="90">Last 90 days</option>
+            </select>
+          </label>
+          <div class="outlook-controls-right">
+            <button class="demo-btn ghost" onclick="outlookSelectAll(true)">Select all new</button>
+            <button class="demo-btn ghost" onclick="outlookSelectAll(false)">Clear selection</button>
+          </div>
+        </div>
+        <div id="outlookSyncStatus"></div>
+        <div id="outlookSyncList" class="outlook-list"></div>
+        <div class="outlook-helper">
+          <strong>Booking convention (mandatory for v14.2):</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li>Every demo MUST invite <strong>demo@core-velocity.com</strong> — that calendar is the source of truth.</li>
+            <li>Subject format: <code>&lt;Client Name&gt; — XS1</code>, <code>XP1</code>, <code>XS1 + XP1</code>, or <code>Full Range</code>.</li>
+            <li>Set the <strong>Location</strong> field on the Outlook event (physical address or "Microsoft Teams").</li>
+            <li>Add any teammates running the demo with you as attendees — they'll be auto-credited as supporting reps.</li>
+          </ul>
+          <div style="margin-top: 8px;">Every non-cancelled event in the shared calendar is treated as a real demo — no keyword filtering. Rows with missing fields show a <strong>Needs review</strong> badge but can still be imported.</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="demo-btn ghost" onclick="closeOutlookSyncModal()">Cancel</button>
+        <button class="demo-btn primary" id="outlookSyncImportBtn" onclick="importSelectedOutlookEvents()" disabled>Import selected</button>
       </div>
     </div>
   </div>
@@ -2831,6 +2948,12 @@
         <div class="gd-callout info">
           <strong>Why bring demos into the score?</strong> Demos are the leading indicator of pipeline. A rep who closes 100% of goal this month but ran zero demos is mortgaging next month's number — and a rep who runs 12 demos with a 50% conversion rate is building a pipeline the AED hasn't caught up with yet. Goal Attainment still dominates at 55%, but Demo Effectiveness (15%) now ensures the Leaderboard rewards both <em>what they closed this month</em> and <em>what they're queueing up for next month</em>.
         </div>
+        <div class="gd-callout info" style="border-color: rgba(0, 120, 212, 0.45); background: rgba(0, 120, 212, 0.08);">
+          <strong>v14.2 — Shared demo calendar auto-import.</strong> Manual demo entry is gone. There is now ONE shared Outlook calendar — <code>demo@core-velocity.com</code> — and every rep must invite that address on every demo they book. The tracker reads that shared calendar directly via Microsoft Graph and treats <em>every non-cancelled event</em> as a real demo (no keyword guessing, no false positives).
+          <div style="margin-top: 10px;"><strong>Subject convention:</strong> <code>&lt;Client Name&gt; — XS1 | XP1 | XS1 + XP1 | Full Range</code>. Set the Outlook Location field for on-site addresses (or "Microsoft Teams" for virtual). Add any teammates running the demo as attendees — they're auto-credited as supporting reps.</div>
+          <div style="margin-top: 10px;"><strong>How Gladys uses it:</strong> Demo Tracker → <span style="color:#60a5fa;">📅 Sync from demo@</span> → pick a lookback window (7 / 14 / 30 / 60 / 90 days) → review the auto-mapped rows (organizer → primary rep, attendees → supporting reps, subject → client + product, event location → location, start time → date). Rows missing fields show a <span style="color:#fbbf24;">Needs review</span> badge with a specific warning ("No product in subject", "Organizer not a known rep", etc.). Each imported demo carries the Outlook event ID so weekly re-syncs are idempotent.</div>
+          <div style="margin-top: 10px;"><strong>Permissions:</strong> Azure AD app needs <code>Calendars.Read.Shared</code> delegated permission with admin consent. Each signed-in user must have at least Reviewer access to the demo@ mailbox calendar (configured by IT once, applied to the whole sales group).</div>
+        </div>
         <div class="gd-callout info" style="border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08);">
           <strong>v13.8 — Shared demo credit.</strong> Many demos are joint efforts: one rep books the meeting, another runs the technical demonstration on-site. When Gladys logs a demo, she now picks a <em>primary rep</em> AND optionally tags <em>supporting reps</em>. Every credited rep gets the demo counted toward their Demo Effectiveness score, their Demo Tracker rep card, and the KPI strip — the demo itself is still one row in the log, but it powers multiple reps' scores. Supporting credits are shown as <span style="color:#a855f7;">+ Rep Name</span> chips under the primary in the log table, and as a <span style="color:#a855f7;">(+N supporting)</span> badge on the rep card. The <strong>Edit</strong> and <strong>Delete</strong> actions are now full text buttons in the Actions column (no more guessing what the 🗑 icon does).
         </div>
@@ -3029,7 +3152,7 @@
    3.  After creation, copy the "Application (client) ID" and paste
        it below in ONEDRIVE_CONFIG.clientId.
    4.  Under "API permissions" → Add permission → Microsoft Graph
-       → Delegated → add: Files.ReadWrite, User.Read. Grant consent.
+       → Delegated → add: Files.ReadWrite, User.Read, Calendars.Read.Shared. Grant consent.
    5.  Save & host the file. The first user to log in will be
        prompted by Microsoft to grant access; the JSON database
        lives at the path below inside that user's OneDrive and is
@@ -3044,7 +3167,7 @@ const ONEDRIVE_CONFIG = {
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
   redirectUri: window.location.origin + window.location.pathname,
   filePath   : '/OXEFIT/sales-tracker.json',        // location inside the user's OneDrive
-  scopes     : ['Files.ReadWrite', 'User.Read']
+  scopes     : ['Files.ReadWrite', 'User.Read', 'Calendars.Read.Shared']  // v14.2 — Calendars.Read.Shared lets us read the shared demo@core-velocity.com calendar
 };
 
 /* ════════════════════════════════════════════════════════════════════
@@ -3578,7 +3701,7 @@ function showSetupInstructions() {
     '2. Name it "OXEFIT Tracker", choose "Personal & work accounts", set Redirect URI to Single-page app + the URL where you host this file.\n' +
     '3. Copy the "Application (client) ID".\n' +
     '4. Open this HTML file and paste it into  ONEDRIVE_CONFIG.clientId  near the top of the <script> tag.\n' +
-    '5. Under API permissions add Microsoft Graph → Delegated → Files.ReadWrite + User.Read, then grant admin consent.\n' +
+    '5. Under API permissions add Microsoft Graph → Delegated → Files.ReadWrite + User.Read + Calendars.Read.Shared, then grant admin consent.\n' +
     '6. Save the file and reload. Your team will be prompted to sign in with Microsoft on first use.\n\n' +
     'See the comment block at the top of the <script> for the full guide.'
   );
@@ -5828,6 +5951,9 @@ function renderDemoTab() {
   // show "+ New Demo" only for office/admin
   const addBtn = document.getElementById('demoAddBtn');
   if (addBtn) addBtn.style.display = demoCanManage() ? 'inline-block' : 'none';
+  // v14.0 — Outlook sync also office/admin only, and requires Microsoft sign-in
+  const olBtn = document.getElementById('demoOutlookBtn');
+  if (olBtn) olBtn.style.display = demoCanManage() ? 'inline-block' : 'none';
   renderDemoDashboard();
 }
 
@@ -6275,6 +6401,393 @@ function deleteDemoEntry(id) {
   closeDemoModal();
   renderDemoDashboard();
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   v14.2 — SHARED DEMO CALENDAR → DEMO TRACKER INTEGRATION
+   ──────────────────────────────────────────────────────────────────
+   Workflow convention (v14.2):
+   • There is ONE shared calendar at demo@core-velocity.com.
+   • Every rep MUST invite demo@core-velocity.com to their demo
+     meeting. The invite is the source of truth.
+   • The invite subject/body should follow the convention:
+        Subject: <Client name> — XS1 | XP1 | XS1 + XP1 | Full Range
+        Location: <physical address OR "Microsoft Teams" / "Zoom">
+        Attendees: client contacts + internal reps
+     Time, date, and location are inherent to the Outlook event.
+   • Because every event in this calendar is by-definition a demo,
+     we do NOT keyword-filter — we trust every non-cancelled event.
+   • The organizer (the rep who created the invite) becomes the
+     PRIMARY REP. Other internal attendees become SUPPORTING REPS.
+   • Product is parsed out of the subject (XS1 / XP1 / both).
+   • Anything missing (rep, client, product) is flagged in the
+     picker so Gladys can fix it before importing.
+
+   Permission model:
+   • Uses Calendars.Read.Shared (delegated). Each rep — when they
+     sign in with their work account — must have at least Reviewer
+     access to the demo@ mailbox calendar. In practice the demo@
+     mailbox should be shared with the whole sales group in Outlook.
+   ──────────────────────────────────────────────────────────────── */
+
+const SHARED_DEMO_CALENDAR_EMAIL = 'demo@core-velocity.com';
+const OUTLOOK_SCOPES   = ['Calendars.Read.Shared', 'User.Read'];
+const OUTLOOK_LOOKBACK_DAYS_DEFAULT = 14;
+
+let outlookCandidates = [];   // [{event, mapped}]
+let outlookSelected   = new Set();
+
+/* Token helper — uses MSAL but with calendar scope */
+async function getOutlookAccessToken() {
+  if (!msalInstance || !msalAccount) throw new Error('Microsoft sign-in required');
+  const req = { scopes: OUTLOOK_SCOPES, account: msalAccount };
+  try {
+    const r = await msalInstance.acquireTokenSilent(req);
+    return r.accessToken;
+  } catch(e) {
+    if (typeof isRunningInPopup === 'function' && isRunningInPopup()) {
+      await msalInstance.acquireTokenRedirect(req);
+      throw new Error('Acquiring Calendars.Read.Shared via redirect');
+    }
+    try {
+      const r = await msalInstance.acquireTokenPopup(req);
+      return r.accessToken;
+    } catch(pe) {
+      await msalInstance.acquireTokenRedirect(req);
+      throw pe;
+    }
+  }
+}
+
+/* Email → rep name lookup (case-insensitive). Returns null if unknown. */
+function outlookResolveRep(email) {
+  if (!email) return null;
+  const key = String(email).trim().toLowerCase();
+  return REP_EMAILS[key] || null;
+}
+
+/* v14.2 — Parse the subject of a demo invite.
+   Convention is: "<Client Name> — XS1 | XP1 | XS1 + XP1 | Full Range"
+   …with " - ", " — ", " | " or ": " as a separator. The product half is
+   optional (we can read it from the body too); the client half is required.
+   Returns { client, product }. Either may be empty if the convention wasn't
+   followed — we surface that as a warning in the picker. */
+function outlookParseDemoSubject(subject) {
+  const raw = String(subject || '').trim();
+  if (!raw) return { client: '', product: '' };
+
+  // Split on the most likely separators. Try em-dash, en-dash, hyphen, pipe, colon.
+  const parts = raw.split(/\s+[\u2014\u2013\-|:]\s+/);
+  let client = '', productHalf = '';
+  if (parts.length >= 2) {
+    client      = parts[0].trim();
+    productHalf = parts.slice(1).join(' ').trim();
+  } else {
+    client = raw;
+  }
+
+  // Detect product from the productHalf first, then fall back to the whole subject.
+  const probe = (productHalf + ' ' + raw).toLowerCase();
+  const hasXS1 = /\bxs[\s-]?1\b/.test(probe);
+  const hasXP1 = /\bxp[\s-]?1\b/.test(probe);
+  const hasFull = /\bfull[\s-]?range\b/.test(probe);
+  let product = '';
+  if (hasFull)                  product = 'Full Range';
+  else if (hasXS1 && hasXP1)    product = 'XS1 + XP1';
+  else if (hasXS1)              product = 'XS1';
+  else if (hasXP1)              product = 'XP1';
+
+  return { client, product };
+}
+
+/* Fallback product probe across subject + body if subject didn't carry it. */
+function outlookGuessProductFromBody(ev) {
+  const blob = (ev.bodyPreview || '').toLowerCase();
+  const hasXS1 = /\bxs[\s-]?1\b/.test(blob);
+  const hasXP1 = /\bxp[\s-]?1\b/.test(blob);
+  if (hasXS1 && hasXP1) return 'XS1 + XP1';
+  if (hasXS1) return 'XS1';
+  if (hasXP1) return 'XP1';
+  return '';
+}
+
+/* Guess demo type from location string. */
+function outlookGuessType(loc) {
+  const s = String(loc || '').toLowerCase();
+  if (/teams|zoom|google meet|virtual|online|webex/.test(s)) return 'Virtual';
+  if (/showroom|office|hq|core[\s-]?velocity/.test(s)) return 'Showroom';
+  if (/expo|trade show|conference|exhibition/.test(s)) return 'Trade Show';
+  return 'On-site';
+}
+
+/* v14.2 — Convert a Graph event from the shared demo@ calendar into
+   a draft demo payload. Surfaces warnings when the booking convention
+   wasn't followed (no client name, no product, no internal rep). */
+function outlookMapEventToDemo(ev) {
+  const start = (ev.start && ev.start.dateTime) ? new Date(ev.start.dateTime + (ev.start.timeZone === 'UTC' ? 'Z' : '')) : null;
+  const date  = start ? start.toISOString().slice(0,10) : new Date().toISOString().slice(0,10);
+
+  // Organizer → primary rep
+  const organizerEmail = ev.organizer && ev.organizer.emailAddress && ev.organizer.emailAddress.address;
+  let primary = outlookResolveRep(organizerEmail);
+
+  // Attendees → supporting reps + external client contacts
+  const supportSet = new Set();
+  const externalAttendees = [];
+  let internalCount = 0;
+  if (Array.isArray(ev.attendees)) {
+    ev.attendees.forEach(a => {
+      const em = a && a.emailAddress && a.emailAddress.address;
+      if (!em) return;
+      // Skip the demo@ mailbox itself — it's just the shared-calendar inbox, not a participant.
+      if (em.toLowerCase() === SHARED_DEMO_CALENDAR_EMAIL.toLowerCase()) return;
+      const rep = outlookResolveRep(em);
+      if (rep) {
+        internalCount++;
+        if (!primary) primary = rep;       // Organizer wasn't an internal rep — promote first internal attendee.
+        if (rep !== primary) supportSet.add(rep);
+      } else if (!/@core-velocity\.com$/i.test(em)) {
+        externalAttendees.push(a.emailAddress);
+      }
+    });
+  }
+
+  // Parse the subject per the v14.2 convention: "<Client> — <Product>"
+  const parsed = outlookParseDemoSubject(ev.subject || '');
+  let client  = parsed.client;
+  let product = parsed.product || outlookGuessProductFromBody(ev);
+
+  // If the subject didn't yield a client, fall back to the first external attendee's
+  // display name or email domain.
+  if (!client && externalAttendees.length) {
+    const ext = externalAttendees[0];
+    client = ext.name || (ext.address || '').split('@')[0] || '';
+  }
+
+  const location = (ev.location && ev.location.displayName) || '';
+
+  // Build warnings — these don't block import, just surface in the picker.
+  const warnings = [];
+  if (!primary)            warnings.push('Organizer is not a known sales rep — please pick one.');
+  if (!client)             warnings.push('No client name detected in subject — please add one.');
+  if (!product)            warnings.push('No product (XS1 / XP1) in subject — please pick one.');
+  if (!location)           warnings.push('No location set on the calendar event.');
+  if (internalCount === 0) warnings.push('No internal reps on the invite.');
+
+  return {
+    eventId: ev.id,
+    date,
+    rep: primary || ALL_REPS[0],
+    supportReps: Array.from(supportSet),
+    client: client || (ev.subject || '').trim(),
+    type: outlookGuessType(location),
+    location,
+    product: product || 'XS1',
+    outcome: 'Pending',
+    dealId: '',
+    notes: (ev.bodyPreview || '').slice(0, 300),
+    _internalCount: internalCount,
+    _externalCount: externalAttendees.length,
+    _subject: ev.subject || '',
+    _warnings: warnings,
+    _organizerEmail: organizerEmail || ''
+  };
+}
+
+/* v14.2 — Fetch events from the SHARED demo@core-velocity.com calendar.
+   Every non-cancelled event in this calendar is a demo by definition
+   (because the rule is: invite demo@ for any demo). No keyword filter.
+   Uses /users/{email}/calendarView which auto-expands recurring series. */
+async function outlookFetchDemoEvents(lookbackDays) {
+  const days  = Math.max(1, Math.min(90, lookbackDays || OUTLOOK_LOOKBACK_DAYS_DEFAULT));
+  const end   = new Date();
+  const start = new Date(); start.setDate(start.getDate() - days);
+  const tok   = await getOutlookAccessToken();
+
+  const params = new URLSearchParams({
+    startDateTime: start.toISOString(),
+    endDateTime  : end.toISOString(),
+    '$top'       : '100',
+    '$select'    : 'id,subject,bodyPreview,start,end,location,organizer,attendees,categories,isCancelled',
+    '$orderby'   : 'start/dateTime desc'
+  });
+  const url = `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(SHARED_DEMO_CALENDAR_EMAIL)}/calendarView?${params.toString()}`;
+
+  const all = [];
+  let next  = url;
+  while (next) {
+    const res = await fetch(next, {
+      headers: { Authorization: 'Bearer ' + tok, Prefer: 'outlook.timezone="UTC"' }
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(()=>'');
+      // Helpful, specific error for the most common failure modes
+      if (res.status === 403) {
+        throw new Error(`Permission denied on ${SHARED_DEMO_CALENDAR_EMAIL} calendar. You need at least Reviewer access — ask IT to share the demo@ mailbox calendar with the sales group.`);
+      }
+      if (res.status === 404) {
+        throw new Error(`Mailbox ${SHARED_DEMO_CALENDAR_EMAIL} not found. Confirm the shared calendar exists and the address is correct.`);
+      }
+      throw new Error(`Graph ${res.status}: ${txt.slice(0,200)}`);
+    }
+    const json = await res.json();
+    (json.value || []).forEach(ev => { if (!ev.isCancelled) all.push(ev); });
+    next = json['@odata.nextLink'] || null;
+    if (all.length > 500) break; // safety
+  }
+
+  // No keyword filter — every event in this calendar is, by convention, a demo.
+  return all.map(ev => ({ event: ev, mapped: outlookMapEventToDemo(ev) }));
+}
+
+/* Open the import picker modal. */
+async function openOutlookSyncModal() {
+  if (!demoCanManage()) {
+    alert('Only Gladys (Office Admin) or Ahmed (Admin) can import from Outlook.');
+    return;
+  }
+  if (!msalAccount) {
+    alert('Please sign in with your Microsoft 365 account first (Connect OneDrive button).');
+    return;
+  }
+  const modal = document.getElementById('outlookSyncModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.getElementById('outlookSyncStatus').innerHTML = `<div class="outlook-status">🔄 Fetching events from <strong>${SHARED_DEMO_CALENDAR_EMAIL}</strong> shared calendar…</div>`;
+  document.getElementById('outlookSyncList').innerHTML = '';
+  document.getElementById('outlookSyncImportBtn').disabled = true;
+
+  try {
+    const days = parseInt(document.getElementById('outlookLookback').value, 10) || OUTLOOK_LOOKBACK_DAYS_DEFAULT;
+    const candidates = await outlookFetchDemoEvents(days);
+    outlookCandidates = candidates;
+    renderOutlookCandidates();
+  } catch(e) {
+    document.getElementById('outlookSyncStatus').innerHTML =
+      `<div class="outlook-status err">❌ Couldn't fetch the shared calendar: ${escapeHtml((e && e.message) || 'unknown error').slice(0,300)}<br/><small>Make sure (1) the Azure AD app has <strong>Calendars.Read.Shared</strong> delegated permission with admin consent, and (2) your account has at least <strong>Reviewer</strong> access to the ${escapeHtml(SHARED_DEMO_CALENDAR_EMAIL)} mailbox calendar.</small></div>`;
+  }
+}
+
+function closeOutlookSyncModal() {
+  const m = document.getElementById('outlookSyncModal');
+  if (m) m.classList.remove('open');
+  outlookCandidates = [];
+  outlookSelected.clear();
+}
+
+function renderOutlookCandidates() {
+  const statusEl = document.getElementById('outlookSyncStatus');
+  const listEl   = document.getElementById('outlookSyncList');
+  const importBtn= document.getElementById('outlookSyncImportBtn');
+  const existingIds = new Set(demoEntries.map(d => d.outlookEventId).filter(Boolean));
+
+  const fresh    = outlookCandidates.filter(c => !existingIds.has(c.event.id));
+  const already  = outlookCandidates.length - fresh.length;
+
+  // Pre-select all fresh candidates
+  outlookSelected = new Set(fresh.map(c => c.event.id));
+
+  if (!outlookCandidates.length) {
+    statusEl.innerHTML = `<div class="outlook-status">No events found on <strong>${SHARED_DEMO_CALENDAR_EMAIL}</strong> in the selected window. Either no demos were booked, or reps forgot to invite the shared mailbox.</div>`;
+    listEl.innerHTML = '';
+    importBtn.disabled = true;
+    return;
+  }
+  const withWarnings = outlookCandidates.filter(c => (c.mapped._warnings || []).length).length;
+  statusEl.innerHTML = `<div class="outlook-status ok">✅ Found <strong>${outlookCandidates.length}</strong> demo${outlookCandidates.length===1?'':'s'} on <strong>${SHARED_DEMO_CALENDAR_EMAIL}</strong> · <strong>${fresh.length}</strong> new · <strong>${already}</strong> already imported${withWarnings ? ` · <span style="color:#fbbf24;">⚠ ${withWarnings} need review</span>` : ''}.</div>`;
+  importBtn.disabled = fresh.length === 0;
+
+  listEl.innerHTML = outlookCandidates.map(c => {
+    const ev = c.event, m = c.mapped;
+    const isAlready = existingIds.has(ev.id);
+    const checked   = !isAlready;
+    const tz        = (ev.start && ev.start.timeZone) || 'UTC';
+    const startStr  = ev.start && ev.start.dateTime ? new Date(ev.start.dateTime + (tz === 'UTC' ? 'Z' : '')).toLocaleString('en-GB', { dateStyle:'medium', timeStyle:'short' }) : m.date;
+    const supportChips = (m.supportReps || []).map(r => `<span class="outlook-chip support">+ ${escapeHtml(r)}</span>`).join('');
+    const teamOf = (r) => TEAMS['Dubai'].includes(r) ? 'DXB' : 'AUH';
+    const primaryChip = m.rep ? `<span class="outlook-chip primary">${escapeHtml(m.rep)} <em>${teamOf(m.rep)}</em></span>` : '<span class="outlook-chip warn">⚠ Unknown rep</span>';
+    const warnings = m._warnings || [];
+    const warnHtml = warnings.length ? `<div class="outlook-warnings">⚠ ${warnings.map(w => escapeHtml(w)).join(' · ')}</div>` : '';
+    const hasWarn = warnings.length > 0;
+
+    return `
+      <label class="outlook-row ${isAlready ? 'is-imported' : ''} ${hasWarn && !isAlready ? 'has-warn' : ''}">
+        <input type="checkbox" data-event-id="${escapeHtml(ev.id)}" ${checked ? 'checked' : ''} ${isAlready ? 'disabled' : ''} onchange="toggleOutlookCandidate(this)">
+        <div class="outlook-row-body">
+          <div class="outlook-row-head">
+            <strong>${escapeHtml(m._subject || '(no subject)')}</strong>
+            ${isAlready ? '<span class="outlook-pill done">Already imported</span>' : hasWarn ? '<span class="outlook-pill warn">Needs review</span>' : '<span class="outlook-pill new">New</span>'}
+          </div>
+          <div class="outlook-row-meta">
+            📅 ${escapeHtml(startStr)} &nbsp;·&nbsp;
+            ${m.location ? `📍 ${escapeHtml(m.location)} &nbsp;·&nbsp;` : '<span style="color:#fbbf24;">📍 No location</span> &nbsp;·&nbsp;'}
+            🎯 ${escapeHtml(m.product)}
+          </div>
+          <div class="outlook-row-mapping">
+            ${primaryChip}
+            ${supportChips}
+            <span class="outlook-arrow">→</span>
+            <span class="outlook-chip client">${escapeHtml(m.client || '(no client)')}</span>
+          </div>
+          ${warnHtml}
+        </div>
+      </label>`;
+  }).join('');
+}
+
+function toggleOutlookCandidate(cb) {
+  if (cb.checked) outlookSelected.add(cb.dataset.eventId);
+  else            outlookSelected.delete(cb.dataset.eventId);
+  document.getElementById('outlookSyncImportBtn').disabled = outlookSelected.size === 0;
+}
+
+function outlookSelectAll(state) {
+  const cbs = document.querySelectorAll('#outlookSyncList input[type="checkbox"]:not(:disabled)');
+  cbs.forEach(cb => {
+    cb.checked = state;
+    if (state) outlookSelected.add(cb.dataset.eventId);
+    else       outlookSelected.delete(cb.dataset.eventId);
+  });
+  document.getElementById('outlookSyncImportBtn').disabled = outlookSelected.size === 0;
+}
+
+function importSelectedOutlookEvents() {
+  if (!demoCanManage()) return;
+  const toImport = outlookCandidates.filter(c => outlookSelected.has(c.event.id));
+  if (!toImport.length) return;
+  let added = 0;
+  toImport.forEach(c => {
+    const m = c.mapped;
+    // Idempotency guard
+    if (demoEntries.some(d => d.outlookEventId === c.event.id)) return;
+    const entry = {
+      id:           'd_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+      outlookEventId: c.event.id,
+      date:         m.date,
+      weekKey:      demoWeekKey(m.date),
+      rep:          m.rep,
+      supportReps:  m.supportReps || [],
+      client:       m.client,
+      type:         m.type,
+      location:     m.location,
+      product:      m.product,
+      outcome:      'Pending',
+      dealId:       '',
+      notes:        m.notes,
+      reason:       '',
+      source:       'outlook-shared',
+      createdAt:    new Date().toISOString(),
+      updatedAt:    new Date().toISOString()
+    };
+    demoEntries.push(entry);
+    added++;
+  });
+  saveDemos();
+  closeOutlookSyncModal();
+  demoPopulateWeekSelect();
+  renderDemoDashboard();
+  showToast(`✅ Imported ${added} demo${added===1?'':'s'} from Outlook`, 'success');
+}
+
 
 /* ════════════════════════════════════════════════════════════════════
    GOOGLE DRIVE — auth + picker + file browser + viewer
