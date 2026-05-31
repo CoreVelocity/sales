@@ -1443,7 +1443,6 @@
     transition: all 0.15s;
   }
   .outlook-row:hover { background: rgba(0,120,212,0.06); border-color: rgba(0,120,212,0.35); }
-  .outlook-row.is-imported { opacity: 0.55; cursor: not-allowed; }
   .outlook-row input[type="checkbox"] { accent-color: #0078d4; margin-top: 4px; cursor: pointer; }
   .outlook-row-body { flex: 1; min-width: 0; }
   .outlook-row-head {
@@ -1492,6 +1491,23 @@
   .outlook-review-btn:hover { background: rgba(245,158,11,0.25); color: #fcd34d; }
   .outlook-review-btn .chev { display: inline-block; transition: transform 0.2s; margin-left: 4px; }
   .outlook-review-btn.open .chev { transform: rotate(180deg); }
+  /* v14.4 — Remove-import button for already-imported rows */
+  .outlook-remove-btn {
+    margin-top: 8px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.45);
+    color: #fca5a5;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .outlook-remove-btn:hover { background: rgba(239,68,68,0.28); color: #fecaca; }
+  /* v14.4 — let imported rows stay clearly muted but allow clicking the remove button */
+  .outlook-row.is-imported { opacity: 0.7; cursor: default; }
+  .outlook-row.is-imported .outlook-remove-btn { opacity: 1; cursor: pointer; }
   .outlook-edit {
     margin-top: 10px;
     padding: 12px;
@@ -2129,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 14.3.html · Review &amp; Fix inline
+      version 14.4.html · Remove Import (admin)
     </div>
   </div>
 </div>
@@ -6826,6 +6842,14 @@ function renderOutlookRow(c, isAlready) {
       return `<option value="${escapeHtml(r)}" ${sel?'selected':''}>${escapeHtml(r)} (${teamOf(r)})</option>`;
     }).join('');
 
+  // v14.4 — Admin can remove an already-imported demo straight from the picker
+  const removeBtnHtml = (isAlready && demoCanManage()) ? `
+    <button type="button" class="outlook-remove-btn"
+      onclick="event.preventDefault(); event.stopPropagation(); removeImportedOutlookDemo('${evIdJs}')"
+      title="Delete this demo from the tracker so you can re-import after fixing the calendar event">
+      🗑️ Remove Import
+    </button>` : '';
+
   const editorHtml = (!isAlready) ? `
     <button type="button" class="outlook-review-btn ${isOpen?'open':''}" onclick="event.preventDefault(); toggleOutlookEditor('${evIdJs}')">
       ${hasWarn ? '⚠ Review &amp; Fix' : '✏️ Edit'}<span class="chev">▾</span>
@@ -6883,6 +6907,7 @@ function renderOutlookRow(c, isAlready) {
           <span class="outlook-chip client">${escapeHtml(m.client || '(no client)')}</span>
         </div>
         ${warnHtml}
+        ${removeBtnHtml}
         ${editorHtml}
       </div>
     </label>`;
@@ -6998,6 +7023,52 @@ function importSelectedOutlookEvents() {
   demoPopulateWeekSelect();
   renderDemoDashboard();
   showToast(`✅ Imported ${added} demo${added===1?'':'s'} from Outlook`, 'success');
+}
+
+/* v14.4 — Admin removes a previously-imported demo straight from the picker.
+   This deletes the corresponding entry from demoEntries (matched by
+   outlookEventId), persists, refreshes the dashboard, and flips the picker
+   row back to "New" so it can be re-imported (typically after fixing the
+   subject/attendees on the shared calendar). */
+function removeImportedOutlookDemo(eventId) {
+  if (!demoCanManage()) {
+    showToast('⚠ Only office admins can remove imports', 'warning');
+    return;
+  }
+  if (!eventId) return;
+  const entry = demoEntries.find(d => d.outlookEventId === eventId);
+  if (!entry) {
+    showToast('That entry was already removed', 'info');
+    rerenderOutlookRow(eventId);
+    refreshOutlookStatus();
+    return;
+  }
+  const label = `${entry.client || '(no client)'} on ${formatDemoDate(entry.date)}`;
+  if (!confirm(`Remove imported demo for ${label}?\n\nThis deletes it from the tracker. The Outlook event itself is untouched, so you can fix it and re-import.`)) return;
+
+  // Remove the entry, clear any selection state, persist
+  demoEntries = demoEntries.filter(d => d.outlookEventId !== eventId);
+  outlookSelected.delete(eventId);
+  saveDemos();
+
+  // Refresh dashboard + week dropdown in the background
+  demoPopulateWeekSelect();
+  renderDemoDashboard();
+
+  // Flip this row from "Already imported" → "New" / "Needs review" without
+  // closing the modal, and update the header counters.
+  rerenderOutlookRow(eventId);
+  refreshOutlookStatus();
+
+  // Re-enable the import button if a fresh checkbox got auto-checked
+  const importBtn = document.getElementById('outlookSyncImportBtn');
+  if (importBtn) {
+    const cb = document.querySelector(`#outlookSyncList input[data-event-id="${CSS.escape(eventId)}"]`);
+    if (cb && cb.checked) outlookSelected.add(eventId);
+    importBtn.disabled = outlookSelected.size === 0;
+  }
+
+  showToast(`🗑️ Removed import — ${label}`, 'success');
 }
 
 
