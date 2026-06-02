@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 14.8.html · Live auto-refresh (admin sees submissions automatically)
+      version 14.9.html · Live auto-refresh (admin sees submissions automatically)
     </div>
   </div>
 </div>
@@ -3867,14 +3867,21 @@ function pickRow(a, b) {
   // Return whichever row should survive the merge (either may be undefined).
   if (!a) return b;
   if (!b) return a;
-  if (!!a.locked !== !!b.locked) return a.locked ? a : b;   // locked wins
   const sa = rowStamp(a), sb = rowStamp(b);
+  // v14.9 — NEWEST WINS FIRST. This is the core fix for "admin can't clear a
+  // submitted row — it vanishes for a second then all the values come back."
+  // An admin unlock / clear / reset now stamps the row with a fresh updatedAt
+  // (see unlockRow + resetWeek), so that deliberate change is NEWER than the
+  // older remote copy and survives the merge — even though the remote copy is
+  // still `locked`. Previously "locked wins" ran BEFORE the timestamp check, so
+  // the stale-but-locked remote row beat the admin's unlock and snapped the
+  // values back on the very next 20s auto-refresh.
   if (sa !== sb) return sa > sb ? a : b;                     // newest wins
+  // Equal stamps (same instant) → a submitted/locked row beats an unlocked one.
+  if (!!a.locked !== !!b.locked) return a.locked ? a : b;    // locked wins ties
   if (rowHasData(a) !== rowHasData(b)) return rowHasData(a) ? a : b;
-  // v14.7 — TRUE TIE: keep LOCAL. Both merge call sites seed `a` with the
-  // REMOTE row first, then contest with the LOCAL row as `b`. The old code
-  // `return a` therefore kept REMOTE and silently reverted a rep's freshly
-  // typed (but identically-stamped) edits. Returning `b` keeps local.
+  // TRUE TIE: keep LOCAL. Both merge call sites seed `a` with the REMOTE row
+  // first, then contest with the LOCAL row as `b`. Returning `b` keeps local.
   return b;
 }
 function mergeWeekRows(localRows, remoteRows) {
@@ -5175,6 +5182,10 @@ function unlockRow(ri) {
       rows[ri].locked = false;
       rows[ri].submittedBy = '';
       rows[ri].submittedAt = '';
+      // v14.9 — stamp the unlock so the merge treats it as the FRESHEST copy.
+      // Without this, the still-locked remote row outranks the admin's change
+      // on the next auto-refresh and the lock/values snap back.
+      rows[ri].updatedAt = new Date().toISOString();
       saveAll();
       renderTable();
       renderCommitPanel();
@@ -5190,7 +5201,13 @@ function resetWeek() {
     `This will WIPE all entries for Week ${curWeek+1} of ${MONTHS[curMonth]} ${curYear} and restore the default team rows (empty). All locks will be removed.`,
     () => {
       const md = getCurMonthData();
-      md.weeks[curWeek] = buildDefaultTeamRows();
+      const fresh = buildDefaultTeamRows();
+      // v14.9 — stamp every reset row NOW so the wipe is the newest copy and
+      // survives the next merge. Otherwise the locked, data-bearing remote rows
+      // outrank these blank rows and the week refills on the next auto-refresh.
+      const nowIso = new Date().toISOString();
+      fresh.forEach(r => { r.updatedAt = nowIso; });
+      md.weeks[curWeek] = fresh;
       saveAll();
       renderAll();
       showToast('Week reset to default', 'success');
