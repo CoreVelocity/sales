@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 15.0.html · Shared-drive integrity · targets visible to reps · HubSpot data reaches reps
+      version 15.1.html · Robust sharedWithMe resolution · shared-drive integrity · targets visible to reps · HubSpot data reaches reps
     </div>
   </div>
 </div>
@@ -3266,8 +3266,9 @@ const ONEDRIVE_CONFIG = {
   // rep wrote to their own /me drive, so the admin never saw their submissions.
   sharedDriveUser: 'demo@core-velocity.com',
   // v14.5 — Files.ReadWrite.All is required to read/write another principal's
-  // drive via /users/{upn}/drive. Falls back to /me automatically if access
-  // to the shared drive is denied (see resolveDriveRoot()).
+  // drive via /users/{upn}/drive. v15.1: primary access is via
+  // /me/drive/sharedWithMe (resolveSharedFileRef). NO personal /me fallback —
+  // a denied shared drive surfaces a loud error instead of hiding data.
   scopes     : ['Files.ReadWrite.All', 'User.Read', 'Calendars.Read.Shared']
 };
 
@@ -3790,6 +3791,71 @@ function driveRootUrl(useShared) {
 // Retained for backward-compat with older call sites; v15.0 never flips it.
 let useSharedDrive = true;
 
+/* ════════════════════════════════════════════════════════════════════
+   v15.1 — ROBUST SHARED-FILE RESOLUTION via /me/drive/sharedWithMe
+   ────────────────────────────────────────────────────────────────────
+   Path-addressing ANOTHER user's drive root
+     /users/{upn}/drive/root:/OXEFIT/sales-tracker.json:/content
+   is the most fragile way to reach a shared file: it requires the caller
+   to have rights on the WHOLE drive and breaks on sharing quirks. The
+   reliable Graph pattern is:
+     1. demo@ shares the file (or its OXEFIT folder) with the team.
+     2. Each user lists /me/drive/sharedWithMe and finds the item, which
+        carries remoteItem.parentReference.driveId + remoteItem.id.
+     3. Read/write by the STABLE drive-item URL:
+          /drives/{driveId}/items/{itemId}/content
+   We resolve once, cache {driveId,itemId}, and reuse it for every
+   read/write. Path-addressing is kept ONLY as a seed/fallback so the
+   very first upload can create the file if it doesn't exist yet.
+   ──────────────────────────────────────────────────────────────────── */
+let _sharedFileRef = null;          // { driveId, itemId } once resolved
+const _sharedFileName = (ONEDRIVE_CONFIG.filePath.split('/').pop() || 'sales-tracker.json').toLowerCase();
+
+// Stable content URL for a resolved shared file.
+function sharedItemContentUrl(ref) {
+  return `https://graph.microsoft.com/v1.0/drives/${encodeURIComponent(ref.driveId)}/items/${encodeURIComponent(ref.itemId)}/content`;
+}
+
+// Look through items shared with the signed-in user and find our JSON DB.
+// Returns { driveId, itemId } or null if it isn't shared with this user yet.
+async function resolveSharedFileRef(tok, force) {
+  if (_sharedFileRef && !force) return _sharedFileRef;
+  try {
+    const res = await fetch('https://graph.microsoft.com/v1.0/me/drive/sharedWithMe', {
+      headers: { Authorization: 'Bearer ' + tok }
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    const items = (body && Array.isArray(body.value)) ? body.value : [];
+    for (const it of items) {
+      const ri   = it.remoteItem || it;
+      const name = (it.name || ri.name || '').toLowerCase();
+      const driveId = ri.parentReference && ri.parentReference.driveId;
+      const itemId  = ri.id;
+      if (!driveId || !itemId) continue;
+      // Direct file share: the shared item IS our JSON file.
+      if (name === _sharedFileName) {
+        _sharedFileRef = { driveId, itemId };
+        return _sharedFileRef;
+      }
+      // Folder share (e.g. the OXEFIT folder): drill in to find the file.
+      if (ri.folder) {
+        try {
+          const ch = await fetch(`https://graph.microsoft.com/v1.0/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/children`, {
+            headers: { Authorization: 'Bearer ' + tok }
+          });
+          if (ch.ok) {
+            const kids = await ch.json();
+            const hit = (kids.value || []).find(k => (k.name || '').toLowerCase() === _sharedFileName);
+            if (hit) { _sharedFileRef = { driveId, itemId: hit.id }; return _sharedFileRef; }
+          }
+        } catch(_) {}
+      }
+    }
+  } catch(_) {}
+  return null;
+}
+
 // v15.0 — one-time, prominent notice when a rep's account can't reach the
 // shared drive. Without shared access their data CANNOT be made visible to the
 // admin, so we must tell them rather than silently writing it to /me.
@@ -3819,12 +3885,31 @@ function parseEnvelope(remote) {
 }
 
 async function fetchRemoteEnvelope(tok) {
-  // v15.0 — SHARED DRIVE ONLY. No /me fallback. A 403 here means the rep's
-  // account isn't allowed on the shared drive; we raise a typed error so the
-  // caller can show a clear message instead of silently writing data to a
-  // personal drive the admin never reads.
+  // v15.1 — PREFER the robust /me/drive/sharedWithMe resolution. We locate the
+  // shared file by its driveId+itemId (works as long as demo@ shared the file
+  // or its OXEFIT folder with this user) and read it via the stable
+  // /drives/{driveId}/items/{itemId}/content endpoint.
+  const ref = await resolveSharedFileRef(tok);
+  if (ref) {
+    let res = await fetch(sharedItemContentUrl(ref), { headers: { Authorization: 'Bearer ' + tok } });
+    if (res.status === 404) {
+      // Cached ref went stale (file deleted/recreated) — re-resolve once.
+      const fresh = await resolveSharedFileRef(tok, true);
+      if (fresh) res = await fetch(sharedItemContentUrl(fresh), { headers: { Authorization: 'Bearer ' + tok } });
+    }
+    if (res.status === 404) return { status: 404, shared: true, ref };
+    if (res.status === 403) { const e = new Error('shared-drive-403'); e.code = 403; throw e; }
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' (shared-item)');
+    const json = await res.json();
+    return { status: 200, shared: true, ref, env: parseEnvelope(json) };
+  }
+
+  // v15.1 — FALLBACK: path-address the shared drive root. This covers the very
+  // first run (file doesn't exist yet, so it can't be in sharedWithMe) and the
+  // admin/owner case (the file lives in their OWN drive, never "shared with me").
+  // No /me personal-drive fallback — a 403 still surfaces a clear error.
   const res = await fetch(driveRootUrl(true), { headers: { Authorization: 'Bearer ' + tok } });
-  if (res.status === 404) return { status: 404, shared: true };       // no file yet
+  if (res.status === 404) return { status: 404, shared: true };       // no file yet → seed it
   if (res.status === 403) { const e = new Error('shared-drive-403'); e.code = 403; throw e; }
   if (!res.ok) throw new Error('HTTP ' + res.status + ' (shared)');
   const json = await res.json();
@@ -4066,15 +4151,30 @@ async function uploadToOneDrive() {
     }
 
     // 3. UPLOAD the unified envelope to the SHARED drive.
-    const res = await fetch(driveRootUrl(true), {
+    // v15.1 — write via the resolved {driveId,itemId} when we have it (stable,
+    // robust). Otherwise path-address the shared root to SEED the file the very
+    // first time (and for the owner whose file isn't "shared with me").
+    const ref = _sharedFileRef || await resolveSharedFileRef(tok);
+    const putUrl = ref ? sharedItemContentUrl(ref) : driveRootUrl(true);
+    const res = await fetch(putUrl, {
       method : 'PUT',
       headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' },
       body   : JSON.stringify(buildEnvelope())
     });
     if (res.status === 403) {
-      // v15.0 — NO /me fallback. Surface the access problem instead of hiding data.
+      // v15.1 — NO /me fallback. Surface the access problem instead of hiding data.
       showSharedDriveError();
       return;
+    } else if (res.status === 404 && ref) {
+      // Cached ref stale — re-resolve and retry once via path-addressing seed.
+      _sharedFileRef = null;
+      const res2 = await fetch(driveRootUrl(true), {
+        method : 'PUT',
+        headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' },
+        body   : JSON.stringify(buildEnvelope())
+      });
+      if (res2.status === 403) { showSharedDriveError(); return; }
+      if (!res2.ok) throw new Error('HTTP ' + res2.status);
     } else if (!res.ok) {
       throw new Error('HTTP ' + res.status);
     }
