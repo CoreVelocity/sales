@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 14.6.html · Shared-drive sync + merge (admin visibility fix)
+      version 14.8.html · Live auto-refresh (admin sees submissions automatically)
     </div>
   </div>
 </div>
@@ -3461,6 +3461,12 @@ let curMonth    = new Date().getMonth();
 let curWeek     = 0;
 let modalYear   = curYear;
 let saveTimer   = null;
+// v14.8 — live auto-refresh so a signed-in admin sees team submissions WITHOUT
+// a manual sync click. Previously downloadFromOneDrive() ran only once at login,
+// so anything the team submitted afterward never reached the admin's screen.
+let autoRefreshTimer = null;
+let _refreshInFlight = false;
+const AUTO_REFRESH_MS = 20000;   // poll the shared file every 20s
 
 // OneDrive state
 let msalInstance = null;
@@ -3640,8 +3646,10 @@ async function initOneDrive(opts) {
         sessionStorage.setItem('oxefit_email', email);
         try { showToast(`Signed in as ${repName}`, 'success'); } catch(_) {}
         try { launchApp(/*alreadyAuthed*/ true); } catch(_) {}
-        // Continue: also pull OneDrive data in background
+        // Continue: also pull OneDrive data in background, then begin live polling
+        // so submissions made after sign-in surface automatically (v14.8).
         try { await downloadFromOneDrive(); } catch(_) {}
+        try { startAutoRefresh(); } catch(_) {}
         return redirectRes.account;
       }
 
@@ -4002,6 +4010,41 @@ async function manualSync() {
   await downloadFromOneDrive();
 }
 
+/* ════════════════════════════════════════
+   LIVE AUTO-REFRESH  (v14.8)
+   Keeps a signed-in session current with the shared OneDrive file so the
+   admin sees team submissions automatically. downloadFromOneDrive() already
+   MERGES remote into local (locked rows + newest stamp win), so a background
+   pull can never erase the viewer's own unsynced edits.
+════════════════════════════════════════ */
+async function refreshFromCloud() {
+  if (!msalAccount) return;                 // only when authenticated
+  if (_refreshInFlight || _uploadInFlight) return;  // don't collide with a save
+  // Never yank the grid out from under a rep who is actively typing.
+  const ae = document.activeElement;
+  if (ae && ae.classList && ae.classList.contains('cell-input')) return;
+  _refreshInFlight = true;
+  try { await downloadFromOneDrive(); }
+  catch(_) {}
+  finally { _refreshInFlight = false; }
+}
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  if (!msalAccount) return;
+  autoRefreshTimer = setInterval(refreshFromCloud, AUTO_REFRESH_MS);
+}
+function stopAutoRefresh() {
+  if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+}
+
+// Pull immediately when the user returns to the tab (e.g. admin switches back
+// after the team has submitted) — far snappier than waiting for the next poll.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshFromCloud();
+});
+window.addEventListener('focus', refreshFromCloud);
+
 function showSetupInstructions() {
   alert(
     'To enable OneDrive sync:\n\n' +
@@ -4183,6 +4226,9 @@ async function launchApp(alreadyAuthed) {
   } else {
     await initOneDrive();
   }
+  // v14.8 — begin live polling so the admin sees team submissions without
+  // having to click the sync chip. No-op until an MSAL account is present.
+  startAutoRefresh();
   renderHubspotChip();
   renderAll();
 }
