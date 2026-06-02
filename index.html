@@ -3559,8 +3559,11 @@ function saveAll() {
   if (msalAccount) scheduleCloudSync();
 }
 function scheduleCloudSync() {
+  // v14.7 — 2.5s debounce (was 800ms). Reps type across several cells before
+  // pausing; a tighter window fired a Fetch→Merge→Upload mid-entry, which —
+  // combined with the old merge bugs — looked like entries being deleted.
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(uploadToOneDrive, 800);
+  saveTimer = setTimeout(uploadToOneDrive, 2500);
 }
 // v14.5 — alias expected by saveDemos(); ensures demo edits also push to the
 // shared drive. Guarded by msalAccount so offline edits stay local-only.
@@ -3860,7 +3863,11 @@ function pickRow(a, b) {
   const sa = rowStamp(a), sb = rowStamp(b);
   if (sa !== sb) return sa > sb ? a : b;                     // newest wins
   if (rowHasData(a) !== rowHasData(b)) return rowHasData(a) ? a : b;
-  return a;                                                  // tie → keep local
+  // v14.7 — TRUE TIE: keep LOCAL. Both merge call sites seed `a` with the
+  // REMOTE row first, then contest with the LOCAL row as `b`. The old code
+  // `return a` therefore kept REMOTE and silently reverted a rep's freshly
+  // typed (but identically-stamped) edits. Returning `b` keeps local.
+  return b;
 }
 function mergeWeekRows(localRows, remoteRows) {
   const local  = Array.isArray(localRows)  ? localRows  : [];
@@ -3971,7 +3978,12 @@ async function uploadToOneDrive() {
       throw new Error('HTTP ' + res.status);
     }
     setSyncStatus('connected');
-    if (typeof renderAll === 'function') { try { renderAll(); } catch(_) {} }
+    // v14.7 — Do NOT re-render the grid while a rep is mid-keystroke; a
+    // renderAll() here rebuilds every <input>, drops focus, and looks like the
+    // entry "disappeared". Only refresh when nothing in the grid is focused.
+    const ae = document.activeElement;
+    const editingGrid = ae && (ae.classList && ae.classList.contains('cell-input'));
+    if (!editingGrid && typeof renderAll === 'function') { try { renderAll(); } catch(_) {} }
   } catch(e) {
     console.error('Upload failed', e);
     setSyncStatus('error', 'Sync error');
@@ -4797,6 +4809,7 @@ function renderBuyerSignalsCell(td, ri, row, editable) {
         if (!r) return;
         ensureBuyerSignals(r);
         r.buyerSignals[k] = e.target.checked;
+        r.updatedAt = new Date().toISOString(); // v14.7 — stamp for merge
         saveAll();
         renderTable();
         renderKPIs();
@@ -5038,6 +5051,10 @@ function updateField(ri, field, value) {
   if (!rows[ri]) return;
   if (rows[ri].locked && currentRole !== 'admin') return; // safety
   rows[ri][field] = value;
+  // v14.7 — stamp the row so the merge knows this local edit is the freshest
+  // copy. Without this, actively-edited unlocked rows carry rowStamp()===0 and
+  // the Fetch→Merge→Upload cycle reverts them to the older remote value.
+  rows[ri].updatedAt = new Date().toISOString();
   saveAll();
   renderKPIs();
   renderSummaryBar();
