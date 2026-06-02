@@ -413,6 +413,12 @@
   }
   thead th.col-hot { color: #f87171; }
   thead th.col-warm { color: #fb923c; }
+  /* v15.6 — small format hint under a column title */
+  thead th .th-hint {
+    display: block; margin-top: 2px; font-size: 9px; font-weight: 500;
+    letter-spacing: 0.2px; text-transform: none; color: var(--text-muted);
+    opacity: 0.85;
+  }
   thead th.col-forecast { color: var(--accent-glow); }
   thead th.col-blocked { color: #fca5a5; min-width: 220px; }
   thead th.col-stage   { color: var(--text-muted); min-width: 170px; }
@@ -461,6 +467,41 @@
   .team-badge.abu-dhabi { background: rgba(245,158,11,0.2); color: var(--gold-light); border: 1px solid rgba(245,158,11,0.4); }
   .num-input { min-width: 90px; text-align: right; }
   .deal-text-input { min-width: 160px; }
+
+  /* ── v15.6 · Clearer Commit / Best Case entry UX ──────────────────────
+     Goal: the rep instantly knows WHAT to type in the deal-name box and
+     HOW the AED amount should be entered, with a live formatted readout. */
+  .aed-cell { min-width: 130px; vertical-align: top; }
+  .aed-input-wrap {
+    position: relative; display: flex; align-items: center;
+    background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 6px; transition: border-color 0.15s, background 0.15s;
+  }
+  .aed-input-wrap:focus-within { border-color: var(--accent2); background: rgba(37,99,235,0.08); }
+  .aed-prefix {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--text-muted); padding: 0 4px 0 8px; user-select: none;
+    border-right: 1px solid var(--border);
+  }
+  .aed-input-wrap .cell-input.num-input {
+    border: none; background: transparent; min-width: 70px;
+    padding: 6px 8px; text-align: right; flex: 1;
+  }
+  .aed-input-wrap .cell-input.num-input:focus { outline: none; background: transparent; }
+  .aed-readout {
+    font-size: 10.5px; line-height: 1.4; margin-top: 3px; text-align: right;
+    color: var(--text-muted); font-variant-numeric: tabular-nums; min-height: 14px;
+  }
+  .aed-readout.has-val { color: var(--gold-light); font-weight: 600; }
+  .aed-readout.aed-warn { color: #f87171; font-weight: 600; }
+  .aed-input-wrap.locked { border-color: transparent; background: transparent; }
+  .aed-input-wrap.locked .aed-prefix { border-right-color: transparent; }
+  /* Deal-name format hint shown beneath the textarea while editing */
+  .deal-name-hint {
+    font-size: 10px; line-height: 1.4; color: var(--text-muted);
+    margin-top: 3px; font-style: italic;
+  }
+  .deal-name-hint b { color: var(--accent-glow); font-style: normal; font-weight: 600; }
 
   .col-hot-bg  { background: rgba(239,68,68,0.04); }
   .col-warm-bg { background: rgba(249,115,22,0.04); }
@@ -2145,7 +2186,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 15.5.html · HubSpot hardening: token obfuscation · read-only scope guard · rep UX chip · stale-token auto-recover · Shared HubSpot connection · Rename migration · Multi-admin (Sami + Kamal)
+      version 15.7.html · Clearer deal entry: AED-prefixed amount fields with live formatted readout, deal-name format hints &amp; column sub-labels
     </div>
   </div>
 </div>
@@ -2756,12 +2797,12 @@
           <tbody>
             <tr>
               <td><strong>Commit</strong><span class="gd-tag commit">High Confidence</span></td>
-              <td>Deals the rep is <strong>personally committing</strong> to close this month. Includes deal name, AED amount, and the next concrete action.</td>
+              <td>Deals the rep is <strong>personally committing</strong> to close this month. Enter the deal name as <code>Client – Product</code> (e.g. <code>Marina Fitness – XS1</code>), one deal per line, and the AED amount in <strong>whole dirhams, no commas</strong> (type <code>250000</code> — the field shows <code>AED 250,000</code> back to you). Also capture the next concrete action.</td>
               <td>Forecast Accuracy, Commit Variance, Weighted Forecast</td>
             </tr>
             <tr>
               <td><strong>Best Case</strong><span class="gd-tag best">Upside</span></td>
-              <td>Deals that <em>could</em> close this month if everything breaks the right way. Lower probability than Commit but still in active pursuit.</td>
+              <td>Deals that <em>could</em> close this month if everything breaks the right way. Lower probability than Commit but still in active pursuit. Same entry format as Commit — deal name <code>Client – Product</code>, AED amount in whole dirhams.</td>
               <td>Weighted Forecast, Total Pipeline</td>
             </tr>
             <tr>
@@ -4830,13 +4871,13 @@ function renderTable() {
   const cols = [
     {label:'Sales Rep',              cls:''},
     {label:'Total Pipeline (HS)',    cls:'col-closed'},
-    {label:'Commit — Deal Name',     cls:'col-hot'},
-    {label:'Commit (AED)',           cls:'col-hot'},
+    {label:'Commit — Deal Name',     cls:'col-hot',  hint:'Client – Product (one deal per line)'},
+    {label:'Commit (AED)',           cls:'col-hot',  hint:'Whole dirhams · no commas'},
     {label:'Buyer Signals',          cls:'col-signals'},
     {label:'Qual Score',             cls:'col-qual'},
     {label:'Next Action',            cls:'col-hot'},
-    {label:'Best Case — Deal Name',  cls:'col-warm'},
-    {label:'Best Case (AED)',        cls:'col-warm'},
+    {label:'Best Case — Deal Name',  cls:'col-warm', hint:'Client – Product (one deal per line)'},
+    {label:'Best Case (AED)',        cls:'col-warm', hint:'Whole dirhams · no commas'},
     {label:'Confidence',             cls:'col-stage'},
     {label:'Total Forecast (AED)',   cls:'col-forecast'},
     {label:'Closed (Win) AED',       cls:'col-closed'},
@@ -4847,7 +4888,18 @@ function renderTable() {
     {label:'Submit / Status',        cls:''}
   ];
   const tr = document.createElement('tr');
-  cols.forEach(c => { const th = document.createElement('th'); th.textContent = c.label; th.className = c.cls; tr.appendChild(th); });
+  cols.forEach(c => {
+    const th = document.createElement('th');
+    th.className = c.cls;
+    // v15.6 — optional sub-hint under the column title so reps know the
+    // expected format at a glance (deal-name pattern / AED entry rule).
+    if (c.hint) {
+      th.innerHTML = `${c.label}<span class="th-hint">${c.hint}</span>`;
+    } else {
+      th.textContent = c.label;
+    }
+    tr.appendChild(th);
+  });
   thead.appendChild(tr);
 
   // BODY — grouped by team
@@ -4932,8 +4984,10 @@ function renderRow(row, ri, tbody) {
   }
 
   // Commit: deal name (multi-line textarea like Notes) + AED value
-  tr.appendChild(makeTextareaCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'Deal name(s)…\nOne per line'));
-  tr.appendChild(makeNumCell (ri, 'commitValue',  'col-hot-bg',                 row.commitValue,  editable));
+  // v15.6 — clearer guidance: example format under the name box, and an
+  // AED-prefixed amount field with a live "AED 250,000" readout.
+  tr.appendChild(makeTextareaCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'e.g. Marina Fitness – XS1\nOne deal per line', true));
+  tr.appendChild(makeAedCell (ri, 'commitValue',  'col-hot-bg',                 row.commitValue,  editable));
 
   // Buyer Signals (6 checkboxes / chips)
   const signalsTd = document.createElement('td');
@@ -4953,8 +5007,9 @@ function renderRow(row, ri, tbody) {
   tr.appendChild(makeTextareaCell(ri, 'commitAction', 'col-hot-bg action-text-input', row.commitAction, editable, 'Next action(s)…\nOne per line'));
 
   // Best Case: deal name (multi-line textarea like Notes) + AED value
-  tr.appendChild(makeTextareaCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'Deal name(s)…\nOne per line'));
-  tr.appendChild(makeNumCell (ri, 'bestCaseValue', 'col-warm-bg',                 row.bestCaseValue, editable));
+  // v15.6 — same clearer guidance as Commit.
+  tr.appendChild(makeTextareaCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'e.g. JBR Wellness – XP1\nOne deal per line', true));
+  tr.appendChild(makeAedCell (ri, 'bestCaseValue', 'col-warm-bg',                 row.bestCaseValue, editable));
 
   // Pipeline Stage (now positioned just before Total Pipeline so users set the stage that drives the forecast weight)
   const stageTd = document.createElement('td');
@@ -5083,7 +5138,7 @@ function makeTextCell(ri, field, extraClass, value, editable, placeholder) {
 }
 /* Multi-line textarea cell — used for Commit / Best Case deal name columns so
    reps can list multiple deals on separate lines (similar to the Notes cell). */
-function makeTextareaCell(ri, field, extraClass, value, editable, placeholder) {
+function makeTextareaCell(ri, field, extraClass, value, editable, placeholder, showHint) {
   const td = document.createElement('td');
   td.className = (extraClass.split(' ').filter(c => c.endsWith('-bg')).join(' ')) + ' deal-multiline-cell';
   const ta = document.createElement('textarea');
@@ -5099,6 +5154,14 @@ function makeTextareaCell(ri, field, extraClass, value, editable, placeholder) {
   if (!editable) { ta.readOnly = true; ta.className += ' locked-field'; }
   else { ta.addEventListener('input', e => { updateField(ri, field, e.target.value); autoGrow(); }); }
   td.appendChild(ta);
+  // v15.6 — format hint for deal-name cells (only while editable, so locked
+  // rows stay clean). Tells the rep exactly how to name a deal.
+  if (showHint && editable) {
+    const hint = document.createElement('div');
+    hint.className = 'deal-name-hint';
+    hint.innerHTML = 'Format: <b>Client – Product</b> · one deal per line';
+    td.appendChild(hint);
+  }
   // Defer auto-grow until in DOM so scrollHeight is accurate
   setTimeout(autoGrow, 0);
   return td;
@@ -5113,6 +5176,62 @@ function makeNumCell(ri, field, bgClass, value, editable) {
   if (!editable) { inp.readOnly = true; inp.className += ' locked-field'; }
   else { inp.addEventListener('input', e => updateField(ri, field, e.target.value)); }
   td.appendChild(inp); return td;
+}
+
+/* v15.6 — AED currency cell for Commit / Best Case amounts.
+   Improvements over a bare number input:
+     • A non-editable "AED" prefix chip so the rep knows the unit & currency.
+     • A live, comma-grouped readout ("AED 250,000") beneath the field that
+       confirms the magnitude as they type — kills the classic
+       "did I type 25000 or 250000?" fat-finger error.
+     • A gentle sanity warning when a value looks too small to be a real deal
+       (< AED 1,000) so stray test entries get caught before submit. */
+function makeAedCell(ri, field, bgClass, value, editable) {
+  const td = document.createElement('td');
+  td.className = (bgClass || '') + ' aed-cell';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'aed-input-wrap' + (editable ? '' : ' locked');
+
+  const prefix = document.createElement('span');
+  prefix.className = 'aed-prefix';
+  prefix.textContent = 'AED';
+  wrap.appendChild(prefix);
+
+  const inp = document.createElement('input');
+  inp.type = 'number'; inp.min = '0'; inp.step = '1';
+  inp.className = 'cell-input num-input';
+  inp.placeholder = '0';
+  if (value !== '' && value !== null && value !== undefined) inp.value = value;
+  if (!editable) { inp.readOnly = true; inp.className += ' locked-field'; }
+  wrap.appendChild(inp);
+  td.appendChild(wrap);
+
+  // Live formatted readout
+  const readout = document.createElement('div');
+  readout.className = 'aed-readout';
+  const refreshReadout = () => {
+    const n = parseFloat(inp.value);
+    if (!inp.value || isNaN(n) || n <= 0) {
+      readout.textContent = '';
+      readout.className = 'aed-readout';
+      return;
+    }
+    if (n > 0 && n < 1000) {
+      readout.textContent = 'AED ' + fmtNum(n) + ' · looks low?';
+      readout.className = 'aed-readout aed-warn';
+    } else {
+      readout.textContent = 'AED ' + fmtNum(n);
+      readout.className = 'aed-readout has-val';
+    }
+  };
+  refreshReadout();
+  td.appendChild(readout);
+
+  if (editable) {
+    inp.addEventListener('input', e => { updateField(ri, field, e.target.value); refreshReadout(); });
+  }
+  return td;
 }
 
 /* ════════════════════════════════════════
