@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 14.4.html · Remove Import (admin)
+      version 14.6.html · Shared-drive sync + merge (admin visibility fix)
     </div>
   </div>
 </div>
@@ -2616,7 +2616,7 @@
   <div class="modal-backdrop" id="outlookSyncModal">
     <div class="modal outlook-modal">
       <div class="modal-head">
-        <h3>📅 Sync Demos from <span style="color:#60a5fa;">demo@core-velocity.com</span></h3>
+        <h3>📅 Sync Demos from <span style="color:#60a5fa;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3f5b5a52507f5c504d5a12495a53505c564b46115c5052">[email&#160;protected]</a></span></h3>
         <button class="modal-close" onclick="closeOutlookSyncModal()">×</button>
       </div>
       <div class="outlook-modal-body">
@@ -2640,7 +2640,7 @@
         <div class="outlook-helper">
           <strong>Booking convention (mandatory for v14.2):</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
-            <li>Every demo MUST invite <strong>demo@core-velocity.com</strong> — that calendar is the source of truth.</li>
+            <li>Every demo MUST invite <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ddb9b8b0b29dbeb2afb8f0abb8b1b2beb4a9a4f3beb2b0">[email&#160;protected]</a></strong> — that calendar is the source of truth.</li>
             <li>Subject format: <code>&lt;Client Name&gt; — XS1</code>, <code>XP1</code>, <code>XS1 + XP1</code>, or <code>Full Range</code>.</li>
             <li>Set the <strong>Location</strong> field on the Outlook event (physical address or "Microsoft Teams").</li>
             <li>Add any teammates running the demo with you as attendees — they'll be auto-credited as supporting reps.</li>
@@ -3043,7 +3043,7 @@
           <strong>Why bring demos into the score?</strong> Demos are the leading indicator of pipeline. A rep who closes 100% of goal this month but ran zero demos is mortgaging next month's number — and a rep who runs 12 demos with a 50% conversion rate is building a pipeline the AED hasn't caught up with yet. Goal Attainment still dominates at 55%, but Demo Effectiveness (15%) now ensures the Leaderboard rewards both <em>what they closed this month</em> and <em>what they're queueing up for next month</em>.
         </div>
         <div class="gd-callout info" style="border-color: rgba(0, 120, 212, 0.45); background: rgba(0, 120, 212, 0.08);">
-          <strong>v14.2 — Shared demo calendar auto-import.</strong> Manual demo entry is gone. There is now ONE shared Outlook calendar — <code>demo@core-velocity.com</code> — and every rep must invite that address on every demo they book. The tracker reads that shared calendar directly via Microsoft Graph and treats <em>every non-cancelled event</em> as a real demo (no keyword guessing, no false positives).
+          <strong>v14.2 — Shared demo calendar auto-import.</strong> Manual demo entry is gone. There is now ONE shared Outlook calendar — <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="157170787a55767a6770386370797a767c616c3b767a78">[email&#160;protected]</a></code> — and every rep must invite that address on every demo they book. The tracker reads that shared calendar directly via Microsoft Graph and treats <em>every non-cancelled event</em> as a real demo (no keyword guessing, no false positives).
           <div style="margin-top: 10px;"><strong>Subject convention:</strong> <code>&lt;Client Name&gt; — XS1 | XP1 | XS1 + XP1 | Full Range</code>. Set the Outlook Location field for on-site addresses (or "Microsoft Teams" for virtual). Add any teammates running the demo as attendees — they're auto-credited as supporting reps.</div>
           <div style="margin-top: 10px;"><strong>How Gladys uses it:</strong> Demo Tracker → <span style="color:#60a5fa;">📅 Sync from demo@</span> → pick a lookback window (7 / 14 / 30 / 60 / 90 days) → review the auto-mapped rows (organizer → primary rep, attendees → supporting reps, subject → client + product, event location → location, start time → date). Rows missing fields show a <span style="color:#fbbf24;">Needs review</span> badge with a specific warning ("No product in subject", "Organizer not a known rep", etc.). Each imported demo carries the Outlook event ID so weekly re-syncs are idempotent.</div>
           <div style="margin-top: 10px;"><strong>Permissions:</strong> Azure AD app needs <code>Calendars.Read.Shared</code> delegated permission with admin consent. Each signed-in user must have at least Reviewer access to the demo@ mailbox calendar (configured by IT once, applied to the whole sales group).</div>
@@ -3227,7 +3227,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ════════════════════════════════════════════════════════════════════
    ONEDRIVE / MICROSOFT GRAPH CONFIGURATION  ── (REQUIREMENT C)
    ────────────────────────────────────────────────────────────────────
@@ -3260,8 +3260,15 @@ const ONEDRIVE_CONFIG = {
   clientId   : 'cd1b7f5f-5ff9-4066-ab4f-06f270a94fcb',  // OXEFIT Tracker — Azure app
   authority  : 'https://login.microsoftonline.com/core-velocity.com',
   redirectUri: window.location.origin + window.location.pathname,
-  filePath   : '/OXEFIT/sales-tracker.json',        // location inside the user's OneDrive
-  scopes     : ['Files.ReadWrite', 'User.Read', 'Calendars.Read.Shared']  // v14.2 — Calendars.Read.Shared lets us read the shared demo@core-velocity.com calendar
+  filePath   : '/OXEFIT/sales-tracker.json',        // location of the JSON DB inside the SHARED drive
+  // v14.5 — ALL reads/writes go to ONE shared drive (the demo@core-velocity.com
+  // mailbox/OneDrive) so admin + every rep see the same file. Previously each
+  // rep wrote to their own /me drive, so the admin never saw their submissions.
+  sharedDriveUser: 'demo@core-velocity.com',
+  // v14.5 — Files.ReadWrite.All is required to read/write another principal's
+  // drive via /users/{upn}/drive. Falls back to /me automatically if access
+  // to the shared drive is denied (see resolveDriveRoot()).
+  scopes     : ['Files.ReadWrite.All', 'User.Read', 'Calendars.Read.Shared']
 };
 
 /* ════════════════════════════════════════════════════════════════════
@@ -3555,6 +3562,11 @@ function scheduleCloudSync() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(uploadToOneDrive, 800);
 }
+// v14.5 — alias expected by saveDemos(); ensures demo edits also push to the
+// shared drive. Guarded by msalAccount so offline edits stay local-only.
+function scheduleOneDriveSync() {
+  if (msalAccount) scheduleCloudSync();
+}
 
 /* ════════════════════════════════════════
    ONEDRIVE INTEGRATION
@@ -3733,26 +3745,85 @@ async function getAccessToken() {
   }
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   v14.5 — SHARED-DRIVE STORAGE + ENVELOPE FORMAT
+   --------------------------------------------------------------------
+   All reads/writes target ONE drive (demo@core-velocity.com) so admin
+   and every rep share a single source of truth.
+
+   On-disk format (the "envelope"):
+     { "_envelope": "oxefit-v1",
+       "_meta": { updatedBy, updatedAt },
+       "data":  { "<year-month>": { weeks:[[],…] }, … },   // == allData
+       "demos": [ {id, …}, … ] }                            // == demoEntries
+
+   Backward-compat: a legacy file (bare month-keyed object, no _envelope)
+   is read as { data: <file>, demos: [] }.
+════════════════════════════════════════════════════════════════════ */
+
+// Resolve the Graph drive-root segment. Prefer the shared drive; the caller
+// falls back to /me if the shared drive returns 403 (access not granted).
+function driveRootUrl(useShared) {
+  if (useShared && ONEDRIVE_CONFIG.sharedDriveUser) {
+    return `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(ONEDRIVE_CONFIG.sharedDriveUser)}/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
+  }
+  return `https://graph.microsoft.com/v1.0/me/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
+}
+// Sticky flag: once we learn the shared drive is unreachable we stop retrying
+// it for the rest of the session (avoids a 403 on every keystroke-debounced save).
+let useSharedDrive = true;
+
+// Unwrap whatever is on disk into { data, demos }.
+function parseEnvelope(remote) {
+  if (remote && typeof remote === 'object' && remote._envelope === 'oxefit-v1') {
+    return {
+      data : (remote.data && typeof remote.data === 'object') ? remote.data : {},
+      demos: Array.isArray(remote.demos) ? remote.demos : [],
+      meta : remote._meta || null
+    };
+  }
+  // Legacy bare month-keyed object → treat as data, no demos.
+  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], meta: null };
+}
+
+async function fetchRemoteEnvelope(tok) {
+  // Try shared drive first (unless already known-bad), then fall back to /me.
+  const attempts = useSharedDrive ? [true, false] : [false];
+  for (const shared of attempts) {
+    const res = await fetch(driveRootUrl(shared), { headers: { Authorization: 'Bearer ' + tok } });
+    if (res.status === 404) return { status: 404, shared };           // no file yet
+    if (res.status === 403 && shared) { useSharedDrive = false; continue; } // no shared access → fall back
+    if (!res.ok) throw new Error('HTTP ' + res.status + (shared ? ' (shared)' : ' (/me)'));
+    const json = await res.json();
+    return { status: 200, shared, env: parseEnvelope(json) };
+  }
+  return { status: 404, shared: false };
+}
+
 async function downloadFromOneDrive() {
   if (!msalAccount) return;
   try {
     setSyncStatus('syncing', 'Loading…');
     const tok = await getAccessToken();
-    const url = `https://graph.microsoft.com/v1.0/me/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
-    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + tok } });
-    if (res.status === 404) {
-      // File doesn't exist yet — keep local data and push it up
+    const r = await fetchRemoteEnvelope(tok);
+    if (r.status === 404) {
+      // File doesn't exist yet — push our local data up to seed it.
       await uploadToOneDrive();
       setSyncStatus('connected');
       return;
     }
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const remote = await res.json();
-    if (remote && typeof remote === 'object') {
-      allData = remote;
-      saveLocal();
-      renderAll();
-    }
+    // Merge remote INTO local so we never blow away unsynced local edits, then
+    // adopt the merged result as the new truth.
+    const merged = mergeEnvelopes(
+      { data: allData, demos: demoEntries },
+      r.env
+    );
+    allData     = merged.data;
+    demoEntries = merged.demos;
+    saveLocal();
+    saveDemosLocalOnly();
+    renderAll();
+    if (typeof renderDemos === 'function') { try { renderDemos(); } catch(_) {} }
     setSyncStatus('connected');
   } catch(e) {
     console.error('Download failed', e);
@@ -3760,22 +3831,153 @@ async function downloadFromOneDrive() {
   }
 }
 
+/* ── MERGE HELPERS (v14.5) ──────────────────────────────────────────
+   A row's identity is (year-month, weekIndex, rep). When the same row
+   exists locally and remotely we keep the "stronger" one:
+     1. a LOCKED (submitted) row beats an unlocked one;
+     2. if both same lock-state, the most recently touched wins
+        (submittedAt / updatedAt / lastEdit, else fall back to "has data").
+   This guarantees one rep's save can never erase another rep's row. ── */
+function rowStamp(r) {
+  if (!r) return 0;
+  const t = r.submittedAt || r.updatedAt || r.lastEdit || 0;
+  const ms = t ? Date.parse(t) : 0;
+  return isNaN(ms) ? 0 : ms;
+}
+function rowHasData(r) {
+  // Field names must match defaultRow(): commitText/commitAction/bestCaseText
+  // (NOT commitName/nextAction/bestCaseName).
+  return !!(r && (r.commitValue || r.bestCaseValue || r.totalPipeline ||
+                  r.commitText  || r.bestCaseText  || r.commitAction  ||
+                  r.blocked     || r.forecastXS1   || r.forecastXP1   ||
+                  r.notes       || r.closedWon));
+}
+function pickRow(a, b) {
+  // Return whichever row should survive the merge (either may be undefined).
+  if (!a) return b;
+  if (!b) return a;
+  if (!!a.locked !== !!b.locked) return a.locked ? a : b;   // locked wins
+  const sa = rowStamp(a), sb = rowStamp(b);
+  if (sa !== sb) return sa > sb ? a : b;                     // newest wins
+  if (rowHasData(a) !== rowHasData(b)) return rowHasData(a) ? a : b;
+  return a;                                                  // tie → keep local
+}
+function mergeWeekRows(localRows, remoteRows) {
+  const local  = Array.isArray(localRows)  ? localRows  : [];
+  const remote = Array.isArray(remoteRows) ? remoteRows : [];
+  const byRep = new Map();
+  const order = [];
+  const add = (r) => {
+    if (!r) return;
+    const key = (r.rep || '') + '';
+    if (!byRep.has(key)) { byRep.set(key, r); order.push(key); }
+    else byRep.set(key, pickRow(byRep.get(key), r));
+  };
+  remote.forEach(add);   // seed with remote …
+  local.forEach(add);    // … then let local contest each rep slot
+  return order.map(k => byRep.get(k));
+}
+function mergeData(localData, remoteData) {
+  const out = {};
+  const months = new Set([...Object.keys(localData || {}), ...Object.keys(remoteData || {})]);
+  months.forEach(mk => {
+    const lm = (localData  && localData[mk])  || { weeks: [[],[],[],[],[]] };
+    const rm = (remoteData && remoteData[mk]) || { weeks: [[],[],[],[],[]] };
+    const weeks = [];
+    for (let w = 0; w < 5; w++) {
+      weeks.push(mergeWeekRows((lm.weeks && lm.weeks[w]) || [], (rm.weeks && rm.weeks[w]) || []));
+    }
+    out[mk] = Object.assign({}, rm, lm, { weeks });
+  });
+  return out;
+}
+function mergeDemos(localDemos, remoteDemos) {
+  const byId = new Map();
+  const add = (d) => {
+    if (!d || !d.id) return;
+    const ex = byId.get(d.id);
+    if (!ex) { byId.set(d.id, d); return; }
+    byId.set(d.id, rowStamp(d) >= rowStamp(ex) ? d : ex);   // newest updatedAt wins
+  };
+  (Array.isArray(remoteDemos) ? remoteDemos : []).forEach(add);
+  (Array.isArray(localDemos)  ? localDemos  : []).forEach(add);
+  return Array.from(byId.values());
+}
+function mergeEnvelopes(local, remote) {
+  return {
+    data : mergeData(local.data,  remote.data),
+    demos: mergeDemos(local.demos, remote.demos)
+  };
+}
+function buildEnvelope() {
+  return {
+    _envelope: 'oxefit-v1',
+    _meta    : { updatedBy: currentUser || 'unknown', updatedAt: new Date().toISOString() },
+    data     : allData,
+    demos    : (typeof demoEntries !== 'undefined' && Array.isArray(demoEntries)) ? demoEntries : []
+  };
+}
+
+/* ── FETCH → MERGE → UPLOAD (v14.5) ─────────────────────────────────
+   Before writing, we re-read the shared file and merge our in-memory
+   state into it, so concurrent saves by other reps are preserved. ── */
+let _uploadInFlight = false;
+let _uploadQueued   = false;
 async function uploadToOneDrive() {
   if (!msalAccount) return;
+  if (_uploadInFlight) { _uploadQueued = true; return; }  // coalesce rapid saves
+  _uploadInFlight = true;
   try {
     setSyncStatus('syncing');
     const tok = await getAccessToken();
-    const url = `https://graph.microsoft.com/v1.0/me/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
-    const res = await fetch(url, {
+
+    // 1. FETCH current remote (shared drive, with /me fallback).
+    let targetShared = useSharedDrive;
+    try {
+      const r = await fetchRemoteEnvelope(tok);
+      if (r.status === 200) {
+        // 2. MERGE remote into local.
+        const merged = mergeEnvelopes({ data: allData, demos: demoEntries }, r.env);
+        allData     = merged.data;
+        demoEntries = merged.demos;
+        targetShared = r.shared;          // write back to wherever we just read
+        saveLocal();
+        saveDemosLocalOnly();
+      } else if (r.status === 404) {
+        targetShared = r.shared;          // seed a brand-new file there
+      }
+    } catch(mergeErr) {
+      // Non-fatal: if the pre-fetch fails we still attempt the write below
+      // so the rep's data is not lost; it just isn't merge-protected this round.
+      console.warn('Pre-upload merge skipped:', mergeErr);
+    }
+
+    // 3. UPLOAD the unified envelope.
+    const res = await fetch(driveRootUrl(targetShared), {
       method : 'PUT',
       headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' },
-      body   : JSON.stringify(allData)
+      body   : JSON.stringify(buildEnvelope())
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (res.status === 403 && targetShared) {
+      // Lost shared access mid-flight → fall back to /me and retry once.
+      useSharedDrive = false;
+      const res2 = await fetch(driveRootUrl(false), {
+        method : 'PUT',
+        headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' },
+        body   : JSON.stringify(buildEnvelope())
+      });
+      if (!res2.ok) throw new Error('HTTP ' + res2.status + ' (/me)');
+    } else if (!res.ok) {
+      throw new Error('HTTP ' + res.status);
+    }
     setSyncStatus('connected');
+    if (typeof renderAll === 'function') { try { renderAll(); } catch(_) {} }
   } catch(e) {
     console.error('Upload failed', e);
     setSyncStatus('error', 'Sync error');
+  } finally {
+    _uploadInFlight = false;
+    if (_uploadQueued) { _uploadQueued = false; scheduleCloudSync(); }  // flush coalesced save
   }
 }
 
@@ -5995,13 +6197,17 @@ function loadDemos() {
   } catch(e) { demoEntries = []; }
 }
 function saveDemos() {
-  localStorage.setItem(DEMO_STORE_KEY, JSON.stringify(demoEntries));
-  // Best-effort: trigger OneDrive sync of main payload so demos travel with it
+  saveDemosLocalOnly();
+  // v14.5 — demos now travel inside the main shared-drive envelope.
+  // scheduleOneDriveSync() debounces and pushes the unified payload.
   if (typeof scheduleOneDriveSync === 'function') {
     try { scheduleOneDriveSync(); } catch(_) {}
-  } else if (typeof uploadToOneDrive === 'function') {
-    try { uploadToOneDrive(); } catch(_) {}
   }
+}
+// v14.5 — persist demos to localStorage WITHOUT triggering a cloud sync.
+// Used by the merge path (download/upload) to avoid recursive uploads.
+function saveDemosLocalOnly() {
+  localStorage.setItem(DEMO_STORE_KEY, JSON.stringify(demoEntries));
 }
 
 /* ── Week-key helpers (ISO week starting Monday) ─────────────── */
@@ -8277,5 +8483,5 @@ hsLoadTokens();
   // Else: stay on login screen, MSAL is now warm and ready
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a053ef394b47e62f',t:'MTc4MDM3Njg0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
