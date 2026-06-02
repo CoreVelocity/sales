@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 15.2.html · Multi-admin (Sami + Kamal) · rep name fixes (Milena, Hussean) · sharedWithMe resolution · shared-drive integrity
+      version 15.3.html · Rename migration (HubSpot owner-map + goals + history) fixes Milena/Hussean pipeline pull · Multi-admin (Sami + Kamal) · sharedWithMe resolution
     </div>
   </div>
 </div>
@@ -3333,7 +3333,15 @@ const REP_EMAILS = {
   'wafiq@core-velocity.com'   : 'Wafiq',
   'jawdat@core-velocity.com'  : 'Jawdat',
   'hussean@core-velocity.com' : 'Hussean',
-  'connor@core-velocity.com'  : 'Connor'
+  'connor@core-velocity.com'  : 'Connor',
+  // v15.3 — old-spelling UPN aliases. The reps were renamed (display name
+  // Milene→Milena, Hussein→Hussean) but their Microsoft 365 sign-in address
+  // (UPN) may still use the original spelling. These aliases ensure SSO
+  // resolves to the correct rep regardless of which spelling the UPN uses.
+  // Safe to keep permanently; if/when the UPNs are renamed in M365 they
+  // simply go unused. Remove only after confirming the live UPN spellings.
+  'milene@core-velocity.com'  : 'Milena',
+  'hussein@core-velocity.com' : 'Hussean'
 };
 // v13: Office Admin role — Gladys owns the Demo Tracker tab.
 //   - Full CRUD on demo entries
@@ -3548,9 +3556,72 @@ function ensureWeekSeeded(md, w) {
 const STORAGE_KEY = 'oxefit_data_v5';
 
 function saveLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(allData)); }
+
+/* v15.3 — GLOBAL REP-RENAME MIGRATION.
+   A rename (Milene→Milena, Hussein→Hussean) orphans every store that is
+   keyed by rep NAME, not just the HubSpot owner map. This rewrites the old
+   spellings across the entire data object so renamed reps keep:
+     • their historical weekly submissions (row.rep, row.submittedBy)
+     • shared/supporting demo credit (entry.supportReps[])
+     • admin-set monthly targets (perfMeta.goals[ym][rep])
+   It uses RENAMED_REPS (defined near the owner-map loader) as the single
+   source of truth, and returns whether anything changed so callers persist
+   exactly once. Safe to run repeatedly — it's a no-op once migrated. */
+function migrateRenamedRepsInData(data) {
+  if (!data || typeof data !== 'object') return false;
+  let changed = false;
+  const remap = (name) => {
+    if (name && RENAMED_REPS[name]) { changed = true; return RENAMED_REPS[name]; }
+    return name;
+  };
+  // 1. Weekly rows across every month bucket.
+  for (const key of Object.keys(data)) {
+    if (NON_MONTH_KEYS.has(key)) continue;
+    const md = data[key];
+    if (!md || !Array.isArray(md.weeks)) continue;
+    md.weeks.forEach(week => {
+      if (!Array.isArray(week)) return;
+      week.forEach(row => {
+        if (!row) return;
+        if (row.rep)         row.rep         = remap(row.rep);
+        if (row.submittedBy) row.submittedBy = remap(row.submittedBy);
+      });
+    });
+  }
+  // 2. Demo entries with supporting-rep credit (if present in this build).
+  if (Array.isArray(data.demoEntries)) {
+    data.demoEntries.forEach(e => {
+      if (!e) return;
+      if (e.rep) e.rep = remap(e.rep);
+      if (Array.isArray(e.supportReps)) {
+        e.supportReps = e.supportReps.map(remap);
+      }
+    });
+  }
+  // 3. Admin-set monthly goals: perfMeta.goals[ym][rep].
+  if (data.perfMeta && data.perfMeta.goals) {
+    for (const ym of Object.keys(data.perfMeta.goals)) {
+      const bucket = data.perfMeta.goals[ym];
+      if (!bucket) continue;
+      for (const [oldName, newName] of Object.entries(RENAMED_REPS)) {
+        if (bucket[oldName] != null) {
+          if (bucket[newName] == null || bucket[newName] === 0) {
+            bucket[newName] = bucket[oldName];
+          }
+          delete bucket[oldName];
+          changed = true;
+        }
+      }
+    }
+  }
+  return changed;
+}
+
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
+  // Self-heal stale rep names from the v15.2 rename, persist once.
+  if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
 function getMonthData(y,m) {
@@ -3943,6 +4014,7 @@ async function downloadFromOneDrive() {
     );
     allData     = merged.data;
     demoEntries = merged.demos;
+    migrateRenamedRepsInData(allData);   // v15.3 — heal stale names pulled from remote
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -4144,6 +4216,7 @@ async function uploadToOneDrive() {
         const merged = mergeEnvelopes({ data: allData, demos: demoEntries }, r.env);
         allData     = merged.data;
         demoEntries = merged.demos;
+        migrateRenamedRepsInData(allData);   // v15.3 — heal stale names pulled from remote
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -5496,9 +5569,49 @@ const HUBSPOT_OWNERMAP_KEY = 'oxefit_hubspot_ownermap_v1'; // NEW: rep-name -> o
    from a dropdown auto-populated by GET /crm/v3/owners. Persists in
    localStorage as { "Fatima": "12345678", "Marios": "23456789", ... }
    ────────────────────────────────────────────────────────────── */
+/* v15.3 — REP RENAME ALIASES.
+   When a rep is renamed (Milene→Milena, Hussein→Hussean in v15.2), the
+   admin's previously-saved HubSpot owner mapping in localStorage is still
+   keyed under the OLD spelling. The new-spelling lookup misses, falls
+   through to a blank email, and throws "No HubSpot owner mapped" — which
+   is exactly why Milena and Hussean stopped pulling pipeline/closed.
+   This alias map migrates any stale keys to the current names on read,
+   so the admin never has to re-map them. Extend this list for any future
+   rename and the migration is automatic. */
+const RENAMED_REPS = {
+  'Milene'  : 'Milena',
+  'Hussein' : 'Hussean'
+};
+
+/* Rewrites stale rep-name keys (owner-map style { name: ownerId }) to their
+   current spelling. Returns { map, changed } so callers can persist once. */
+function hsMigrateRenamedKeys(map) {
+  let changed = false;
+  const out = Object.assign({}, map || {});
+  for (const [oldName, newName] of Object.entries(RENAMED_REPS)) {
+    if (out[oldName] != null) {
+      // Only adopt the old value if the new key isn't already set, so a
+      // deliberate re-map under the new name always wins.
+      if (out[newName] == null || out[newName] === '') {
+        out[newName] = out[oldName];
+      }
+      delete out[oldName];
+      changed = true;
+    }
+  }
+  return { map: out, changed };
+}
+
 function hsGetOwnerMap() {
-  try { return JSON.parse(localStorage.getItem(HUBSPOT_OWNERMAP_KEY) || '{}'); }
+  let raw;
+  try { raw = JSON.parse(localStorage.getItem(HUBSPOT_OWNERMAP_KEY) || '{}'); }
   catch(_) { return {}; }
+  const { map, changed } = hsMigrateRenamedKeys(raw);
+  // Persist the migration once so the old keys don't linger.
+  if (changed) {
+    try { localStorage.setItem(HUBSPOT_OWNERMAP_KEY, JSON.stringify(map)); } catch(_) {}
+  }
+  return map;
 }
 function hsSaveOwnerMap(map) {
   localStorage.setItem(HUBSPOT_OWNERMAP_KEY, JSON.stringify(map || {}));
