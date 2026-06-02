@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 14.9.html · Live auto-refresh (admin sees submissions automatically)
+      version 15.0.html · Shared-drive integrity · targets visible to reps · HubSpot data reaches reps
     </div>
   </div>
 </div>
@@ -3772,17 +3772,38 @@ async function getAccessToken() {
    is read as { data: <file>, demos: [] }.
 ════════════════════════════════════════════════════════════════════ */
 
-// Resolve the Graph drive-root segment. Prefer the shared drive; the caller
-// falls back to /me if the shared drive returns 403 (access not granted).
+// Resolve the Graph drive-root segment.
+// v15.0 — ALWAYS target the shared drive (demo@core-velocity.com). We no longer
+// fall back to the signed-in user's personal /me drive on 403. That silent
+// fallback was the root cause of "admin can't see submissions": a rep who
+// lacked shared-drive access would quietly write their envelope to their OWN
+// OneDrive, where the admin never reads — so the data was effectively lost.
+// Now an access failure surfaces a loud, actionable error instead.
 function driveRootUrl(useShared) {
-  if (useShared && ONEDRIVE_CONFIG.sharedDriveUser) {
-    return `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(ONEDRIVE_CONFIG.sharedDriveUser)}/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
+  const upn = ONEDRIVE_CONFIG.sharedDriveUser;
+  if (upn) {
+    return `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(upn)}/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
   }
+  // Legacy single-user mode only (no shared drive configured at all).
   return `https://graph.microsoft.com/v1.0/me/drive/root:${ONEDRIVE_CONFIG.filePath}:/content`;
 }
-// Sticky flag: once we learn the shared drive is unreachable we stop retrying
-// it for the rest of the session (avoids a 403 on every keystroke-debounced save).
+// Retained for backward-compat with older call sites; v15.0 never flips it.
 let useSharedDrive = true;
+
+// v15.0 — one-time, prominent notice when a rep's account can't reach the
+// shared drive. Without shared access their data CANNOT be made visible to the
+// admin, so we must tell them rather than silently writing it to /me.
+let _sharedDriveErrorShown = false;
+function showSharedDriveError() {
+  try {
+    setSyncStatus('error', 'No shared-drive access');
+    if (_sharedDriveErrorShown) return;
+    _sharedDriveErrorShown = true;
+    showToast('Your account can\'t reach the shared team drive (demo@core-velocity.com). ' +
+              'Your entry is saved on THIS device but is NOT yet visible to admin. ' +
+              'Ask admin to grant you access to the shared drive, then sign in again.', 'error');
+  } catch(_) {}
+}
 
 // Unwrap whatever is on disk into { data, demos }.
 function parseEnvelope(remote) {
@@ -3798,17 +3819,16 @@ function parseEnvelope(remote) {
 }
 
 async function fetchRemoteEnvelope(tok) {
-  // Try shared drive first (unless already known-bad), then fall back to /me.
-  const attempts = useSharedDrive ? [true, false] : [false];
-  for (const shared of attempts) {
-    const res = await fetch(driveRootUrl(shared), { headers: { Authorization: 'Bearer ' + tok } });
-    if (res.status === 404) return { status: 404, shared };           // no file yet
-    if (res.status === 403 && shared) { useSharedDrive = false; continue; } // no shared access → fall back
-    if (!res.ok) throw new Error('HTTP ' + res.status + (shared ? ' (shared)' : ' (/me)'));
-    const json = await res.json();
-    return { status: 200, shared, env: parseEnvelope(json) };
-  }
-  return { status: 404, shared: false };
+  // v15.0 — SHARED DRIVE ONLY. No /me fallback. A 403 here means the rep's
+  // account isn't allowed on the shared drive; we raise a typed error so the
+  // caller can show a clear message instead of silently writing data to a
+  // personal drive the admin never reads.
+  const res = await fetch(driveRootUrl(true), { headers: { Authorization: 'Bearer ' + tok } });
+  if (res.status === 404) return { status: 404, shared: true };       // no file yet
+  if (res.status === 403) { const e = new Error('shared-drive-403'); e.code = 403; throw e; }
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' (shared)');
+  const json = await res.json();
+  return { status: 200, shared: true, env: parseEnvelope(json) };
 }
 
 async function downloadFromOneDrive() {
@@ -3838,6 +3858,7 @@ async function downloadFromOneDrive() {
     setSyncStatus('connected');
   } catch(e) {
     console.error('Download failed', e);
+    if (e && e.code === 403) { showSharedDriveError(); return; }   // v15.0
     setSyncStatus('error', 'Sync error');
   }
 }
@@ -3862,6 +3883,30 @@ function rowHasData(r) {
                   r.commitText  || r.bestCaseText  || r.commitAction  ||
                   r.blocked     || r.forecastXS1   || r.forecastXP1   ||
                   r.notes       || r.closedWon));
+}
+// v15.0 — CRM fields (Closed Won + Total Pipeline) are owned by HubSpot and
+// written by the admin's "Sync All Reps". They live on the SAME row identity as
+// a rep's manual Commit/BestCase entry. Because pickRow swaps WHOLE rows, the
+// winning side (e.g. a rep's freshly-edited but CRM-less row) would otherwise
+// erase the admin's CRM numbers — so reps never see their pipeline/closed.
+// Fix: after choosing the surviving row, overlay the freshest CRM-sourced
+// fields from whichever side synced most recently.
+function hsStamp(r) {
+  const t = r && r.hubspotSyncedAt ? Date.parse(r.hubspotSyncedAt) : 0;
+  return isNaN(t) ? 0 : t;
+}
+function overlayCrmFields(winner, a, b) {
+  // Pick the row with the most recent HubSpot sync as the CRM source of truth.
+  const src = hsStamp(a) >= hsStamp(b) ? a : b;
+  if (!src || !src.hubspotSynced || hsStamp(src) === 0) return winner;
+  if (winner === src) return winner;            // winner already holds latest CRM data
+  // Clone so we don't mutate either input row, then overlay CRM-owned fields.
+  const merged = { ...winner };
+  merged.closedWon       = src.closedWon;
+  merged.truePipeline    = src.truePipeline;
+  merged.hubspotSynced   = true;
+  merged.hubspotSyncedAt = src.hubspotSyncedAt;
+  return merged;
 }
 function pickRow(a, b) {
   // Return whichever row should survive the merge (either may be undefined).
@@ -3893,16 +3938,56 @@ function mergeWeekRows(localRows, remoteRows) {
     if (!r) return;
     const key = (r.rep || '') + '';
     if (!byRep.has(key)) { byRep.set(key, r); order.push(key); }
-    else byRep.set(key, pickRow(byRep.get(key), r));
+    else {
+      const prev = byRep.get(key);
+      const winner = pickRow(prev, r);
+      byRep.set(key, overlayCrmFields(winner, prev, r));   // v15.0 — preserve CRM fields
+    }
   };
   remote.forEach(add);   // seed with remote …
   local.forEach(add);    // … then let local contest each rep slot
   return order.map(k => byRep.get(k));
 }
+// v15.0 — keys under allData that are NOT month buckets and must be merged
+// with their own logic (never run through the weeks[] month merge).
+const NON_MONTH_KEYS = new Set(['perfMeta']);
+
+/* v15.0 — Merge admin-managed goals/thresholds (allData.perfMeta).
+   ROOT CAUSE of "reps can't see the targets admin set": the old mergeData ran
+   Object.assign({}, rm, lm, {weeks}) over EVERY top-level key, including
+   perfMeta. A rep's browser has an EMPTY local perfMeta (lm), so it overrode
+   the admin's real REMOTE perfMeta (rm) — and worse, injected a bogus weeks[]
+   array onto it. Result: goals set by admin never reached reps.
+
+   Fix: perfMeta is admin-owned. We deep-merge goals/thresholds and let the
+   side that actually HAS data win per key, with a perfMeta.updatedAt
+   tie-break so the most recent admin edit propagates to everyone. */
+function mergePerfMeta(localPM, remotePM) {
+  const l = (localPM  && typeof localPM  === 'object') ? localPM  : null;
+  const r = (remotePM && typeof remotePM === 'object') ? remotePM : null;
+  if (!l) return r;
+  if (!r) return l;
+  const lt = l.updatedAt ? Date.parse(l.updatedAt) : 0;
+  const rt = r.updatedAt ? Date.parse(r.updatedAt) : 0;
+  // Newer side is the base; the older side only fills gaps it uniquely has.
+  const newer = (lt >= rt) ? l : r;
+  const older = (lt >= rt) ? r : l;
+  const out = { ...older, ...newer };
+  // Deep-merge goals so a stale-but-present month from one side isn't lost.
+  out.goals = { ...(older.goals || {}), ...(newer.goals || {}) };
+  Object.keys(out.goals).forEach(mk => {
+    out.goals[mk] = { ...((older.goals || {})[mk] || {}), ...((newer.goals || {})[mk] || {}) };
+  });
+  out.thresholds = newer.thresholds || older.thresholds || { ...PERF_THRESH_DEFAULT };
+  out.updatedAt  = (lt >= rt ? l.updatedAt : r.updatedAt) || new Date().toISOString();
+  return out;
+}
+
 function mergeData(localData, remoteData) {
   const out = {};
   const months = new Set([...Object.keys(localData || {}), ...Object.keys(remoteData || {})]);
   months.forEach(mk => {
+    if (NON_MONTH_KEYS.has(mk)) return;   // v15.0 — handled separately below
     const lm = (localData  && localData[mk])  || { weeks: [[],[],[],[],[]] };
     const rm = (remoteData && remoteData[mk]) || { weeks: [[],[],[],[],[]] };
     const weeks = [];
@@ -3911,6 +3996,12 @@ function mergeData(localData, remoteData) {
     }
     out[mk] = Object.assign({}, rm, lm, { weeks });
   });
+  // v15.0 — merge admin-owned perfMeta with dedicated logic.
+  const pm = mergePerfMeta(
+    localData  ? localData.perfMeta  : null,
+    remoteData ? remoteData.perfMeta : null
+  );
+  if (pm) out.perfMeta = pm;
   return out;
 }
 function mergeDemos(localDemos, remoteDemos) {
@@ -3953,8 +4044,7 @@ async function uploadToOneDrive() {
     setSyncStatus('syncing');
     const tok = await getAccessToken();
 
-    // 1. FETCH current remote (shared drive, with /me fallback).
-    let targetShared = useSharedDrive;
+    // 1. FETCH current remote (SHARED DRIVE ONLY — v15.0, no /me fallback).
     try {
       const r = await fetchRemoteEnvelope(tok);
       if (r.status === 200) {
@@ -3962,36 +4052,33 @@ async function uploadToOneDrive() {
         const merged = mergeEnvelopes({ data: allData, demos: demoEntries }, r.env);
         allData     = merged.data;
         demoEntries = merged.demos;
-        targetShared = r.shared;          // write back to wherever we just read
         saveLocal();
         saveDemosLocalOnly();
-      } else if (r.status === 404) {
-        targetShared = r.shared;          // seed a brand-new file there
       }
+      // r.status === 404 → no file yet; the PUT below seeds it on the shared drive.
     } catch(mergeErr) {
-      // Non-fatal: if the pre-fetch fails we still attempt the write below
-      // so the rep's data is not lost; it just isn't merge-protected this round.
+      // v15.0 — a 403 here is FATAL for visibility: writing to /me would hide
+      // the data from admin. Abort the upload and tell the rep loudly.
+      if (mergeErr && mergeErr.code === 403) { showSharedDriveError(); return; }
+      // Any other pre-fetch error is non-fatal; still attempt the write below
+      // so the rep's data isn't lost (it just isn't merge-protected this round).
       console.warn('Pre-upload merge skipped:', mergeErr);
     }
 
-    // 3. UPLOAD the unified envelope.
-    const res = await fetch(driveRootUrl(targetShared), {
+    // 3. UPLOAD the unified envelope to the SHARED drive.
+    const res = await fetch(driveRootUrl(true), {
       method : 'PUT',
       headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' },
       body   : JSON.stringify(buildEnvelope())
     });
-    if (res.status === 403 && targetShared) {
-      // Lost shared access mid-flight → fall back to /me and retry once.
-      useSharedDrive = false;
-      const res2 = await fetch(driveRootUrl(false), {
-        method : 'PUT',
-        headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' },
-        body   : JSON.stringify(buildEnvelope())
-      });
-      if (!res2.ok) throw new Error('HTTP ' + res2.status + ' (/me)');
+    if (res.status === 403) {
+      // v15.0 — NO /me fallback. Surface the access problem instead of hiding data.
+      showSharedDriveError();
+      return;
     } else if (!res.ok) {
       throw new Error('HTTP ' + res.status);
     }
+    _sharedDriveErrorShown = false;   // recovered — allow a fresh notice if it breaks again
     setSyncStatus('connected');
     // v14.7 — Do NOT re-render the grid while a rep is mid-keystroke; a
     // renderAll() here rebuilds every <input>, drops focus, and looks like the
@@ -5959,6 +6046,7 @@ function hubspotApplyCrmTotalsForRep(repName, dealsForRep) {
       curRow.truePipeline   = truePipeline;
       curRow.hubspotSynced  = true;
       curRow.hubspotSyncedAt= nowIso;
+      curRow.updatedAt      = nowIso;   // v15.0 — stamp so CRM data survives the merge
     }
   }
 
@@ -6013,8 +6101,9 @@ function hubspotApplyCrmTotalsForRep(repName, dealsForRep) {
         tr.closedWon       = wonTotal;
         tr.hubspotSynced   = true;
         tr.hubspotSyncedAt = nowIso;
+        tr.updatedAt       = nowIso;   // v15.0 — stamp so CRM data survives the merge
       } else {
-        if (tr.hubspotSynced) tr.closedWon = 0;
+        if (tr.hubspotSynced) { tr.closedWon = 0; tr.updatedAt = nowIso; }
       }
     }
     if (wonTotal > 0) writtenCount++;
@@ -7775,6 +7864,7 @@ function setGoal(year, month, rep, value) {
   const k = `${year}-${month}`;
   if (!perfMeta().goals[k]) perfMeta().goals[k] = {};
   perfMeta().goals[k][rep] = Number(value) || 0;
+  perfMeta().updatedAt = new Date().toISOString();   // v15.0 — propagate to reps via merge
 }
 function getThresh() {
   const t = perfMeta().thresholds;
@@ -8500,6 +8590,7 @@ function saveThresh() {
   const a = parseFloat(document.getElementById('threshAmber').value);
   if (isNaN(g) || isNaN(a) || g <= a) { showToast('Healthy must be greater than Watch', 'error'); return; }
   perfMeta().thresholds = { green: g, amber: a };
+  perfMeta().updatedAt  = new Date().toISOString();   // v15.0 — propagate to reps via merge
   saveAll();
   closeThreshModal();
   showToast('Thresholds saved', 'success');
