@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 15.1.html · Robust sharedWithMe resolution · shared-drive integrity · targets visible to reps · HubSpot data reaches reps
+      version 15.2.html · Multi-admin (Sami + Kamal) · rep name fixes (Milena, Hussean) · sharedWithMe resolution · shared-drive integrity
     </div>
   </div>
 </div>
@@ -3052,7 +3052,7 @@
           <strong>v13.8 — Shared demo credit.</strong> Many demos are joint efforts: one rep books the meeting, another runs the technical demonstration on-site. When Gladys logs a demo, she now picks a <em>primary rep</em> AND optionally tags <em>supporting reps</em>. Every credited rep gets the demo counted toward their Demo Effectiveness score, their Demo Tracker rep card, and the KPI strip — the demo itself is still one row in the log, but it powers multiple reps' scores. Supporting credits are shown as <span style="color:#a855f7;">+ Rep Name</span> chips under the primary in the log table, and as a <span style="color:#a855f7;">(+N supporting)</span> badge on the rep card. The <strong>Edit</strong> and <strong>Delete</strong> actions are now full text buttons in the Actions column (no more guessing what the 🗑 icon does).
         </div>
         <div class="gd-example">
-          <div class="gd-example-head">📌 Worked Example A — Milene (hits goal, decent demos)</div>
+          <div class="gd-example-head">📌 Worked Example A — Milena (hits goal, decent demos)</div>
           <ul>
             <li>Goal attainment 95%, Forecast accuracy 88%, PCR 3.2× (green 4.0×)</li>
             <li>1-month period · 5 demos run · 3 converted · 1 lost · 1 pending</li>
@@ -3081,7 +3081,7 @@
             <li><code>overGoal = 0.18 → closerBonus = min(10, 0.18×50) = <strong>+9</strong></code></li>
             <li><code>score = min(100, round(89.95 + 9)) = <strong>99 → Excellent</strong></code></li>
           </ul>
-          <p class="gd-fineprint" style="margin-top:8px;">Hasan stays at the top — he closed past goal AND he's feeding the funnel. The Closer Bonus still does the heavy lifting that puts him over Milene.</p>
+          <p class="gd-fineprint" style="margin-top:8px;">Hasan stays at the top — he closed past goal AND he's feeding the funnel. The Closer Bonus still does the heavy lifting that puts him over Milena.</p>
         </div>
         <div class="gd-example">
           <div class="gd-example-head">📌 Worked Example C — Connor (misses goal, accurate, no demos)</div>
@@ -3302,8 +3302,8 @@ const GDRIVE_CONFIG = {
    USER / TEAM CONFIGURATION  ── (REQUIREMENT B)
 ════════════════════════════════════════ */
 const TEAMS = {
-  'Dubai':     ['Fatima', 'Marios', 'Hasan', 'Katy', 'Milene'],
-  'Abu Dhabi': ['Wafiq', 'Jawdat', 'Hussein', 'Connor']
+  'Dubai':     ['Fatima', 'Marios', 'Hasan', 'Katy', 'Milena'],
+  'Abu Dhabi': ['Wafiq', 'Jawdat', 'Hussean', 'Connor']
 };
 const ALL_REPS = Object.values(TEAMS).flat();
 
@@ -3317,8 +3317,10 @@ const ALL_REPS = Object.values(TEAMS).flat();
    "your Microsoft account is not authorized" message.
    ──────────────────────────────────────────────────────────────── */
 const REP_EMAILS = {
-  // Admin
+  // Admins
   'ahmed@core-velocity.com'   : 'Ahmed',
+  'sami@core-velocity.com'    : 'Sami',
+  'kamal@core-velocity.com'   : 'Kamal',
   // Office Admin (v13 — owns Demo Tracker)
   'gladys@core-velocity.com'  : 'Gladys',
   // Dubai team
@@ -3326,11 +3328,11 @@ const REP_EMAILS = {
   'marios@core-velocity.com'  : 'Marios',
   'hasan@core-velocity.com'   : 'Hasan',
   'katy@core-velocity.com'    : 'Katy',
-  'milene@core-velocity.com'  : 'Milene',
+  'milena@core-velocity.com'  : 'Milena',
   // Abu Dhabi team
   'wafiq@core-velocity.com'   : 'Wafiq',
   'jawdat@core-velocity.com'  : 'Jawdat',
-  'hussein@core-velocity.com' : 'Hussein',
+  'hussean@core-velocity.com' : 'Hussean',
   'connor@core-velocity.com'  : 'Connor'
 };
 // v13: Office Admin role — Gladys owns the Demo Tracker tab.
@@ -3351,6 +3353,11 @@ function lookupRepByEmail(email) {
 // All other reps & viewers self-register their own password on first login.
 // Passwords are stored as SHA-256 hashes in localStorage (key: oxefit_pw_hashes_v1).
 const ADMIN_USER  = 'Ahmed';
+// v15.2 — multiple admins. Ahmed remains the primary (hard-coded password)
+// admin; Sami and Kamal are added as full admins. Anyone in this set gets the
+// 'admin' role on login. Keep ADMIN_USER for the hard-coded password path.
+const ADMIN_USERS = ['Ahmed', 'Sami', 'Kamal'];
+function isAdminUser(name) { return ADMIN_USERS.includes(name); }
 const ADMIN_PASS  = 'Liverp00l';
 const PW_STORE_KEY = 'oxefit_pw_hashes_v1';
 const MIN_PW_LEN   = 8;
@@ -3641,7 +3648,7 @@ async function initOneDrive(opts) {
           return null;
         }
         currentUser = repName;
-        currentRole = (repName === ADMIN_USER) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
+        currentRole = isAdminUser(repName) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
         sessionStorage.setItem('oxefit_role',  currentRole);
         sessionStorage.setItem('oxefit_user',  currentUser);
         sessionStorage.setItem('oxefit_email', email);
@@ -4342,7 +4349,7 @@ async function handleMicrosoftLogin() {
     // Set session
     msalAccount  = account;
     currentUser  = repName;
-    currentRole  = (repName === ADMIN_USER) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
+    currentRole  = isAdminUser(repName) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
 
     sessionStorage.setItem('oxefit_role', currentRole);
     sessionStorage.setItem('oxefit_user', currentUser);
@@ -5475,8 +5482,8 @@ const HUBSPOT_CONFIG = {
   // Map of OXEFIT rep name -> HubSpot user email (used to resolve owner_id)
   repEmails   : {
     'Ahmed'  : '',
-    'Fatima' : '',  'Marios'  : '',  'Hasan'  : '',  'Katy'    : '',  'Milene' : '',
-    'Wafiq'  : '',  'Jawdat'  : '',  'Hussein': '',  'Connor'  : ''
+    'Fatima' : '',  'Marios'  : '',  'Hasan'  : '',  'Katy'    : '',  'Milena' : '',
+    'Wafiq'  : '',  'Jawdat'  : '',  'Hussean': '',  'Connor'  : ''
   }
 };
 const HUBSPOT_TOKEN_KEY  = 'oxefit_hubspot_pat_v1';
@@ -8738,7 +8745,7 @@ hsLoadTokens();
     if (repName) {
       msalAccount = redirectAccount;
       currentUser = repName;
-      currentRole = (repName === ADMIN_USER) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
+      currentRole = isAdminUser(repName) ? 'admin' : (repName === OFFICE_ADMIN) ? 'office' : 'rep';
       sessionStorage.setItem('oxefit_role', currentRole);
       sessionStorage.setItem('oxefit_user', currentUser);
       sessionStorage.setItem('oxefit_email', email);
