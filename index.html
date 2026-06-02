@@ -2145,7 +2145,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 15.3.html · Rename migration (HubSpot owner-map + goals + history) fixes Milena/Hussean pipeline pull · Multi-admin (Sami + Kamal) · sharedWithMe resolution
+      version 15.5.html · HubSpot hardening: token obfuscation · read-only scope guard · rep UX chip · stale-token auto-recover · Shared HubSpot connection · Rename migration · Multi-admin (Sami + Kamal)
     </div>
   </div>
 </div>
@@ -3955,11 +3955,12 @@ function parseEnvelope(remote) {
     return {
       data : (remote.data && typeof remote.data === 'object') ? remote.data : {},
       demos: Array.isArray(remote.demos) ? remote.demos : [],
+      hubspot: (remote.hubspot && typeof remote.hubspot === 'object') ? remote.hubspot : null, // v15.4
       meta : remote._meta || null
     };
   }
   // Legacy bare month-keyed object → treat as data, no demos.
-  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], meta: null };
+  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], hubspot: null, meta: null };
 }
 
 async function fetchRemoteEnvelope(tok) {
@@ -4015,6 +4016,9 @@ async function downloadFromOneDrive() {
     allData     = merged.data;
     demoEntries = merged.demos;
     migrateRenamedRepsInData(allData);   // v15.3 — heal stale names pulled from remote
+    // v15.4 — adopt the admin's shared HubSpot connection (token + proxy +
+    // owner map) so this rep can open the deal-picker for their own row.
+    if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -4187,12 +4191,21 @@ function mergeEnvelopes(local, remote) {
   };
 }
 function buildEnvelope() {
-  return {
+  const env = {
     _envelope: 'oxefit-v1',
     _meta    : { updatedBy: currentUser || 'unknown', updatedAt: new Date().toISOString() },
     data     : allData,
     demos    : (typeof demoEntries !== 'undefined' && Array.isArray(demoEntries)) ? demoEntries : []
   };
+  // v15.4 — ride the admin's HubSpot connection along so reps inherit it.
+  // hsBuildSharedConfig() returns null when there's no token, so a rep who
+  // hasn't received a connection yet never wipes the admin's block: we only
+  // attach our own when we actually hold a token, and the merge below
+  // preserves the remote block otherwise.
+  const hs = (typeof hsBuildSharedConfig === 'function') ? hsBuildSharedConfig() : null;
+  if (hs) env.hubspot = hs;
+  else if (_lastRemoteHubspot) env.hubspot = _lastRemoteHubspot; // preserve admin's block on rep writes
+  return env;
 }
 
 /* ── FETCH → MERGE → UPLOAD (v14.5) ─────────────────────────────────
@@ -4217,6 +4230,10 @@ async function uploadToOneDrive() {
         allData     = merged.data;
         demoEntries = merged.demos;
         migrateRenamedRepsInData(allData);   // v15.3 — heal stale names pulled from remote
+        // v15.4 — capture/adopt the shared HubSpot block before we re-upload so
+        // (a) reps inherit the admin connection, and (b) a rep's own upload
+        // re-emits the admin's block instead of dropping it.
+        if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -5637,6 +5654,112 @@ function hsSaveProxyBase(v) {
   if (clean) localStorage.setItem(HUBSPOT_PROXY_KEY, clean);
   else       localStorage.removeItem(HUBSPOT_PROXY_KEY);
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   v15.4 — SHARED HUBSPOT CONNECTION (reps inherit the admin connection)
+   v15.5 — SECURITY HARDENING + UX POLISH
+   ────────────────────────────────────────────────────────────────────
+   PROBLEM (v15.4): the HubSpot Private-App token, the CORS-proxy URL, and the
+   rep→ownerId map all lived ONLY in the admin's browser localStorage.
+   A rep signing in on their own laptop had hsIsConnected() === false,
+   so hubspotConnectOrSync() short-circuited with "Only admin can connect
+   HubSpot" and they could never open their deal-picker — pipeline and
+   closed stayed blank for them.
+
+   FIX (v15.4): piggyback the connection inside the SAME shared OneDrive
+   envelope the team already syncs. The admin's token travels with the data;
+   every rep HYDRATES it on sync via hsIngestSharedConfig(). Reps never type a
+   token, never see the admin's settings panel — they just inherit a live
+   connection and open the picker for their OWN row.
+
+   v15.5 IMPROVEMENTS:
+   1. TOKEN OBFUSCATION — the PAT in the JSON envelope is now base64-encoded
+      (_v:2) via _hsObfuscate/_hsDeobfuscate. Backwards-compatible: plain
+      _v:1 tokens from v15.4 are still ingested correctly.
+   2. SCOPE GUARD — after a successful token test, the admin's /integrations/v1/me
+      response is scanned for write-capable scopes. A dismissible yellow warning
+      is shown inside the modal if any are found.
+   3. REP UX CHIP — reps see "HubSpot (shared)" (not "HubSpot Connected") with
+      a tooltip naming the admin who shared the connection.
+   4. STALE-TOKEN AUTO-RECOVERY — on a 401, reps automatically re-pull the
+      shared file once and retry. Admins receive a "reconnect" prompt instead.
+      Loop guard (_hsRetryingAfter401) prevents infinite recursion.
+
+   SECURITY NOTE: the PAT (base64-encoded) is readable by anyone with the
+   shared-drive permission — the same boundary as the rest of the sales data.
+   Scope the Private App to read-only deal/owner scopes only.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* v15.5 — tiny obfuscation helpers.
+   We use base64 (btoa/atob) to keep the raw PAT string out of the JSON
+   at rest in the OneDrive file. This is NOT encryption — it only prevents
+   a casual glance from exposing the token. The real security boundary is
+   the OneDrive permission model (only team members with the shared-drive
+   access can download the file). */
+function _hsObfuscate(str) {
+  try { return btoa(unescape(encodeURIComponent(str))); }
+  catch(_) { return str; }  // fall back to plain if btoa fails (shouldn't happen)
+}
+function _hsDeobfuscate(str) {
+  if (!str) return '';
+  // Detect whether the value looks like base64 (no spaces, chars in [A-Za-z0-9+/=])
+  // to stay backwards-compatible with any plain-text tokens stored by v15.4.
+  const looksEncoded = /^[A-Za-z0-9+/=]+$/.test(str) && str.length > 20;
+  if (!looksEncoded) return str;   // v15.4 or earlier: return as-is
+  try { return decodeURIComponent(escape(atob(str))); }
+  catch(_) { return str; }  // if decode fails, treat as plain
+}
+
+/* Admin-side: serialise the connection so it can ride in the envelope.
+   Only emit a block when there is actually a token to share. */
+function hsBuildSharedConfig() {
+  const token = (hubspotState.accessToken || '').trim();
+  if (!token) return null;                 // nothing to share → omit the key entirely
+  return {
+    _v       : 2,                          // v15.5: token is now base64-obfuscated
+    token    : _hsObfuscate(token),
+    proxyBase: hsGetProxyBase() || '',
+    ownerMap : hsGetOwnerMap() || {},      // already rename-migrated on read
+    sharedBy : currentUser || 'admin',
+    sharedAt : new Date().toISOString()
+  };
+}
+
+/* Rep-side: adopt the admin's connection from an envelope's hubspot block.
+   Idempotent and safe for the admin too (writing the same values back).
+   Returns true if anything changed so callers can refresh the chip once. */
+function hsIngestSharedConfig(hs) {
+  if (!hs || typeof hs !== 'object') return false;
+  // v15.5: deobfuscate token regardless of _v (backwards-compatible with _v:1)
+  const incoming = _hsDeobfuscate(String(hs.token || '').trim());
+  if (!incoming) return false;
+  let changed = false;
+
+  // 1. Token — hydrate (or refresh) the rep's connection.
+  if (incoming !== (hubspotState.accessToken || '')) {
+    hsSaveToken(incoming);                 // persists to localStorage + in-memory
+    changed = true;
+  }
+  // 2. Proxy base — reps MUST use the admin's worker URL or fetches CORS-fail.
+  if (hs.proxyBase && hs.proxyBase !== hsGetProxyBase()) {
+    hsSaveProxyBase(hs.proxyBase);
+    changed = true;
+  }
+  // 3. Owner map — merge admin's rep→ownerId so the rep resolves their own id.
+  //    Don't clobber a locally-set id; the shared map fills gaps.
+  if (hs.ownerMap && typeof hs.ownerMap === 'object') {
+    const cur = hsGetOwnerMap();
+    let mapChanged = false;
+    for (const [rep, id] of Object.entries(hs.ownerMap)) {
+      if (id && cur[rep] !== id && !cur[rep]) { cur[rep] = id; mapChanged = true; }
+    }
+    if (mapChanged) { hsSaveOwnerMap(cur); changed = true; }
+  }
+  if (changed && typeof renderHubspotChip === 'function') {
+    try { renderHubspotChip(); } catch(_) {}
+  }
+  return changed;
+}
 function hsBuildUrl(path) {
   // path is "/crm/v3/..." -> proxyBase + path  (Worker rewrites to api.hubapi.com)
   const base = hsGetProxyBase();
@@ -5649,6 +5772,11 @@ let hubspotState = {
   fetchedDeals: [],
   selected    : new Set()
 };
+
+// v15.4 — last HubSpot block seen on the shared drive. A rep (no token of
+// their own) re-emits this on upload so their write never strips the admin's
+// shared connection out of the envelope.
+let _lastRemoteHubspot = null;
 
 function hsLoadTokens() {
   try {
@@ -5677,10 +5805,26 @@ function renderHubspotChip() {
   if (!chip || !txt) return;
   if (hsIsConnected()) {
     chip.classList.add('connected');
-    txt.textContent = 'HubSpot Connected';
+    // v15.5 — reps see "HubSpot (shared)" with a tooltip so they understand
+    // the connection comes from the admin, not from something they set up.
+    if (currentRole === 'admin') {
+      txt.textContent = 'HubSpot Connected';
+      chip.title = 'Connected — this token is shared with all reps automatically.';
+    } else {
+      txt.textContent = 'HubSpot (shared)';
+      const sharedBy = (_lastRemoteHubspot && _lastRemoteHubspot.sharedBy) ? _lastRemoteHubspot.sharedBy : 'admin';
+      chip.title = 'HubSpot connection inherited from ' + sharedBy + '. Click to open your deal picker.';
+    }
   } else {
     chip.classList.remove('connected');
-    txt.textContent = 'Connect HubSpot';
+    chip.title = '';
+    if (currentRole === 'admin') {
+      txt.textContent = 'Connect HubSpot';
+    } else {
+      // v15.5 — friendly label so reps don't try to paste a token themselves
+      txt.textContent = 'HubSpot (not synced)';
+      chip.title = 'HubSpot connection not yet received. Click to fetch the shared connection from OneDrive.';
+    }
   }
   // version12.1: Sync All chip visible only to admin while connected
   const allChip = document.getElementById('hubspotSyncAllChip');
@@ -5700,11 +5844,40 @@ function hubspotConnectOrSync() {
       openHubspotModal();
     }
   } else {
+    // v15.4 — a rep is no longer told "only admin can connect". Reps inherit the
+    // admin's connection through the shared OneDrive envelope. If the chip is
+    // still showing disconnected, the shared block just hasn't arrived yet —
+    // pull the shared file once and, if a connection comes down, open the
+    // picker straight away. Only a truly absent admin connection shows a hint.
     if (currentRole !== 'admin') {
-      showToast('Only admin can connect HubSpot', 'error');
+      hubspotRepInheritAndOpen();
       return;
     }
     openHubspotTokenModal();
+  }
+}
+
+/* v15.4 — rep path: force a sync, hydrate the shared HubSpot connection, then
+   open the deal-picker. Replaces the old hard "Only admin can connect" block.
+   v15.5 — improved UX messaging. */
+async function hubspotRepInheritAndOpen() {
+  if (currentRole === 'viewer') { showToast('View-only mode', 'error'); return; }
+  if (!msalAccount) {
+    showToast('Please sign in with Microsoft first — the HubSpot connection is delivered through your OneDrive sync.', 'error');
+    return;
+  }
+  showToast('Fetching shared HubSpot connection…', 'info');
+  try { await downloadFromOneDrive(); } catch(_) {}
+  if (hsIsConnected()) {
+    const sharedBy = (_lastRemoteHubspot && _lastRemoteHubspot.sharedBy) ? _lastRemoteHubspot.sharedBy : 'admin';
+    showToast('Connected via ' + sharedBy + '\'s HubSpot — opening your deals…', 'success');
+    openHubspotModal();
+  } else {
+    showToast(
+      'HubSpot isn\'t set up yet — the admin needs to connect HubSpot once from their device. ' +
+      'After that it syncs to everyone automatically.',
+      'error'
+    );
   }
 }
 
@@ -5908,7 +6081,50 @@ async function hubspotSaveAndTestToken() {
   }
   hsSaveToken(val);
   renderHubspotChip();
-  showToast('HubSpot connected ✓', 'success');
+
+  // v15.5 — READ-ONLY SCOPE GUARD.
+  // After a successful /crm/v3/owners test we do a quick introspection call
+  // to check whether the Private App has write-capable scopes. If it does we
+  // show a dismissible yellow warning so the admin can recreate it with
+  // read-only scopes. This is best-effort — if the introspection endpoint
+  // itself fails we just skip the check silently.
+  (async () => {
+    try {
+      const infoUrl = hsBuildUrl('/integrations/v1/me');
+      if (infoUrl) {
+        const ir = await fetch(infoUrl, { headers: { 'Authorization': 'Bearer ' + val } });
+        if (ir.ok) {
+          const info = await ir.json();
+          const scopes = (info.scopeGroups || []).map(g => g.scopes || []).flat()
+                       .concat(info.scopes || []);
+          const writeScopes = scopes.filter(s =>
+            /write|delete|send|create|update/i.test(String(s))
+          );
+          if (writeScopes.length) {
+            const modal = document.getElementById('hsTokenOverlay');
+            const existing = modal && modal.querySelector('.hs-scope-warn');
+            if (!existing) {
+              const warn = document.createElement('div');
+              warn.className = 'hs-scope-warn';
+              warn.style.cssText = 'margin:12px 0 0;padding:10px 14px;background:rgba(255,193,7,0.12);border:1px solid rgba(255,193,7,0.45);border-radius:8px;font-size:12px;color:#c8a000;line-height:1.5;';
+              warn.innerHTML = '<strong>⚠ Write-capable scopes detected:</strong> ' +
+                escapeHtml(writeScopes.slice(0,5).join(', ')) +
+                '. This token has more access than needed. For best security, recreate the Private App with <strong>read-only</strong> scopes: ' +
+                '<code>crm.objects.deals.read</code>, <code>crm.objects.owners.read</code>, <code>crm.schemas.deals.read</code>. ' +
+                '<a href="#" onclick="this.closest(\'.hs-scope-warn\').remove();return false;" style="color:#c8a000;font-weight:600;">Dismiss</a>';
+              const body = modal && modal.querySelector('.hs-token-body');
+              if (body) body.appendChild(warn);
+            }
+          }
+        }
+      }
+    } catch(_) { /* scope check is best-effort */ }
+  })();
+
+  showToast('HubSpot connected ✓ — sharing the connection with the team', 'success');
+  // v15.4 — push the connection up to the shared OneDrive envelope right away
+  // so every rep inherits the token + proxy + owner map on their next sync.
+  if (msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
   // latest9: keep the modal open and reveal the Owner Mapping panel so
   // the admin can immediately assign reps → HubSpot owners without
   // re-opening the dialog.
@@ -5921,6 +6137,9 @@ function hubspotDisconnect() {
   closeHubspotTokenModal();
   showToast('HubSpot disconnected', 'success');
 }
+
+/* v15.5 — internal flag to avoid infinite re-pull loops */
+let _hsRetryingAfter401 = false;
 
 async function hubspotApi(path, opts = {}) {
   if (!hubspotState.accessToken) throw new Error('HubSpot not connected — click the chip to connect');
@@ -5936,8 +6155,37 @@ async function hubspotApi(path, opts = {}) {
     }
   });
   if (r.status === 401) {
+    // v15.5 — STALE TOKEN AUTO-RECOVERY.
+    // The admin may have rotated the PAT. If the rep is using an inherited
+    // token from the shared envelope, pull the latest file once and retry.
+    // We only attempt this once per call chain (guard flag) to prevent loops.
+    if (!_hsRetryingAfter401 && currentRole !== 'admin' && msalAccount) {
+      _hsRetryingAfter401 = true;
+      try {
+        showToast('HubSpot token may have changed — re-fetching…', 'info');
+        await downloadFromOneDrive();      // re-hydrates via hsIngestSharedConfig
+        if (hubspotState.accessToken) {
+          // retry the original request with the fresh token
+          const r2 = await fetch(url, {
+            ...opts,
+            headers: {
+              'Content-Type' : 'application/json',
+              ...(opts.headers || {}),
+              'Authorization': 'Bearer ' + hubspotState.accessToken
+            }
+          });
+          if (r2.ok) return r2.json();
+          // still failing after re-fetch
+        }
+      } catch(_) { /* fall through to the error below */ }
+      finally { _hsRetryingAfter401 = false; }
+    }
+    // For admins (or if the re-try also failed) — clear and surface the error.
     hsClearTokens(); renderHubspotChip();
-    throw new Error('HubSpot token rejected — reconnect');
+    throw new Error('HubSpot token rejected — ' +
+      (currentRole === 'admin'
+        ? 'reconnect by clicking the chip'
+        : 'ask the admin to reconnect HubSpot; the new token will sync automatically'));
   }
   if (!r.ok) throw new Error('HubSpot ' + r.status + ': ' + await r.text());
   return r.json();
@@ -6078,6 +6326,9 @@ function hsSaveOwnerMapping() {
   hsSaveOwnerMap(map);
   // Re-render to update the green/grey dots
   hsRenderOwnerMappingPanel();
+  // v15.4 — propagate the updated owner map to the shared envelope so reps
+  // resolve their own ownerId without the admin re-mapping on every device.
+  if (msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
   const s = document.getElementById('hsOwnerMapStatus');
   if (s) { s.textContent = '✓ Saved ' + Object.keys(map).length + ' mapping' + (Object.keys(map).length === 1 ? '' : 's') + '.'; s.style.color = '#10b981'; }
   showToast('Owner mapping saved', 'success');
