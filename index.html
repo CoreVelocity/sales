@@ -377,7 +377,11 @@
   }
   .table-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
   .table-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .table-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .table-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tracker-filter-wrap { display: flex; align-items: center; gap: 4px; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 12px; }
+  .tracker-filter-label { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+  .tracker-filter-sel { background: #1e293b; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+  .tracker-filter-sel:focus { outline: none; border-color: #3b82f6; }
   .btn { font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
   .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 2px 12px rgba(37,99,235,0.35); }
   .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
@@ -2842,7 +2846,7 @@
             </tr>
             <tr>
               <td><strong>Buyer Signals</strong></td>
-              <td>6 checkboxes: Budget, Timeline, Champion, Technical Fit, Decision-Maker, Competition Out. Drives the Qualification Score (§4).</td>
+              <td>7 checkboxes: Budget, Timeline, Champion, Demo Completed, Proposal Submitted, Decision-Maker, Competition Out. Drives the Qualification Score (§5).</td>
               <td>Qualification Score</td>
             </tr>
           </tbody>
@@ -2913,10 +2917,11 @@
         <p>Shown in the tracker grid next to each deal row. Combines the buyer-signal checkboxes (60% of the score) with stage progression (40% of the score).</p>
         <div class="gd-formula">
           <div class="gd-formula-lbl">Qualification Score</div>
-          <code>signalsPart  = (checkedSignals ÷ 6) × 60</code><br/>
+          <code>signalsPart  = (checkedSignals ÷ 7) × 60</code><br/>
           <code>stagePart    = (StageWeight ÷ 0.75) × 40</code><br/>
           <code>qualScore    = round( signalsPart + stagePart )</code>
         </div>
+        <p>There are <strong>7 buyer signals</strong> in total: Budget Confirmed, Timeline Defined, Internal Champion, Demo Completed, Proposal Submitted, Decision-Maker Engaged, Competition Eliminated.</p>
         <p>Stage maps to: Qualified → 13.3, Proposal → 26.7, Negotiation → 40.</p>
         <div class="gd-tier-grid">
           <div class="gd-tier hot">
@@ -2935,10 +2940,10 @@
         <div class="gd-example">
           <div class="gd-example-head">📌 Example — Hasan</div>
           <ul>
-            <li>Deal in <strong>Negotiation</strong>, 5 of 6 buyer signals checked.</li>
-            <li><code>signalsPart = (5 ÷ 6) × 60 = 50.0</code></li>
+            <li>Deal in <strong>Negotiation</strong>, 6 of 7 buyer signals checked (all except Proposal Submitted).</li>
+            <li><code>signalsPart = (6 ÷ 7) × 60 ≈ 51.4</code></li>
             <li><code>stagePart   = (0.75 ÷ 0.75) × 40 = 40.0</code></li>
-            <li><code>qualScore   = round(50 + 40) = <strong>90 → HOT</strong></code></li>
+            <li><code>qualScore   = round(51.4 + 40) = <strong>91 → HOT</strong></code></li>
           </ul>
         </div>
       </section>
@@ -3435,14 +3440,15 @@ const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
 const STAGES        = ['Qualified', 'Proposal', 'Negotiation'];
 const STAGE_WEIGHTS = { Qualified: 0.25, Proposal: 0.50, Negotiation: 0.75 };
-const BUYER_SIGNAL_KEYS = ['budget','timeline','champion','technicalFit','decisionMaker','competitorOut'];
+const BUYER_SIGNAL_KEYS = ['budget','timeline','champion','demoCompleted','proposalSubmitted','decisionMaker','competitorOut'];
 const BUYER_SIGNAL_LABELS = {
-  budget:        'Budget Confirmed',
-  timeline:      'Timeline Defined',
-  champion:      'Internal Champion',
-  technicalFit:  'Technical Fit Verified',
-  decisionMaker: 'Decision-Maker Engaged',
-  competitorOut: 'Competition Eliminated'
+  budget:            'Budget Confirmed',
+  timeline:          'Timeline Defined',
+  champion:          'Internal Champion',
+  demoCompleted:     'Demo Completed',
+  proposalSubmitted: 'Proposal Submitted',
+  decisionMaker:     'Decision-Maker Engaged',
+  competitorOut:     'Competition Eliminated'
 };
 const CONF_LEVELS = ['90%','70%','50%','30%'];
 
@@ -3518,6 +3524,9 @@ let curMonth    = new Date().getMonth();
 let curWeek     = 0;
 let modalYear   = curYear;
 let saveTimer   = null;
+// v15.8 — Tracker grid filters (Sales Rep + Team selectors in table header)
+let trackerFilterRep  = '';   // '' = show all; otherwise exact rep name
+let trackerFilterTeam = '';   // '' = show all; 'Dubai' | 'Abu Dhabi'
 // v14.8 — live auto-refresh so a signed-in admin sees team submissions WITHOUT
 // a manual sync click. Previously downloadFromOneDrive() ran only once at login,
 // so anything the team submitted afterward never reached the admin's screen.
@@ -3538,7 +3547,7 @@ const defaultRow = (team, rep) => ({
   commitText:   '',
   commitValue:  '',
   commitAction: '',
-  buyerSignals: { budget:false, timeline:false, champion:false, technicalFit:false, decisionMaker:false, competitorOut:false },
+  buyerSignals: { budget:false, timeline:false, champion:false, demoCompleted:false, proposalSubmitted:false, decisionMaker:false, competitorOut:false },
   bestCaseText: '',
   bestCaseValue:'',
   totalPipeline:'',
@@ -3568,6 +3577,10 @@ function buildDefaultTeamRows() {
   const rows = [];
   Object.entries(TEAMS).forEach(([team, members]) => {
     members.forEach(name => rows.push(defaultRow(team, name)));
+    // v15.8 — Direct Engagement: a standalone admin-only line under Abu Dhabi
+    if (team === 'Abu Dhabi') {
+      rows.push(defaultRow('Abu Dhabi', 'Direct Engagement'));
+    }
   });
   return rows;
 }
@@ -3587,6 +3600,11 @@ function ensureWeekSeeded(md, w) {
         added = true;
       }
     });
+    // v15.8 — ensure Direct Engagement row exists under Abu Dhabi
+    if (team === 'Abu Dhabi' && !existingReps.has('Direct Engagement')) {
+      md.weeks[w].push(defaultRow('Abu Dhabi', 'Direct Engagement'));
+      added = true;
+    }
   });
   return added;
 }
@@ -3658,11 +3676,46 @@ function migrateRenamedRepsInData(data) {
   return changed;
 }
 
+/* v15.8 — BUYER-SIGNAL KEY MIGRATION.
+   v15.7 and earlier used 'technicalFit' as a key; v15.8 renames it to
+   'demoCompleted' and adds 'proposalSubmitted'. This migrates every stored
+   row so existing team data is not lost. Safe to run repeatedly. */
+function migrateBuyerSignalKeys(data) {
+  if (!data || typeof data !== 'object') return false;
+  let changed = false;
+  for (const key of Object.keys(data)) {
+    if (NON_MONTH_KEYS.has(key)) continue;
+    const md = data[key];
+    if (!md || !Array.isArray(md.weeks)) continue;
+    md.weeks.forEach(week => {
+      if (!Array.isArray(week)) return;
+      week.forEach(row => {
+        if (!row || !row.buyerSignals) return;
+        const sig = row.buyerSignals;
+        // Rename technicalFit → demoCompleted
+        if (typeof sig.technicalFit === 'boolean' && typeof sig.demoCompleted === 'undefined') {
+          sig.demoCompleted = sig.technicalFit;
+          delete sig.technicalFit;
+          changed = true;
+        }
+        // Seed proposalSubmitted if missing
+        if (typeof sig.proposalSubmitted === 'undefined') {
+          sig.proposalSubmitted = false;
+          changed = true;
+        }
+      });
+    });
+  }
+  return changed;
+}
+
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
+  // v15.8 — migrate buyer-signal key rename, persist once.
+  if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
 function getMonthData(y,m) {
@@ -4653,6 +4706,11 @@ function fmtNum(n) {
 ════════════════════════════════════════ */
 function canEditRow(row) {
   if (currentRole === 'viewer') return false;
+  // v15.8 — Direct Engagement is editable only by the three admins
+  if (row.rep === 'Direct Engagement') {
+    if (row.locked) return isAdminUser(currentUser);
+    return isAdminUser(currentUser);
+  }
   if (row.locked) return currentRole === 'admin'; // only admin overrides after submission
   if (currentRole === 'admin') return true;
   if (currentRole === 'rep')   return row.rep === currentUser;
@@ -4863,6 +4921,57 @@ function renderTable() {
   expBtn.onclick = exportCSV;
   actDiv.appendChild(expBtn);
 
+  // v15.8 — Filter controls: Team + Sales Rep
+  const filterWrap = document.createElement('div');
+  filterWrap.className = 'tracker-filter-wrap';
+
+  // Team filter
+  const teamLabel = document.createElement('label');
+  teamLabel.className = 'tracker-filter-label';
+  teamLabel.textContent = 'Team:';
+  const teamSel = document.createElement('select');
+  teamSel.className = 'tracker-filter-sel';
+  [['', 'All Teams'], ['Dubai', 'Dubai'], ['Abu Dhabi', 'Abu Dhabi']].forEach(([val, text]) => {
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = text;
+    if (val === trackerFilterTeam) opt.selected = true;
+    teamSel.appendChild(opt);
+  });
+  teamSel.addEventListener('change', () => {
+    trackerFilterTeam = teamSel.value;
+    trackerFilterRep  = '';   // reset rep filter when team changes
+    renderTable();
+  });
+  filterWrap.appendChild(teamLabel);
+  filterWrap.appendChild(teamSel);
+
+  // Sales Rep filter
+  const repLabel = document.createElement('label');
+  repLabel.className = 'tracker-filter-label';
+  repLabel.style.marginLeft = '10px';
+  repLabel.textContent = 'Rep:';
+  const repSel = document.createElement('select');
+  repSel.className = 'tracker-filter-sel';
+  const allReps = Object.entries(TEAMS).flatMap(([team, members]) =>
+    (trackerFilterTeam === '' || team === trackerFilterTeam) ? members : []
+  );
+  // Add Direct Engagement as a filterable pseudo-rep
+  const deOption = 'Direct Engagement';
+  [['', 'All Reps'], ...allReps.map(n => [n, n]), [deOption, deOption]].forEach(([val, text]) => {
+    const opt = document.createElement('option');
+    opt.value = val; opt.textContent = text;
+    if (val === trackerFilterRep) opt.selected = true;
+    repSel.appendChild(opt);
+  });
+  repSel.addEventListener('change', () => {
+    trackerFilterRep = repSel.value;
+    renderTable();
+  });
+  filterWrap.appendChild(repLabel);
+  filterWrap.appendChild(repSel);
+
+  actDiv.appendChild(filterWrap);
+
   // HEADERS
   const thead = document.getElementById('mainThead');
   thead.innerHTML = '';
@@ -4908,6 +5017,22 @@ function renderTable() {
   const rows = getCurWeekRows();
 
   Object.entries(TEAMS).forEach(([teamName, members]) => {
+    // v15.8 — Team filter: skip entire group if a different team is selected
+    if (trackerFilterTeam && teamName !== trackerFilterTeam) return;
+
+    // Determine which members (+ Direct Engagement for Abu Dhabi) are visible
+    const visibleMembers = trackerFilterRep
+      ? members.filter(n => n === trackerFilterRep)
+      : members;
+
+    // Direct Engagement is under Abu Dhabi; include it when no rep filter or
+    // when the filter specifically selects 'Direct Engagement'
+    const showDE = teamName === 'Abu Dhabi' &&
+      (trackerFilterRep === '' || trackerFilterRep === 'Direct Engagement');
+
+    // If nothing in this team matches the active filters, skip the header too
+    if (visibleMembers.length === 0 && !showDE) return;
+
     // Team header row
     const headerTr = document.createElement('tr');
     headerTr.className = 'team-header' + (teamName === 'Abu Dhabi' ? ' abu-dhabi' : '');
@@ -4917,11 +5042,17 @@ function renderTable() {
     headerTr.appendChild(headerTd);
     tbody.appendChild(headerTr);
 
-    // Member rows in original order
-    members.forEach(memberName => {
+    // Member rows in original order (filtered)
+    visibleMembers.forEach(memberName => {
       const ri = rows.findIndex(r => r.rep === memberName);
       if (ri >= 0) renderRow(rows[ri], ri, tbody);
     });
+
+    // Direct Engagement row (Abu Dhabi only, after the member rows)
+    if (showDE) {
+      const deri = rows.findIndex(r => r.rep === 'Direct Engagement');
+      if (deri >= 0) renderRow(rows[deri], deri, tbody);
+    }
   });
 
   renderTotalsRow(rows, tbody, cols.length);
@@ -4963,10 +5094,13 @@ function renderRow(row, ri, tbody) {
   // immediately after Sales Rep. Sourced EXCLUSIVELY from HubSpot (sum of all
   // open deals for the rep). Read-only with HS badge; empty-state prompt
   // when not yet synced.
+  // v15.8 — Direct Engagement has no HubSpot pipeline; show a plain dash.
   {
     const tpTd = document.createElement('td');
     tpTd.className = 'col-closed-bg';
-    if (row.hubspotSynced) {
+    if (row.rep === 'Direct Engagement') {
+      tpTd.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">—</span>';
+    } else if (row.hubspotSynced) {
       const tpVal = parseFloat(row.truePipeline) || 0;
       tpTd.innerHTML = `
         <div class="hs-sourced-cell" title="From HubSpot · open deals · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
@@ -5059,10 +5193,13 @@ function renderRow(row, ri, tbody) {
   // Closed (Win) AED — sourced EXCLUSIVELY from HubSpot. Manual entry is
   // disabled by design. If HubSpot has not been synced yet, show a clear
   // empty-state prompting admin to sync the CRM.
+  // v15.8 — Direct Engagement has no HubSpot closed-won figure; plain dash.
   {
     const cwTd = document.createElement('td');
     cwTd.className = 'col-closed-bg';
-    if (row.hubspotSynced) {
+    if (row.rep === 'Direct Engagement') {
+      cwTd.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">—</span>';
+    } else if (row.hubspotSynced) {
       const cwVal = parseFloat(row.closedWon) || 0;
       cwTd.innerHTML = `
         <div class="hs-sourced-cell" title="From HubSpot · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
@@ -5092,8 +5229,12 @@ function renderRow(row, ri, tbody) {
   tr.appendChild(notesTd);
 
   // Submit / Status
+  // v15.8 — Direct Engagement row has no submit/lock mechanic: admins edit it
+  // freely; it is never locked or submitted like a rep row.
   const subTd = document.createElement('td'); subTd.className = 'submit-cell';
-  if (row.locked) {
+  if (row.rep === 'Direct Engagement') {
+    subTd.innerHTML = '<span class="de-submit-label" style="color:var(--text-muted);font-size:11px;font-style:italic;">Direct Engagement</span>';
+  } else if (row.locked) {
     const when = row.submittedAt ? new Date(row.submittedAt).toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : '';
     subTd.innerHTML = `
       <span class="lock-indicator">
@@ -5305,7 +5446,7 @@ function renderBuyerSignalsCell(td, ri, row, editable) {
 function computeQualScore(row) {
   const sig = ensureBuyerSignals(row);
   const sigCount = BUYER_SIGNAL_KEYS.reduce((s,k)=>s+(sig[k]?1:0),0);
-  const sigPart  = (sigCount / BUYER_SIGNAL_KEYS.length) * 60;     // 0-60
+  const sigPart  = (sigCount / BUYER_SIGNAL_KEYS.length) * 60;     // 0-60 (7 signals in v15.8)
   const stagePart = (STAGE_WEIGHTS[row.stage] || 0) * 40 / 0.75;   // Negotiation(0.75)→40, Proposal→26.7, Qualified→13.3
   const score = Math.round(sigPart + stagePart);
   let tier = 'cold', color = '#f87171';
@@ -5628,7 +5769,7 @@ function exportCSV() {
                    'Commit Deal','Commit Value (AED)','Weighted Forecast (AED)',
                    'Qual Score','Qual Tier',
                    'Buyer: Budget','Buyer: Timeline','Buyer: Champion',
-                   'Buyer: Tech Fit','Buyer: Decision-Maker','Buyer: Comp Out',
+                   'Buyer: Demo Completed','Buyer: Proposal Submitted','Buyer: Decision-Maker','Buyer: Comp Out',
                    'Next Action',
                    'Best Case Deal','Best Case Value (AED)',
                    'Total Forecast (AED)','Closed (Win) AED','Blocked',
@@ -5648,7 +5789,7 @@ function exportCSV() {
       esc(r.commitText),   r.commitValue||0, Math.round(weighted),
       qs.score, esc(qs.tier),
       sig.budget?'Y':'N', sig.timeline?'Y':'N', sig.champion?'Y':'N',
-      sig.technicalFit?'Y':'N', sig.decisionMaker?'Y':'N', sig.competitorOut?'Y':'N',
+      sig.demoCompleted?'Y':'N', sig.proposalSubmitted?'Y':'N', sig.decisionMaker?'Y':'N', sig.competitorOut?'Y':'N',
       esc(r.commitAction),
       esc(r.bestCaseText), r.bestCaseValue||0,
       r.totalPipeline||0,  r.closedWon||0,  esc(r.blocked),
