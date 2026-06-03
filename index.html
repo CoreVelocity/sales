@@ -218,11 +218,11 @@
   }
   .user-name { font-size: 13px; font-weight: 600; }
   .signout-btn {
-    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 8px; color: #fca5a5; font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.18);
+    border-radius: 8px; color: #b91c1c; font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 12px; font-weight: 600; padding: 6px 14px; cursor: pointer; transition: background 0.2s;
   }
-  .signout-btn:hover { background: rgba(239,68,68,0.2); }
+  .signout-btn:hover { background: rgba(220,38,38,0.12); }
 
   /* CLOUD SYNC INDICATOR */
   .sync-chip {
@@ -345,6 +345,7 @@
   .kpi-value.accent  { color: var(--accent-glow); }
   .kpi-value.success { color: var(--success); }
   .kpi-value.gold    { color: var(--gold-light); }
+  #kpiClosedWon.kpi-value.gold { color: #059669; }
   .kpi-value.hot     { color: #f87171; }
   .kpi-value.warm    { color: #fb923c; }
   .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
@@ -390,15 +391,20 @@
 
   /* TEAM SECTION ROW (visual group header inside the table) */
   tr.team-header td {
-    background: linear-gradient(90deg, rgba(37,99,235,0.18), rgba(37,99,235,0.02));
+    background: linear-gradient(90deg, #3a3f4b, #2c313c);
     padding: 8px 14px; font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--accent-glow); border-top: 2px solid rgba(37,99,235,0.4);
+    color: #e2e8f0; border-top: 2px solid #1f242e;
   }
   tr.team-header.abu-dhabi td {
-    background: linear-gradient(90deg, rgba(245,158,11,0.18), rgba(245,158,11,0.02));
-    color: var(--gold-light);
-    border-top-color: rgba(245,158,11,0.4);
+    background: linear-gradient(90deg, #3a3f4b, #2c313c);
+    color: #e2e8f0;
+    border-top-color: #1f242e;
+  }
+  tr.team-header.direct-engagement td {
+    background: linear-gradient(90deg, #3a3f4b, #2c313c);
+    color: #e2e8f0;
+    border-top-color: #1f242e;
   }
 
   .table-wrap { overflow-x: auto; }
@@ -575,8 +581,13 @@
   .commit-card-rows  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .commit-metric-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
   .commit-metric-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
-  .commit-card.abu-dhabi .commit-metric-value { color: var(--gold-light); }
+  .commit-card.abu-dhabi .commit-metric-value { color: #6b21a8; }
+  .commit-card.abu-dhabi { border-left-color: #6b21a8; }
   .commit-card.total     .commit-metric-value { color: var(--success); }
+  /* Closed (Win) values always render green, overriding team tint */
+  .commit-metric-value.won,
+  .commit-card.abu-dhabi .commit-metric-value.won,
+  .commit-card.total .commit-metric-value.won { color: #059669; }
   .commit-card-sub { font-size: 10px; color: var(--text-muted); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .commit-locked-pill  { background: rgba(34,197,94,0.12);  color: #4ade80; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
   .commit-pending-pill { background: rgba(251,191,36,0.12); color: #fbbf24; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
@@ -1146,19 +1157,19 @@
     padding: 0 24px;
   }
   .primary-tab {
-    position: relative; padding: 14px 22px; cursor: pointer;
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 14px;
-    font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+    position: relative; padding: 12px 20px; cursor: pointer;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 12px;
+    font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
     color: var(--text-muted); border: none; background: transparent;
     transition: color 0.15s ease;
   }
   .primary-tab:hover { color: var(--text); }
-  .primary-tab.active { color: #60a5fa; }
+  .primary-tab.active { color: #2563eb; }
   .primary-tab.active::after {
     content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px;
     height: 3px; border-radius: 3px 3px 0 0;
     background: linear-gradient(90deg, var(--accent), var(--accent2));
-    box-shadow: 0 0 18px rgba(37,99,235,0.6);
+    box-shadow: 0 0 8px rgba(37,99,235,0.25);
   }
   .primary-tab-icon {
     display: inline-block; margin-right: 8px; opacity: 0.85;
@@ -1280,16 +1291,16 @@
   .hubspot-chip {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 6px 12px; border-radius: 8px; cursor: pointer;
-    background: rgba(255,122,89,0.08); border: 1px solid rgba(255,122,89,0.3);
-    color: #ff9a7a; font-size: 11px; font-weight: 600;
+    background: rgba(234,88,12,0.06); border: 1px solid rgba(234,88,12,0.22);
+    color: #c2410c; font-size: 11px; font-weight: 600;
     transition: all 0.15s ease;
   }
   .hubspot-chip:hover {
     background: rgba(255,122,89,0.14); border-color: rgba(255,122,89,0.5);
   }
   .hubspot-chip.connected {
-    background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.35);
-    color: #6ee7b7;
+    background: rgba(5,150,105,0.07); border-color: rgba(5,150,105,0.28);
+    color: #047857;
   }
   .hubspot-chip .hs-dot {
     width: 7px; height: 7px; border-radius: 50%; background: #ff7a59;
@@ -2235,7 +2246,7 @@
         <div class="hs-dot"></div>
         <span id="hubspotText">Connect HubSpot</span>
       </div>
-      <div class="hubspot-chip" id="hubspotSyncAllChip" onclick="hubspotSyncAllReps()" title="Pull Closed Won + Open Pipeline for every mapped rep" style="display:none;background:rgba(251,146,60,0.12);border-color:rgba(251,146,60,0.4);">
+      <div class="hubspot-chip" id="hubspotSyncAllChip" onclick="hubspotSyncAllReps()" title="Pull Closed Won + Open Pipeline for every mapped rep" style="display:none;background:rgba(234,88,12,0.07);border-color:rgba(234,88,12,0.25);color:#c2410c;">
         <div class="hs-dot" style="background:#fb923c;box-shadow:0 0 6px #fb923c;"></div>
         <span id="hubspotSyncAllText">Sync All Reps</span>
       </div>
@@ -4834,7 +4845,7 @@ function renderCommitPanel() {
         <div><div class="commit-metric-label">Commit</div><div class="commit-metric-value">AED ${fmtNum(d.commit)||'0'}</div></div>
         <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">AED ${fmtNum(d.forecast)||'0'}</div></div>
         <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">AED ${fmtNum(d.bestCase)||'0'}</div></div>
-        <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value gold">AED ${fmtNum(d.closedWon)||'0'}</div></div>
+        <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value won">AED ${fmtNum(d.closedWon)||'0'}</div></div>
         <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value" style="color:#fb923c;">${d.truePipeline ? 'AED ' + fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? 'AED 0' : '—')}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
@@ -4849,8 +4860,7 @@ function renderCommitPanel() {
   document.getElementById('commitGrid').innerHTML =
     card('dubai',     'Dubai Team',     agg['Dubai'],     TEAMS['Dubai'].length     * 5) +
     card('abu-dhabi', 'Abu Dhabi Team', agg['Abu Dhabi'], TEAMS['Abu Dhabi'].length * 5) +
-    card('direct-engagement', '🤝 Direct Engagement', agg['Direct Engagement'], 5) +
-    card('total',     'Combined Total', total,            (ALL_REPS.length + 1)      * 5);
+    card('total',     'Combined Total', total,            ALL_REPS.length            * 5);
 }
 function renderMonthLabel() {
   document.getElementById('monthLabelBtn').textContent = MONTHS[curMonth] + ' ' + curYear;
