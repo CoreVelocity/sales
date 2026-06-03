@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker</title>
+<title>OXEFIT Sales Commitment Tracker v16.0</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -22,13 +23,13 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap');
 
-  :root {
-    --navy:       #0d1b3e;
-    --navy-mid:   #152550;
-    --navy-light: #1e3370;
-    --accent:     #1a4db5;
+    :root {
+    --navy:       #f0f2f5;
+    --navy-mid:   #f8f9fb;
+    --navy-light: #ffffff;
+    --accent:     #3b82f6;
     --accent2:    #2563eb;
-    --accent-glow:#3b82f6;
+    --accent-glow:#60a5fa;
     --gold:       #f59e0b;
     --gold-light: #fbbf24;
     --success:    #10b981;
@@ -36,35 +37,35 @@
     --warn:       #f59e0b;
     --hot:        #ef4444;
     --warm:       #f97316;
-    --text:       #e2e8f0;
-    --text-muted: #94a3b8;
-    --border:     rgba(255,255,255,0.08);
-    --card:       rgba(255,255,255,0.04);
-    --card-hover: rgba(255,255,255,0.07);
-    --input-bg:   rgba(255,255,255,0.06);
-    --row-even:   rgba(255,255,255,0.02);
-    --row-hover:  rgba(30,100,200,0.15);
-    --shadow:     0 4px 24px rgba(0,0,0,0.5);
+    --text:       #1a202c;
+    --text-muted: #4a5568;
+    --border:     #e2e6ea;
+    --card:       #ffffff;
+    --card-hover: #f1f5f9;
+    --input-bg:   #ffffff;
+    --row-even:   #f9fafb;
+    --row-hover:  #eff6ff;
+    --shadow:     0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--navy);
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #f0f2f5;
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--navy-mid); }
+  ::-webkit-scrollbar-track { background: #f8f9fb; }
   ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
   /* LOGIN */
   #loginScreen {
     position: fixed; inset: 0; z-index: 1000;
-    background: var(--navy);
+    background: #f0f2f5;
     display: flex; align-items: center; justify-content: center;
     flex-direction: column;
   }
@@ -81,17 +82,10 @@
     background: radial-gradient(ellipse, rgba(37,99,235,0.12) 0%, transparent 70%);
     border-radius: 50%;
   }
-  .login-card {
-    position: relative; z-index: 2;
-    background: var(--navy-mid);
-    border: 1px solid rgba(37,99,235,0.3);
-    border-radius: 20px; padding: 48px 52px;
-    width: 100%; max-width: 440px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(37,99,235,0.15);
-  }
+  .login-card { position: relative; z-index: 2; background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 48px 52px; width: 100%; max-width: 440px; box-shadow: var(--shadow); }
   .login-logo-wrap { display: flex; justify-content: center; margin-bottom: 32px; }
   .login-title {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 13px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
     color: var(--text-muted); text-align: center; margin-bottom: 28px;
   }
@@ -102,12 +96,12 @@
   }
   .login-field input, .login-field select {
     width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text); font-family: 'Barlow', sans-serif;
+    border-radius: 10px; color: var(--text); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 15px; padding: 13px 16px; outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .login-field input:focus, .login-field select:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
-  .login-field select option { background: var(--navy-mid); }
+  .login-field select option { background: #f8f9fb; }
   .login-error {
     background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
     border-radius: 8px; color: #fca5a5; font-size: 13px; font-weight: 500;
@@ -116,7 +110,7 @@
   .login-btn {
     width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent2));
     border: none; border-radius: 10px; color: #fff;
-    font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; padding: 14px; cursor: pointer;
     transition: opacity 0.2s, transform 0.1s; box-shadow: 0 4px 20px rgba(37,99,235,0.4);
   }
@@ -163,7 +157,7 @@
     width: 100%; background: transparent;
     border: 1px dashed var(--border); border-radius: 10px;
     color: var(--text-muted);
-    font-family: 'Barlow', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 13px; font-weight: 500;
     padding: 11px 14px; cursor: pointer;
     transition: border-color 0.15s, color 0.15s, background 0.15s;
@@ -195,8 +189,8 @@
   }
 
   /* TOPBAR */
-  .topbar {
-    background: var(--navy-mid); border-bottom: 1px solid var(--border);
+  .topbar { background: #ffffff; border-bottom: 1px solid var(--border); color: var(--text);
+    background: #f8f9fb; border-bottom: 1px solid var(--border);
     padding: 0 28px; height: 64px;
     display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.4);
@@ -204,7 +198,7 @@
   .topbar-logo { display: flex; align-items: center; }
   .topbar-right { display: flex; align-items: center; gap: 16px; }
   .role-badge {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
   }
   .role-badge.admin { background: rgba(30,51,112,0.5); border: 1px solid rgba(37,99,235,0.5); color: #93c5fd; }
@@ -225,7 +219,7 @@
   .user-name { font-size: 13px; font-weight: 600; }
   .signout-btn {
     background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 8px; color: #fca5a5; font-family: 'Barlow', sans-serif;
+    border-radius: 8px; color: #fca5a5; font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 12px; font-weight: 600; padding: 6px 14px; cursor: pointer; transition: background 0.2s;
   }
   .signout-btn:hover { background: rgba(239,68,68,0.2); }
@@ -245,8 +239,8 @@
   .sync-dot.error    { background: var(--danger); }
 
   /* MONTH NAV */
-  .month-nav-bar {
-    background: var(--navy-mid); border-bottom: 1px solid var(--border);
+  .month-nav-bar { background: #ffffff; border-bottom: 1px solid var(--border);
+    background: #f8f9fb; border-bottom: 1px solid var(--border);
     padding: 10px 28px; display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 12px;
   }
@@ -260,7 +254,7 @@
   .month-arrow:hover { background: var(--accent); border-color: var(--accent2); }
   .month-label-btn {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+    color: var(--text); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 17px; font-weight: 700; letter-spacing: 1px;
     padding: 6px 20px; cursor: pointer; transition: background 0.2s;
     min-width: 170px; text-align: center;
@@ -285,7 +279,7 @@
   }
   .modal-backdrop.open { display: flex; }
   .month-picker-modal {
-    background: var(--navy-mid); border: 1px solid rgba(37,99,235,0.3);
+    background: #f8f9fb; border: 1px solid rgba(37,99,235,0.3);
     border-radius: 16px; padding: 28px; width: 340px; box-shadow: var(--shadow);
   }
   .modal-year-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -294,11 +288,11 @@
     color: var(--text); width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px;
   }
-  .modal-year-label { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; }
+  .modal-year-label { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 22px; font-weight: 700; }
   .modal-months-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .modal-month-btn {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    color: var(--text); font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 600;
+    color: var(--text); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 600;
     padding: 10px 4px; cursor: pointer; transition: background 0.2s, border-color 0.2s;
     text-align: center; position: relative;
   }
@@ -311,12 +305,12 @@
 
   /* SUBMIT CONFIRM MODAL */
   .confirm-modal {
-    background: var(--navy-mid); border: 1px solid rgba(245,158,11,0.4);
+    background: #f8f9fb; border: 1px solid rgba(245,158,11,0.4);
     border-radius: 16px; padding: 28px; width: 440px; max-width: 95vw;
     box-shadow: var(--shadow);
   }
   .confirm-modal h3 {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 20px; font-weight: 700;
     margin-bottom: 10px; color: var(--gold-light);
   }
   .confirm-modal p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; }
@@ -334,7 +328,7 @@
   }
   @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
-  .kpi-card {
+  .kpi-card { background: #ffffff; border: 1px solid var(--border); color: var(--text);
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
     padding: 20px 18px; position: relative; overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -347,7 +341,7 @@
   .kpi-card.hot::before { background: linear-gradient(90deg, var(--hot), #f97316); }
   .kpi-card.warm::before { background: linear-gradient(90deg, var(--warm), var(--gold)); }
   .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
-  .kpi-value { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -0.5px; }
+  .kpi-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -0.5px; }
   .kpi-value.accent  { color: var(--accent-glow); }
   .kpi-value.success { color: var(--success); }
   .kpi-value.gold    { color: var(--gold-light); }
@@ -356,10 +350,10 @@
   .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
   /* WEEK TABS */
-  .week-tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .week-tabs { background: #f8f9fb; border-bottom: 1px solid var(--border); display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .week-tab {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    color: var(--text-muted); font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 600;
+    color: var(--text-muted); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 600;
     padding: 8px 16px; cursor: pointer; transition: all 0.2s; position: relative;
   }
   .week-tab:hover { border-color: var(--accent2); color: var(--text); }
@@ -368,21 +362,21 @@
 
   /* TABLE SECTION */
   .table-section {
-    background: var(--navy-mid); border: 1px solid var(--border);
+    background: #f8f9fb; border: 1px solid var(--border);
     border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 24px;
   }
   .table-header {
     background: var(--navy-light); padding: 16px 20px;
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   }
-  .table-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
+  .table-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
   .table-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .table-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .tracker-filter-wrap { display: flex; align-items: center; gap: 4px; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 12px; }
   .tracker-filter-label { font-size: 12px; color: #94a3b8; white-space: nowrap; }
   .tracker-filter-sel { background: #1e293b; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
   .tracker-filter-sel:focus { outline: none; border-color: #3b82f6; }
-  .btn { font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+  .btn { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
   .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 2px 12px rgba(37,99,235,0.35); }
   .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
   .btn-ghost { background: var(--card); border: 1px solid var(--border); color: var(--text-muted); }
@@ -397,7 +391,7 @@
   /* TEAM SECTION ROW (visual group header inside the table) */
   tr.team-header td {
     background: linear-gradient(90deg, rgba(37,99,235,0.18), rgba(37,99,235,0.02));
-    padding: 8px 14px; font-family: 'Barlow Condensed', sans-serif;
+    padding: 8px 14px; font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
     color: var(--accent-glow); border-top: 2px solid rgba(37,99,235,0.4);
   }
@@ -438,7 +432,7 @@
   tbody tr.locked-row { background: rgba(16,185,129,0.05) !important; }
   tbody tr.locked-row:hover { background: rgba(16,185,129,0.08) !important; }
   tbody tr.totals-row { background: rgba(37,99,235,0.1) !important; border-top: 2px solid var(--accent); }
-  tbody tr.totals-row td { font-weight: 700; color: var(--accent-glow); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; }
+  tbody tr.totals-row td { font-weight: 700; color: var(--accent-glow); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 14px; }
   td { padding: 10px 12px; vertical-align: middle; }
   /* v12.2: sales tracker — align ALL cells upper-left (matches deal-name behavior) */
   #mainTable tbody td { vertical-align: top; text-align: left; }
@@ -450,14 +444,14 @@
 
   .cell-input {
     background: transparent; border: 1px solid transparent; border-radius: 6px;
-    color: var(--text); font-family: 'Barlow', sans-serif; font-size: 13px;
+    color: var(--text); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px;
     padding: 4px 8px; width: 100%; outline: none; transition: border-color 0.15s, background 0.15s;
   }
   .cell-input:focus { border-color: var(--accent2); background: rgba(37,99,235,0.12); }
   .cell-input:hover:not(:focus):not([readonly]) { border-color: var(--border); background: var(--input-bg); }
   .cell-input[readonly] { cursor: default; }
   select.cell-input { cursor: pointer; }
-  select.cell-input option { background: var(--navy-mid); }
+  select.cell-input option { background: #f8f9fb; }
   select.cell-input[disabled] { cursor: not-allowed; }
   .rep-name-cell {
     min-width: 110px; font-weight: 600; padding: 6px 10px;
@@ -522,7 +516,7 @@
   .deal-multiline-cell { min-width: 180px; max-width: 240px; vertical-align: top; }
   .deal-multiline-input {
     width: 100%; min-height: 32px; resize: vertical;
-    font-family: 'Barlow', sans-serif; font-size: 12px; line-height: 1.5;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 12px; line-height: 1.5;
     padding: 6px 8px; border-radius: 6px;
     background: var(--input-bg); border: 1px solid var(--border);
     color: var(--text); overflow: hidden; box-sizing: border-box;
@@ -537,7 +531,7 @@
   .notes-bullet-list li { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 3px; }
   .notes-bullet-list li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-glow); margin-top: 6px; flex-shrink: 0; }
   .notes-editor-wrap { display: flex; flex-direction: column; gap: 4px; }
-  .notes-textarea { background: rgba(37,99,235,0.08); border: 1px solid var(--accent2); border-radius: 6px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 12px; padding: 6px 8px; resize: vertical; min-height: 72px; outline: none; line-height: 1.5; width: 100%; }
+  .notes-textarea { background: rgba(37,99,235,0.08); border: 1px solid var(--accent2); border-radius: 6px; color: var(--text); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 12px; padding: 6px 8px; resize: vertical; min-height: 72px; outline: none; line-height: 1.5; width: 100%; }
   .notes-btn-row { display: flex; gap: 4px; }
   .notes-save-btn { background: var(--accent); color: #fff; border: none; border-radius: 5px; font-size: 10px; font-weight: 700; padding: 3px 10px; cursor: pointer; }
   .notes-cancel-btn { background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: 5px; font-size: 10px; padding: 3px 10px; cursor: pointer; }
@@ -547,7 +541,7 @@
   .submit-btn {
     background: linear-gradient(135deg, #059669, var(--success));
     color: #fff; border: none; border-radius: 8px;
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 1px; padding: 6px 14px; cursor: pointer;
     transition: opacity 0.2s, transform 0.1s;
     box-shadow: 0 2px 10px rgba(16,185,129,0.3);
@@ -570,28 +564,28 @@
   .unlock-mini:hover { color: var(--danger); }
 
   /* MONTHLY COMMITMENTS PANEL */
-  .commit-panel { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
-  .commit-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .commit-panel { background: #f8f9fb; border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
+  .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
   .commit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .commit-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
+  .commit-card { background: #ffffff; border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
   .commit-card.dubai     { border-left: 3px solid var(--accent-glow); }
   .commit-card.abu-dhabi { border-left: 3px solid var(--gold-light); }
   .commit-card.total     { border-left: 3px solid var(--success); }
   .commit-card-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
   .commit-card-rows  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .commit-metric-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-  .commit-metric-value { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
+  .commit-metric-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
   .commit-card.abu-dhabi .commit-metric-value { color: var(--gold-light); }
   .commit-card.total     .commit-metric-value { color: var(--success); }
   .commit-card-sub { font-size: 10px; color: var(--text-muted); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .commit-locked-pill  { background: rgba(34,197,94,0.12);  color: #4ade80; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
   .commit-pending-pill { background: rgba(251,191,36,0.12); color: #fbbf24; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
-  .commit-of-pill      { background: rgba(255,255,255,0.04); color: var(--text-muted); padding: 2px 8px; border-radius: 10px; font-weight: 600; font-size: 10px; }
+  .commit-of-pill      { background: var(--card); color: var(--text-muted); padding: 2px 8px; border-radius: 10px; font-weight: 600; font-size: 10px; }
   @media (max-width: 800px) { .commit-grid { grid-template-columns: 1fr; } }
 
   /* SUMMARY BAR */
-  .summary-bar { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
-  .summary-bar-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .summary-bar { background: #ffffff; border: 1px solid var(--border); background: #f8f9fb; border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
+  .summary-bar-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
   .summary-weeks { display: flex; gap: 10px; align-items: flex-end; height: 110px; }
   .summary-week { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
   .summary-bar-inner {
@@ -629,7 +623,7 @@
   .gd-toc a {
     color: var(--text-muted); text-decoration: none;
     padding: 5px 11px; border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid var(--input-bg);
     transition: all 0.15s ease;
     font-weight: 500;
   }
@@ -646,13 +640,13 @@
   }
   .gd-hero-icon {
     font-size: 44px; line-height: 1;
-    background: rgba(255,255,255,0.06);
+    background: var(--input-bg);
     width: 72px; height: 72px;
     display: flex; align-items: center; justify-content: center;
     border-radius: 14px; flex-shrink: 0;
   }
   .gd-hero h1 {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 28px; font-weight: 800; letter-spacing: 1.5px;
     margin: 0 0 6px; color: var(--text);
   }
@@ -667,7 +661,7 @@
     scroll-margin-top: 70px;
   }
   .gd-section h2 {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 22px; font-weight: 700; letter-spacing: 1px;
     color: var(--text);
     margin: 0 0 16px;
@@ -750,12 +744,12 @@
     text-align: left; padding: 10px 12px;
     background: rgba(255,255,255,0.03);
     color: var(--text); font-weight: 700;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--border);
     font-size: 11.5px; letter-spacing: 0.5px; text-transform: uppercase;
   }
   .gd-table td {
     padding: 11px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--card);
     color: var(--text-muted); vertical-align: top;
     line-height: 1.6;
   }
@@ -780,7 +774,7 @@
   .gd-weight-grid.score-weights { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   .gd-weight-card {
     background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid var(--input-bg);
     border-radius: 10px; padding: 18px;
     text-align: center;
   }
@@ -792,7 +786,7 @@
     color: var(--text-muted); margin-bottom: 6px;
   }
   .gd-weight-val {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 38px; font-weight: 800; color: var(--text);
     line-height: 1;
   }
@@ -866,7 +860,7 @@
   .gd-tier.warm { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.30); }
   .gd-tier.cold { background: rgba(239,68,68,0.08);  border-color: rgba(239,68,68,0.30); }
   .gd-tier-lbl {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 22px; font-weight: 800; letter-spacing: 1.5px;
   }
   .gd-tier.hot  .gd-tier-lbl { color: #34d399; }
@@ -876,8 +870,8 @@
 
   /* Metric card */
   .gd-metric-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: var(--row-even);
+    border: 1px solid var(--input-bg);
     border-radius: 12px;
     padding: 20px 22px;
     margin: 16px 0;
@@ -888,7 +882,7 @@
     margin-bottom: 10px;
   }
   .gd-metric-name {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 18px; font-weight: 700; letter-spacing: 0.8px;
     color: var(--text);
   }
@@ -908,8 +902,8 @@
   .gd-legend-card {
     display: flex; gap: 12px; align-items: flex-start;
     padding: 14px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: var(--row-even);
+    border: 1px solid var(--input-bg);
     border-radius: 10px;
   }
   .gd-legend-dot {
@@ -924,8 +918,8 @@
 
   /* FAQ */
   .gd-faq {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: var(--row-even);
+    border: 1px solid var(--input-bg);
     border-radius: 8px;
     padding: 0;
     margin: 8px 0;
@@ -947,7 +941,7 @@
     transition: transform 0.2s ease;
   }
   .gd-faq[open] summary::before { content: '−'; }
-  .gd-faq summary:hover { background: rgba(255,255,255,0.02); }
+  .gd-faq summary:hover { background: var(--row-even); }
   .gd-faq p {
     margin: 0; padding: 0 16px 14px 44px;
     font-size: 12.5px; color: var(--text-muted); line-height: 1.6;
@@ -1008,7 +1002,7 @@
     border-color: rgba(168,85,247,0.4);
   }
   .stage-select {
-    background: rgba(255,255,255,0.04); color: var(--text);
+    background: var(--card); color: var(--text);
     border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
     padding: 4px 8px; font-size: 11px; font-weight: 600;
   }
@@ -1032,7 +1026,7 @@
   .age-pill {
     display: inline-block; padding: 2px 7px; border-radius: 999px;
     font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.05);
-    color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-muted); border: 1px solid var(--border);
   }
   .age-pill.stale { background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.4); }
 
@@ -1066,7 +1060,7 @@
   }
   .buyer-signal-chip.muted {
     background: rgba(255,255,255,0.03); color: var(--text-muted);
-    border-color: rgba(255,255,255,0.08);
+    border-color: var(--border);
   }
 
   /* ── QUALIFICATION SCORE ── */
@@ -1077,7 +1071,7 @@
     display: inline-flex; flex-direction: column; align-items: center; gap: 3px;
   }
   .qual-score-value {
-    font-family: 'Barlow Condensed', sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 22px; font-weight: 800; line-height: 1;
     color: var(--text);
   }
@@ -1086,7 +1080,7 @@
   .qual-score-value.tier-hot  { color: #34d399; }
   .qual-score-bar {
     width: 60px; height: 4px; border-radius: 2px;
-    background: rgba(255,255,255,0.08); overflow: hidden;
+    background: var(--border); overflow: hidden;
   }
   .qual-score-bar-fill {
     height: 100%; transition: width 0.25s ease;
@@ -1148,12 +1142,12 @@
   /* ── PRIMARY TAB BAR (Tracker / Marketing Consumer Performance) ── */
   .primary-tabs {
     display: flex; gap: 0; align-items: stretch;
-    background: var(--navy-mid); border-bottom: 1px solid var(--border);
+    background: #f8f9fb; border-bottom: 1px solid var(--border);
     padding: 0 24px;
   }
   .primary-tab {
     position: relative; padding: 14px 22px; cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif; font-size: 14px;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 14px;
     font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
     color: var(--text-muted); border: none; background: transparent;
     transition: color 0.15s ease;
@@ -1175,7 +1169,7 @@
 
   /* ── MARKETING / GDRIVE VIEW ── */
   .gdrive-panel {
-    background: var(--navy-mid); border: 1px solid var(--border);
+    background: #f8f9fb; border: 1px solid var(--border);
     border-radius: 14px; padding: 22px 24px; margin: 20px 24px;
   }
   .gdrive-head {
@@ -1183,7 +1177,7 @@
     gap: 16px; flex-wrap: wrap; margin-bottom: 18px;
   }
   .gdrive-title {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 22px;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 22px;
     font-weight: 700; letter-spacing: 1.5px; color: var(--text);
     margin-bottom: 4px;
   }
@@ -1217,7 +1211,7 @@
     font-size: 12px; line-height: 1.6;
   }
   .gdrive-config-card code {
-    background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;
+    background: var(--border); padding: 2px 6px; border-radius: 4px;
     font-size: 11px; color: #fbbf24;
   }
   .gdrive-file-list {
@@ -1400,7 +1394,7 @@
     gap: 10px; align-items: center; padding: 10px 8px;
     border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px;
   }
-  .hs-deal-row:hover { background: rgba(255,255,255,0.02); }
+  .hs-deal-row:hover { background: var(--row-even); }
   .hs-deal-name { color: var(--text); font-weight: 600; }
   .hs-deal-meta { color: var(--text-muted); font-size: 11px; }
   .hs-empty {
@@ -1410,8 +1404,8 @@
 
   @media (max-width: 768px) {
     .content { padding: 14px; }
-    .topbar { padding: 0 14px; }
-    .month-nav-bar { padding: 8px 14px; }
+    .topbar { background: #ffffff; border-bottom: 1px solid var(--border); color: var(--text); padding: 0 14px; }
+    .month-nav-bar { background: #ffffff; border-bottom: 1px solid var(--border); padding: 8px 14px; }
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
@@ -1424,7 +1418,7 @@
     flex-wrap: wrap; gap: 16px;
   }
   .demo-hero-title {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 32px; font-weight: 700;
     letter-spacing: 1px; margin: 0; color: var(--text);
   }
   .demo-hero-sub { margin: 6px 0 0; color: var(--text-muted); font-size: 14px; max-width: 640px; }
@@ -1465,18 +1459,18 @@
   .outlook-modal-body { padding: 18px 22px; max-height: 60vh; overflow-y: auto; }
   .outlook-controls {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 14px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--input-bg); margin-bottom: 14px;
     flex-wrap: wrap;
   }
   .outlook-controls label { font-size: 13px; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
   .outlook-controls select {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    background: var(--card); border: 1px solid rgba(255,255,255,0.1);
     color: var(--text); border-radius: 8px; padding: 6px 10px; font-size: 13px;
   }
   .outlook-controls-right { display: flex; gap: 8px; }
   .outlook-status {
     padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
   }
   .outlook-status.ok { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); color: #86efac; }
   .outlook-status.err { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
@@ -1484,7 +1478,7 @@
   .outlook-row {
     display: flex; gap: 12px; align-items: flex-start;
     padding: 12px 14px; border-radius: 10px; cursor: pointer;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
     transition: all 0.15s;
   }
   .outlook-row:hover { background: rgba(0,120,212,0.06); border-color: rgba(0,120,212,0.35); }
@@ -1498,7 +1492,7 @@
   .outlook-row-mapping { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; }
   .outlook-chip {
     padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
-    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1);
   }
   .outlook-chip.primary { background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.4); color: #d8b4fe; }
   .outlook-chip.primary em { font-style: normal; opacity: 0.7; font-size: 9px; margin-left: 4px; }
@@ -1610,7 +1604,7 @@
   }
   .outlook-edit-actions .btn-save:hover { background: rgba(34,197,94,0.3); }
   .outlook-edit-actions .btn-cancel {
-    background: rgba(255,255,255,0.06);
+    background: var(--input-bg);
     border-color: rgba(255,255,255,0.15);
     color: var(--text-muted);
   }
@@ -1652,11 +1646,11 @@
     background: var(--kpi-color, #a855f7);
   }
   .demo-kpi-label {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
   }
   .demo-kpi-value {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 32px; font-weight: 700;
     color: var(--text); margin-top: 4px;
   }
   .demo-kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
@@ -1683,7 +1677,7 @@
     display: grid; grid-template-columns: 90px 1fr 50px; gap: 10px; align-items: center;
     cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.15s;
   }
-  .demo-bar-row:hover { background: rgba(255,255,255,0.04); }
+  .demo-bar-row:hover { background: var(--card); }
   .demo-bar-row.active { background: rgba(168,85,247,0.15); }
   .demo-bar-name { font-size: 12px; font-weight: 600; color: var(--text); }
   .demo-bar-name .team-tag {
@@ -1691,7 +1685,7 @@
     margin-left: 4px; vertical-align: middle; color: var(--text-muted); background: rgba(255,255,255,0.05);
   }
   .demo-bar-track {
-    background: rgba(255,255,255,0.06); height: 22px; border-radius: 6px; overflow: hidden; position: relative;
+    background: var(--input-bg); height: 22px; border-radius: 6px; overflow: hidden; position: relative;
   }
   .demo-bar-fill {
     height: 100%; background: linear-gradient(90deg, #a855f7, #6366f1);
@@ -1713,12 +1707,12 @@
   /* Funnel */
   .demo-funnel { display: flex; flex-direction: column; gap: 8px; }
   .demo-funnel-step {
-    background: rgba(255,255,255,0.04); border-radius: 8px;
+    background: var(--card); border-radius: 8px;
     padding: 14px 16px; position: relative;
     border-left: 3px solid var(--step-color, #a855f7);
   }
   .demo-funnel-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-  .demo-funnel-value { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-top: 2px; }
+  .demo-funnel-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-top: 2px; }
   .demo-funnel-pct { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
   .demo-funnel-step.step-demos    { --step-color: #a855f7; }
   .demo-funnel-step.step-converted { --step-color: #10b981; }
@@ -1741,7 +1735,7 @@
   .demo-rep-card-team { font-size: 10px; color: var(--text-muted); }
   .demo-rep-card-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .demo-rep-stat { text-align: center; padding: 6px; background: rgba(255,255,255,0.03); border-radius: 6px; }
-  .demo-rep-stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; }
+  .demo-rep-stat-val { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 20px; font-weight: 700; }
   .demo-rep-stat-val.converted { color: #6ee7b7; }
   .demo-rep-stat-val.lost      { color: #fca5a5; }
   .demo-rep-stat-val.pending   { color: #fcd34d; }
@@ -1774,10 +1768,10 @@
     position: sticky; top: 0;
   }
   .demo-log-table td {
-    padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 10px 12px; border-bottom: 1px solid var(--card);
     vertical-align: top; color: var(--text);
   }
-  .demo-log-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .demo-log-table tr:hover td { background: var(--row-even); }
   .demo-outcome-pill {
     display: inline-block; padding: 3px 10px; border-radius: 12px;
     font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
@@ -1845,7 +1839,7 @@
   }
   .demo-support-chip {
     display: flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,0.04);
+    background: var(--card);
     border: 1px solid var(--border); border-radius: 6px;
     padding: 6px 8px; cursor: pointer;
     font-size: 12px; color: var(--text);
@@ -1993,7 +1987,7 @@
   .pcr-row {
     display:grid; grid-template-columns: 110px 1fr 90px 90px 70px;
     align-items:center; gap:12px; padding:10px 12px;
-    background: rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px;
+    background: var(--row-even); border:1px solid var(--border); border-radius:10px;
   }
   .pcr-rep { font-weight:600; font-size:13px; color:#fff; display:flex; flex-direction:column; }
   .pcr-rep .team { font-size:10px; font-weight:400; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px; }
@@ -2032,15 +2026,15 @@
   .rep-card-score-circle {
     width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     font-weight:700; font-size:14px; color:#fff;
-    background: conic-gradient(var(--success) 0deg, var(--success) calc(var(--p) * 3.6deg), rgba(255,255,255,0.08) calc(var(--p) * 3.6deg));
+    background: conic-gradient(var(--success) 0deg, var(--success) calc(var(--p) * 3.6deg), var(--border) calc(var(--p) * 3.6deg));
     position:relative;
   }
   .rep-card-score-circle::before {
     content:''; position:absolute; inset:4px; border-radius:50%; background: var(--navy-light);
   }
   .rep-card-score-circle span { position:relative; z-index:1; font-size:13px; }
-  .rep-card-score-circle.warn { background: conic-gradient(var(--warn) 0deg, var(--warn) calc(var(--p) * 3.6deg), rgba(255,255,255,0.08) calc(var(--p) * 3.6deg)); }
-  .rep-card-score-circle.bad  { background: conic-gradient(var(--danger) 0deg, var(--danger) calc(var(--p) * 3.6deg), rgba(255,255,255,0.08) calc(var(--p) * 3.6deg)); }
+  .rep-card-score-circle.warn { background: conic-gradient(var(--warn) 0deg, var(--warn) calc(var(--p) * 3.6deg), var(--border) calc(var(--p) * 3.6deg)); }
+  .rep-card-score-circle.bad  { background: conic-gradient(var(--danger) 0deg, var(--danger) calc(var(--p) * 3.6deg), var(--border) calc(var(--p) * 3.6deg)); }
 
   .rep-metric-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
   .rep-metric {
@@ -2091,7 +2085,7 @@
   .perf-leaderboard .rank {
     display:inline-flex; align-items:center; justify-content:center;
     width:24px; height:24px; border-radius:50%; font-weight:700; font-size:11px;
-    background: rgba(255,255,255,0.06); color:var(--text);
+    background: var(--input-bg); color:var(--text);
   }
   .perf-leaderboard .rank.gold   { background: linear-gradient(135deg,#fbbf24,#f59e0b); color:#1a1a1a; }
   .perf-leaderboard .rank.silver { background: linear-gradient(135deg,#e2e8f0,#94a3b8); color:#1a1a1a; }
@@ -2189,8 +2183,8 @@
       Access is restricted to the OXEFIT sales team and admin.
     </div>
 
-    <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      version 15.7.html · Clearer deal entry: AED-prefixed amount fields with live formatted readout, deal-name format hints &amp; column sub-labels
+    <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
+      v16.0 · Direct Engagement made independent, manual Outlook sync button added, light grey theme applied
     </div>
   </div>
 </div>
@@ -2516,6 +2510,7 @@
             <option value="">All Sales Reps</option>
           </select>
           <button class="demo-btn outlook office-only" id="demoOutlookBtn" onclick="openOutlookSyncModal()" style="display:none;" title="Pull every event from the shared demo@core-velocity.com calendar">📅 Sync from demo@</button>
+          <button class="demo-btn outlook office-only" onclick="openOutlookSyncModal()" style="display:none;">📅 Sync from Outlook</button>
           <button class="demo-btn primary office-only" id="demoAddBtn" onclick="openDemoModal()" style="display:none;">+ New Demo</button>
         </div>
       </div>
@@ -2788,7 +2783,16 @@
           <span class="gd-pill closed">Closed Won</span>
         </div>
         <p>Each of these flows into one or more performance metrics. The dashboard then rolls them up per rep, per team, and aggregated across whatever <em>Period</em> you select (current month, last 3, last 6, YTD).</p>
-        <div class="gd-callout info">
+        
+        <div class="gd-callout info" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
+          <strong>v16.0 — Direct Engagement Independence & Light Theme.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Standalone Direct Engagement:</strong> Now rendered as its own independent section in the forecast grid and commitment dashboard, no longer nested under Abu Dhabi.</li>
+            <li><strong>Manual Outlook Sync:</strong> Added a dedicated button in the Demo Tracker toolbar for immediate sync.</li>
+            <li><strong>Light Grey Theme:</strong> Modernized the interface with a light grey palette and Inter font stack for improved legibility.</li>
+          </ul>
+        </div>
+<div class="gd-callout info">
           <strong>Rule of thumb:</strong> all forecast metrics use the <em>latest week with activity</em> as a month-end snapshot. <em>Closed Won</em> uses the maximum value reported across weeks (because closed-won is cumulative — it only ever goes up within a month).
         </div>
       </section>
@@ -3085,7 +3089,16 @@
           <span class="gd-chip warn">60 – 79 Solid</span>
           <span class="gd-chip bad">&lt; 60 Needs attention</span>
         </div>
-        <div class="gd-callout info">
+        
+        <div class="gd-callout info" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
+          <strong>v16.0 — Direct Engagement Independence & Light Theme.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Standalone Direct Engagement:</strong> Now rendered as its own independent section in the forecast grid and commitment dashboard, no longer nested under Abu Dhabi.</li>
+            <li><strong>Manual Outlook Sync:</strong> Added a dedicated button in the Demo Tracker toolbar for immediate sync.</li>
+            <li><strong>Light Grey Theme:</strong> Modernized the interface with a light grey palette and Inter font stack for improved legibility.</li>
+          </ul>
+        </div>
+<div class="gd-callout info">
           <strong>Why bring demos into the score?</strong> Demos are the leading indicator of pipeline. A rep who closes 100% of goal this month but ran zero demos is mortgaging next month's number — and a rep who runs 12 demos with a 50% conversion rate is building a pipeline the AED hasn't caught up with yet. Goal Attainment still dominates at 55%, but Demo Effectiveness (15%) now ensures the Leaderboard rewards both <em>what they closed this month</em> and <em>what they're queueing up for next month</em>.
         </div>
         <div class="gd-callout info" style="border-color: rgba(0, 120, 212, 0.45); background: rgba(0, 120, 212, 0.08);">
@@ -3171,7 +3184,16 @@
             <tr><td>Year to Date</td><td>January 1 of current year through today</td></tr>
           </tbody>
         </table></div>
-        <div class="gd-callout info">
+        
+        <div class="gd-callout info" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
+          <strong>v16.0 — Direct Engagement Independence & Light Theme.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Standalone Direct Engagement:</strong> Now rendered as its own independent section in the forecast grid and commitment dashboard, no longer nested under Abu Dhabi.</li>
+            <li><strong>Manual Outlook Sync:</strong> Added a dedicated button in the Demo Tracker toolbar for immediate sync.</li>
+            <li><strong>Light Grey Theme:</strong> Modernized the interface with a light grey palette and Inter font stack for improved legibility.</li>
+          </ul>
+        </div>
+<div class="gd-callout info">
           <strong>Important:</strong> Pipeline Coverage Ratio always uses the <em>latest month with activity</em>, not summed across the period — because PCR is a forward-looking snapshot of "is your pipe big enough for next month".
         </div>
       </section>
@@ -3524,7 +3546,7 @@ let curMonth    = new Date().getMonth();
 let curWeek     = 0;
 let modalYear   = curYear;
 let saveTimer   = null;
-// v15.8 — Tracker grid filters (Sales Rep + Team selectors in table header)
+// v15.9 — Tracker grid filters (Sales Rep + Team selectors in table header)
 let trackerFilterRep  = '';   // '' = show all; otherwise exact rep name
 let trackerFilterTeam = '';   // '' = show all; 'Dubai' | 'Abu Dhabi'
 // v14.8 — live auto-refresh so a signed-in admin sees team submissions WITHOUT
@@ -3577,10 +3599,7 @@ function buildDefaultTeamRows() {
   const rows = [];
   Object.entries(TEAMS).forEach(([team, members]) => {
     members.forEach(name => rows.push(defaultRow(team, name)));
-    // v15.8 — Direct Engagement: a standalone admin-only line under Abu Dhabi
-    if (team === 'Abu Dhabi') {
-      rows.push(defaultRow('Abu Dhabi', 'Direct Engagement'));
-    }
+    
   });
   return rows;
 }
@@ -3600,9 +3619,9 @@ function ensureWeekSeeded(md, w) {
         added = true;
       }
     });
-    // v15.8 — ensure Direct Engagement row exists under Abu Dhabi
-    if (team === 'Abu Dhabi' && !existingReps.has('Direct Engagement')) {
-      md.weeks[w].push(defaultRow('Abu Dhabi', 'Direct Engagement'));
+    // v15.9 — ensure Direct Engagement row exists as a standalone section
+    if (!existingReps.has('Direct Engagement')) {
+      md.weeks[w].push(defaultRow('Direct Engagement', 'Direct Engagement'));
       added = true;
     }
   });
@@ -3676,8 +3695,8 @@ function migrateRenamedRepsInData(data) {
   return changed;
 }
 
-/* v15.8 — BUYER-SIGNAL KEY MIGRATION.
-   v15.7 and earlier used 'technicalFit' as a key; v15.8 renames it to
+/* v15.9 — BUYER-SIGNAL KEY MIGRATION.
+   v15.7 and earlier used 'technicalFit' as a key; v15.9 renames it to
    'demoCompleted' and adds 'proposalSubmitted'. This migrates every stored
    row so existing team data is not lost. Safe to run repeatedly. */
 function migrateBuyerSignalKeys(data) {
@@ -3714,7 +3733,7 @@ function loadLocal() {
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
-  // v15.8 — migrate buyer-signal key rename, persist once.
+  // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -4706,7 +4725,7 @@ function fmtNum(n) {
 ════════════════════════════════════════ */
 function canEditRow(row) {
   if (currentRole === 'viewer') return false;
-  // v15.8 — Direct Engagement is editable only by the three admins
+  // v15.9 — Direct Engagement is editable only by the three admins
   if (row.rep === 'Direct Engagement') {
     if (row.locked) return isAdminUser(currentUser);
     return isAdminUser(currentUser);
@@ -4748,11 +4767,11 @@ function renderAll() {
 function renderCommitPanel() {
   const md = getCurMonthData();
   const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, truePipeline:0, xs1:0, xp1:0, count:0, locked:0, pending:0, syncedReps:new Set() });
-  const agg = { 'Dubai': blank(), 'Abu Dhabi': blank() };
+  const agg = { 'Dubai': blank(), 'Abu Dhabi': blank(), 'Direct Engagement': blank() };
   md.weeks.forEach((w, wi) => {
     if (!w) return;
     w.forEach(r => {
-      const t = agg[r.team]; if (!t) return;
+      const t = agg[r.team] || (r.rep === 'Direct Engagement' ? agg['Direct Engagement'] : null); if (!t) return;
       const commit    = parseFloat(r.commitValue)   || 0;
       const bestCase  = parseFloat(r.bestCaseValue) || 0;
       const closedWon = parseFloat(r.closedWon)     || 0;
@@ -4807,6 +4826,7 @@ function renderCommitPanel() {
   // Combine synced rep sets
   agg['Dubai'].syncedReps.forEach(r => total.syncedReps.add(r));
   agg['Abu Dhabi'].syncedReps.forEach(r => total.syncedReps.add(r));
+  if(agg['Direct Engagement']) agg['Direct Engagement'].syncedReps.forEach(r => total.syncedReps.add(r));
   const card = (cls, label, d, totalCount) => `
     <div class="commit-card ${cls}">
       <div class="commit-card-label">${label}</div>
@@ -4829,7 +4849,8 @@ function renderCommitPanel() {
   document.getElementById('commitGrid').innerHTML =
     card('dubai',     'Dubai Team',     agg['Dubai'],     TEAMS['Dubai'].length     * 5) +
     card('abu-dhabi', 'Abu Dhabi Team', agg['Abu Dhabi'], TEAMS['Abu Dhabi'].length * 5) +
-    card('total',     'Combined Total', total,            ALL_REPS.length            * 5);
+    card('direct-engagement', '🤝 Direct Engagement', agg['Direct Engagement'], 5) +
+    card('total',     'Combined Total', total,            (ALL_REPS.length + 1)      * 5);
 }
 function renderMonthLabel() {
   document.getElementById('monthLabelBtn').textContent = MONTHS[curMonth] + ' ' + curYear;
@@ -4921,7 +4942,7 @@ function renderTable() {
   expBtn.onclick = exportCSV;
   actDiv.appendChild(expBtn);
 
-  // v15.8 — Filter controls: Team + Sales Rep
+  // v15.9 — Filter controls: Team + Sales Rep
   const filterWrap = document.createElement('div');
   filterWrap.className = 'tracker-filter-wrap';
 
@@ -4931,7 +4952,7 @@ function renderTable() {
   teamLabel.textContent = 'Team:';
   const teamSel = document.createElement('select');
   teamSel.className = 'tracker-filter-sel';
-  [['', 'All Teams'], ['Dubai', 'Dubai'], ['Abu Dhabi', 'Abu Dhabi']].forEach(([val, text]) => {
+  [['', 'All Teams'], ['Dubai', 'Dubai'], ['Abu Dhabi', 'Abu Dhabi'], ['Direct Engagement', 'Direct Engagement']].forEach(([val, text]) => {
     const opt = document.createElement('option');
     opt.value = val; opt.textContent = text;
     if (val === trackerFilterTeam) opt.selected = true;
@@ -5017,21 +5038,17 @@ function renderTable() {
   const rows = getCurWeekRows();
 
   Object.entries(TEAMS).forEach(([teamName, members]) => {
-    // v15.8 — Team filter: skip entire group if a different team is selected
+    // v15.9 — Team filter: skip entire group if a different team is selected
     if (trackerFilterTeam && teamName !== trackerFilterTeam) return;
 
-    // Determine which members (+ Direct Engagement for Abu Dhabi) are visible
+    // Determine which members are visible (Direct Engagement is rendered
+    // separately as its own standalone section, not under any team)
     const visibleMembers = trackerFilterRep
       ? members.filter(n => n === trackerFilterRep)
       : members;
 
-    // Direct Engagement is under Abu Dhabi; include it when no rep filter or
-    // when the filter specifically selects 'Direct Engagement'
-    const showDE = teamName === 'Abu Dhabi' &&
-      (trackerFilterRep === '' || trackerFilterRep === 'Direct Engagement');
-
     // If nothing in this team matches the active filters, skip the header too
-    if (visibleMembers.length === 0 && !showDE) return;
+    if (visibleMembers.length === 0) return;
 
     // Team header row
     const headerTr = document.createElement('tr');
@@ -5047,13 +5064,26 @@ function renderTable() {
       const ri = rows.findIndex(r => r.rep === memberName);
       if (ri >= 0) renderRow(rows[ri], ri, tbody);
     });
-
-    // Direct Engagement row (Abu Dhabi only, after the member rows)
-    if (showDE) {
-      const deri = rows.findIndex(r => r.rep === 'Direct Engagement');
-      if (deri >= 0) renderRow(rows[deri], deri, tbody);
-    }
   });
+
+  // v15.9 — Direct Engagement Standalone Section
+  if (!trackerFilterTeam || trackerFilterTeam === 'Direct Engagement') {
+    if (!trackerFilterRep || trackerFilterRep === 'Direct Engagement') {
+      const deRi = rows.findIndex(r => r.rep === 'Direct Engagement');
+      if (deRi >= 0) {
+        const deHeaderTr = document.createElement('tr');
+        deHeaderTr.className = 'team-header direct-engagement';
+        deHeaderTr.style.background = '#f3f4f6';
+        deHeaderTr.style.color = '#374151';
+        const deHeaderTd = document.createElement('td');
+        deHeaderTd.colSpan = cols.length;
+        deHeaderTd.textContent = '🤝 Direct Engagement';
+        deHeaderTr.appendChild(deHeaderTd);
+        tbody.appendChild(deHeaderTr);
+        renderRow(rows[deRi], deRi, tbody);
+      }
+    }
+  }
 
   renderTotalsRow(rows, tbody, cols.length);
 }
@@ -5094,7 +5124,7 @@ function renderRow(row, ri, tbody) {
   // immediately after Sales Rep. Sourced EXCLUSIVELY from HubSpot (sum of all
   // open deals for the rep). Read-only with HS badge; empty-state prompt
   // when not yet synced.
-  // v15.8 — Direct Engagement has no HubSpot pipeline; show a plain dash.
+  // v15.9 — Direct Engagement has no HubSpot pipeline; show a plain dash.
   {
     const tpTd = document.createElement('td');
     tpTd.className = 'col-closed-bg';
@@ -5193,7 +5223,7 @@ function renderRow(row, ri, tbody) {
   // Closed (Win) AED — sourced EXCLUSIVELY from HubSpot. Manual entry is
   // disabled by design. If HubSpot has not been synced yet, show a clear
   // empty-state prompting admin to sync the CRM.
-  // v15.8 — Direct Engagement has no HubSpot closed-won figure; plain dash.
+  // v15.9 — Direct Engagement has no HubSpot closed-won figure; plain dash.
   {
     const cwTd = document.createElement('td');
     cwTd.className = 'col-closed-bg';
@@ -5229,7 +5259,7 @@ function renderRow(row, ri, tbody) {
   tr.appendChild(notesTd);
 
   // Submit / Status
-  // v15.8 — Direct Engagement row has no submit/lock mechanic: admins edit it
+  // v15.9 — Direct Engagement row has no submit/lock mechanic: admins edit it
   // freely; it is never locked or submitted like a rep row.
   const subTd = document.createElement('td'); subTd.className = 'submit-cell';
   if (row.rep === 'Direct Engagement') {
@@ -5446,7 +5476,7 @@ function renderBuyerSignalsCell(td, ri, row, editable) {
 function computeQualScore(row) {
   const sig = ensureBuyerSignals(row);
   const sigCount = BUYER_SIGNAL_KEYS.reduce((s,k)=>s+(sig[k]?1:0),0);
-  const sigPart  = (sigCount / BUYER_SIGNAL_KEYS.length) * 60;     // 0-60 (7 signals in v15.8)
+  const sigPart  = (sigCount / BUYER_SIGNAL_KEYS.length) * 60;     // 0-60 (7 signals in v15.9)
   const stagePart = (STAGE_WEIGHTS[row.stage] || 0) * 40 / 0.75;   // Negotiation(0.75)→40, Proposal→26.7, Qualified→13.3
   const score = Math.round(sigPart + stagePart);
   let tier = 'cold', color = '#f87171';
