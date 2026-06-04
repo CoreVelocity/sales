@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v17.1</title>
+<title>OXEFIT Sales Commitment Tracker v17.3</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -578,7 +578,8 @@
   .commit-card.abu-dhabi { border-left: 3px solid var(--gold-light); }
   .commit-card.total     { border-left: 3px solid var(--success); }
   .commit-card-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-  .commit-card-rows  { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  /* v17.3 — 2-row layout: row1 = Commit/Total Forecast/Best Case/Closed, row2 = Total Pipeline/XS1/XP1 */
+  .commit-card-rows  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 14px; }
   .commit-metric-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
   .commit-metric-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
   .commit-card.abu-dhabi .commit-metric-value { color: #6b21a8; }
@@ -2195,6 +2196,45 @@
 
   /* Keep status / team-specific tints already defined above (won=green,
      abu-dhabi=purple, total=green, warn=red) — those win by specificity. */
+
+  /* ════════════════════════════════════════════════════════════
+     v17.3 — COLOR UNIFICATION (table headers, buyer signals, team tag)
+     ════════════════════════════════════════════════════════════ */
+
+  /* R3 — All main table column titles → black (Sales Rep, Commit,
+     Total Pipeline (HS), etc.). Overrides the per-column tints above. */
+  thead th,
+  thead th.col-hot,
+  thead th.col-warm,
+  thead th.col-forecast,
+  thead th.col-blocked,
+  thead th.col-stage,
+  thead th.col-qual { color: #000000; }
+  thead th .th-hint { color: #1a202c; opacity: 0.9; }
+
+  /* R2 — Buyer Signals column header + its option labels → dark navy.
+     (Kept distinct from the black headers per request.) */
+  thead th.col-signals            { color: #1e293b; }
+  .buyer-signals-grid label       { color: #1e293b; }
+
+  /* R4 — A selected (checked) buyer-signal option → dark green (was blue).
+     Applies to both the live editable grid and the locked read-only chips. */
+  .buyer-signals-grid label.checked { color: #166534; font-weight: 600; }
+  .buyer-signals-grid input[type="checkbox"] { accent-color: #166534; }
+  .buyer-signal-chip {
+    background: rgba(22,101,52,0.12); color: #166534;
+    border-color: rgba(22,101,52,0.35);
+  }
+  .buyer-signal-chip.muted {
+    background: rgba(0,0,0,0.03); color: var(--text-muted);
+    border-color: var(--border);
+  }
+
+  /* R5 — Dubai team tag next to each rep name → dark blue */
+  .team-badge.dubai {
+    background: rgba(30,64,175,0.12); color: #1e40af;
+    border: 1px solid rgba(30,64,175,0.35);
+  }
 </style>
 </head>
 <body>
@@ -2229,7 +2269,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v17.1 · Performance tab white-text readability fixed, Monthly Commitments (AED) single-row, low-contrast accent/gold text darkened
+      v17.3 · Monthly Commitments 2-row layout, black table headers, dark-navy Buyer Signals, dark-green selected signals, dark-blue Dubai tag
     </div>
   </div>
 </div>
