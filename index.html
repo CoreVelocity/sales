@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v16.0</title>
+<title>OXEFIT Sales Commitment Tracker v17.0</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -370,7 +370,7 @@
     background: var(--navy-light); padding: 16px 20px;
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   }
-  .table-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
+  .table-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #1e40af; }
   .table-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .table-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .tracker-filter-wrap { display: flex; align-items: center; gap: 4px; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 12px; }
@@ -382,12 +382,12 @@
   .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
   .btn-ghost { background: var(--card); border: 1px solid var(--border); color: var(--text-muted); }
   .btn-ghost:hover { border-color: var(--accent2); color: var(--text); }
-  .btn-danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
-  .btn-danger:hover { background: rgba(239,68,68,0.25); }
+  .btn-danger { background: rgba(239,68,68,0.10); border: 1px solid rgba(239,68,68,0.35); color: #b91c1c; }
+  .btn-danger:hover { background: rgba(239,68,68,0.18); }
   .btn-success { background: linear-gradient(135deg, #059669, var(--success)); color: #fff; box-shadow: 0 2px 12px rgba(16,185,129,0.35); }
   .btn-success:hover { opacity: 0.88; }
-  .btn-sync { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); color: #93c5fd; }
-  .btn-sync:hover { background: rgba(37,99,235,0.25); }
+  .btn-sync { background: rgba(37,99,235,0.10); border: 1px solid rgba(37,99,235,0.35); color: #1e40af; }
+  .btn-sync:hover { background: rgba(37,99,235,0.18); }
 
   /* TEAM SECTION ROW (visual group header inside the table) */
   tr.team-header td {
@@ -571,7 +571,7 @@
 
   /* MONTHLY COMMITMENTS PANEL */
   .commit-panel { background: #f8f9fb; border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
-  .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+  .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1e40af; margin-bottom: 14px; }
   .commit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .commit-card { background: #ffffff; border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
   .commit-card.dubai     { border-left: 3px solid var(--accent-glow); }
@@ -1164,7 +1164,7 @@
     transition: color 0.15s ease;
   }
   .primary-tab:hover { color: var(--text); }
-  .primary-tab.active { color: #2563eb; }
+  .primary-tab.active { color: #1e40af; }
   .primary-tab.active::after {
     content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px;
     height: 3px; border-radius: 3px 3px 0 0;
@@ -2195,7 +2195,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v16.0 · Direct Engagement made independent, manual Outlook sync button added, light grey theme applied
+      v17.0 · Dark-blue titles unified across tabs, Reset/Sync buttons restyled for readability
     </div>
   </div>
 </div>
