@@ -572,7 +572,7 @@
   /* MONTHLY COMMITMENTS PANEL */
   .commit-panel { background: #f8f9fb; border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
   .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1e40af; margin-bottom: 14px; }
-  .commit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .commit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .commit-card { background: #ffffff; border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
   .commit-card.dubai     { border-left: 3px solid var(--accent-glow); }
   .commit-card.abu-dhabi { border-left: 3px solid var(--gold-light); }
@@ -4933,8 +4933,7 @@ function renderCommitPanel() {
     </div>`;
   document.getElementById('commitGrid').innerHTML =
     card('dubai',     'Dubai Team',     agg['Dubai'],     TEAMS['Dubai'].length     * 5) +
-    card('abu-dhabi', 'Abu Dhabi Team', agg['Abu Dhabi'], TEAMS['Abu Dhabi'].length * 5) +
-    card('total',     'Combined Total', total,            ALL_REPS.length            * 5);
+    card('abu-dhabi', 'Abu Dhabi Team', agg['Abu Dhabi'], TEAMS['Abu Dhabi'].length * 5);
 }
 function renderMonthLabel() {
   document.getElementById('monthLabelBtn').textContent = MONTHS[curMonth] + ' ' + curYear;
@@ -5200,7 +5199,9 @@ function renderRow(row, ri, tbody) {
   const repTd = document.createElement('td');
   repTd.className = 'rep-name-cell';
   repTd.innerHTML = `
-    <span class="team-badge ${row.team === 'Abu Dhabi' ? 'abu-dhabi' : 'dubai'}">${row.team || '-'}</span>
+    ${row.rep === 'Direct Engagement'
+      ? ''
+      : `<span class="team-badge ${row.team === 'Abu Dhabi' ? 'abu-dhabi' : 'dubai'}">${row.team || '-'}</span>`}
     <span>${row.rep || '-'}</span>`;
   tr.appendChild(repTd);
 
