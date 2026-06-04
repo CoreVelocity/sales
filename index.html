@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v17.0</title>
+<title>OXEFIT Sales Commitment Tracker v17.1</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -578,7 +578,7 @@
   .commit-card.abu-dhabi { border-left: 3px solid var(--gold-light); }
   .commit-card.total     { border-left: 3px solid var(--success); }
   .commit-card-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-  .commit-card-rows  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .commit-card-rows  { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
   .commit-metric-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
   .commit-metric-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
   .commit-card.abu-dhabi .commit-metric-value { color: #6b21a8; }
@@ -2161,6 +2161,40 @@
     .goals-grid { grid-template-columns: 1fr; }
   }
 
+  /* ════════════════════════════════════════════════════════════
+     v17.1 — READABILITY OVERRIDES (Sales Rep Performance tab)
+     Old dark-theme `color:#fff` is invisible on the new light cards.
+     Recolor data values to dark slate (#1a202c) and section titles to
+     the unified dark blue (#1e40af). Colored buttons / pills / gradient
+     ranks keep their white text (handled by more specific rules above).
+     ════════════════════════════════════════════════════════════ */
+  .perf-team-metric,
+  .perf-kpi-val,
+  .pcr-rep,
+  .rep-card-name,
+  .rep-metric .val,
+  .rep-units .val { color: #1a202c; }
+
+  /* Keep semantic status colors intact (good/warn/bad win via specificity) */
+  .perf-kpi-val.good,
+  .rep-metric .val.good { color: var(--success); }
+
+  /* Section + leaderboard titles → unified dark blue */
+  .perf-section-head h2 { color: #1e40af; }
+  .perf-leaderboard th:hover { color: #1e40af; }
+
+  /* ── Low-contrast light-blue (accent-glow) text on white cards → dark blue ── */
+  .kpi-value.accent          { color: #1e40af; }
+  tbody tr.totals-row td     { color: #1e40af; }
+  .commit-metric-value       { color: #1e40af; }            /* Dubai/default tint */
+  .commit-card.dubai .commit-metric-value { color: #1e40af; }
+
+  /* ── Low-contrast light-orange (gold-light #fbbf24) text on white → deep amber ── */
+  .kpi-value.gold            { color: #b45309; }
+  .aed-readout.has-val       { color: #b45309; }
+
+  /* Keep status / team-specific tints already defined above (won=green,
+     abu-dhabi=purple, total=green, warn=red) — those win by specificity. */
 </style>
 </head>
 <body>
@@ -2195,7 +2229,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v17.0 · Dark-blue titles unified across tabs, Reset/Sync buttons restyled for readability
+      v17.1 · Performance tab white-text readability fixed, Monthly Commitments (AED) single-row, low-contrast accent/gold text darkened
     </div>
   </div>
 </div>
@@ -2348,7 +2382,7 @@
 
     <!-- Monthly Commitments dashboard (locked / submitted entries only) -->
     <div class="commit-panel" id="commitPanel">
-      <div class="commit-title">Monthly Commitments — All Entries (Locked + In Progress)</div>
+      <div class="commit-title">Monthly Commitments (AED) — All Entries (Locked + In Progress)</div>
       <div class="commit-grid" id="commitGrid"></div>
     </div>
 
@@ -4842,11 +4876,11 @@ function renderCommitPanel() {
     <div class="commit-card ${cls}">
       <div class="commit-card-label">${label}</div>
       <div class="commit-card-rows">
-        <div><div class="commit-metric-label">Commit</div><div class="commit-metric-value">AED ${fmtNum(d.commit)||'0'}</div></div>
-        <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">AED ${fmtNum(d.forecast)||'0'}</div></div>
-        <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">AED ${fmtNum(d.bestCase)||'0'}</div></div>
-        <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value won">AED ${fmtNum(d.closedWon)||'0'}</div></div>
-        <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value" style="color:#fb923c;">${d.truePipeline ? 'AED ' + fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? 'AED 0' : '—')}</div></div>
+        <div><div class="commit-metric-label">Commit</div><div class="commit-metric-value">${fmtNum(d.commit)||'0'}</div></div>
+        <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">${fmtNum(d.forecast)||'0'}</div></div>
+        <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">${fmtNum(d.bestCase)||'0'}</div></div>
+        <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value won">${fmtNum(d.closedWon)||'0'}</div></div>
+        <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value" style="color:#fb923c;">${d.truePipeline ? fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? '0' : '—')}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
       </div>
