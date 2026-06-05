@@ -551,6 +551,13 @@
     font-size: 9.5px; padding: 1px 6px; border-radius: 10px; font-weight: 600;
     background: #e0f2fe; color: #075985; margin-left: 6px;
   }
+  /* v18.2 — owner-rep badge for Direct Engagement (Kamal/Sami/Ahmed) */
+  .deal-picker-menu .dp-item .dp-owner {
+    font-size: 9.5px; padding: 1px 7px; border-radius: 10px; font-weight: 700;
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    color: #5b21b6; margin-left: 4px; letter-spacing: .3px;
+    border: 1px solid #c4b5fd;
+  }
   .deal-picker-menu .dp-clear {
     padding: 7px 10px; text-align: center; cursor: pointer;
     font: 500 11.5px 'Inter', system-ui, sans-serif; color: #b91c1c;
@@ -571,6 +578,33 @@
   }
   .deal-picker-menu .dp-multi-count { color: #0c4a6e; }
   .deal-picker-menu .dp-multi-total { font-variant-numeric: tabular-nums; color: #0369a1; }
+
+  /* ── v18.2 SEARCH BAR ─────────────────────────────────────────
+     Sticky search field below the multi-header. Filters deal rows
+     live by name (case-insensitive substring). */
+  .deal-picker-menu .dp-search-wrap {
+    position: sticky; top: 36px; z-index: 2;
+    padding: 6px 8px; background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .deal-picker-menu .dp-search {
+    width: 100%; box-sizing: border-box;
+    padding: 6px 10px 6px 28px;
+    border: 1px solid #cbd5e1; border-radius: 5px;
+    font: 400 12px 'Inter', system-ui, sans-serif; color: #1e293b;
+    background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 8px center;
+    outline: none; transition: border-color .12s ease, background-color .12s ease;
+  }
+  .deal-picker-menu .dp-search:focus {
+    border-color: #0369a1; background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(3,105,161,0.12);
+  }
+  .deal-picker-menu .dp-search::placeholder { color: #94a3b8; }
+  .deal-picker-menu .dp-no-match {
+    padding: 14px 12px; text-align: center;
+    font: 500 11.5px 'Inter', system-ui, sans-serif; color: #64748b;
+    font-style: italic;
+  }
 
   .deal-picker-menu .dp-item.dp-item-multi {
     cursor: pointer; user-select: none;
@@ -5849,6 +5883,54 @@ function makeDealPickerCell(ri, slot, row, editable) {
     updateHeader();
     menu.appendChild(headerBar);
 
+    // ── v18.2 SEARCH BAR ─────────────────────────────────────
+    // Live filter by deal name. Persisted on the menu element so
+    // re-renders (after selection changes) preserve the query.
+    const searchWrap = document.createElement('div');
+    searchWrap.className = 'dp-search-wrap';
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'dp-search';
+    searchInput.placeholder = 'Search deals…';
+    searchInput.value = menu._dpQuery || '';
+    searchInput.addEventListener('input', (ev) => {
+      ev.stopPropagation();
+      menu._dpQuery = ev.target.value || '';
+      applyFilter();
+    });
+    searchInput.addEventListener('click', (ev) => ev.stopPropagation());
+    searchWrap.appendChild(searchInput);
+    menu.appendChild(searchWrap);
+
+    // applyFilter scans rendered .dp-item rows and hides ones that
+    // don't match the current query. Also toggles a "no matches" hint.
+    let noMatchEl = null;
+    const applyFilter = () => {
+      const q = (menu._dpQuery || '').trim().toLowerCase();
+      const rows = menu.querySelectorAll('.dp-item.dp-item-multi');
+      let visible = 0;
+      rows.forEach(r => {
+        const name = (r.querySelector('.dp-name')?.textContent || '').toLowerCase();
+        const show = !q || name.includes(q);
+        r.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      // Toggle no-match message
+      if (!visible && q) {
+        if (!noMatchEl) {
+          noMatchEl = document.createElement('div');
+          noMatchEl.className = 'dp-no-match';
+          noMatchEl.textContent = 'No deals match "' + q + '"';
+          // Insert just after the search bar
+          searchWrap.insertAdjacentElement('afterend', noMatchEl);
+        } else {
+          noMatchEl.textContent = 'No deals match "' + q + '"';
+        }
+      } else if (noMatchEl) {
+        noMatchEl.remove(); noMatchEl = null;
+      }
+    };
+
     // Commit the current selection back to the row + redraw
     const commitSelection = () => {
       const r = getCurWeekRows()[ri];
@@ -5918,6 +6000,13 @@ function makeDealPickerCell(ri, slot, row, editable) {
 
       item.appendChild(cb);
       item.appendChild(n);
+      // v18.2 — Direct Engagement: show which admin owns each deal
+      if (d.ownerRep) {
+        const o = document.createElement('span');
+        o.className = 'dp-owner';
+        o.textContent = d.ownerRep;
+        item.appendChild(o);
+      }
       item.appendChild(s);
       item.appendChild(a);
       if (cb.checked) item.classList.add('dp-checked');
@@ -5948,12 +6037,18 @@ function makeDealPickerCell(ri, slot, row, editable) {
     done.onclick = (ev) => {
       ev.stopPropagation();
       menu.classList.remove('open');
+      menu._dpQuery = '';   // v18.2 — reset search on close
       _dpOpenMenu = null;
       renderTable();
     };
     foot.appendChild(clr);
     foot.appendChild(done);
     menu.appendChild(foot);
+
+    // v18.2 — apply any persisted search query after the rows are rendered
+    if (menu._dpQuery) applyFilter();
+    // Focus the search input so the rep can start typing immediately
+    setTimeout(() => { try { searchInput.focus(); } catch(_) {} }, 0);
   };
 
   // Button click → open menu + lazy-fetch if cache miss / stale
@@ -5979,7 +6074,40 @@ function makeDealPickerCell(ri, slot, row, editable) {
     }
     renderMenu({ loading: true });
     try {
-      const deals = await hubspotFetchDealsForRep(row.rep);
+      // v18.2 — Direct Engagement aggregates deals owned by all three
+      // admins (Kamal + Sami + Ahmed). Fetch each in parallel, then
+      // merge, de-duplicating by HubSpot deal id (a deal owned by one
+      // admin only appears once). Each item is tagged with `ownerRep`
+      // for display.
+      let deals;
+      if (row.rep === 'Direct Engagement') {
+        const owners = ['Kamal', 'Sami', 'Ahmed'];
+        const results = await Promise.allSettled(
+          owners.map(n => hubspotFetchDealsForRep(n))
+        );
+        const merged = new Map();
+        const errors = [];
+        results.forEach((res, i) => {
+          if (res.status === 'fulfilled') {
+            (res.value || []).forEach(d => {
+              if (!merged.has(d.id)) {
+                merged.set(d.id, Object.assign({}, d, { ownerRep: owners[i] }));
+              }
+            });
+          } else {
+            errors.push(owners[i] + ': ' + (res.reason?.message || 'fetch failed'));
+          }
+        });
+        deals = Array.from(merged.values());
+        // Sort by stage rank desc, then amount desc
+        const rank = { Negotiation: 3, Proposal: 2, Discovery: 1, Qualified: 0 };
+        deals.sort((a,b) => (rank[b.stage]||0)-(rank[a.stage]||0) || (b.amount||0)-(a.amount||0));
+        if (!deals.length && errors.length) {
+          throw new Error('Could not load admin deals — ' + errors.join('; '));
+        }
+      } else {
+        deals = await hubspotFetchDealsForRep(row.rep);
+      }
       const state = { deals, ts: Date.now() };
       hsRowDealsCache.set(row.rep, state);
       // Only re-render if menu is still open
