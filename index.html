@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v17.3</title>
+<title>OXEFIT Sales Commitment Tracker v18.0</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -500,6 +500,95 @@
   .aed-readout.aed-warn { color: #f87171; font-weight: 600; }
   .aed-input-wrap.locked { border-color: transparent; background: transparent; }
   .aed-input-wrap.locked .aed-prefix { border-right-color: transparent; }
+
+  /* ──────────────────────────────────────────────────────────
+     v18.0 — HubSpot-driven deal picker (Commit + Best Case)
+     Replaces manual deal-name textarea + AED entry with a
+     read-only picker that pulls from HubSpot per rep.
+  ────────────────────────────────────────────────────────── */
+  .deal-picker-cell { min-width: 220px; vertical-align: top; position: relative; }
+  .deal-picker-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 8px 10px; gap: 8px;
+    background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px;
+    font: 500 12.5px/1.3 'Inter', system-ui, sans-serif; color: #1e293b;
+    cursor: pointer; text-align: left;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .deal-picker-btn:hover { border-color: #94a3b8; box-shadow: 0 1px 3px rgba(15,23,42,.08); }
+  .deal-picker-btn.has-value { border-color: #0ea5e9; background: #f0f9ff; color: #0c4a6e; }
+  .deal-picker-btn .dp-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .deal-picker-btn .dp-caret { color: #64748b; font-size: 10px; flex-shrink: 0; }
+  .deal-picker-btn.locked-field { background: #f1f5f9; cursor: default; pointer-events: none; }
+
+  .deal-picker-menu {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30;
+    background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(15,23,42,.14);
+    max-height: 280px; overflow-y: auto;
+    display: none;
+  }
+  .deal-picker-menu.open { display: block; }
+  .deal-picker-menu .dp-loading,
+  .deal-picker-menu .dp-empty,
+  .deal-picker-menu .dp-error {
+    padding: 10px 12px; font: 400 12px/1.4 'Inter', system-ui, sans-serif;
+    color: #64748b; text-align: center;
+  }
+  .deal-picker-menu .dp-error { color: #b91c1c; }
+  .deal-picker-menu .dp-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; gap: 8px; cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    font: 400 12px/1.3 'Inter', system-ui, sans-serif; color: #1e293b;
+  }
+  .deal-picker-menu .dp-item:last-child { border-bottom: none; }
+  .deal-picker-menu .dp-item:hover { background: #f8fafc; }
+  .deal-picker-menu .dp-item.dp-disabled { opacity: .45; cursor: not-allowed; }
+  .deal-picker-menu .dp-item .dp-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .deal-picker-menu .dp-item .dp-amt  { font-variant-numeric: tabular-nums; color: #0369a1; font-weight: 600; font-size: 11.5px; }
+  .deal-picker-menu .dp-item .dp-stage {
+    font-size: 9.5px; padding: 1px 6px; border-radius: 10px; font-weight: 600;
+    background: #e0f2fe; color: #075985; margin-left: 6px;
+  }
+  .deal-picker-menu .dp-clear {
+    padding: 7px 10px; text-align: center; cursor: pointer;
+    font: 500 11.5px 'Inter', system-ui, sans-serif; color: #b91c1c;
+    background: #fef2f2; border-top: 1px solid #fecaca;
+  }
+  .deal-picker-menu .dp-clear:hover { background: #fee2e2; }
+
+  /* Hard-block pill when HubSpot disconnected */
+  .deal-picker-block {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 10px; min-width: 220px;
+    background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 6px;
+    font: 500 11.5px 'Inter', system-ui, sans-serif; color: #92400e;
+    cursor: pointer; text-align: center;
+  }
+  .deal-picker-block:hover { background: #fde68a; }
+  .deal-picker-block.locked { cursor: default; opacity: .7; }
+
+  /* Read-only AED value chip beside the picker */
+  .deal-value-display {
+    min-width: 130px; vertical-align: top;
+  }
+  .deal-value-display .dvd-wrap {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px; background: #f8fafc;
+    border: 1px solid #e2e8f0; border-radius: 6px;
+  }
+  .deal-value-display .dvd-aed {
+    font: 600 10px 'Inter', system-ui, sans-serif; color: #64748b;
+    background: #ffffff; padding: 2px 6px; border-radius: 3px;
+    border: 1px solid #cbd5e1; flex-shrink: 0;
+  }
+  .deal-value-display .dvd-val {
+    flex: 1; font: 600 13px 'Inter', system-ui, sans-serif;
+    color: #0c4a6e; font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .deal-value-display .dvd-val.empty { color: #94a3b8; font-weight: 400; }
   /* Deal-name format hint shown beneath the textarea while editing */
   .deal-name-hint {
     font-size: 10px; line-height: 1.4; color: var(--text-muted);
@@ -2269,7 +2358,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v17.3 · Monthly Commitments 2-row layout, black table headers, dark-navy Buyer Signals, dark-green selected signals, dark-blue Dubai tag
+      v18.0 · HubSpot-driven deal picker for Commit + Best Case · strict read-only selection · lazy-refresh on dropdown open
     </div>
   </div>
 </div>
@@ -2869,6 +2958,14 @@
         </div>
         <p>Each of these flows into one or more performance metrics. The dashboard then rolls them up per rep, per team, and aggregated across whatever <em>Period</em> you select (current month, last 3, last 6, YTD).</p>
         
+        <div class="gd-callout info" style="border-color: #059669; background: rgba(5, 150, 105, 0.06);">
+          <strong>v18.0 — HubSpot-Driven Deal Picker.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are now selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
+            <li><strong>Hard block when disconnected:</strong> If HubSpot is not connected, the deal cells show a "Connect HubSpot" prompt instead of an entry field.</li>
+            <li><strong>Lazy refresh:</strong> Deal lists fetch on first dropdown open per rep per session. Sync Now and Sync All Reps invalidate the cache so the next open pulls fresh data.</li>
+          </ul>
+        </div>
         <div class="gd-callout info" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
           <strong>v16.0 — Direct Engagement Independence & Light Theme.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
@@ -3175,6 +3272,14 @@
           <span class="gd-chip bad">&lt; 60 Needs attention</span>
         </div>
         
+        <div class="gd-callout info" style="border-color: #059669; background: rgba(5, 150, 105, 0.06);">
+          <strong>v18.0 — HubSpot-Driven Deal Picker.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are now selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
+            <li><strong>Hard block when disconnected:</strong> If HubSpot is not connected, the deal cells show a "Connect HubSpot" prompt instead of an entry field.</li>
+            <li><strong>Lazy refresh:</strong> Deal lists fetch on first dropdown open per rep per session. Sync Now and Sync All Reps invalidate the cache so the next open pulls fresh data.</li>
+          </ul>
+        </div>
         <div class="gd-callout info" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
           <strong>v16.0 — Direct Engagement Independence & Light Theme.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
@@ -3270,6 +3375,14 @@
           </tbody>
         </table></div>
         
+        <div class="gd-callout info" style="border-color: #059669; background: rgba(5, 150, 105, 0.06);">
+          <strong>v18.0 — HubSpot-Driven Deal Picker.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are now selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
+            <li><strong>Hard block when disconnected:</strong> If HubSpot is not connected, the deal cells show a "Connect HubSpot" prompt instead of an entry field.</li>
+            <li><strong>Lazy refresh:</strong> Deal lists fetch on first dropdown open per rep per session. Sync Now and Sync All Reps invalidate the cache so the next open pulls fresh data.</li>
+          </ul>
+        </div>
         <div class="gd-callout info" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
           <strong>v16.0 — Direct Engagement Independence & Light Theme.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
@@ -3653,10 +3766,12 @@ const defaultRow = (team, rep) => ({
   stage:        'Qualified',
   commitText:   '',
   commitValue:  '',
+  commitHsId:   '',  // v18.0 — HubSpot deal ID for the Commit slot
   commitAction: '',
   buyerSignals: { budget:false, timeline:false, champion:false, demoCompleted:false, proposalSubmitted:false, decisionMaker:false, competitorOut:false },
   bestCaseText: '',
   bestCaseValue:'',
+  bestCaseHsId: '',  // v18.0 — HubSpot deal ID for the Best Case slot
   totalPipeline:'',
   // truePipeline = sum of ALL open HubSpot deals for this rep (NOT just the
   // imported Commit/BestCase). Used for Pipeline Coverage Ratio. HubSpot-sourced.
@@ -5232,11 +5347,10 @@ function renderRow(row, ri, tbody) {
     tr.appendChild(tpTd);
   }
 
-  // Commit: deal name (multi-line textarea like Notes) + AED value
-  // v15.6 — clearer guidance: example format under the name box, and an
-  // AED-prefixed amount field with a live "AED 250,000" readout.
-  tr.appendChild(makeTextareaCell(ri, 'commitText',   'col-hot-bg deal-text-input', row.commitText,   editable, 'e.g. Marina Fitness – XS1\nOne deal per line', true));
-  tr.appendChild(makeAedCell (ri, 'commitValue',  'col-hot-bg',                 row.commitValue,  editable));
+  // Commit: HubSpot-driven deal picker (v18.0) — strict read-only selection
+  // from the rep's live HubSpot pipeline. Value chip auto-fills from picked deal.
+  tr.appendChild(makeDealPickerCell(ri, 'commit', row, editable));
+  tr.appendChild(makeDealValueDisplay('commit', row.commitValue, 'col-hot-bg'));
 
   // Buyer Signals (6 checkboxes / chips)
   const signalsTd = document.createElement('td');
@@ -5255,10 +5369,10 @@ function renderRow(row, ri, tbody) {
   // on separate lines).
   tr.appendChild(makeTextareaCell(ri, 'commitAction', 'col-hot-bg action-text-input', row.commitAction, editable, 'Next action(s)…\nOne per line'));
 
-  // Best Case: deal name (multi-line textarea like Notes) + AED value
-  // v15.6 — same clearer guidance as Commit.
-  tr.appendChild(makeTextareaCell(ri, 'bestCaseText',  'col-warm-bg deal-text-input', row.bestCaseText,  editable, 'e.g. JBR Wellness – XP1\nOne deal per line', true));
-  tr.appendChild(makeAedCell (ri, 'bestCaseValue', 'col-warm-bg',                 row.bestCaseValue, editable));
+  // Best Case: HubSpot-driven deal picker (v18.0) — same pattern as Commit.
+  // Cannot pick the same HubSpot deal that's already in the Commit slot.
+  tr.appendChild(makeDealPickerCell(ri, 'bestCase', row, editable));
+  tr.appendChild(makeDealValueDisplay('bestCase', row.bestCaseValue, 'col-warm-bg'));
 
   // Pipeline Stage (now positioned just before Total Pipeline so users set the stage that drives the forecast weight)
   const stageTd = document.createElement('td');
@@ -5487,6 +5601,244 @@ function makeAedCell(ri, field, bgClass, value, editable) {
   if (editable) {
     inp.addEventListener('input', e => { updateField(ri, field, e.target.value); refreshReadout(); });
   }
+  return td;
+}
+
+/* ════════════════════════════════════════
+   v18.0 — HUBSPOT DEAL PICKER
+   Replaces manual Commit / Best Case deal-name + AED inputs.
+   • Strict: only deals from HubSpot can be picked (read-only).
+   • Lazy: list fetched on first dropdown open per rep per session.
+   • Hard-block: if HubSpot not connected, shows prompt instead of picker.
+   • Sync hooks: hsRowDealsCache is invalidated by hubspotSyncAllReps()
+     and openHubspotModal() so the next open refetches fresh data.
+════════════════════════════════════════ */
+
+// Per-rep deal cache (lazy, session-scoped). Key = repName.
+// Value = { ts:number, deals:Array<{id,name,amount,stage,...}> } or { error:string }
+const hsRowDealsCache = new Map();
+
+// Track which menu is currently open so we can close on outside click.
+let _dpOpenMenu = null;
+document.addEventListener('click', (e) => {
+  if (!_dpOpenMenu) return;
+  if (_dpOpenMenu.contains(e.target)) return;
+  // also ignore clicks on the button that owns the menu
+  const owner = _dpOpenMenu._ownerBtn;
+  if (owner && owner.contains(e.target)) return;
+  _dpOpenMenu.classList.remove('open');
+  _dpOpenMenu = null;
+});
+
+/**
+ * Builds the Commit OR Best Case deal-picker cell for a row.
+ * @param {number} ri - row index in the current week
+ * @param {'commit'|'bestCase'} slot - which slot this picker controls
+ * @param {object} row - the data row
+ * @param {boolean} editable - false if row locked
+ */
+function makeDealPickerCell(ri, slot, row, editable) {
+  const td = document.createElement('td');
+  td.className = 'deal-picker-cell ' + (slot === 'commit' ? 'col-hot-bg' : 'col-warm-bg');
+
+  const textField  = slot === 'commit' ? 'commitText'  : 'bestCaseText';
+  const valueField = slot === 'commit' ? 'commitValue' : 'bestCaseValue';
+  const idField    = slot === 'commit' ? 'commitHsId'  : 'bestCaseHsId';
+  const curName    = (row[textField] || '').trim();
+
+  // ── Locked row: render a static read-only chip ─────────────
+  if (!editable) {
+    const btn = document.createElement('div');
+    btn.className = 'deal-picker-btn locked-field' + (curName ? ' has-value' : '');
+    const lbl = document.createElement('span');
+    lbl.className = 'dp-label';
+    lbl.textContent = curName || '—';
+    btn.appendChild(lbl);
+    td.appendChild(btn);
+    return td;
+  }
+
+  // ── HubSpot NOT connected: hard-block ─────────────────────
+  if (!hsIsConnected()) {
+    const block = document.createElement('div');
+    block.className = 'deal-picker-block';
+    block.innerHTML = '🔗 Connect HubSpot to pick deals';
+    block.onclick = () => {
+      if (currentRole === 'admin') {
+        if (typeof openHubspotConfigModal === 'function') openHubspotConfigModal();
+        else hubspotConnectOrSync();
+      } else {
+        showToast('Ask your admin to connect HubSpot before entering deals.', 'error');
+      }
+    };
+    td.appendChild(block);
+    return td;
+  }
+
+  // ── Connected: render picker button + lazy dropdown ───────
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'deal-picker-btn' + (curName ? ' has-value' : '');
+  const lbl = document.createElement('span');
+  lbl.className = 'dp-label';
+  lbl.textContent = curName || (slot === 'commit' ? 'Select a Commit deal…' : 'Select a Best Case deal…');
+  btn.appendChild(lbl);
+  const caret = document.createElement('span');
+  caret.className = 'dp-caret';
+  caret.textContent = '▼';
+  btn.appendChild(caret);
+  td.appendChild(btn);
+
+  const menu = document.createElement('div');
+  menu.className = 'deal-picker-menu';
+  menu._ownerBtn = btn;
+  td.appendChild(menu);
+
+  // Render menu contents from current state
+  const renderMenu = (state) => {
+    menu.innerHTML = '';
+    if (state.loading) {
+      menu.innerHTML = '<div class="dp-loading">Loading deals from HubSpot…</div>';
+      return;
+    }
+    if (state.error) {
+      const e = document.createElement('div');
+      e.className = 'dp-error';
+      e.textContent = state.error;
+      menu.appendChild(e);
+      return;
+    }
+    const deals = (state.deals || []).filter(d => !d.isClosedWon);
+    if (!deals.length) {
+      menu.innerHTML = '<div class="dp-empty">No open deals in HubSpot for this rep.</div>';
+      return;
+    }
+    // Forbid picking the same deal in both Commit + Best Case
+    const otherSlotName = (slot === 'commit' ? row.bestCaseText : row.commitText) || '';
+    const otherSlotId   = (slot === 'commit' ? row.bestCaseHsId : row.commitHsId)  || '';
+
+    deals.forEach(d => {
+      const item = document.createElement('div');
+      item.className = 'dp-item';
+      const isTaken = (otherSlotId && d.id === otherSlotId) ||
+                      (otherSlotName && d.name.trim() === otherSlotName.trim());
+      if (isTaken) item.classList.add('dp-disabled');
+      const n = document.createElement('span');
+      n.className = 'dp-name';
+      n.textContent = d.name;
+      const a = document.createElement('span');
+      a.className = 'dp-amt';
+      a.textContent = 'AED ' + fmtNum(d.amount || 0);
+      const s = document.createElement('span');
+      s.className = 'dp-stage';
+      s.textContent = d.stage || '—';
+      item.appendChild(n);
+      item.appendChild(s);
+      item.appendChild(a);
+      if (!isTaken) {
+        item.onclick = () => {
+          const r = getCurWeekRows()[ri];
+          if (!r) return;
+          r[textField]  = d.name;
+          r[valueField] = d.amount || 0;
+          r[idField]    = d.id;
+          // Commit-slot also seeds the stage (drives forecast weight)
+          if (slot === 'commit' && d.stage) r.stage = d.stage;
+          r.updatedAt = new Date().toISOString();
+          saveAll();
+          renderTable();
+          renderKPIs();
+          renderSummaryBar && renderSummaryBar();
+        };
+      } else {
+        item.title = 'Already selected in the other slot';
+      }
+      menu.appendChild(item);
+    });
+
+    // Clear option
+    if (curName) {
+      const clr = document.createElement('div');
+      clr.className = 'dp-clear';
+      clr.textContent = '✕ Clear selection';
+      clr.onclick = () => {
+        const r = getCurWeekRows()[ri];
+        if (!r) return;
+        r[textField]  = '';
+        r[valueField] = '';
+        r[idField]    = '';
+        r.updatedAt = new Date().toISOString();
+        saveAll();
+        renderTable();
+        renderKPIs();
+        renderSummaryBar && renderSummaryBar();
+      };
+      menu.appendChild(clr);
+    }
+  };
+
+  // Button click → open menu + lazy-fetch if cache miss / stale
+  btn.onclick = async (e) => {
+    e.stopPropagation();
+    // Close any other open menu
+    if (_dpOpenMenu && _dpOpenMenu !== menu) {
+      _dpOpenMenu.classList.remove('open');
+    }
+    // Toggle
+    if (menu.classList.contains('open')) {
+      menu.classList.remove('open');
+      _dpOpenMenu = null;
+      return;
+    }
+    menu.classList.add('open');
+    _dpOpenMenu = menu;
+
+    const cached = hsRowDealsCache.get(row.rep);
+    if (cached && !cached.stale) {
+      renderMenu(cached);
+      return;
+    }
+    renderMenu({ loading: true });
+    try {
+      const deals = await hubspotFetchDealsForRep(row.rep);
+      const state = { deals, ts: Date.now() };
+      hsRowDealsCache.set(row.rep, state);
+      // Only re-render if menu is still open
+      if (menu.classList.contains('open')) renderMenu(state);
+    } catch (err) {
+      const state = { error: err.message || 'Failed to load deals.', ts: Date.now() };
+      hsRowDealsCache.set(row.rep, state);
+      if (menu.classList.contains('open')) renderMenu(state);
+    }
+  };
+
+  return td;
+}
+
+/**
+ * Read-only AED value chip — mirrors whatever the picker wrote into the row.
+ * Replaces the editable AED input for Commit / Best Case in v18.0.
+ */
+function makeDealValueDisplay(slot, value, bgClass) {
+  const td = document.createElement('td');
+  td.className = (bgClass || '') + ' deal-value-display';
+  const wrap = document.createElement('div');
+  wrap.className = 'dvd-wrap';
+  const aed = document.createElement('span');
+  aed.className = 'dvd-aed';
+  aed.textContent = 'AED';
+  wrap.appendChild(aed);
+  const val = document.createElement('span');
+  const n = parseFloat(value) || 0;
+  if (n > 0) {
+    val.className = 'dvd-val';
+    val.textContent = fmtNum(n);
+  } else {
+    val.className = 'dvd-val empty';
+    val.textContent = '—';
+  }
+  wrap.appendChild(val);
+  td.appendChild(wrap);
   return td;
 }
 
@@ -6775,6 +7127,8 @@ async function openHubspotModal() {
   // Determine which rep to import for. If current user is a rep, use them.
   // Admin gets a picker. Viewer is blocked.
   if (currentRole === 'viewer') { showToast('View-only mode', 'error'); return; }
+  // v18.0 — invalidate row picker cache so reopening picks up new deals
+  if (typeof hsRowDealsCache !== 'undefined') hsRowDealsCache.clear();
   hsCurrentRep = (currentRole === 'rep') ? currentUser : (ALL_REPS[0]);
   document.getElementById('hsModalOwner').textContent = hsCurrentRep;
   document.getElementById('hsModalBody').innerHTML = '<div class="hs-empty">Loading deals…</div>';
@@ -6982,6 +7336,8 @@ async function hubspotSyncAllReps() {
   if (!hsIsConnected()) {
     showToast('Connect HubSpot first', 'error'); return;
   }
+  // v18.0 — wipe the row-picker cache so reps' dropdowns refetch fresh
+  if (typeof hsRowDealsCache !== 'undefined') hsRowDealsCache.clear();
   if (!hsGetProxyBase()) {
     showToast('CORS proxy URL is not configured — open Connect HubSpot', 'error');
     return;
