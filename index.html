@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v18.0</title>
+<title>OXEFIT Sales Commitment Tracker v18.1</title>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -557,6 +557,52 @@
     background: #fef2f2; border-top: 1px solid #fecaca;
   }
   .deal-picker-menu .dp-clear:hover { background: #fee2e2; }
+
+  /* ── v18.1 MULTI-SELECT picker styling ───────────────────────
+     Sticky header shows "N selected · AED 1,234,567" running total.
+     Items become checkbox rows. Footer has Clear all + Done. */
+  .deal-picker-menu .dp-multi-header {
+    position: sticky; top: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 10px;
+    background: linear-gradient(180deg, #ecfeff 0%, #e0f2fe 100%);
+    border-bottom: 1px solid #bae6fd;
+    font: 600 11.5px 'Inter', system-ui, sans-serif; color: #075985;
+  }
+  .deal-picker-menu .dp-multi-count { color: #0c4a6e; }
+  .deal-picker-menu .dp-multi-total { font-variant-numeric: tabular-nums; color: #0369a1; }
+
+  .deal-picker-menu .dp-item.dp-item-multi {
+    cursor: pointer; user-select: none;
+    padding-left: 8px;
+  }
+  .deal-picker-menu .dp-item.dp-item-multi:hover { background: #f0f9ff; }
+  .deal-picker-menu .dp-item.dp-item-multi.dp-checked { background: #ecfeff; }
+  .deal-picker-menu .dp-item.dp-item-multi.dp-checked .dp-name { font-weight: 600; color: #0c4a6e; }
+  .deal-picker-menu .dp-item.dp-item-multi .dp-check {
+    flex: 0 0 auto; margin: 0 4px 0 0; accent-color: #0369a1;
+    width: 14px; height: 14px; cursor: pointer;
+  }
+  .deal-picker-menu .dp-item.dp-disabled .dp-check { cursor: not-allowed; }
+
+  .deal-picker-menu .dp-multi-footer {
+    position: sticky; bottom: 0; z-index: 2;
+    display: flex; justify-content: space-between; gap: 6px;
+    padding: 6px 8px; background: #f8fafc; border-top: 1px solid #e2e8f0;
+  }
+  .deal-picker-menu .dp-foot-btn {
+    flex: 1; padding: 6px 10px; border-radius: 5px;
+    font: 600 11.5px 'Inter', system-ui, sans-serif; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .deal-picker-menu .dp-clear-btn {
+    color: #b91c1c; background: #fef2f2; border-color: #fecaca;
+  }
+  .deal-picker-menu .dp-clear-btn:hover { background: #fee2e2; }
+  .deal-picker-menu .dp-done-btn {
+    color: #ffffff; background: #0369a1; border-color: #0369a1;
+  }
+  .deal-picker-menu .dp-done-btn:hover { background: #0c4a6e; }
 
   /* Hard-block pill when HubSpot disconnected */
   .deal-picker-block {
@@ -2358,7 +2404,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v18.0 · HubSpot-driven deal picker for Commit + Best Case · strict read-only selection · lazy-refresh on dropdown open
+      v18.1 · Multi-deal selection per Commit / Best Case slot · rep-scoped picker · running AED total · strict read-only · lazy-refresh on dropdown open
     </div>
   </div>
 </div>
@@ -2958,10 +3004,18 @@
         </div>
         <p>Each of these flows into one or more performance metrics. The dashboard then rolls them up per rep, per team, and aggregated across whatever <em>Period</em> you select (current month, last 3, last 6, YTD).</p>
         
+        <div class="gd-callout info" style="border-color: #0369a1; background: rgba(3, 105, 161, 0.06);">
+          <strong>v18.1 — Multi-Deal Selection per Slot.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Pick more than one deal:</strong> Each rep can now check multiple deals under their Commit and under their Best Case. The picker is a checkbox list — Commit AED and Best Case AED sum automatically from the selection.</li>
+            <li><strong>Rep-scoped deal list:</strong> Each row's dropdown only shows that rep's own HubSpot deals (fetched by their owner ID). Reps never see another rep's pipeline.</li>
+            <li><strong>Running total + cross-slot guard:</strong> Sticky header shows "N selected · AED total" live as you tick boxes. A deal already picked in Commit is disabled in Best Case (and vice-versa) on the same row.</li>
+          </ul>
+        </div>
         <div class="gd-callout info" style="border-color: #059669; background: rgba(5, 150, 105, 0.06);">
           <strong>v18.0 — HubSpot-Driven Deal Picker.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
-            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are now selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
+            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
             <li><strong>Hard block when disconnected:</strong> If HubSpot is not connected, the deal cells show a "Connect HubSpot" prompt instead of an entry field.</li>
             <li><strong>Lazy refresh:</strong> Deal lists fetch on first dropdown open per rep per session. Sync Now and Sync All Reps invalidate the cache so the next open pulls fresh data.</li>
           </ul>
@@ -3272,10 +3326,18 @@
           <span class="gd-chip bad">&lt; 60 Needs attention</span>
         </div>
         
+        <div class="gd-callout info" style="border-color: #0369a1; background: rgba(3, 105, 161, 0.06);">
+          <strong>v18.1 — Multi-Deal Selection per Slot.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Pick more than one deal:</strong> Each rep can now check multiple deals under their Commit and under their Best Case. The picker is a checkbox list — Commit AED and Best Case AED sum automatically from the selection.</li>
+            <li><strong>Rep-scoped deal list:</strong> Each row's dropdown only shows that rep's own HubSpot deals (fetched by their owner ID). Reps never see another rep's pipeline.</li>
+            <li><strong>Running total + cross-slot guard:</strong> Sticky header shows "N selected · AED total" live as you tick boxes. A deal already picked in Commit is disabled in Best Case (and vice-versa) on the same row.</li>
+          </ul>
+        </div>
         <div class="gd-callout info" style="border-color: #059669; background: rgba(5, 150, 105, 0.06);">
           <strong>v18.0 — HubSpot-Driven Deal Picker.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
-            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are now selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
+            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
             <li><strong>Hard block when disconnected:</strong> If HubSpot is not connected, the deal cells show a "Connect HubSpot" prompt instead of an entry field.</li>
             <li><strong>Lazy refresh:</strong> Deal lists fetch on first dropdown open per rep per session. Sync Now and Sync All Reps invalidate the cache so the next open pulls fresh data.</li>
           </ul>
@@ -3375,10 +3437,18 @@
           </tbody>
         </table></div>
         
+        <div class="gd-callout info" style="border-color: #0369a1; background: rgba(3, 105, 161, 0.06);">
+          <strong>v18.1 — Multi-Deal Selection per Slot.</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+            <li><strong>Pick more than one deal:</strong> Each rep can now check multiple deals under their Commit and under their Best Case. The picker is a checkbox list — Commit AED and Best Case AED sum automatically from the selection.</li>
+            <li><strong>Rep-scoped deal list:</strong> Each row's dropdown only shows that rep's own HubSpot deals (fetched by their owner ID). Reps never see another rep's pipeline.</li>
+            <li><strong>Running total + cross-slot guard:</strong> Sticky header shows "N selected · AED total" live as you tick boxes. A deal already picked in Commit is disabled in Best Case (and vice-versa) on the same row.</li>
+          </ul>
+        </div>
         <div class="gd-callout info" style="border-color: #059669; background: rgba(5, 150, 105, 0.06);">
           <strong>v18.0 — HubSpot-Driven Deal Picker.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
-            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are now selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
+            <li><strong>Strict picker:</strong> Commit and Best Case deal names + amounts are selected from a read-only HubSpot dropdown — no more manual entry. Reps retain control over buyer signals, next actions, confidence, and other qualitative fields.</li>
             <li><strong>Hard block when disconnected:</strong> If HubSpot is not connected, the deal cells show a "Connect HubSpot" prompt instead of an entry field.</li>
             <li><strong>Lazy refresh:</strong> Deal lists fetch on first dropdown open per rep per session. Sync Now and Sync All Reps invalidate the cache so the next open pulls fresh data.</li>
           </ul>
@@ -3764,14 +3834,16 @@ const defaultRow = (team, rep) => ({
   team:         team || '',
   rep:          rep  || '',
   stage:        'Qualified',
-  commitText:   '',
-  commitValue:  '',
-  commitHsId:   '',  // v18.0 — HubSpot deal ID for the Commit slot
+  commitText:   '',  // v18.1 — derived: joined names of selected commit deals (read by exporters/dashboard)
+  commitValue:  '',  // v18.1 — derived: SUM of selected commit deals' AED amounts
+  commitHsId:   '',  // v18.0 legacy single-id (kept for back-compat with code that reads .commitHsId)
+  commitHsIds:  [],  // v18.1 — array of HubSpot deal IDs selected for the Commit slot (multi-select)
   commitAction: '',
   buyerSignals: { budget:false, timeline:false, champion:false, demoCompleted:false, proposalSubmitted:false, decisionMaker:false, competitorOut:false },
-  bestCaseText: '',
-  bestCaseValue:'',
-  bestCaseHsId: '',  // v18.0 — HubSpot deal ID for the Best Case slot
+  bestCaseText: '',  // v18.1 — derived: joined names of selected best-case deals
+  bestCaseValue:'',  // v18.1 — derived: SUM of selected best-case deals' AED amounts
+  bestCaseHsId: '',  // v18.0 legacy single-id
+  bestCaseHsIds:[],  // v18.1 — array of HubSpot deal IDs selected for the Best Case slot (multi-select)
   totalPipeline:'',
   // truePipeline = sum of ALL open HubSpot deals for this rep (NOT just the
   // imported Commit/BestCase). Used for Pipeline Coverage Ratio. HubSpot-sourced.
@@ -5618,6 +5690,41 @@ function makeAedCell(ri, field, bgClass, value, editable) {
 // Value = { ts:number, deals:Array<{id,name,amount,stage,...}> } or { error:string }
 const hsRowDealsCache = new Map();
 
+/* ── v18.1 multi-select helpers ───────────────────────────────
+   _dpNormalizeIds: returns the row's selected-ID array, migrating from the
+     legacy single-id field on the fly so older saved data still works.
+   _dpRefreshRowDisplay: updates the AED chip cell next to the picker WITHOUT
+     re-rendering the whole table (which would close the open dropdown).
+ ─────────────────────────────────────────────────────────────── */
+function _dpNormalizeIds(arr, legacyId) {
+  if (Array.isArray(arr) && arr.length) return arr.slice();
+  if (legacyId) return [legacyId];
+  return [];
+}
+function _dpRefreshRowDisplay(ri, slot, total) {
+  // Find the row's <tr> and the value-display <td> for this slot.
+  const tbody = document.getElementById('rowsBody') || document.querySelector('#trackerTable tbody');
+  if (!tbody) return;
+  const trs = tbody.querySelectorAll('tr[data-ri], tr');
+  // We address by index, matching how renderTable appends rows.
+  const tr = trs[ri];
+  if (!tr) return;
+  const cell = tr.querySelector(slot === 'commit'
+    ? 'td.deal-value-display.col-hot-bg'
+    : 'td.deal-value-display.col-warm-bg');
+  if (!cell) return;
+  const val = cell.querySelector('.dvd-val');
+  if (!val) return;
+  const n = Number(total) || 0;
+  if (n > 0) {
+    val.className = 'dvd-val';
+    val.textContent = fmtNum(n);
+  } else {
+    val.className = 'dvd-val empty';
+    val.textContent = '—';
+  }
+}
+
 // Track which menu is currently open so we can close on outside click.
 let _dpOpenMenu = null;
 document.addEventListener('click', (e) => {
@@ -5681,7 +5788,7 @@ function makeDealPickerCell(ri, slot, row, editable) {
   btn.className = 'deal-picker-btn' + (curName ? ' has-value' : '');
   const lbl = document.createElement('span');
   lbl.className = 'dp-label';
-  lbl.textContent = curName || (slot === 'commit' ? 'Select a Commit deal…' : 'Select a Best Case deal…');
+  lbl.textContent = curName || (slot === 'commit' ? 'Select Commit deals…' : 'Select Best Case deals…');
   btn.appendChild(lbl);
   const caret = document.createElement('span');
   caret.className = 'dp-caret';
@@ -5713,68 +5820,140 @@ function makeDealPickerCell(ri, slot, row, editable) {
       menu.innerHTML = '<div class="dp-empty">No open deals in HubSpot for this rep.</div>';
       return;
     }
-    // Forbid picking the same deal in both Commit + Best Case
-    const otherSlotName = (slot === 'commit' ? row.bestCaseText : row.commitText) || '';
-    const otherSlotId   = (slot === 'commit' ? row.bestCaseHsId : row.commitHsId)  || '';
+
+    // ── v18.1 MULTI-SELECT ────────────────────────────────────
+    // Pull current selections from the row (array form). Migrate legacy
+    // single-id rows on the fly so older saved data still works.
+    const idsField   = slot === 'commit' ? 'commitHsIds'   : 'bestCaseHsIds';
+    const otherIdsF  = slot === 'commit' ? 'bestCaseHsIds' : 'commitHsIds';
+    const otherLegId = slot === 'commit' ? 'bestCaseHsId'  : 'commitHsId';
+
+    const selectedIds = new Set(_dpNormalizeIds(row[idsField], row[idField]));
+    const takenIds    = new Set(_dpNormalizeIds(row[otherIdsF], row[otherLegId]));
+    const otherSlotNames = (slot === 'commit' ? row.bestCaseText : row.commitText) || '';
+    const otherNameSet   = new Set(
+      otherSlotNames.split(/\s*[,;]\s*|\s*\n\s*/).map(s => s.trim().toLowerCase()).filter(Boolean)
+    );
+
+    // Sticky header showing running total of the current selection
+    const headerBar = document.createElement('div');
+    headerBar.className = 'dp-multi-header';
+    const updateHeader = () => {
+      const picked = deals.filter(d => selectedIds.has(d.id));
+      const count  = picked.length;
+      const total  = picked.reduce((s,d) => s + (Number(d.amount)||0), 0);
+      headerBar.innerHTML =
+        `<span class="dp-multi-count">${count} selected</span>` +
+        `<span class="dp-multi-total">AED ${fmtNum(total)}</span>`;
+    };
+    updateHeader();
+    menu.appendChild(headerBar);
+
+    // Commit the current selection back to the row + redraw
+    const commitSelection = () => {
+      const r = getCurWeekRows()[ri];
+      if (!r) return;
+      const picked = deals.filter(d => selectedIds.has(d.id));
+      const total  = picked.reduce((s,d) => s + (Number(d.amount)||0), 0);
+      const names  = picked.map(d => d.name).join(', ');
+
+      r[textField]  = names;
+      r[valueField] = total || '';
+      r[idsField]   = picked.map(d => d.id);
+      // Keep legacy single-id field aligned with the FIRST selection so any
+      // older read paths (export, dashboard) still see something sensible.
+      r[idField]    = picked.length ? picked[0].id : '';
+
+      // Commit-slot stage: seed from the HIGHEST-stage selected deal.
+      if (slot === 'commit' && picked.length) {
+        const rank = { Negotiation: 3, Proposal: 2, Discovery: 1, Qualified: 0 };
+        const top  = picked.slice().sort((a,b) => (rank[b.stage]||0) - (rank[a.stage]||0))[0];
+        if (top && top.stage) r.stage = top.stage;
+      }
+      r.updatedAt = new Date().toISOString();
+      saveAll();
+      // Don't re-render whole table while the menu is open (would close it).
+      // Update the picker button label + the AED value cell in this row only.
+      const btnLbl = btn.querySelector('.dp-label');
+      if (btnLbl) {
+        btnLbl.textContent = names
+          || (slot === 'commit' ? 'Select Commit deals…' : 'Select Best Case deals…');
+      }
+      btn.classList.toggle('has-value', !!names);
+      // Refresh the read-only AED chip and KPIs without nuking the open menu.
+      _dpRefreshRowDisplay(ri, slot, total);
+      renderKPIs();
+      renderSummaryBar && renderSummaryBar();
+      updateHeader();
+    };
 
     deals.forEach(d => {
-      const item = document.createElement('div');
-      item.className = 'dp-item';
-      const isTaken = (otherSlotId && d.id === otherSlotId) ||
-                      (otherSlotName && d.name.trim() === otherSlotName.trim());
-      if (isTaken) item.classList.add('dp-disabled');
+      const item = document.createElement('label');
+      item.className = 'dp-item dp-item-multi';
+      const isTakenInOther = takenIds.has(d.id) || otherNameSet.has((d.name||'').trim().toLowerCase());
+      if (isTakenInOther) item.classList.add('dp-disabled');
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.className = 'dp-check';
+      cb.checked = selectedIds.has(d.id);
+      cb.disabled = isTakenInOther;
+      cb.addEventListener('change', (ev) => {
+        ev.stopPropagation();
+        if (cb.checked) selectedIds.add(d.id);
+        else            selectedIds.delete(d.id);
+        item.classList.toggle('dp-checked', cb.checked);
+        commitSelection();
+      });
+
       const n = document.createElement('span');
       n.className = 'dp-name';
       n.textContent = d.name;
-      const a = document.createElement('span');
-      a.className = 'dp-amt';
-      a.textContent = 'AED ' + fmtNum(d.amount || 0);
       const s = document.createElement('span');
       s.className = 'dp-stage';
       s.textContent = d.stage || '—';
+      const a = document.createElement('span');
+      a.className = 'dp-amt';
+      a.textContent = 'AED ' + fmtNum(d.amount || 0);
+
+      item.appendChild(cb);
       item.appendChild(n);
       item.appendChild(s);
       item.appendChild(a);
-      if (!isTaken) {
-        item.onclick = () => {
-          const r = getCurWeekRows()[ri];
-          if (!r) return;
-          r[textField]  = d.name;
-          r[valueField] = d.amount || 0;
-          r[idField]    = d.id;
-          // Commit-slot also seeds the stage (drives forecast weight)
-          if (slot === 'commit' && d.stage) r.stage = d.stage;
-          r.updatedAt = new Date().toISOString();
-          saveAll();
-          renderTable();
-          renderKPIs();
-          renderSummaryBar && renderSummaryBar();
-        };
-      } else {
-        item.title = 'Already selected in the other slot';
-      }
+      if (cb.checked) item.classList.add('dp-checked');
+      if (isTakenInOther) item.title = 'Already selected in the other slot';
       menu.appendChild(item);
     });
 
-    // Clear option
-    if (curName) {
-      const clr = document.createElement('div');
-      clr.className = 'dp-clear';
-      clr.textContent = '✕ Clear selection';
-      clr.onclick = () => {
-        const r = getCurWeekRows()[ri];
-        if (!r) return;
-        r[textField]  = '';
-        r[valueField] = '';
-        r[idField]    = '';
-        r.updatedAt = new Date().toISOString();
-        saveAll();
-        renderTable();
-        renderKPIs();
-        renderSummaryBar && renderSummaryBar();
-      };
-      menu.appendChild(clr);
-    }
+    // Footer with Clear All + Done
+    const foot = document.createElement('div');
+    foot.className = 'dp-multi-footer';
+    const clr = document.createElement('button');
+    clr.type = 'button';
+    clr.className = 'dp-foot-btn dp-clear-btn';
+    clr.textContent = '✕ Clear all';
+    clr.onclick = (ev) => {
+      ev.stopPropagation();
+      selectedIds.clear();
+      // Uncheck visible boxes
+      menu.querySelectorAll('input.dp-check').forEach(c => {
+        if (!c.disabled) { c.checked = false; c.closest('.dp-item').classList.remove('dp-checked'); }
+      });
+      commitSelection();
+    };
+    const done = document.createElement('button');
+    done.type = 'button';
+    done.className = 'dp-foot-btn dp-done-btn';
+    done.textContent = 'Done';
+    done.onclick = (ev) => {
+      ev.stopPropagation();
+      menu.classList.remove('open');
+      _dpOpenMenu = null;
+      renderTable();
+    };
+    foot.appendChild(clr);
+    foot.appendChild(done);
+    menu.appendChild(foot);
   };
 
   // Button click → open menu + lazy-fetch if cache miss / stale
