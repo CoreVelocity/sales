@@ -4,7 +4,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v18.1</title>
+<title>OXEFIT Sales Commitment Tracker v19.0</title>
+
+<!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('oxefit_theme');
+      var sys = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', saved || sys);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 
 <!-- MSAL.js for OneDrive (Microsoft Graph) authentication -->
 <!-- Primary CDN: jsDelivr -->
@@ -23,10 +36,37 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap');
 
-    :root {
-    --navy:       #f0f2f5;
-    --navy-mid:   #f8f9fb;
-    --navy-light: #ffffff;
+    /* ═══════════════════════════════════════════════════════════
+       THEME SYSTEM (v19.0)
+       Two themes share one variable contract. Components reference
+       the semantic tokens below; flipping [data-theme] re-skins the
+       entire app. Accent / status hues are intentionally shared so
+       brand identity stays consistent across light and dark.
+       ═══════════════════════════════════════════════════════════ */
+    :root, [data-theme="light"] {
+    /* surfaces */
+    --navy:       #eef1f6;   /* page background        */
+    --navy-mid:   #f6f8fb;   /* secondary surface      */
+    --navy-light: #ffffff;   /* elevated surface       */
+    --card:       #ffffff;   /* cards / panels         */
+    --card-hover: #f1f5f9;
+    --input-bg:   #ffffff;
+    --row-even:   #f9fafb;
+    --row-hover:  #eef4ff;
+    /* sidebar */
+    --sidebar-bg:        #0f1b34;  /* sidebar is dark in BOTH themes — anchors the brand */
+    --sidebar-grad:      linear-gradient(180deg, #122244 0%, #0c1730 100%);
+    --sidebar-text:      #9fb0cd;
+    --sidebar-text-hi:   #ffffff;
+    --sidebar-active-bg: rgba(59,130,246,0.16);
+    --sidebar-active-bar:#3b82f6;
+    --sidebar-hover-bg:  rgba(255,255,255,0.05);
+    --sidebar-border:    rgba(255,255,255,0.07);
+    /* text */
+    --text:       #1a202c;
+    --text-muted: #5a667a;
+    --border:     #e2e6ea;
+    /* brand + status (shared) */
     --accent:     #3b82f6;
     --accent2:    #2563eb;
     --accent-glow:#60a5fa;
@@ -37,35 +77,68 @@
     --warn:       #f59e0b;
     --hot:        #ef4444;
     --warm:       #f97316;
-    --text:       #1a202c;
-    --text-muted: #4a5568;
-    --border:     #e2e6ea;
-    --card:       #ffffff;
-    --card-hover: #f1f5f9;
-    --input-bg:   #ffffff;
-    --row-even:   #f9fafb;
-    --row-hover:  #eff6ff;
-    --shadow:     0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow:     0 4px 6px -1px rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg:  0 18px 40px -12px rgba(15,27,52,0.22);
   }
+
+  [data-theme="dark"] {
+    /* surfaces */
+    --navy:       #0b1322;   /* page background        */
+    --navy-mid:   #111c30;   /* secondary surface      */
+    --navy-light: #1a2740;   /* elevated surface       */
+    --card:       #14203a;   /* cards / panels         */
+    --card-hover: #1c2c4a;
+    --input-bg:   #0f1a2e;
+    --row-even:   #121e34;
+    --row-hover:  #1a2a47;
+    /* sidebar */
+    --sidebar-bg:        #0a1322;
+    --sidebar-grad:      linear-gradient(180deg, #0c1730 0%, #070e1c 100%);
+    --sidebar-text:      #93a4c4;
+    --sidebar-text-hi:   #ffffff;
+    --sidebar-active-bg: rgba(59,130,246,0.22);
+    --sidebar-active-bar:#60a5fa;
+    --sidebar-hover-bg:  rgba(255,255,255,0.05);
+    --sidebar-border:    rgba(255,255,255,0.06);
+    /* text */
+    --text:       #e7edf7;
+    --text-muted: #93a1ba;
+    --border:     #26344f;
+    /* brand + status (shared, slightly brightened for dark) */
+    --accent:     #3b82f6;
+    --accent2:    #2563eb;
+    --accent-glow:#7cb0ff;
+    --gold:       #f59e0b;
+    --gold-light: #fbbf24;
+    --success:    #10b981;
+    --danger:     #f87171;
+    --warn:       #f59e0b;
+    --hot:        #f87171;
+    --warm:       #fb923c;
+    --shadow:     0 4px 6px -1px rgba(0,0,0,0.40), 0 2px 4px -1px rgba(0,0,0,0.30);
+    --shadow-lg:  0 22px 48px -12px rgba(0,0,0,0.65);
+  }
+
+  html { color-scheme: light dark; }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #f0f2f5;
+    background: var(--navy);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #f8f9fb; }
+  ::-webkit-scrollbar-track { background: var(--navy-mid); }
   ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
   /* LOGIN */
   #loginScreen {
     position: fixed; inset: 0; z-index: 1000;
-    background: #f0f2f5;
+    background: var(--navy);
     display: flex; align-items: center; justify-content: center;
     flex-direction: column;
   }
@@ -82,7 +155,7 @@
     background: radial-gradient(ellipse, rgba(37,99,235,0.12) 0%, transparent 70%);
     border-radius: 50%;
   }
-  .login-card { position: relative; z-index: 2; background: #ffffff; border: 1px solid var(--border); border-radius: 20px; padding: 48px 52px; width: 100%; max-width: 440px; box-shadow: var(--shadow); }
+  .login-card { position: relative; z-index: 2; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 48px 52px; width: 100%; max-width: 440px; box-shadow: var(--shadow); }
   .login-logo-wrap { display: flex; justify-content: center; margin-bottom: 32px; }
   .login-title {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -101,7 +174,7 @@
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   .login-field input:focus, .login-field select:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
-  .login-field select option { background: #f8f9fb; }
+  .login-field select option { background: var(--navy-mid); }
   .login-error {
     background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3);
     border-radius: 8px; color: #fca5a5; font-size: 13px; font-weight: 500;
@@ -122,7 +195,7 @@
      white background, 1px #8C8C8C border, official 4-square logo */
   .ms-signin-btn {
     width: 100%;
-    background: #ffffff; color: #5e5e5e;
+    background: var(--card); color: #5e5e5e;
     border: 1px solid #8c8c8c; border-radius: 10px;
     font-family: 'Segoe UI', 'Barlow', system-ui, sans-serif;
     font-size: 15px; font-weight: 600;
@@ -168,8 +241,8 @@
   }
 
   /* MAIN APP */
-  #app { display: none; flex-direction: column; min-height: 100vh; }
-  #app.visible { display: flex; }
+  #app { display: none; min-height: 100vh; }
+  #app.visible { display: flex; flex-direction: row; }
 
   /* MODE BANNERS */
   .view-banner {
@@ -188,15 +261,114 @@
     font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #6ee7b7;
   }
 
+  /* ═══════════════ SIDEBAR (v19.0) ═══════════════ */
+  .sidebar {
+    width: 248px; flex-shrink: 0;
+    background: var(--sidebar-bg);
+    background-image: var(--sidebar-grad);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+    z-index: 200;
+  }
+  .sidebar-brand {
+    height: 64px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .sidebar-logo { height: 38px; width: auto; filter: drop-shadow(0 2px 8px rgba(37,99,235,0.35)); }
+  .sidebar-brand-fallback {
+    font-family: 'Barlow Condensed','Inter',sans-serif; font-weight: 800;
+    font-size: 26px; letter-spacing: 3px; color: var(--sidebar-text-hi);
+  }
+  .sidebar-nav { flex: 1; padding: 18px 14px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+  .nav-item {
+    position: relative; display: flex; align-items: center; gap: 13px;
+    width: 100%; text-align: left; cursor: pointer;
+    background: transparent; border: none;
+    color: var(--sidebar-text);
+    font-family: 'Inter','Segoe UI',system-ui,sans-serif;
+    font-size: 13.5px; font-weight: 600; letter-spacing: 0.2px;
+    padding: 12px 14px; border-radius: 11px;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.06s ease;
+  }
+  .nav-item:hover { background: var(--sidebar-hover-bg); color: var(--sidebar-text-hi); }
+  .nav-item:active { transform: scale(0.985); }
+  .nav-item.active { background: var(--sidebar-active-bg); color: var(--sidebar-text-hi); }
+  .nav-item.active::before {
+    content: ''; position: absolute; left: -14px; top: 8px; bottom: 8px;
+    width: 4px; border-radius: 0 4px 4px 0; background: var(--sidebar-active-bar);
+    box-shadow: 0 0 12px var(--sidebar-active-bar);
+  }
+  .nav-ico { font-size: 17px; width: 22px; text-align: center; opacity: 0.95; flex-shrink: 0; }
+  .nav-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .sidebar-footer {
+    flex-shrink: 0; padding: 16px 18px 20px;
+    border-top: 1px solid var(--sidebar-border);
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .sidebar-version {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--sidebar-text); opacity: 0.6; text-align: center;
+  }
+  /* THEME TOGGLE */
+  .theme-toggle {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--sidebar-border);
+    border-radius: 30px; padding: 7px 10px; cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.08); }
+  .theme-toggle-ico { font-size: 13px; line-height: 1; transition: opacity 0.2s; }
+  .theme-toggle-ico.sun  { color: #fbbf24; }
+  .theme-toggle-ico.moon { color: #93c5fd; }
+  [data-theme="dark"]  .theme-toggle-ico.sun  { opacity: 0.35; }
+  [data-theme="light"] .theme-toggle-ico.moon { opacity: 0.35; }
+  .theme-toggle-track {
+    position: relative; width: 40px; height: 20px; border-radius: 20px;
+    background: rgba(255,255,255,0.18); transition: background 0.2s;
+  }
+  [data-theme="dark"] .theme-toggle-track { background: rgba(96,165,250,0.45); }
+  .theme-toggle-thumb {
+    position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transition: transform 0.22s cubic-bezier(.4,0,.2,1);
+  }
+  [data-theme="dark"] .theme-toggle-thumb { transform: translateX(20px); }
+
+  /* SCRIM (mobile only) */
+  .sidebar-scrim {
+    display: none; position: fixed; inset: 0; z-index: 150;
+    background: rgba(4,9,18,0.55); backdrop-filter: blur(2px);
+  }
+
+  /* MAIN COLUMN */
+  .main-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* HAMBURGER (mobile menu trigger) */
+  .hamburger {
+    display: none; flex-direction: column; justify-content: center; gap: 4px;
+    width: 38px; height: 38px; border-radius: 9px; cursor: pointer;
+    background: var(--card); border: 1px solid var(--border);
+    margin-right: 4px; flex-shrink: 0;
+  }
+  .hamburger span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--text); margin: 0 auto; transition: 0.2s; }
+
   /* TOPBAR */
-  .topbar { background: #ffffff; border-bottom: 1px solid var(--border); color: var(--text);
-    background: #f8f9fb; border-bottom: 1px solid var(--border);
+  .topbar { background: var(--navy-mid); border-bottom: 1px solid var(--border); color: var(--text);
     padding: 0 28px; height: 64px;
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+  }
+  .topbar-heading {
+    font-family: 'Inter','Segoe UI',system-ui,sans-serif;
+    font-size: 17px; font-weight: 700; letter-spacing: 0.3px; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .topbar-logo { display: flex; align-items: center; }
-  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
   .role-badge {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
@@ -239,8 +411,8 @@
   .sync-dot.error    { background: var(--danger); }
 
   /* MONTH NAV */
-  .month-nav-bar { background: #ffffff; border-bottom: 1px solid var(--border);
-    background: #f8f9fb; border-bottom: 1px solid var(--border);
+  .month-nav-bar { background: var(--card); border-bottom: 1px solid var(--border);
+    background: var(--navy-mid); border-bottom: 1px solid var(--border);
     padding: 10px 28px; display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 12px;
   }
@@ -279,7 +451,7 @@
   }
   .modal-backdrop.open { display: flex; }
   .month-picker-modal {
-    background: #f8f9fb; border: 1px solid rgba(37,99,235,0.3);
+    background: var(--navy-mid); border: 1px solid rgba(37,99,235,0.3);
     border-radius: 16px; padding: 28px; width: 340px; box-shadow: var(--shadow);
   }
   .modal-year-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -305,7 +477,7 @@
 
   /* SUBMIT CONFIRM MODAL */
   .confirm-modal {
-    background: #f8f9fb; border: 1px solid rgba(245,158,11,0.4);
+    background: var(--navy-mid); border: 1px solid rgba(245,158,11,0.4);
     border-radius: 16px; padding: 28px; width: 440px; max-width: 95vw;
     box-shadow: var(--shadow);
   }
@@ -328,7 +500,7 @@
   }
   @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
-  .kpi-card { background: #ffffff; border: 1px solid var(--border); color: var(--text);
+  .kpi-card { background: var(--card); border: 1px solid var(--border); color: var(--text);
     background: var(--card); border: 1px solid var(--border); border-radius: 14px;
     padding: 20px 18px; position: relative; overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -351,7 +523,7 @@
   .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
   /* WEEK TABS */
-  .week-tabs { background: #f8f9fb; border-bottom: 1px solid var(--border); display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .week-tabs { background: var(--navy-mid); border-bottom: 1px solid var(--border); display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
   .week-tab {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     color: var(--text-muted); font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 600;
@@ -363,7 +535,7 @@
 
   /* TABLE SECTION */
   .table-section {
-    background: #f8f9fb; border: 1px solid var(--border);
+    background: var(--navy-mid); border: 1px solid var(--border);
     border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 24px;
   }
   .table-header {
@@ -457,7 +629,7 @@
   .cell-input:hover:not(:focus):not([readonly]) { border-color: var(--border); background: var(--input-bg); }
   .cell-input[readonly] { cursor: default; }
   select.cell-input { cursor: pointer; }
-  select.cell-input option { background: #f8f9fb; }
+  select.cell-input option { background: var(--navy-mid); }
   select.cell-input[disabled] { cursor: not-allowed; }
   .rep-name-cell {
     min-width: 110px; font-weight: 600; padding: 6px 10px;
@@ -510,8 +682,8 @@
   .deal-picker-btn {
     display: flex; align-items: center; justify-content: space-between;
     width: 100%; padding: 8px 10px; gap: 8px;
-    background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px;
-    font: 500 12.5px/1.3 'Inter', system-ui, sans-serif; color: #1e293b;
+    background: var(--card); border: 1px solid #cbd5e1; border-radius: 6px;
+    font: 500 12.5px/1.3 'Inter', system-ui, sans-serif; color: var(--text);
     cursor: pointer; text-align: left;
     transition: border-color .15s, box-shadow .15s;
   }
@@ -523,7 +695,7 @@
 
   .deal-picker-menu {
     position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30;
-    background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px;
+    background: var(--card); border: 1px solid #cbd5e1; border-radius: 6px;
     box-shadow: 0 8px 24px rgba(15,23,42,.14);
     max-height: 280px; overflow-y: auto;
     display: none;
@@ -540,7 +712,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 10px; gap: 8px; cursor: pointer;
     border-bottom: 1px solid #f1f5f9;
-    font: 400 12px/1.3 'Inter', system-ui, sans-serif; color: #1e293b;
+    font: 400 12px/1.3 'Inter', system-ui, sans-serif; color: var(--text);
   }
   .deal-picker-menu .dp-item:last-child { border-bottom: none; }
   .deal-picker-menu .dp-item:hover { background: #f8fafc; }
@@ -584,19 +756,19 @@
      live by name (case-insensitive substring). */
   .deal-picker-menu .dp-search-wrap {
     position: sticky; top: 36px; z-index: 2;
-    padding: 6px 8px; background: #ffffff;
+    padding: 6px 8px; background: var(--card);
     border-bottom: 1px solid #e2e8f0;
   }
   .deal-picker-menu .dp-search {
     width: 100%; box-sizing: border-box;
     padding: 6px 10px 6px 28px;
     border: 1px solid #cbd5e1; border-radius: 5px;
-    font: 400 12px 'Inter', system-ui, sans-serif; color: #1e293b;
+    font: 400 12px 'Inter', system-ui, sans-serif; color: var(--text);
     background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 8px center;
     outline: none; transition: border-color .12s ease, background-color .12s ease;
   }
   .deal-picker-menu .dp-search:focus {
-    border-color: #0369a1; background-color: #ffffff;
+    border-color: #0369a1; background-color: var(--card);
     box-shadow: 0 0 0 3px rgba(3,105,161,0.12);
   }
   .deal-picker-menu .dp-search::placeholder { color: #94a3b8; }
@@ -660,7 +832,7 @@
   }
   .deal-value-display .dvd-aed {
     font: 600 10px 'Inter', system-ui, sans-serif; color: #64748b;
-    background: #ffffff; padding: 2px 6px; border-radius: 3px;
+    background: var(--card); padding: 2px 6px; border-radius: 3px;
     border: 1px solid #cbd5e1; flex-shrink: 0;
   }
   .deal-value-display .dvd-val {
@@ -739,10 +911,10 @@
   .unlock-mini:hover { color: var(--danger); }
 
   /* MONTHLY COMMITMENTS PANEL */
-  .commit-panel { background: #f8f9fb; border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
+  .commit-panel { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
   .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1e40af; margin-bottom: 14px; }
   .commit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .commit-card { background: #ffffff; border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
+  .commit-card { background: var(--card); border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
   .commit-card.dubai     { border-left: 3px solid var(--accent-glow); }
   .commit-card.abu-dhabi { border-left: 3px solid var(--gold-light); }
   .commit-card.total     { border-left: 3px solid var(--success); }
@@ -765,7 +937,7 @@
   @media (max-width: 800px) { .commit-grid { grid-template-columns: 1fr; } }
 
   /* SUMMARY BAR */
-  .summary-bar { background: #ffffff; border: 1px solid var(--border); background: #f8f9fb; border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
+  .summary-bar { background: var(--card); border: 1px solid var(--border); background: var(--navy-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
   .summary-bar-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
   .summary-weeks { display: flex; gap: 10px; align-items: flex-end; height: 110px; }
   .summary-week { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
@@ -1323,7 +1495,7 @@
   /* ── PRIMARY TAB BAR (Tracker / Marketing Consumer Performance) ── */
   .primary-tabs {
     display: flex; gap: 0; align-items: stretch;
-    background: #f8f9fb; border-bottom: 1px solid var(--border);
+    background: var(--navy-mid); border-bottom: 1px solid var(--border);
     padding: 0 24px;
   }
   .primary-tab {
@@ -1350,7 +1522,7 @@
 
   /* ── MARKETING / GDRIVE VIEW ── */
   .gdrive-panel {
-    background: #f8f9fb; border: 1px solid var(--border);
+    background: var(--navy-mid); border: 1px solid var(--border);
     border-radius: 14px; padding: 22px 24px; margin: 20px 24px;
   }
   .gdrive-head {
@@ -1421,7 +1593,7 @@
     margin-top: 18px; background: #000; border: 1px solid var(--border);
     border-radius: 12px; overflow: hidden; min-height: 600px;
   }
-  .gdrive-viewer-wrap iframe { width: 100%; height: 720px; border: 0; display: block; background: #fff; }
+  .gdrive-viewer-wrap iframe { width: 100%; height: 720px; border: 0; display: block; background: var(--card); }
   .gdrive-viewer-empty {
     padding: 60px 20px; text-align: center; color: var(--text-muted);
     font-size: 13px;
@@ -1583,11 +1755,30 @@
     font-size: 13px;
   }
 
+  @media (max-width: 980px) {
+    .sidebar {
+      position: fixed; left: 0; top: 0; height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.26s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-scrim.open { display: block; }
+    .hamburger { display: flex; }
+  }
+
   @media (max-width: 768px) {
     .content { padding: 14px; }
-    .topbar { background: #ffffff; border-bottom: 1px solid var(--border); color: var(--text); padding: 0 14px; }
-    .month-nav-bar { background: #ffffff; border-bottom: 1px solid var(--border); padding: 8px 14px; }
+    .topbar { padding: 0 14px; }
+    .month-nav-bar { padding: 8px 14px; }
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .topbar-heading { font-size: 15px; }
+    .topbar-right { gap: 10px; }
+    .user-chip .user-name { display: none; }
+  }
+  @media (max-width: 520px) {
+    .topbar-right .sync-chip span,
+    .topbar-right .hubspot-chip span { display: none; }
   }
 
   /* ════════════ DEMO TRACKER (v13) ════════════ */
@@ -2177,7 +2368,7 @@
   .pcr-bar-fill.good { background: linear-gradient(90deg, var(--success), #34d399); }
   .pcr-bar-fill.warn { background: linear-gradient(90deg, var(--warn), var(--gold-light)); }
   .pcr-bar-fill.bad  { background: linear-gradient(90deg, var(--danger), #f87171); }
-  .pcr-bar-target { position:absolute; top:-2px; bottom:-2px; width:2px; background:#fff; opacity:0.6; }
+  .pcr-bar-target { position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--card); opacity:0.6; }
   .pcr-bar-target::after {
     content: attr(data-label); position:absolute; top:-14px; left:50%;
     transform:translateX(-50%); font-size:9px; color:var(--text-muted); white-space:nowrap;
@@ -2343,7 +2534,7 @@
   .pcr-rep,
   .rep-card-name,
   .rep-metric .val,
-  .rep-units .val { color: #1a202c; }
+  .rep-units .val { color: var(--text); }
 
   /* Keep semantic status colors intact (good/warn/bad win via specificity) */
   .perf-kpi-val.good,
@@ -2378,13 +2569,13 @@
   thead th.col-forecast,
   thead th.col-blocked,
   thead th.col-stage,
-  thead th.col-qual { color: #000000; }
-  thead th .th-hint { color: #1a202c; opacity: 0.9; }
+  thead th.col-qual { color: var(--text); }
+  thead th .th-hint { color: var(--text); opacity: 0.9; }
 
   /* R2 — Buyer Signals column header + its option labels → dark navy.
      (Kept distinct from the black headers per request.) */
-  thead th.col-signals            { color: #1e293b; }
-  .buyer-signals-grid label       { color: #1e293b; }
+  thead th.col-signals            { color: var(--text); }
+  .buyer-signals-grid label       { color: var(--text); }
 
   /* R4 — A selected (checked) buyer-signal option → dark green (was blue).
      Applies to both the live editable grid and the locked read-only chips. */
@@ -2438,7 +2629,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v18.1 · Multi-deal selection per Commit / Best Case slot · rep-scoped picker · running AED total · strict read-only · lazy-refresh on dropdown open
+      v19.0 · Redesigned sidebar navigation · Light &amp; Dark theme · Multi-deal selection per Commit / Best Case slot · rep-scoped picker · running AED total
     </div>
   </div>
 </div>
@@ -2470,16 +2661,58 @@
 <!-- MAIN APP -->
 <div id="app">
 
+  <!-- ░░░ SIDEBAR NAVIGATION (v19.0) ░░░ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <img src="2.png" alt="OXEFIT" class="sidebar-logo"
+           onerror="this.style.display='none';document.getElementById('sidebarBrandFallback').style.display='inline';">
+      <span class="sidebar-brand-fallback" id="sidebarBrandFallback" style="display:none;">OXEFIT</span>
+    </div>
+
+    <nav class="sidebar-nav" id="primaryTabs">
+      <button class="nav-item active" data-tab="tracker" onclick="switchTab('tracker')">
+        <span class="nav-ico">📊</span><span class="nav-label">Sales Tracker</span>
+      </button>
+      <button class="nav-item" data-tab="performance" onclick="switchTab('performance')">
+        <span class="nav-ico">🎯</span><span class="nav-label">Rep Performance</span>
+      </button>
+      <button class="nav-item" data-tab="demos" onclick="switchTab('demos')">
+        <span class="nav-ico">🎬</span><span class="nav-label">Demo Tracker</span>
+      </button>
+      <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')">
+        <span class="nav-ico">📈</span><span class="nav-label">Marketing</span>
+      </button>
+      <button class="nav-item" data-tab="guidelines" onclick="switchTab('guidelines')">
+        <span class="nav-ico">📖</span><span class="nav-label">Guidelines</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light / dark mode" aria-label="Toggle theme">
+        <span class="theme-toggle-ico sun">☀</span>
+        <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
+        <span class="theme-toggle-ico moon">☾</span>
+      </button>
+      <div class="sidebar-version">v19.0</div>
+    </div>
+  </aside>
+
+  <!-- mobile scrim -->
+  <div class="sidebar-scrim" id="sidebarScrim" onclick="closeSidebar()"></div>
+
+  <!-- ░░░ MAIN COLUMN ░░░ -->
+  <div class="main-wrap">
+
   <div class="rep-banner" id="repBanner" style="display:none;">
     <div class="view-banner-dot" style="background:#10b981;"></div>
     <span id="repBannerText">Sales Rep Mode — You can only edit your own row</span>
   </div>
 
   <div class="topbar">
-    <div class="topbar-logo">
-      <img src="2.png" alt="OXEFIT Logo" style="height:44px;width:auto;filter:brightness(1.05) drop-shadow(0 2px 6px rgba(37,99,235,0.3));"
-           onerror="this.style.display='none'">
-    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-heading" id="topbarHeading">Sales Tracker</div>
     <div class="topbar-right">
       <div class="sync-chip" id="syncChip" onclick="manualSync()" title="OneDrive sync status">
         <div class="sync-dot" id="syncDot"></div>
@@ -2509,25 +2742,6 @@
       <div class="month-arrow" onclick="shiftMonth(1)">&#8250;</div>
     </div>
     <div class="month-dot-row" id="monthDotRow"></div>
-  </div>
-
-  <!-- PRIMARY TABS -->
-  <div class="primary-tabs" id="primaryTabs">
-    <button class="primary-tab active" data-tab="tracker" onclick="switchTab('tracker')">
-      <span class="primary-tab-icon">📊</span>Sales Tracker
-    </button>
-    <button class="primary-tab" data-tab="performance" onclick="switchTab('performance')">
-      <span class="primary-tab-icon">🎯</span>Sales Rep Performance
-    </button>
-    <button class="primary-tab" data-tab="demos" onclick="switchTab('demos')">
-      <span class="primary-tab-icon">🎬</span>Demo Tracker
-    </button>
-    <button class="primary-tab" data-tab="marketing" onclick="switchTab('marketing')">
-      <span class="primary-tab-icon">📈</span>Marketing Consumer Performance
-    </button>
-    <button class="primary-tab" data-tab="guidelines" onclick="switchTab('guidelines')">
-      <span class="primary-tab-icon">📖</span>Guidelines
-    </button>
   </div>
 
   <!-- TRACKER VIEW -->
@@ -3577,6 +3791,7 @@
 
   <div class="toast" id="toast"></div>
 
+  </div><!-- /.main-wrap -->
 </div>
 
 <!-- HubSpot deal-picker modal -->
@@ -7833,13 +8048,44 @@ function escapeHtml(s) {
 /* ════════════════════════════════════════════════════════════════════
    TAB SWITCHING — Sales Tracker  ⇄  Marketing Consumer Performance
 ════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   THEME + SIDEBAR CONTROLS (v19.0)
+════════════════════════════════════════ */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('oxefit_theme', theme); } catch (e) {}
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+}
+function toggleSidebar() {
+  document.getElementById('sidebar')?.classList.toggle('open');
+  document.getElementById('sidebarScrim')?.classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sidebarScrim')?.classList.remove('open');
+}
+
+const TAB_HEADINGS = {
+  tracker:     'Sales Tracker',
+  performance: 'Sales Rep Performance',
+  demos:       'Demo Tracker',
+  marketing:   'Marketing Consumer Performance',
+  guidelines:  'Guidelines'
+};
+
 function switchTab(tabName) {
-  document.querySelectorAll('.primary-tab').forEach(b => {
+  document.querySelectorAll('.nav-item').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);
   });
   document.querySelectorAll('.tab-view').forEach(v => {
     v.classList.toggle('active', v.id === 'view-' + tabName);
   });
+  const heading = document.getElementById('topbarHeading');
+  if (heading) heading.textContent = TAB_HEADINGS[tabName] || '';
+  closeSidebar();   // collapse mobile drawer after navigating
   if (tabName === 'marketing') {
     gdEnsureInit();         // lazy-init Google APIs on first visit
     gdRestoreFromCache();   // re-open the last viewed file if any
