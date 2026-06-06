@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v19.3</title>
+<title>CoreV | OxeFit Sales Tracker v19.4</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2084,6 +2084,23 @@
   .req-check input { width: auto; accent-color: var(--accent2); }
   .req-form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 
+  /* v19.4 — event-specific fields */
+  .req-event-section {
+    margin-top: 16px; padding-top: 18px; border-top: 1px dashed var(--border);
+  }
+  .req-event-banner {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+    color: #fff; background: var(--brand-grad); display: inline-block;
+    padding: 5px 12px; border-radius: 8px; margin-bottom: 14px;
+  }
+  .req-audience-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 560px) { .req-audience-grid { grid-template-columns: 1fr; } }
+  .req-audience-grid .req-check { font-size: 12.5px; font-weight: 500; padding: 8px 10px; }
+  .req-outcomes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 680px) { .req-outcomes { grid-template-columns: 1fr; } }
+  .req-outcome-cell { display: flex; flex-direction: column; gap: 5px; }
+  .req-sub-label { font-size: 10.5px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.3px; }
+
   .req-list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
   .req-filter {
     background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
@@ -2129,6 +2146,20 @@
     display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 8px;
     background: rgba(37,99,235,0.12); color: var(--accent2); margin-right: 6px;
   }
+  /* v19.4 — event detail block inside a request card */
+  .req-event-detail { margin-top: 12px; padding: 14px 16px; background: var(--navy-mid); border: 1px solid var(--border); border-radius: 12px; }
+  .req-event-detail-head { font-size: 10.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--teal2); margin-bottom: 10px; }
+  [data-theme="dark"] .req-event-detail-head { color: var(--teal); }
+  .req-event-detail .req-detail-grid { margin-top: 0; padding-top: 0; border-top: none; }
+  .req-yn { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 9px; border-radius: 999px; }
+  .req-yn.yes { background: rgba(16,185,129,0.16); color: #047857; }
+  .req-yn.no  { background: var(--card-hover); color: var(--text-muted); }
+  [data-theme="dark"] .req-yn.yes { color: #6ee7b7; }
+  .req-aud-tag {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 8px;
+    background: rgba(13,148,136,0.12); color: var(--teal2); margin: 0 6px 6px 0;
+  }
+  [data-theme="dark"] .req-aud-tag { color: var(--teal); }
   .req-item-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
   .req-mini-btn {
     font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 8px; cursor: pointer;
@@ -3318,7 +3349,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v19.1 · Collapsible sidebar · Event &amp; On-site Demo requests · Light &amp; Dark theme · Multi-deal selection per Commit / Best Case slot
+      v19.4 · Executive dashboard &amp; command bar · Detailed Event requests · Deal Ownership rules · Light &amp; Dark theme
     </div>
   </div>
 </div>
@@ -3377,7 +3408,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.3</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.4</strong></p>
     </div>
   </div>
 </div>
@@ -3443,7 +3474,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.3</div>
+      <div class="sidebar-version">v19.4</div>
     </div>
   </aside>
 
@@ -3866,7 +3897,7 @@
         <div class="req-grid">
           <div class="req-field">
             <label>Request Type</label>
-            <select id="reqType" required>
+            <select id="reqType" required onchange="toggleEventFields()">
               <option value="On-site Demo">On-site Demo</option>
               <option value="Event">Event</option>
             </select>
@@ -3918,6 +3949,97 @@
             <div class="req-devices">
               <label class="req-check"><input type="checkbox" class="reqDevice" value="XS1"><span>XS1</span></label>
               <label class="req-check"><input type="checkbox" class="reqDevice" value="XP1"><span>XP1</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- ░ EVENT-ONLY FIELDS (v19.4) — shown when Request Type = Event ░ -->
+        <div class="req-event-section" id="eventFields" style="display:none;">
+          <div class="req-event-banner">Event Details</div>
+          <div class="req-grid">
+            <div class="req-field">
+              <label>Event Type</label>
+              <select id="reqEventType">
+                <option value="Pilot">Pilot</option>
+                <option value="Client Activation">Client Activation</option>
+                <option value="Event">Event</option>
+                <option value="Conditional POC">Conditional POC</option>
+              </select>
+            </div>
+            <div class="req-field">
+              <label>Location</label>
+              <select id="reqLocation">
+                <option value="Dubai">Dubai</option>
+                <option value="Abu Dhabi">Abu Dhabi</option>
+                <option value="Outside UAE">Outside UAE</option>
+              </select>
+            </div>
+            <div class="req-field req-col-2">
+              <label>Organizer &amp; Host Name</label>
+              <input type="text" id="reqOrganizer" placeholder="e.g. CoreV Events / co-hosted with Emirates Wellness">
+            </div>
+            <div class="req-field">
+              <label>Operating Hours</label>
+              <input type="text" id="reqOpHours" placeholder="e.g. 9:00 AM – 6:00 PM">
+            </div>
+            <div class="req-field">
+              <label>Expected Footfall</label>
+              <input type="number" id="reqFootfall" min="0" step="10" placeholder="0">
+            </div>
+            <div class="req-field req-col-2">
+              <label>Primary Contact Person / Client</label>
+              <input type="text" id="reqContact" placeholder="Name · role · phone / email">
+            </div>
+
+            <div class="req-field req-col-2">
+              <label>Audience Type</label>
+              <div class="req-audience-grid">
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="Healthcare Professionals"><span>Healthcare Professionals</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="Athletes / Sports Teams"><span>Athletes / Sports Teams</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="Corporate / Executives"><span>Corporate / Executives</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="General Public"><span>General Public</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="Students / Academia"><span>Students / Academia</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="Rehab / Patients"><span>Rehab / Patients</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="VIP / Government"><span>VIP / Government</span></label>
+                <label class="req-check"><input type="checkbox" class="reqAudience" value="Investors"><span>Investors</span></label>
+              </div>
+              <input type="text" id="reqAudienceOther" placeholder="Other (please specify)…" style="margin-top:8px;">
+            </div>
+
+            <div class="req-field">
+              <label>VIP Attendance Expected</label>
+              <select id="reqVIP"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="req-field">
+              <label>Media Coverage</label>
+              <select id="reqMedia"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+
+            <div class="req-field req-col-2">
+              <label>Expected Outcomes</label>
+              <div class="req-outcomes">
+                <div class="req-outcome-cell">
+                  <span class="req-sub-label">Number of Leads</span>
+                  <input type="number" id="reqLeads" min="0" step="1" placeholder="0">
+                </div>
+                <div class="req-outcome-cell">
+                  <span class="req-sub-label">Potential Revenue (AED)</span>
+                  <input type="number" id="reqRevenue" min="0" step="1000" placeholder="0">
+                </div>
+                <div class="req-outcome-cell">
+                  <span class="req-sub-label">Strategic Relationships</span>
+                  <input type="text" id="reqStrategic" placeholder="e.g. distributor intro, MoU…">
+                </div>
+              </div>
+            </div>
+
+            <div class="req-field">
+              <label>Budget Confirmed by Client</label>
+              <select id="reqBudgetConfirmed" onchange="toggleBudgetAmount()"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="req-field" id="budgetAmountField" style="display:none;">
+              <label>Confirmed Budget (AED)</label>
+              <input type="number" id="reqBudgetAmount" min="0" step="1000" placeholder="0">
             </div>
           </div>
         </div>
@@ -9775,6 +9897,17 @@ function populateReqRepSelect() {
   }
 }
 
+function toggleEventFields() {
+  const isEvent = document.getElementById('reqType')?.value === 'Event';
+  const sec = document.getElementById('eventFields');
+  if (sec) sec.style.display = isEvent ? 'block' : 'none';
+}
+function toggleBudgetAmount() {
+  const yes = document.getElementById('reqBudgetConfirmed')?.value === 'Yes';
+  const f = document.getElementById('budgetAmountField');
+  if (f) f.style.display = yes ? 'flex' : 'none';
+}
+
 function resetRequestForm() {
   const f = document.getElementById('requestForm');
   if (!f) return;
@@ -9782,13 +9915,17 @@ function resetRequestForm() {
   document.getElementById('reqEditId').value = '';
   document.getElementById('reqSubmitBtn').textContent = 'Submit Request';
   document.querySelectorAll('.reqDevice').forEach(c => c.checked = false);
+  document.querySelectorAll('.reqAudience').forEach(c => c.checked = false);
   populateReqRepSelect();
+  toggleEventFields();
+  toggleBudgetAmount();
 }
 
 function submitRequest(ev) {
   if (ev) ev.preventDefault();
   if (!reqCanWrite()) { showToast('You do not have permission to submit requests', 'error'); return; }
 
+  const type  = document.getElementById('reqType').value;
   const start = document.getElementById('reqStart').value;
   const end   = document.getElementById('reqEnd').value;
   if (start && end && end < start) {
@@ -9796,32 +9933,50 @@ function submitRequest(ev) {
     return;
   }
   const devices = Array.from(document.querySelectorAll('.reqDevice:checked')).map(c => c.value);
-  if (!devices.length) { showToast('Select at least one device', 'error'); return; }
+  if (type === 'On-site Demo' && !devices.length) { showToast('Select at least one device', 'error'); return; }
 
   const editId = document.getElementById('reqEditId').value;
   const repVal = (currentRole === 'rep' && ALL_REPS.includes(currentUser))
                  ? currentUser
                  : (document.getElementById('reqRep').value || currentUser);
+  const val = (id) => { const e = document.getElementById(id); return e ? (e.value || '').trim() : ''; };
+  const numv = (id) => parseFloat(document.getElementById(id)?.value) || 0;
+  const audience = Array.from(document.querySelectorAll('.reqAudience:checked')).map(c => c.value);
 
   const payload = {
-    type:          document.getElementById('reqType').value,
+    type:          type,
     rep:           repVal,
-    client:        document.getElementById('reqClient').value.trim(),
-    details:       document.getElementById('reqDetails').value.trim(),
+    client:        val('reqClient'),
+    details:       val('reqDetails'),
     expectedStart: start,
     expectedEnd:   end,
-    commercial:    document.getElementById('reqCommercial').value.trim(),
-    plan:          document.getElementById('reqPlan').value.trim(),
-    participants:  document.getElementById('reqParticipants').value.trim(),
-    cost:          parseFloat(document.getElementById('reqCost').value) || 0,
+    commercial:    val('reqCommercial'),
+    plan:          val('reqPlan'),
+    participants:  val('reqParticipants'),
+    cost:          numv('reqCost'),
     devices:       devices,
+    // ── event-specific (v19.4) ──
+    eventType:       val('reqEventType'),
+    location:        val('reqLocation'),
+    organizer:       val('reqOrganizer'),
+    opHours:         val('reqOpHours'),
+    footfall:        numv('reqFootfall'),
+    contact:         val('reqContact'),
+    audience:        audience,
+    audienceOther:   val('reqAudienceOther'),
+    vip:             val('reqVIP'),
+    media:           val('reqMedia'),
+    leads:           numv('reqLeads'),
+    revenueOpp:      numv('reqRevenue'),
+    strategic:       val('reqStrategic'),
+    budgetConfirmed: val('reqBudgetConfirmed'),
+    budgetAmount:    numv('reqBudgetAmount'),
     updatedAt:     new Date().toISOString()
   };
 
   if (editId) {
     const idx = requestEntries.findIndex(r => r.id === editId);
     if (idx >= 0) {
-      // editing keeps original submitter/status unless a manager edits
       requestEntries[idx] = { ...requestEntries[idx], ...payload };
       showToast('Request updated', 'success');
     }
@@ -9846,19 +10001,38 @@ function editRequest(id) {
   if (!reqIsManager() && !(currentRole === 'rep' && r.rep === currentUser)) {
     showToast('You can only edit your own requests', 'error'); return;
   }
-  document.getElementById('reqType').value         = r.type || 'On-site Demo';
+  const set = (elid, v) => { const e = document.getElementById(elid); if (e) e.value = (v == null ? '' : v); };
+  set('reqType', r.type || 'On-site Demo');
   populateReqRepSelect();
-  if (!document.getElementById('reqRep').disabled) document.getElementById('reqRep').value = r.rep || currentUser;
-  document.getElementById('reqClient').value       = r.client || '';
-  document.getElementById('reqDetails').value      = r.details || '';
-  document.getElementById('reqStart').value        = r.expectedStart || '';
-  document.getElementById('reqEnd').value          = r.expectedEnd || '';
-  document.getElementById('reqCommercial').value   = r.commercial || '';
-  document.getElementById('reqPlan').value         = r.plan || '';
-  document.getElementById('reqParticipants').value = r.participants || '';
-  document.getElementById('reqCost').value         = r.cost || '';
+  if (!document.getElementById('reqRep').disabled) set('reqRep', r.rep || currentUser);
+  set('reqClient', r.client);
+  set('reqDetails', r.details);
+  set('reqStart', r.expectedStart);
+  set('reqEnd', r.expectedEnd);
+  set('reqCommercial', r.commercial);
+  set('reqPlan', r.plan);
+  set('reqParticipants', r.participants);
+  set('reqCost', r.cost || '');
   document.querySelectorAll('.reqDevice').forEach(c => { c.checked = (r.devices || []).includes(c.value); });
-  document.getElementById('reqEditId').value       = r.id;
+  // event-specific
+  set('reqEventType', r.eventType || 'Pilot');
+  set('reqLocation', r.location || 'Dubai');
+  set('reqOrganizer', r.organizer);
+  set('reqOpHours', r.opHours);
+  set('reqFootfall', r.footfall || '');
+  set('reqContact', r.contact);
+  document.querySelectorAll('.reqAudience').forEach(c => { c.checked = (r.audience || []).includes(c.value); });
+  set('reqAudienceOther', r.audienceOther);
+  set('reqVIP', r.vip || 'No');
+  set('reqMedia', r.media || 'No');
+  set('reqLeads', r.leads || '');
+  set('reqRevenue', r.revenueOpp || '');
+  set('reqStrategic', r.strategic);
+  set('reqBudgetConfirmed', r.budgetConfirmed || 'No');
+  set('reqBudgetAmount', r.budgetAmount || '');
+  toggleEventFields();
+  toggleBudgetAmount();
+  document.getElementById('reqEditId').value = r.id;
   document.getElementById('reqSubmitBtn').textContent = 'Save Changes';
   document.getElementById('requestForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -9889,19 +10063,57 @@ function deleteRequest(id) {
   showToast('Request deleted', 'success');
 }
 
+function renderEventDetails(r) {
+  const yn = (v) => v === 'Yes'
+    ? '<span class="req-yn yes">Yes</span>'
+    : '<span class="req-yn no">No</span>';
+  const aud = (r.audience || []).slice();
+  if (r.audienceOther) aud.push('Other: ' + r.audienceOther);
+  const audHtml = aud.length ? aud.map(a => `<span class="req-aud-tag">${escapeHtml(a)}</span>`).join('') : '—';
+  const cell = (k, v) => `<div class="req-detail"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  const outcomes = [];
+  if (r.leads)      outcomes.push(`${r.leads} leads`);
+  if (r.revenueOpp) outcomes.push(reqFmtAED(r.revenueOpp) + ' potential');
+  if (r.strategic)  outcomes.push(escapeHtml(r.strategic));
+  return `
+    <div class="req-event-detail">
+      <div class="req-event-detail-head">Event Details</div>
+      <div class="req-detail-grid">
+        ${r.organizer ? cell('Organizer &amp; Host', escapeHtml(r.organizer)) : ''}
+        ${r.location  ? cell('Location', escapeHtml(r.location)) : ''}
+        ${r.opHours   ? cell('Operating Hours', escapeHtml(r.opHours)) : ''}
+        ${r.footfall  ? cell('Expected Footfall', fmtNum(r.footfall) || r.footfall) : ''}
+        ${r.contact   ? `<div class="req-detail full"><span class="k">Primary Contact / Client</span><span class="v">${escapeHtml(r.contact)}</span></div>` : ''}
+        <div class="req-detail full"><span class="k">Audience Type</span><span class="v">${audHtml}</span></div>
+        ${cell('VIP Attendance', yn(r.vip))}
+        ${cell('Media Coverage', yn(r.media))}
+        ${outcomes.length ? `<div class="req-detail full"><span class="k">Expected Outcomes</span><span class="v">${outcomes.join(' · ')}</span></div>` : ''}
+        ${cell('Budget Confirmed', yn(r.budgetConfirmed) + (r.budgetConfirmed === 'Yes' && r.budgetAmount ? ' · ' + reqFmtAED(r.budgetAmount) : ''))}
+      </div>
+    </div>`;
+}
+
 function exportRequestsCSV() {
   let rows = (typeof requestEntries !== 'undefined') ? requestEntries.slice() : [];
   if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
   const filter = document.getElementById('reqFilter')?.value || 'all';
   if (filter !== 'all') rows = rows.filter(r => (r.status || 'Pending') === filter);
   if (!rows.length) { showToast('No requests to export', 'error'); return; }
-  const headers = ['Type','Rep','Client','Status','Expected Start','Expected End','Expected Cost (AED)','Devices','Participants','Path to Commercial','Project Plan','Details','Submitted'];
-  const data = rows.map(r => [
-    r.type, r.rep, r.client, r.status || 'Pending', r.expectedStart || '', r.expectedEnd || '',
-    Math.round(r.cost || 0), (r.devices || []).join(' / '), r.participants || '',
-    r.commercial || '', r.plan || '', r.details || '',
-    r.createdAt ? new Date(r.createdAt).toISOString().slice(0,10) : ''
-  ]);
+  const headers = ['Type','Event Type','Rep','Client','Status','Expected Start','Expected End','Expected Cost (AED)','Devices','Participants','Path to Commercial','Project Plan','Details',
+    'Organizer & Host','Location','Operating Hours','Primary Contact','Expected Footfall','Audience Type','VIP Attendance','Media Coverage','Expected Leads','Potential Revenue (AED)','Strategic Relationships','Budget Confirmed','Confirmed Budget (AED)','Submitted'];
+  const data = rows.map(r => {
+    const aud = (r.audience || []).slice();
+    if (r.audienceOther) aud.push('Other: ' + r.audienceOther);
+    return [
+      r.type, r.eventType || '', r.rep, r.client, r.status || 'Pending', r.expectedStart || '', r.expectedEnd || '',
+      Math.round(r.cost || 0), (r.devices || []).join(' / '), r.participants || '',
+      r.commercial || '', r.plan || '', r.details || '',
+      r.organizer || '', r.location || '', r.opHours || '', r.contact || '', r.footfall || 0,
+      aud.join(' / '), r.vip || '', r.media || '', r.leads || 0, Math.round(r.revenueOpp || 0),
+      r.strategic || '', r.budgetConfirmed || '', Math.round(r.budgetAmount || 0),
+      r.createdAt ? new Date(r.createdAt).toISOString().slice(0,10) : ''
+    ];
+  });
   downloadCSV('CoreV_Requests.csv', headers, data);
   showToast('Requests exported', 'success');
 }
@@ -9951,7 +10163,7 @@ function renderRequests() {
       <div class="req-item-top">
         <div>
           <p class="req-item-title">
-            <span class="req-type-chip ${isEvent ? 'event' : ''}">${escapeHtml(r.type || '')}</span>
+            <span class="req-type-chip ${isEvent ? 'event' : ''}">${escapeHtml(isEvent ? (r.eventType || 'Event') : (r.type || ''))}</span>
             ${escapeHtml(r.client || 'Untitled')}
           </p>
           <div class="req-item-meta">By ${escapeHtml(r.rep || '—')} · submitted ${r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : '—'}</div>
@@ -9969,6 +10181,8 @@ function renderRequests() {
         ${r.commercial ? `<div class="req-detail full"><span class="k">Path to Commercial</span><span class="v">${escapeHtml(r.commercial)}</span></div>` : ''}
         ${r.plan ? `<div class="req-detail full"><span class="k">Project Plan</span><span class="v">${escapeHtml(r.plan)}</span></div>` : ''}
       </div>
+
+      ${isEvent ? renderEventDetails(r) : ''}
 
       ${(canEdit || manager) ? `<div class="req-item-actions">
         ${manager && status !== 'Approved' ? `<button class="req-mini-btn approve" onclick="setRequestStatus('${r.id}','Approved')">✓ Approve</button>` : ''}
