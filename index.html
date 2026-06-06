@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v19.1</title>
+<title>CoreV | OxeFit Sales Tracker v19.3</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -34,7 +34,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@400;600;700;800&display=swap');
+  /* v19.3 — unified on Inter to match the Delivery Tracker */
 
     /* ═══════════════════════════════════════════════════════════
        THEME SYSTEM (v19.0)
@@ -53,15 +53,15 @@
     --input-bg:   #ffffff;
     --row-even:   #f9fafb;
     --row-hover:  #eef4ff;
-    /* sidebar */
-    --sidebar-bg:        #0f1b34;  /* sidebar is dark in BOTH themes — anchors the brand */
-    --sidebar-grad:      linear-gradient(180deg, #122244 0%, #0c1730 100%);
-    --sidebar-text:      #9fb0cd;
-    --sidebar-text-hi:   #ffffff;
-    --sidebar-active-bg: rgba(59,130,246,0.16);
-    --sidebar-active-bar:#3b82f6;
-    --sidebar-hover-bg:  rgba(255,255,255,0.05);
-    --sidebar-border:    rgba(255,255,255,0.07);
+    /* sidebar — light/white in light mode to match the Delivery Tracker */
+    --sidebar-bg:        #ffffff;
+    --sidebar-grad:      linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    --sidebar-text:      #64748b;
+    --sidebar-text-hi:   #0f172a;
+    --sidebar-active-bg: linear-gradient(135deg, #eff6ff, #ecfeff);
+    --sidebar-active-bar:#0d9488;
+    --sidebar-hover-bg:  #f1f5f9;
+    --sidebar-border:    #e7ecf3;
     /* text */
     --text:       #1a202c;
     --text-muted: #5a667a;
@@ -70,6 +70,11 @@
     --accent:     #3b82f6;
     --accent2:    #2563eb;
     --accent-glow:#60a5fa;
+    --teal:       #0d9488;
+    --teal2:      #0f766e;
+    --teal-glow:  #2dd4bf;
+    --brand-grad: linear-gradient(135deg, #0d9488, #2563eb);
+    --app-bg:     linear-gradient(160deg, #eef2f7 0%, #e6ecf3 100%);
     --gold:       #f59e0b;
     --gold-light: #fbbf24;
     --success:    #10b981;
@@ -96,18 +101,23 @@
     --sidebar-grad:      linear-gradient(180deg, #0c1730 0%, #070e1c 100%);
     --sidebar-text:      #93a4c4;
     --sidebar-text-hi:   #ffffff;
-    --sidebar-active-bg: rgba(59,130,246,0.22);
-    --sidebar-active-bar:#60a5fa;
+    --sidebar-active-bg: rgba(45,212,191,0.14);
+    --sidebar-active-bar:#2dd4bf;
     --sidebar-hover-bg:  rgba(255,255,255,0.05);
     --sidebar-border:    rgba(255,255,255,0.06);
     /* text */
     --text:       #e7edf7;
     --text-muted: #93a1ba;
     --border:     #26344f;
-    /* brand + status (shared, slightly brightened for dark) */
+    /* brand + status (slightly brightened for dark) */
     --accent:     #3b82f6;
     --accent2:    #2563eb;
     --accent-glow:#7cb0ff;
+    --teal:       #2dd4bf;
+    --teal2:      #14b8a6;
+    --teal-glow:  #5eead4;
+    --brand-grad: linear-gradient(135deg, #2dd4bf, #3b82f6);
+    --app-bg:     #0b1322;
     --gold:       #f59e0b;
     --gold-light: #fbbf24;
     --success:    #10b981;
@@ -125,10 +135,11 @@
 
   body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--navy);
+    background: var(--app-bg);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -280,9 +291,18 @@
   }
   .sidebar-logo { height: 38px; width: auto; filter: drop-shadow(0 2px 8px rgba(37,99,235,0.35)); }
   .sidebar-brand-fallback {
-    font-family: 'Barlow Condensed','Inter',sans-serif; font-weight: 800;
-    font-size: 26px; letter-spacing: 3px; color: var(--sidebar-text-hi);
+    display: none; align-items: center; gap: 11px;
   }
+  .brand-logo-box {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: var(--brand-grad); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; letter-spacing: -0.5px;
+    box-shadow: 0 6px 14px rgba(13,148,136,0.32);
+  }
+  .brand-word { display: flex; flex-direction: column; line-height: 1.05; }
+  .brand-name { font-weight: 800; font-size: 17px; letter-spacing: -0.3px; color: var(--sidebar-text-hi); }
+  .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.4px; color: var(--sidebar-text); }
   .sidebar-collapse-btn {
     margin-left: auto; flex-shrink: 0;
     width: 28px; height: 28px; border-radius: 8px;
@@ -295,17 +315,17 @@
 
   /* ── COLLAPSED STATE (desktop) ── */
   .sidebar.collapsed { width: 76px; }
-  .sidebar.collapsed .sidebar-brand { padding: 0 0; justify-content: center; }
-  .sidebar.collapsed .sidebar-logo { height: 32px; }
+  .sidebar.collapsed .sidebar-brand { padding: 0; justify-content: center; position: relative; }
+  .sidebar.collapsed .sidebar-logo { display: none; }                 /* hide logo so it can't cover the toggle */
   .sidebar.collapsed .sidebar-brand-fallback { display: none !important; }
   .sidebar.collapsed .sidebar-collapse-btn {
-    position: absolute; top: 18px; right: 50%; transform: translateX(50%);
-    margin: 0;
+    position: static; margin: 0; width: 34px; height: 34px; font-size: 20px;
   }
-  .sidebar.collapsed .sidebar-brand { position: relative; }
   .sidebar.collapsed .nav-label { display: none; }
   .sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; }
   .sidebar.collapsed .nav-ico { width: auto; font-size: 19px; }
+  .sidebar.collapsed .nav-group-label { display: none; }
+  .sidebar.collapsed .nav-group-rule { margin: 10px 14px; }
   .sidebar.collapsed .sidebar-version { display: none; }
   .sidebar.collapsed .theme-toggle-track { display: none; }
   .sidebar.collapsed .theme-toggle { flex-direction: column; gap: 6px; padding: 8px 4px; }
@@ -322,14 +342,29 @@
   }
   .nav-item:hover { background: var(--sidebar-hover-bg); color: var(--sidebar-text-hi); }
   .nav-item:active { transform: scale(0.985); }
-  .nav-item.active { background: var(--sidebar-active-bg); color: var(--sidebar-text-hi); }
+  .nav-item.active { background: var(--sidebar-active-bg); color: var(--accent2); }
+  [data-theme="dark"] .nav-item.active { color: var(--teal); }
   .nav-item.active::before {
     content: ''; position: absolute; left: -14px; top: 8px; bottom: 8px;
-    width: 4px; border-radius: 0 4px 4px 0; background: var(--sidebar-active-bar);
-    box-shadow: 0 0 12px var(--sidebar-active-bar);
+    width: 4px; border-radius: 0 4px 4px 0; background: var(--brand-grad);
+    box-shadow: 0 0 12px var(--teal-glow);
   }
   .nav-ico { font-size: 17px; width: 22px; text-align: center; opacity: 0.95; flex-shrink: 0; }
   .nav-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-group-label {
+    font-size: 9.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--sidebar-text); opacity: 0.5; padding: 4px 14px 6px;
+  }
+  .nav-group-rule { height: 1px; background: var(--sidebar-border); margin: 10px 6px; }
+  .sidebar-foot-btn {
+    display: flex; align-items: center; gap: 13px; width: 100%; cursor: pointer;
+    background: transparent; border: 1px solid transparent; color: var(--sidebar-text);
+    font-family: 'Inter','Segoe UI',system-ui,sans-serif; font-size: 13px; font-weight: 600;
+    padding: 9px 12px; border-radius: 10px; transition: background 0.16s, color 0.16s;
+  }
+  .sidebar-foot-btn:hover { background: var(--sidebar-hover-bg); color: var(--sidebar-text-hi); }
+  .sidebar.collapsed .sidebar-foot-btn { justify-content: center; padding: 9px 0; }
+  .sidebar.collapsed .sidebar-foot-btn .nav-label { display: none; }
 
   .sidebar-footer {
     flex-shrink: 0; padding: 16px 18px 20px;
@@ -343,24 +378,26 @@
   /* THEME TOGGLE */
   .theme-toggle {
     display: flex; align-items: center; justify-content: center; gap: 10px;
-    background: rgba(255,255,255,0.04); border: 1px solid var(--sidebar-border);
+    background: var(--card-hover); border: 1px solid var(--sidebar-border);
     border-radius: 30px; padding: 7px 10px; cursor: pointer;
     transition: background 0.18s ease, border-color 0.18s ease;
   }
-  .theme-toggle:hover { background: rgba(255,255,255,0.08); }
+  [data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.04); }
+  .theme-toggle:hover { border-color: var(--teal); }
   .theme-toggle-ico { font-size: 13px; line-height: 1; transition: opacity 0.2s; }
-  .theme-toggle-ico.sun  { color: #fbbf24; }
-  .theme-toggle-ico.moon { color: #93c5fd; }
+  .theme-toggle-ico.sun  { color: #f59e0b; }
+  .theme-toggle-ico.moon { color: #2563eb; }
   [data-theme="dark"]  .theme-toggle-ico.sun  { opacity: 0.35; }
-  [data-theme="light"] .theme-toggle-ico.moon { opacity: 0.35; }
+  [data-theme="dark"]  .theme-toggle-ico.moon { color: #93c5fd; }
+  [data-theme="light"] .theme-toggle-ico.moon { opacity: 0.4; }
   .theme-toggle-track {
     position: relative; width: 40px; height: 20px; border-radius: 20px;
-    background: rgba(255,255,255,0.18); transition: background 0.2s;
+    background: #cbd5e1; transition: background 0.2s;
   }
-  [data-theme="dark"] .theme-toggle-track { background: rgba(96,165,250,0.45); }
+  [data-theme="dark"] .theme-toggle-track { background: rgba(45,212,191,0.45); }
   .theme-toggle-thumb {
     position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
-    border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     transition: transform 0.22s cubic-bezier(.4,0,.2,1);
   }
   [data-theme="dark"] .theme-toggle-thumb { transform: translateX(20px); }
@@ -1833,6 +1870,163 @@
     .topbar-right .hubspot-chip span { display: none; }
   }
 
+  /* ════════════ EXECUTIVE DASHBOARD (v19.2) ════════════ */
+  .exec-hero {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, #14233f 100%);
+    border: 1px solid var(--border); border-radius: 18px; padding: 28px 32px; margin-bottom: 22px;
+    color: #fff;
+  }
+  .exec-hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-light); }
+  .exec-hero-title { font-size: 30px; font-weight: 800; letter-spacing: 0.3px; margin: 8px 0 0; color: #fff; }
+  .exec-hero-sub { margin: 8px 0 0; color: rgba(255,255,255,0.65); font-size: 13.5px; line-height: 1.6; max-width: 720px; }
+  .exec-hero-month {
+    font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #fff;
+    background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px; padding: 8px 16px; white-space: nowrap;
+  }
+  .exec-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+  @media (max-width: 1100px) { .exec-kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px)  { .exec-kpi-grid { grid-template-columns: 1fr; } }
+  .exec-kpi {
+    background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--accent);
+    border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow);
+  }
+  .exec-kpi.good { border-top-color: var(--success); }
+  .exec-kpi.warm { border-top-color: var(--warm); }
+  .exec-kpi.pipe { border-top-color: #fb923c; }
+  .exec-kpi.accent { border-top-color: var(--accent); }
+  .exec-kpi-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+  .exec-kpi-value { font-size: 26px; font-weight: 800; color: var(--text); margin: 6px 0 2px; line-height: 1.1; }
+  .exec-kpi-value.good { color: var(--success); }
+  .exec-kpi-value.warm { color: var(--warm); }
+  .exec-kpi-value.pipe { color: #fb923c; }
+  .exec-kpi-value.accent { color: var(--accent2); }
+  .exec-kpi-sub { font-size: 11.5px; color: var(--text-muted); }
+
+  .exec-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  @media (max-width: 920px) { .exec-cols { grid-template-columns: 1fr; } }
+  .exec-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px 22px; box-shadow: var(--shadow); }
+  .exec-card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+  .exec-card-head h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0; }
+  .exec-card-hint { font-size: 11px; color: var(--text-muted); }
+
+  .exec-team { margin-bottom: 16px; }
+  .exec-team-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .exec-team-name { font-weight: 700; color: var(--text); font-size: 14px; }
+  .exec-team-val { font-weight: 700; color: var(--success); font-size: 14px; }
+  .exec-team-val small { color: var(--text-muted); font-weight: 500; }
+  .exec-team-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
+  .exec-bar { height: 8px; border-radius: 6px; background: var(--row-even); overflow: hidden; }
+  .exec-bar-fill { height: 100%; border-radius: 6px; }
+  .exec-bar-fill.good { background: linear-gradient(90deg, var(--success), #34d399); }
+  .exec-bar-fill.accent { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+  .exec-rep { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .exec-rank { width: 24px; height: 24px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: #fff; background: var(--text-muted); }
+  .exec-rank.r1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1a1a1a; }
+  .exec-rank.r2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #1a1a1a; }
+  .exec-rank.r3 { background: linear-gradient(135deg, #d6a06a, #b45309); }
+  .exec-rep-body { flex: 1; min-width: 0; }
+  .exec-rep-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .exec-rep-name { font-weight: 600; color: var(--text); font-size: 13.5px; }
+  .exec-rep-val { font-weight: 700; color: var(--accent2); font-size: 13px; }
+  .exec-empty { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px; }
+
+  .exec-ops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .exec-ops { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .exec-ops-num { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+  .exec-ops-lbl { font-size: 11px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.4px; }
+  .exec-actions { display: flex; flex-direction: column; gap: 10px; }
+  .exec-action {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; cursor: pointer;
+    background: var(--navy-mid); border: 1px solid var(--border); border-radius: 11px;
+    padding: 13px 16px; font-size: 14px; font-weight: 600; color: var(--text);
+    font-family: 'Inter','Segoe UI',system-ui,sans-serif; transition: all 0.15s;
+  }
+  .exec-action span { font-size: 17px; }
+  .exec-action:hover { border-color: var(--accent2); background: var(--card-hover); transform: translateX(2px); }
+
+  /* v19.3 — KPI sparkline + range controls */
+  .exec-kpi-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: 2px; }
+  .exec-spark { width: 84px; height: 24px; flex-shrink: 0; opacity: 0.95; }
+  .exec-range-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .exec-range { display: inline-flex; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 3px; gap: 2px; box-shadow: var(--shadow); }
+  .exec-range-btn {
+    border: none; background: transparent; color: var(--text-muted);
+    font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  }
+  .exec-range-btn:hover { color: var(--text); }
+  .exec-range-btn.active { background: var(--brand-grad); color: #fff; }
+  .exec-export-btn {
+    background: var(--card); border: 1px solid var(--border); color: var(--text-muted);
+    font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: 9px; cursor: pointer; transition: all 0.15s;
+  }
+  .exec-export-btn:hover { border-color: var(--teal); color: var(--teal2); }
+  [data-theme="dark"] .exec-export-btn:hover { color: var(--teal); }
+
+  /* v19.3 — nav badge (pending requests) */
+  .nav-badge {
+    margin-left: auto; background: var(--danger); color: #fff;
+    font-size: 10px; font-weight: 800; border-radius: 999px; padding: 1px 7px; min-width: 18px; text-align: center;
+    box-shadow: 0 0 0 2px var(--sidebar-bg);
+  }
+
+  /* v19.3 — global command / search bar */
+  .cmdbar { position: relative; flex: 1; max-width: 420px; margin: 0 8px; }
+  @media (max-width: 760px) { .cmdbar { display: none; } }
+  .cmdbar-ico { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.6; pointer-events: none; }
+  .cmdbar-input {
+    width: 100%; background: var(--navy-mid); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: inherit; font-size: 13px; padding: 9px 12px 9px 32px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .cmdbar-input:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.14); }
+  .cmd-results {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 120;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg);
+    overflow: hidden; max-height: 360px; overflow-y: auto;
+  }
+  .cmd-results.open { display: block; }
+  .cmd-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); }
+  .cmd-row:last-child { border-bottom: none; }
+  .cmd-row:hover, .cmd-row.sel { background: var(--card-hover); }
+  .cmd-type { font-size: 9.5px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; flex-shrink: 0; }
+  .cmd-type-tab { background: rgba(37,99,235,0.14); color: var(--accent2); }
+  .cmd-type-rep { background: rgba(13,148,136,0.16); color: var(--teal2); }
+  [data-theme="dark"] .cmd-type-rep { color: var(--teal); }
+  .cmd-type-request { background: rgba(245,158,11,0.16); color: #b45309; }
+  [data-theme="dark"] .cmd-type-request { color: #fcd34d; }
+  .cmd-label { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cmd-hint { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .cmd-empty { padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+  /* v19.3 — requests list tools */
+  .req-list-tools { display: flex; align-items: center; gap: 8px; }
+  .req-export-btn {
+    background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted);
+    font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  }
+  .req-export-btn:hover { border-color: var(--teal); color: var(--teal2); }
+  [data-theme="dark"] .req-export-btn:hover { color: var(--teal); }
+
+  /* ════════════ SETTINGS MODAL (v19.2) ════════════ */
+  .settings-modal {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 26px 28px; width: 480px; max-width: 95vw; box-shadow: var(--shadow-lg);
+  }
+  .settings-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .settings-head h3 { font-size: 19px; font-weight: 700; color: var(--text); margin: 0; }
+  .settings-block { padding: 16px 0; border-top: 1px solid var(--border); }
+  .settings-block:first-of-type { border-top: none; padding-top: 0; }
+  .settings-block-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .settings-note { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0 0 12px; }
+  .settings-note strong { color: var(--text); }
+  .settings-logo-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .settings-logo-preview { height: 52px; width: auto; max-width: 160px; border-radius: 8px; background: var(--sidebar-bg); padding: 6px 10px; }
+  .settings-logo-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .settings-upload-label { display: inline-flex; align-items: center; cursor: pointer; }
+
   /* ════════════ EVENT / ON-SITE DEMO REQUESTS (v19.1) ════════════ */
   .req-hero {
     display: flex; justify-content: space-between; align-items: flex-start;
@@ -2762,6 +2956,334 @@
     background: rgba(30,64,175,0.12); color: #1e40af;
     border: 1px solid rgba(30,64,175,0.35);
   }
+
+  /* ════════════ DEAL RULES — merged document theming (v19.2) ════════════ */
+  #view-deal-rules {
+    --dor-navy: #0a1628;          /* dark brand panels (banner/headers) — fixed both themes */
+    --dor-navy-mid: #112240;
+    --dor-navy-light: #1a3a6b;
+    --dor-accent: #1e5fc2;
+    --dor-accent-bright: #2d7be8;
+    --dor-gold: #c8922a;
+    --dor-white: #ffffff;         /* white text on dark/accent panels — fixed */
+    --dor-danger: #b53030;
+    --dor-surface: var(--card);   /* section "paper" — themes */
+    --dor-subtle: var(--navy-mid);/* rule cards / steps / list rows — themes */
+    --dor-text: var(--text);      /* body text on paper — themes */
+    --dor-border: var(--border);
+    --dor-muted: var(--text-muted);
+    --dor-note-bg: #fff8ec;
+  }
+  [data-theme="dark"] #view-deal-rules {
+    --dor-accent: #3b82f6;
+    --dor-accent-bright: #60a5fa;
+    --dor-gold: #e0b450;
+    --dor-danger: #f08a8a;
+    --dor-note-bg: rgba(224,180,80,0.10);
+    --dor-subtle: var(--navy-light);
+  }
+  /* keep the gold "extension" pill dark-on-gold in both themes */
+  #view-deal-rules .inactivity-card .info .extension-tag { color: var(--dor-navy); }
+  /* the document brings its own wrapper/banner, so neutralise tab-view padding */
+  #view-deal-rules { padding: 0; }
+  #view-deal-rules .banner { border-radius: 0; }
+
+#view-deal-rules *, #view-deal-rules *::before, #view-deal-rules *::after { box-sizing: border-box; margin: 0; padding: 0; }
+#view-deal-rules .banner {
+    background: var(--dor-navy);
+    color: var(--dor-white);
+    text-align: center;
+    padding: 48px 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+#view-deal-rules .banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      120deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.02) 60px,
+      rgba(255,255,255,0.02) 61px
+    );
+  }
+#view-deal-rules .banner-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--dor-gold);
+    margin-bottom: 12px;
+    position: relative;
+  }
+#view-deal-rules .banner h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    position: relative;
+  }
+#view-deal-rules .banner h1 span { color: var(--dor-accent-bright); }
+#view-deal-rules .banner-tagline {
+    margin-top: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.06em;
+    position: relative;
+  }
+#view-deal-rules .banner-tagline strong {
+    color: var(--dor-gold);
+    font-style: italic;
+  }
+#view-deal-rules .rule-bar {
+    background: var(--dor-accent);
+    color: var(--dor-white);
+    text-align: center;
+    padding: 10px 24px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+#view-deal-rules .wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+#view-deal-rules .section {
+    margin-bottom: 40px;
+    border: 1.5px solid var(--dor-border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--dor-surface);
+    box-shadow: 0 2px 14px rgba(10,22,40,0.06);
+  }
+#view-deal-rules .section-header {
+    background: var(--dor-navy);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+#view-deal-rules .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--dor-gold);
+    min-width: 32px;
+    line-height: 1;
+  }
+#view-deal-rules .section-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dor-white);
+  }
+#view-deal-rules .section-body {
+    padding: 24px 28px;
+  }
+#view-deal-rules .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+@media (max-width: 600px) {#view-deal-rules .grid-2 { grid-template-columns: 1fr; }
+#view-deal-rules .wrapper { padding: 32px 18px 60px; }}
+#view-deal-rules .rule-card {
+    background: var(--dor-subtle);
+    border: 1.5px solid var(--dor-border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+#view-deal-rules .rule-card .label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dor-accent);
+    margin-bottom: 5px;
+  }
+#view-deal-rules .rule-card .value {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--dor-text);
+    line-height: 1.5;
+  }
+#view-deal-rules .sla-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+  }
+#view-deal-rules .sla-card {
+    border-radius: 10px;
+    padding: 20px 18px;
+    text-align: center;
+    background: var(--dor-navy);
+    color: var(--dor-white);
+  }
+#view-deal-rules .sla-card.alt { background: var(--dor-navy-light); }
+#view-deal-rules .sla-card.warn { background: var(--dor-danger); }
+#view-deal-rules .sla-card .sla-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--dor-gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+#view-deal-rules .sla-card .sla-unit {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+  }
+#view-deal-rules .sla-card .sla-label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+#view-deal-rules .steps { display: flex; flex-direction: column; gap: 10px; }
+#view-deal-rules .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--dor-subtle);
+    border-radius: 8px;
+    border-left: 3px solid var(--dor-accent);
+  }
+#view-deal-rules .step.danger { border-left-color: var(--dor-danger); }
+#view-deal-rules .step-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--dor-accent);
+    color: var(--dor-white);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+#view-deal-rules .step.danger .step-dot { background: var(--dor-danger); }
+#view-deal-rules .step-text { font-size: 14px; color: var(--dor-text); line-height: 1.5; }
+#view-deal-rules .step-text strong { color: var(--dor-accent); }
+#view-deal-rules .step.danger .step-text strong { color: var(--dor-danger); }
+#view-deal-rules .rule-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+#view-deal-rules .rule-list li {
+    padding: 12px 18px;
+    background: var(--dor-subtle);
+    border-radius: 7px;
+    border: 1px solid var(--dor-border);
+    font-size: 14px;
+    color: var(--dor-text);
+    line-height: 1.5;
+  }
+#view-deal-rules .rule-list li strong { color: var(--dor-accent); }
+#view-deal-rules .rule-list li.warn strong { color: var(--dor-danger); }
+#view-deal-rules .rule-list li.gold-label strong { color: var(--dor-gold); }
+#view-deal-rules .pipeline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-top: 4px;
+  }
+#view-deal-rules .pipe-stage {
+    background: var(--dor-navy);
+    color: var(--dor-white);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 9px 18px;
+    position: relative;
+    white-space: nowrap;
+  }
+#view-deal-rules .pipe-stage:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 0;
+    width: 0;
+    height: 100%;
+    border-top: 19px solid transparent;
+    border-bottom: 19px solid transparent;
+    border-left: 10px solid var(--dor-navy);
+    z-index: 1;
+  }
+#view-deal-rules .pipe-stage:not(:first-child) { margin-left: 2px; }
+#view-deal-rules .pipe-stage.active { background: var(--dor-accent); }
+#view-deal-rules .pipe-stage.active::after { border-left-color: var(--dor-accent); }
+#view-deal-rules .pipe-stage.closed { background: var(--dor-danger); }
+#view-deal-rules .pipe-stage.closed::after { border-left-color: var(--dor-danger); }
+#view-deal-rules .note-box {
+    margin-top: 14px;
+    padding: 12px 18px;
+    background: var(--dor-note-bg);
+    border-left: 3px solid var(--dor-gold);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--dor-text);
+  }
+#view-deal-rules .inactivity-card {
+    background: var(--dor-navy);
+    border-radius: 10px;
+    padding: 20px 24px;
+    color: var(--dor-white);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+#view-deal-rules .inactivity-card .big-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--dor-gold);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+#view-deal-rules .inactivity-card .info .main {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+#view-deal-rules .inactivity-card .info .sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+#view-deal-rules .inactivity-card .info .extension-tag {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--dor-gold);
+    color: var(--dor-text);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+#view-deal-rules footer {
+    background: var(--dor-navy);
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 22px 24px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+#view-deal-rules footer strong { color: var(--dor-gold); }
 </style>
 </head>
 <body>
@@ -2825,6 +3347,41 @@
   </div>
 </div>
 
+<!-- SETTINGS MODAL (v19.2) -->
+<div class="modal-backdrop" id="settingsModal" onclick="closeSettings(event)">
+  <div class="settings-modal" onclick="event.stopPropagation()">
+    <div class="settings-head">
+      <h3>⚙️ Settings</h3>
+      <button class="btn btn-ghost" onclick="closeSettings()">Close</button>
+    </div>
+
+    <div class="settings-block" id="settingsLogoSection">
+      <div class="settings-block-title">Application Logo</div>
+      <p class="settings-note" id="settingsLogoNote">Upload a PNG/JPG/SVG. It is saved on this browser and replaces the default logo everywhere until you reset it.</p>
+      <div class="settings-logo-row">
+        <img id="settingsLogoPreview" class="settings-logo-preview" alt="" style="display:none;">
+        <div class="settings-logo-actions">
+          <label class="btn btn-primary settings-upload-label">
+            Upload Logo
+            <input type="file" id="logoFileInput" accept="image/*" onchange="handleLogoFile(this)" hidden>
+          </label>
+          <button class="btn btn-ghost" onclick="resetLogo()">Reset to Default</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-block">
+      <div class="settings-block-title">Appearance</div>
+      <p class="settings-note">Current theme: <strong id="settingsThemeLabel">Light</strong>. Use the toggle at the bottom of the side menu to switch between light and dark mode at any time.</p>
+    </div>
+
+    <div class="settings-block">
+      <div class="settings-block-title">About</div>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.3</strong></p>
+    </div>
+  </div>
+</div>
+
 <!-- MAIN APP -->
 <div id="app">
 
@@ -2832,26 +3389,45 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <img src="2.png" alt="OxeFit" class="sidebar-logo"
-           onerror="this.style.display='none';document.getElementById('sidebarBrandFallback').style.display='inline';">
-      <span class="sidebar-brand-fallback" id="sidebarBrandFallback" style="display:none;">CoreV</span>
+           onerror="this.style.display='none';document.getElementById('sidebarBrandFallback').style.display='flex';">
+      <div class="sidebar-brand-fallback" id="sidebarBrandFallback">
+        <span class="brand-logo-box">CV</span>
+        <span class="brand-word"><span class="brand-name">CoreV</span><span class="brand-sub">OxeFit Sales</span></span>
+      </div>
       <button class="sidebar-collapse-btn" id="collapseBtn" onclick="toggleCollapse()" title="Collapse menu" aria-label="Collapse menu">‹</button>
     </div>
 
     <nav class="sidebar-nav" id="primaryTabs">
-      <button class="nav-item active" data-tab="tracker" onclick="switchTab('tracker')" title="Sales Tracker">
+      <div class="nav-group-label">Overview</div>
+      <button class="nav-item active" data-tab="exec" onclick="switchTab('exec')" title="Executive Dashboard">
+        <span class="nav-ico">📌</span><span class="nav-label">Executive Dashboard</span>
+      </button>
+      <button class="nav-item" data-tab="tracker" onclick="switchTab('tracker')" title="Sales Tracker">
         <span class="nav-ico">📊</span><span class="nav-label">Sales Tracker</span>
       </button>
+
+      <div class="nav-group-rule"></div>
+      <div class="nav-group-label">Performance</div>
       <button class="nav-item" data-tab="performance" onclick="switchTab('performance')" title="Rep Performance">
         <span class="nav-ico">🎯</span><span class="nav-label">Rep Performance</span>
       </button>
       <button class="nav-item" data-tab="demos" onclick="switchTab('demos')" title="Demo Tracker">
         <span class="nav-ico">🎬</span><span class="nav-label">Demo Tracker</span>
       </button>
+
+      <div class="nav-group-rule"></div>
+      <div class="nav-group-label">Operations</div>
       <button class="nav-item" data-tab="requests" onclick="switchTab('requests')" title="Event &amp; On-site Demo Requests">
-        <span class="nav-ico">📝</span><span class="nav-label">Requests</span>
+        <span class="nav-ico">📝</span><span class="nav-label">Requests</span><span class="nav-badge" id="requestsBadge" style="display:none;">0</span>
       </button>
       <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
         <span class="nav-ico">📈</span><span class="nav-label">Marketing</span>
+      </button>
+
+      <div class="nav-group-rule"></div>
+      <div class="nav-group-label">Reference</div>
+      <button class="nav-item" data-tab="deal-rules" onclick="switchTab('deal-rules')" title="Deal Ownership &amp; CRM Rules">
+        <span class="nav-ico">⚖️</span><span class="nav-label">Deal Rules</span>
       </button>
       <button class="nav-item" data-tab="guidelines" onclick="switchTab('guidelines')" title="Guidelines">
         <span class="nav-ico">📖</span><span class="nav-label">Guidelines</span>
@@ -2859,12 +3435,15 @@
     </nav>
 
     <div class="sidebar-footer">
+      <button class="sidebar-foot-btn" id="settingsBtn" onclick="openSettings()" title="Settings">
+        <span class="nav-ico">⚙️</span><span class="nav-label">Settings</span>
+      </button>
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light / dark mode" aria-label="Toggle theme">
         <span class="theme-toggle-ico sun">☀</span>
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.1</div>
+      <div class="sidebar-version">v19.3</div>
     </div>
   </aside>
 
@@ -2883,7 +3462,16 @@
     <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
-    <div class="topbar-heading" id="topbarHeading">Sales Tracker</div>
+    <div class="topbar-heading" id="topbarHeading">Executive Dashboard</div>
+    <div class="cmdbar" id="cmdbar">
+      <span class="cmdbar-ico">🔍</span>
+      <input type="text" id="cmdInput" class="cmdbar-input" placeholder="Search tabs, reps, requests…  ( / )"
+             autocomplete="off"
+             oninput="runGlobalSearch(this.value)"
+             onkeydown="cmdKey(event)"
+             onfocus="runGlobalSearch(this.value)">
+      <div class="cmd-results" id="cmdResults"></div>
+    </div>
     <div class="topbar-right">
       <div class="sync-chip" id="syncChip" onclick="manualSync()" title="OneDrive sync status">
         <div class="sync-dot" id="syncDot"></div>
@@ -2915,8 +3503,48 @@
     <div class="month-dot-row" id="monthDotRow"></div>
   </div>
 
+  <!-- ░░░ EXECUTIVE DASHBOARD (v19.2) ░░░ -->
+  <div class="tab-view active" id="view-exec">
+  <div class="content">
+    <section class="exec-hero">
+      <div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales</div>
+        <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
+        <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
+      </div>
+      <div class="exec-hero-month" id="execHeroMonth">—</div>
+    </section>
+
+    <div class="exec-range-row" id="execRangeRow"></div>
+
+    <div class="exec-kpi-grid" id="execKpiGrid"></div>
+
+    <div class="exec-cols">
+      <div class="exec-card">
+        <div class="exec-card-head"><h3>Team Pipeline Split</h3></div>
+        <div id="execTeamSplit"></div>
+      </div>
+      <div class="exec-card">
+        <div class="exec-card-head"><h3>Top Performers</h3><span class="exec-card-hint">by closed (this month)</span></div>
+        <div id="execTopReps"></div>
+      </div>
+    </div>
+
+    <div class="exec-cols">
+      <div class="exec-card">
+        <div class="exec-card-head"><h3>Operations Snapshot</h3></div>
+        <div id="execOps"></div>
+      </div>
+      <div class="exec-card">
+        <div class="exec-card-head"><h3>Quick Actions</h3></div>
+        <div class="exec-actions" id="execActions"></div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /#view-exec -->
+
   <!-- TRACKER VIEW -->
-  <div class="tab-view active" id="view-tracker">
+  <div class="tab-view" id="view-tracker">
   <div class="content">
 
     <div class="setup-notice" id="setupNotice" style="display:none;">
@@ -3305,12 +3933,15 @@
       <div class="req-list-wrap">
         <div class="req-list-head">
           <h3 class="req-card-title">Submitted Requests</h3>
-          <select id="reqFilter" class="req-filter" onchange="renderRequests()">
-            <option value="all">All statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Declined">Declined</option>
-          </select>
+          <div class="req-list-tools">
+            <select id="reqFilter" class="req-filter" onchange="renderRequests()">
+              <option value="all">All statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Declined">Declined</option>
+            </select>
+            <button class="req-export-btn" onclick="exportRequestsCSV()" title="Export to CSV">⤓ CSV</button>
+          </div>
         </div>
         <div id="requestsList"></div>
       </div>
@@ -3482,6 +4113,262 @@
       </div>
     </div>
   </div><!-- /#view-marketing -->
+
+  <!-- ░░░ DEAL OWNERSHIP & CRM RULES (merged v19.2) ░░░ -->
+  <div class="tab-view" id="view-deal-rules">
+<div class="banner">
+  <div class="banner-eyebrow">Internal Policy Document</div>
+  <h1>CoreV – <span>B2B Sales</span><br/>Ownership & CRM Rules</h1>
+  <div class="banner-tagline"><strong>"If it's not in HubSpot, it does not exist."</strong></div>
+</div>
+<div class="rule-bar">Single Source of Truth &nbsp;|&nbsp; HubSpot CRM &nbsp;|&nbsp; Effective Immediately</div>
+
+<div class="wrapper">
+
+  <!-- 1. OWNERSHIP PRINCIPLES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-title">Ownership Principles</div>
+    </div>
+    <div class="section-body">
+      <div class="grid-2" style="margin-bottom:14px;">
+        <div class="rule-card">
+          <div class="label">Definition</div>
+          <div class="value">Territory + CRM Deal Registration in HubSpot</div>
+        </div>
+        <div class="rule-card">
+          <div class="label">First Entry Rule</div>
+          <div class="value">First qualified deal entry (time-stamped) = Ownership</div>
+        </div>
+        <div class="rule-card">
+          <div class="label">Commission</div>
+          <div class="value">No Deal in CRM = No Ownership = No Commission</div>
+        </div>
+        <div class="rule-card">
+          <div class="label">Conflicts</div>
+          <div class="value">Cross-territory work requires written management approval — resolved strictly via CRM data</div>
+        </div>
+      </div>
+
+      <!-- INACTIVITY HIGHLIGHT CARD -->
+      <div class="inactivity-card">
+        <div class="big-num">3M</div>
+        <div class="info">
+          <div class="main">Inactivity Period — Loss of Ownership</div>
+          <div class="sub">No activity for 3 months triggers account reassignment. CRM timestamp is final.</div>
+          <span class="extension-tag">Extensible with Management Approval</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TERRITORY RULES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-title">Territory Rules</div>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="rule-card">
+          <div class="label">Northern Emirates Team</div>
+          <div class="value">Covers all Northern Emirates accounts</div>
+        </div>
+        <div class="rule-card">
+          <div class="label">Southern Emirates Team</div>
+          <div class="value">Covers all Southern Emirates accounts</div>
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:14px;">
+        <strong>Default Rule:</strong> No management approval = NO GO. No cross-territory engagement without written sign-off.
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. LEAD REGISTRATION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-title">Lead Registration — Mandatory Steps</div>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">1</div>
+          <div class="step-text"><strong>Search First</strong> — Always check HubSpot for existing records before any outreach.</div>
+        </div>
+        <div class="step">
+          <div class="step-dot">2</div>
+          <div class="step-text"><strong>New Record?</strong> — Create Company (public name + URL), Contact, and Deal. All three are mandatory.</div>
+        </div>
+        <div class="step">
+          <div class="step-dot">3</div>
+          <div class="step-text"><strong>Existing Record — Active Deal?</strong> — STOP. No engagement permitted.</div>
+        </div>
+        <div class="step danger">
+          <div class="step-dot">4</div>
+          <div class="step-text"><strong>Existing Record — No Recent Activity?</strong> — May proceed ONLY by creating a Deal. No Deal = You do NOT own the account.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. DEAL QUALIFICATION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-title">Deal Qualification — Required for Ownership</div>
+    </div>
+    <div class="section-body">
+      <ul class="rule-list">
+        <li><strong>Decision-Maker Identified</strong> — A decision-maker or key influencer must be confirmed.</li>
+        <li><strong>Clear Need / Use Case</strong> — A defined business need or use case must be documented.</li>
+        <li><strong>Meeting or Demo</strong> — A meeting or demo must be scheduled or completed.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 5. PIPELINE RULES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-title">Pipeline Rules</div>
+    </div>
+    <div class="section-body">
+      <div class="rule-card" style="margin-bottom:16px;">
+        <div class="label">B2B Pipeline</div>
+        <div class="value" style="margin-bottom:12px;">No "Cold Calls" stage in B2B pipeline.</div>
+        <div class="pipeline">
+          <div class="pipe-stage">Identify</div>
+          <div class="pipe-stage active">Qualified</div>
+          <div class="pipe-stage active">Demo</div>
+          <div class="pipe-stage active">Proposal</div>
+          <div class="pipe-stage closed">Closed / Lost</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="label">Consumer Pipeline</div>
+        <div class="value">Cold Calls stage is permitted for consumer-facing sales only.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. ACTIVITY & SLA -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-title">Activity & SLA</div>
+    </div>
+    <div class="section-body">
+      <div class="sla-grid" style="margin-bottom:16px;">
+        <div class="sla-card">
+          <div class="sla-num">48</div>
+          <div class="sla-unit">Hours</div>
+          <div class="sla-label">First Contact SLA</div>
+        </div>
+        <div class="sla-card alt">
+          <div class="sla-num">21</div>
+          <div class="sla-unit">Days</div>
+          <div class="sla-label">Meeting / Demo Window</div>
+        </div>
+        <div class="sla-card alt">
+          <div class="sla-num">30</div>
+          <div class="sla-unit">Days</div>
+          <div class="sla-label">Activity Update Cycle</div>
+        </div>
+        <div class="sla-card warn">
+          <div class="sla-num">3</div>
+          <div class="sla-unit">Months</div>
+          <div class="sla-label">Inactivity = Reassignment Risk</div>
+        </div>
+      </div>
+      <div class="note-box">
+        <strong>Consequence:</strong> SLA failure = Deal marked at risk. Inactivity beyond 3 months triggers reassignment unless extended with management approval.
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. CONFLICT RULES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-title">Conflict Rules</div>
+    </div>
+    <div class="section-body">
+      <ul class="rule-list">
+        <li class="warn"><strong>No Duplicate Outreach</strong> — No parallel proposals or duplicate engagement on the same account.</li>
+        <li class="warn"><strong>No Unauthorized Engagement</strong> — If a conflict exists, no engagement is permitted without prior approval.</li>
+        <li class="gold-label"><strong>CRM is Final</strong> — HubSpot data is the single and absolute source of truth for all disputes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 8. COMMISSION RULES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div class="section-title">Commission Rules</div>
+    </div>
+    <div class="section-body">
+      <ul class="rule-list">
+        <li class="gold-label"><strong>Criteria:</strong> Deal must be registered in HubSpot and assigned to you as the owner.</li>
+        <li class="warn"><strong>Outside CRM:</strong> Any deal closed outside CRM = No commission, no exceptions.</li>
+        <li class="warn"><strong>Poaching:</strong> Engaging another rep's account = Commission voided immediately.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 9. DEAL AGING & CLEANUP -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <div class="section-title">Deal Aging & Cleanup</div>
+    </div>
+    <div class="section-body">
+      <ul class="rule-list">
+        <li><strong>Reassignment Trigger:</strong> No progress for 3 months = Deal reassigned (extensible with management approval).</li>
+        <li><strong>Quarterly Cleanup:</strong> Mandatory pipeline cleanup every quarter.</li>
+        <li class="warn"><strong>Cold Status:</strong> All "Cold" deals must move to Identify or Lost — no exceptions.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 10. IMMEDIATE ACTIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div class="section-title">Immediate Actions — Within 7 Days</div>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">A</div>
+          <div class="step-text">Convert all Cold Leads to <strong>Identify</strong> or <strong>Lost</strong> in HubSpot.</div>
+        </div>
+        <div class="step">
+          <div class="step-dot">B</div>
+          <div class="step-text">Close all inactive deals (stagnant 6–9 months) to <strong>Lost</strong> status.</div>
+        </div>
+        <div class="step">
+          <div class="step-dot">C</div>
+          <div class="step-text">Ensure all active opportunities are registered under a <strong>Deal record</strong>.</div>
+        </div>
+        <div class="step danger">
+          <div class="step-dot">D</div>
+          <div class="step-text"><strong>Escalate all conflicts</strong> to management immediately for resolution via CRM data.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<footer>
+  <strong>CoreV Internal Policy</strong> &nbsp;|&nbsp; Confidential &nbsp;|&nbsp; HubSpot CRM &nbsp;|&nbsp; All rights reserved
+</footer>
+
+  </div><!-- /#view-deal-rules -->
 
   <!-- ════════════════════════════════════════════════════════════════
        GUIDELINES VIEW — equations, terminology, examples
@@ -5418,7 +6305,9 @@ async function launchApp(alreadyAuthed) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   restoreSidebarState();          // v19.1 — apply persisted collapsed/expanded menu
+  applyStoredLogo();              // v19.2 — apply admin-uploaded logo if present
   renderRequests();               // v19.1 — populate Event / On-site Demo request tab
+  renderExecDashboard();          // v19.2 — populate Executive Dashboard
 
   // v13: drive role-based CSS visibility (office-only buttons / columns)
   document.body.setAttribute('data-role', currentRole || 'viewer');
@@ -5573,6 +6462,9 @@ function renderAll() {
   // If the Sales Rep Performance tab is currently open, refresh its data too
   const perfView = document.getElementById('view-performance');
   if (perfView && perfView.classList.contains('active')) renderPerformance();
+  // v19.2 — keep the Executive Dashboard in sync with the selected month
+  const execView = document.getElementById('view-exec');
+  if (execView && execView.classList.contains('active') && typeof renderExecDashboard === 'function') renderExecDashboard();
 }
 
 /* Monthly Commitments — aggregates ALL rows with data across all 5 weeks of curMonth.
@@ -8380,12 +9272,424 @@ function restoreSidebarState() {
   setCollapsed(on);
 }
 
+/* ════════════════════════════════════════
+   LOGO SETTINGS (v19.2)
+   Admin uploads a logo → stored as a data URL in localStorage and
+   applied to the sidebar on every load, overriding the bundled 2.png.
+════════════════════════════════════════ */
+const LOGO_KEY = 'corev_logo';
+function applyStoredLogo() {
+  let url = null;
+  try { url = localStorage.getItem(LOGO_KEY); } catch (e) {}
+  const img = document.querySelector('.sidebar-logo');
+  if (!img) return;
+  if (url) {
+    img.src = url;
+    img.style.display = '';
+    const fb = document.getElementById('sidebarBrandFallback');
+    if (fb) fb.style.display = 'none';
+  }
+}
+function openSettings() {
+  const isAdmin = (currentRole === 'admin');
+  const sec = document.getElementById('settingsLogoSection');
+  if (sec) sec.style.display = isAdmin ? 'block' : 'none';
+  const note = document.getElementById('settingsLogoNote');
+  if (note) note.textContent = isAdmin
+    ? 'Upload a PNG/JPG/SVG. It is saved on this browser and replaces the default logo everywhere until you reset it.'
+    : 'Only an admin can change the application logo.';
+  // reflect current theme label
+  const tl = document.getElementById('settingsThemeLabel');
+  if (tl) tl.textContent = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'Dark' : 'Light';
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(ev) {
+  if (ev && ev.target !== ev.currentTarget) return;
+  document.getElementById('settingsModal').classList.remove('open');
+}
+function handleLogoFile(input) {
+  if (currentRole !== 'admin') { showToast('Admin only', 'error'); return; }
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!/^image\//.test(file.type)) { showToast('Please choose an image file', 'error'); return; }
+  if (file.size > 1024 * 1024) { showToast('Image must be under 1 MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { localStorage.setItem(LOGO_KEY, reader.result); } catch (e) { showToast('Could not save logo', 'error'); return; }
+    applyStoredLogo();
+    const prev = document.getElementById('settingsLogoPreview');
+    if (prev) { prev.src = reader.result; prev.style.display = 'block'; }
+    showToast('Logo updated', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+function resetLogo() {
+  if (currentRole !== 'admin') { showToast('Admin only', 'error'); return; }
+  try { localStorage.removeItem(LOGO_KEY); } catch (e) {}
+  const img = document.querySelector('.sidebar-logo');
+  if (img) { img.src = '2.png'; img.style.display = ''; }
+  const prev = document.getElementById('settingsLogoPreview');
+  if (prev) prev.style.display = 'none';
+  showToast('Logo reset to default', 'success');
+}
+
+/* ════════════════════════════════════════
+   EXECUTIVE DASHBOARD (v19.2)
+   Aggregates the selected month's tracker rows + demos + requests
+   into a single executive view. Read-only; reuses live data.
+════════════════════════════════════════ */
+function execAED(n) { return 'AED ' + (fmtNum(Math.round(Number(n) || 0)) || '0'); }
+
+/* ── generic CSV download helper (v19.3) ── */
+function downloadCSV(filename, headers, rows) {
+  const esc = (v) => {
+    const s = (v == null ? '' : String(v));
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const lines = [headers.map(esc).join(',')]
+    .concat(rows.map(r => r.map(esc).join(',')));
+  const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+/* ── date-range presets (v19.3) ── */
+let execRange = 'current';
+function execMonthsFor(range) {
+  const out = [];
+  if (range === 'ytd') {
+    for (let m = 0; m <= curMonth; m++) out.push({ year: curYear, month: m });
+    return out;
+  }
+  const n = range === 'last3' ? 3 : range === 'last6' ? 6 : 1;
+  for (let i = n - 1; i >= 0; i--) {
+    let y = curYear, m = curMonth - i;
+    while (m < 0) { m += 12; y--; }
+    out.push({ year: y, month: m });
+  }
+  return out;
+}
+function execRangeLabel(range) {
+  return range === 'last3' ? 'Last 3 Months'
+       : range === 'last6' ? 'Last 6 Months'
+       : range === 'ytd'   ? `${curYear} YTD`
+       : `${MONTHS[curMonth]} ${curYear}`;
+}
+
+/* per-month aggregate */
+function execAggForMonth(year, month) {
+  const k = year + '-' + month;
+  const md = (typeof allData !== 'undefined' && allData[k]) ? allData[k] : { weeks: [] };
+  const blank = () => ({ commit: 0, bestCase: 0, closedWon: 0, forecast: 0, xs1: 0, xp1: 0, pipeline: 0 });
+  const teams = { 'Dubai': blank(), 'Abu Dhabi': blank() };
+  const repClosed = {};
+  const pipeSnap = {};
+  (md.weeks || []).forEach(w => {
+    if (!w) return;
+    w.forEach(r => {
+      const team = teams[r.team];
+      const commit = parseFloat(r.commitValue) || 0;
+      const best   = parseFloat(r.bestCaseValue) || 0;
+      const closed = parseFloat(r.closedWon) || 0;
+      const xs1    = parseFloat(r.forecastXS1) || 0;
+      const xp1    = parseFloat(r.forecastXP1) || 0;
+      const sw     = (typeof STAGE_WEIGHTS !== 'undefined' && STAGE_WEIGHTS[r.stage]) || 0;
+      if (r.rep) repClosed[r.rep] = (repClosed[r.rep] || 0) + closed;
+      if (r.rep && r.hubspotSynced) { const tp = parseFloat(r.truePipeline) || 0; if (tp > 0) pipeSnap[r.rep] = tp; }
+      if (!team) return;
+      team.commit += commit; team.bestCase += best; team.closedWon += closed;
+      team.forecast += (commit + best) * sw; team.xs1 += xs1; team.xp1 += xp1;
+    });
+  });
+  ['Dubai', 'Abu Dhabi'].forEach(tn => {
+    let tp = 0; (TEAMS[tn] || []).forEach(rep => { tp += (pipeSnap[rep] || 0); });
+    teams[tn].pipeline = tp;
+  });
+  const total = blank();
+  ['commit','bestCase','closedWon','forecast','xs1','xp1','pipeline'].forEach(kk => {
+    total[kk] = teams['Dubai'][kk] + teams['Abu Dhabi'][kk];
+  });
+  return { teams, total, repClosed };
+}
+
+/* combine a list of months (pipeline = latest month's snapshot, others summed) */
+function computeExecAgg(monthList) {
+  monthList = monthList || [{ year: curYear, month: curMonth }];
+  const blank = () => ({ commit: 0, bestCase: 0, closedWon: 0, forecast: 0, xs1: 0, xp1: 0, pipeline: 0 });
+  const teams = { 'Dubai': blank(), 'Abu Dhabi': blank() };
+  const total = blank();
+  const repClosed = {};
+  let lastTeams = null;
+  monthList.forEach((mm, idx) => {
+    const a = execAggForMonth(mm.year, mm.month);
+    ['Dubai','Abu Dhabi'].forEach(tn => {
+      ['commit','bestCase','closedWon','forecast','xs1','xp1'].forEach(kk => teams[tn][kk] += a.teams[tn][kk]);
+    });
+    Object.entries(a.repClosed).forEach(([rep, v]) => { repClosed[rep] = (repClosed[rep] || 0) + v; });
+    if (idx === monthList.length - 1) lastTeams = a.teams;   // latest pipeline snapshot
+  });
+  if (lastTeams) { teams['Dubai'].pipeline = lastTeams['Dubai'].pipeline; teams['Abu Dhabi'].pipeline = lastTeams['Abu Dhabi'].pipeline; }
+  ['commit','bestCase','closedWon','forecast','xs1','xp1','pipeline'].forEach(kk => {
+    total[kk] = teams['Dubai'][kk] + teams['Abu Dhabi'][kk];
+  });
+  return { teams, total, repClosed };
+}
+
+/* month-over-month series for a metric (last n months ending at current) */
+function execMetricSeries(metric, n) {
+  const vals = [];
+  for (let i = n - 1; i >= 0; i--) {
+    let y = curYear, m = curMonth - i;
+    while (m < 0) { m += 12; y--; }
+    const a = execAggForMonth(y, m);
+    vals.push(a.total[metric] || 0);
+  }
+  return vals;
+}
+
+/* tiny inline sparkline */
+function sparklineSVG(values, color) {
+  const w = 96, h = 26, p = 2;
+  if (!values || values.length < 2) return '';
+  const max = Math.max(...values, 1), min = Math.min(...values, 0);
+  const span = (max - min) || 1;
+  const step = (w - p * 2) / (values.length - 1);
+  const pts = values.map((v, i) => {
+    const x = p + i * step;
+    const y = h - p - ((v - min) / span) * (h - p * 2);
+    return [x, y];
+  });
+  const line = pts.map((pt, i) => (i ? 'L' : 'M') + pt[0].toFixed(1) + ' ' + pt[1].toFixed(1)).join(' ');
+  const area = line + ` L${(p + (values.length-1)*step).toFixed(1)} ${h} L${p} ${h} Z`;
+  const last = pts[pts.length - 1];
+  const gid = 'sg' + Math.random().toString(36).slice(2, 7);
+  return `<svg class="exec-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+    </linearGradient></defs>
+    <path d="${area}" fill="url(#${gid})"/>
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.2" fill="${color}"/>
+  </svg>`;
+}
+
+function execDemosInMonths(monthList) {
+  if (typeof demoEntries === 'undefined' || !Array.isArray(demoEntries)) return 0;
+  const set = new Set(monthList.map(m => m.year + '-' + m.month));
+  return demoEntries.filter(e => {
+    if (!e.date) return false;
+    const d = new Date(e.date);
+    return !isNaN(d) && set.has(d.getFullYear() + '-' + d.getMonth());
+  }).length;
+}
+
+function setExecRange(range) {
+  execRange = range;
+  document.querySelectorAll('.exec-range-btn').forEach(b => b.classList.toggle('active', b.dataset.range === range));
+  renderExecDashboard();
+}
+
+function execExportCSV() {
+  const months = execMonthsFor(execRange);
+  const { teams, total } = computeExecAgg(months);
+  const headers = ['Scope','Commit (AED)','Best Case (AED)','Closed Won (AED)','Weighted Forecast (AED)','Total Pipeline (AED)','XS1','XP1'];
+  const line = (name, d) => [name, Math.round(d.commit), Math.round(d.bestCase), Math.round(d.closedWon), Math.round(d.forecast), Math.round(d.pipeline), d.xs1, d.xp1];
+  const rows = [ line('Dubai', teams['Dubai']), line('Abu Dhabi', teams['Abu Dhabi']), line('TOTAL', total) ];
+  const safe = execRangeLabel(execRange).replace(/[^\w]+/g, '_');
+  downloadCSV(`CoreV_ExecDashboard_${safe}.csv`, headers, rows);
+  showToast('Dashboard exported', 'success');
+}
+
+function renderExecDashboard() {
+  const grid = document.getElementById('execKpiGrid');
+  if (!grid) return;
+  const months = execMonthsFor(execRange);
+  const { teams, total, repClosed } = computeExecAgg(months);
+  const rangeLbl = execRangeLabel(execRange);
+
+  document.getElementById('execHeroMonth').textContent = rangeLbl;
+  const sub = document.getElementById('execHeroSub');
+  if (sub) sub.textContent = `Live snapshot for ${rangeLbl} — pipeline, commitments, performance and operations across both teams.`;
+
+  // range selector + export
+  const ctrl = document.getElementById('execRangeRow');
+  if (ctrl) {
+    ctrl.innerHTML = `
+      <div class="exec-range">
+        ${[['current','This Month'],['last3','Last 3'],['last6','Last 6'],['ytd','YTD']].map(([r,l]) =>
+          `<button class="exec-range-btn ${r===execRange?'active':''}" data-range="${r}" onclick="setExecRange('${r}')">${l}</button>`).join('')}
+      </div>
+      <button class="exec-export-btn" onclick="execExportCSV()">⤓ Export CSV</button>`;
+  }
+
+  const reqPending = (typeof requestEntries !== 'undefined') ? requestEntries.filter(r => (r.status||'Pending') === 'Pending').length : 0;
+  const demos = execDemosInMonths(months);
+  const slClosed = sparklineSVG(execMetricSeries('closedWon', 6), '#10b981');
+  const slCommit = sparklineSVG(execMetricSeries('commit', 6), '#2563eb');
+  const slForecast = sparklineSVG(execMetricSeries('forecast', 6), '#3b82f6');
+
+  const kpis = [
+    { lbl: 'Closed Won',     val: execAED(total.closedWon), cls: 'good',   sub: 'Realised', spark: slClosed },
+    { lbl: 'Commit',         val: execAED(total.commit),    cls: 'accent', sub: 'Committed by reps', spark: slCommit },
+    { lbl: 'Best Case',      val: execAED(total.bestCase),  cls: 'warm',   sub: 'Upside pipeline', spark: '' },
+    { lbl: 'Total Pipeline', val: execAED(total.pipeline),  cls: 'pipe',   sub: 'HubSpot open deals', spark: '' },
+    { lbl: 'Weighted Forecast', val: execAED(total.forecast), cls: 'accent', sub: 'Confidence-weighted', spark: slForecast },
+    { lbl: 'Demos',          val: String(demos),            cls: '',       sub: 'In range', spark: '' },
+    { lbl: 'XS1 / XP1',      val: `${fmtNum(total.xs1)||0} / ${fmtNum(total.xp1)||0}`, cls: '', sub: 'Unit forecast', spark: '' },
+    { lbl: 'Pending Requests', val: String(reqPending),     cls: 'warm',   sub: 'Awaiting approval', spark: '' }
+  ];
+  grid.innerHTML = kpis.map(k => `
+    <div class="exec-kpi ${k.cls}">
+      <div class="exec-kpi-label">${k.lbl}</div>
+      <div class="exec-kpi-value ${k.cls}">${k.val}</div>
+      <div class="exec-kpi-foot"><span class="exec-kpi-sub">${k.sub}</span>${k.spark || ''}</div>
+    </div>`).join('');
+
+  // Team split
+  const maxPipe = Math.max(teams['Dubai'].pipeline + teams['Dubai'].commit,
+                           teams['Abu Dhabi'].pipeline + teams['Abu Dhabi'].commit, 1);
+  const teamRow = (name, d) => {
+    const closedPct = Math.min(100, (d.closedWon / maxPipe) * 100);
+    return `<div class="exec-team">
+      <div class="exec-team-head"><span class="exec-team-name">${name}</span><span class="exec-team-val">${execAED(d.closedWon)} <small>closed</small></span></div>
+      <div class="exec-bar"><div class="exec-bar-fill good" style="width:${closedPct}%"></div></div>
+      <div class="exec-team-meta">Commit ${execAED(d.commit)} · Best ${execAED(d.bestCase)} · Pipeline ${execAED(d.pipeline)}</div>
+    </div>`;
+  };
+  document.getElementById('execTeamSplit').innerHTML =
+    teamRow('Dubai', teams['Dubai']) + teamRow('Abu Dhabi', teams['Abu Dhabi']);
+
+  // Top performers
+  const reps = Object.entries(repClosed).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const topEl = document.getElementById('execTopReps');
+  if (!reps.length) {
+    topEl.innerHTML = `<div class="exec-empty">No closed-won recorded yet for ${rangeLbl}.</div>`;
+  } else {
+    const max = reps[0][1] || 1;
+    topEl.innerHTML = reps.map(([rep, v], i) => `
+      <div class="exec-rep">
+        <span class="exec-rank r${i+1}">${i+1}</span>
+        <div class="exec-rep-body">
+          <div class="exec-rep-top"><span class="exec-rep-name">${escapeHtml(rep)}</span><span class="exec-rep-val">${execAED(v)}</span></div>
+          <div class="exec-bar"><div class="exec-bar-fill accent" style="width:${Math.max(6,(v/max)*100)}%"></div></div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Ops snapshot
+  const reqTotal = (typeof requestEntries !== 'undefined') ? requestEntries.length : 0;
+  const reqApproved = (typeof requestEntries !== 'undefined') ? requestEntries.filter(r => r.status === 'Approved').length : 0;
+  document.getElementById('execOps').innerHTML = `
+    <div class="exec-ops-grid">
+      <div class="exec-ops"><div class="exec-ops-num">${demos}</div><div class="exec-ops-lbl">Demos in range</div></div>
+      <div class="exec-ops"><div class="exec-ops-num">${reqTotal}</div><div class="exec-ops-lbl">Total requests</div></div>
+      <div class="exec-ops"><div class="exec-ops-num" style="color:var(--warn)">${reqPending}</div><div class="exec-ops-lbl">Pending approval</div></div>
+      <div class="exec-ops"><div class="exec-ops-num" style="color:var(--success)">${reqApproved}</div><div class="exec-ops-lbl">Approved</div></div>
+    </div>`;
+
+  // Quick actions
+  document.getElementById('execActions').innerHTML = `
+    <button class="exec-action" onclick="switchTab('tracker')"><span>📊</span> Open Sales Tracker</button>
+    <button class="exec-action" onclick="switchTab('performance')"><span>🎯</span> Rep Performance</button>
+    <button class="exec-action" onclick="switchTab('requests')"><span>📝</span> Submit / Review Requests</button>
+    <button class="exec-action" onclick="switchTab('deal-rules')"><span>⚖️</span> Deal Ownership Rules</button>`;
+
+  updateRequestsBadge();
+}
+
+/* ── Requests nav badge (v19.3) ── */
+function updateRequestsBadge() {
+  const badge = document.getElementById('requestsBadge');
+  if (!badge || typeof requestEntries === 'undefined') return;
+  let pending = requestEntries.filter(r => (r.status || 'Pending') === 'Pending');
+  if (currentRole === 'rep') pending = pending.filter(r => r.rep === currentUser);
+  const n = pending.length;
+  badge.textContent = n;
+  badge.style.display = n > 0 ? '' : 'none';
+}
+
+/* ════════════════════════════════════════
+   GLOBAL COMMAND / SEARCH BAR (v19.3)
+════════════════════════════════════════ */
+let _cmdMatches = [];
+function buildCmdIndex() {
+  const idx = [];
+  // Tabs
+  Object.entries(TAB_HEADINGS).forEach(([tab, label]) => {
+    idx.push({ type: 'Tab', label: label, hint: 'Open', tab: tab });
+  });
+  // Reps -> performance
+  (typeof ALL_REPS !== 'undefined' ? ALL_REPS : []).forEach(rep => {
+    idx.push({ type: 'Rep', label: rep, hint: 'Rep Performance', tab: 'performance' });
+  });
+  // Requests -> requests tab
+  if (typeof requestEntries !== 'undefined') {
+    requestEntries.forEach(r => {
+      if (currentRole === 'rep' && r.rep !== currentUser) return;
+      idx.push({ type: 'Request', label: `${r.client || 'Untitled'} — ${r.type}`, hint: (r.status||'Pending'), tab: 'requests' });
+    });
+  }
+  return idx;
+}
+function runGlobalSearch(q) {
+  const box = document.getElementById('cmdResults');
+  if (!box) return;
+  q = (q || '').trim().toLowerCase();
+  if (!q) { box.classList.remove('open'); box.innerHTML = ''; _cmdMatches = []; return; }
+  const idx = buildCmdIndex();
+  _cmdMatches = idx.filter(it => it.label.toLowerCase().includes(q)).slice(0, 8);
+  if (!_cmdMatches.length) {
+    box.innerHTML = `<div class="cmd-empty">No matches for “${escapeHtml(q)}”</div>`;
+    box.classList.add('open'); return;
+  }
+  box.innerHTML = _cmdMatches.map((m, i) => `
+    <div class="cmd-row${i===0?' sel':''}" onmousedown="cmdPick(${i})">
+      <span class="cmd-type cmd-type-${m.type.toLowerCase()}">${m.type}</span>
+      <span class="cmd-label">${escapeHtml(m.label)}</span>
+      <span class="cmd-hint">${escapeHtml(m.hint)}</span>
+    </div>`).join('');
+  box.classList.add('open');
+}
+function cmdPick(i) {
+  const m = _cmdMatches[i];
+  if (!m) return;
+  switchTab(m.tab);
+  closeCmd();
+  const input = document.getElementById('cmdInput');
+  if (input) input.value = '';
+}
+function closeCmd() {
+  const box = document.getElementById('cmdResults');
+  if (box) { box.classList.remove('open'); }
+}
+function cmdKey(e) {
+  if (e.key === 'Escape') { closeCmd(); e.target.blur(); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (_cmdMatches.length) cmdPick(0); }
+}
+// "/" focuses the command bar (unless typing in a field)
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||'')) && !e.target.isContentEditable) {
+    const input = document.getElementById('cmdInput');
+    if (input) { e.preventDefault(); input.focus(); }
+  }
+});
+// close results on outside click
+document.addEventListener('click', (e) => {
+  const bar = document.getElementById('cmdbar');
+  if (bar && !bar.contains(e.target)) closeCmd();
+});
+
 const TAB_HEADINGS = {
+  exec:        'Executive Dashboard',
   tracker:     'Sales Tracker',
   performance: 'Sales Rep Performance',
   demos:       'Demo Tracker',
   requests:    'Event & On-site Demo Requests',
   marketing:   'Marketing Consumer Performance',
+  'deal-rules':'Deal Ownership & CRM Rules',
   guidelines:  'Guidelines'
 };
 
@@ -8411,6 +9715,9 @@ function switchTab(tabName) {
   }
   if (tabName === 'requests') {
     renderRequests();
+  }
+  if (tabName === 'exec') {
+    renderExecDashboard();
   }
 }
 
@@ -8582,7 +9889,25 @@ function deleteRequest(id) {
   showToast('Request deleted', 'success');
 }
 
+function exportRequestsCSV() {
+  let rows = (typeof requestEntries !== 'undefined') ? requestEntries.slice() : [];
+  if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
+  const filter = document.getElementById('reqFilter')?.value || 'all';
+  if (filter !== 'all') rows = rows.filter(r => (r.status || 'Pending') === filter);
+  if (!rows.length) { showToast('No requests to export', 'error'); return; }
+  const headers = ['Type','Rep','Client','Status','Expected Start','Expected End','Expected Cost (AED)','Devices','Participants','Path to Commercial','Project Plan','Details','Submitted'];
+  const data = rows.map(r => [
+    r.type, r.rep, r.client, r.status || 'Pending', r.expectedStart || '', r.expectedEnd || '',
+    Math.round(r.cost || 0), (r.devices || []).join(' / '), r.participants || '',
+    r.commercial || '', r.plan || '', r.details || '',
+    r.createdAt ? new Date(r.createdAt).toISOString().slice(0,10) : ''
+  ]);
+  downloadCSV('CoreV_Requests.csv', headers, data);
+  showToast('Requests exported', 'success');
+}
+
 function renderRequests() {
+  if (typeof updateRequestsBadge === 'function') updateRequestsBadge();
   const list = document.getElementById('requestsList');
   if (!list) return;            // tab not in DOM yet
   populateReqRepSelect();
