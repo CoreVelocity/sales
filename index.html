@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OXEFIT Sales Commitment Tracker v19.0</title>
+<title>CoreV | OxeFit Sales Tracker v19.1</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -270,6 +270,7 @@
     display: flex; flex-direction: column;
     position: sticky; top: 0; height: 100vh;
     z-index: 200;
+    transition: width 0.22s cubic-bezier(.4,0,.2,1);
   }
   .sidebar-brand {
     height: 64px; flex-shrink: 0;
@@ -282,6 +283,32 @@
     font-family: 'Barlow Condensed','Inter',sans-serif; font-weight: 800;
     font-size: 26px; letter-spacing: 3px; color: var(--sidebar-text-hi);
   }
+  .sidebar-collapse-btn {
+    margin-left: auto; flex-shrink: 0;
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--sidebar-border);
+    color: var(--sidebar-text); font-size: 18px; line-height: 1; cursor: pointer;
+    transition: background 0.16s, color 0.16s, transform 0.2s;
+  }
+  .sidebar-collapse-btn:hover { background: rgba(255,255,255,0.1); color: var(--sidebar-text-hi); }
+
+  /* ── COLLAPSED STATE (desktop) ── */
+  .sidebar.collapsed { width: 76px; }
+  .sidebar.collapsed .sidebar-brand { padding: 0 0; justify-content: center; }
+  .sidebar.collapsed .sidebar-logo { height: 32px; }
+  .sidebar.collapsed .sidebar-brand-fallback { display: none !important; }
+  .sidebar.collapsed .sidebar-collapse-btn {
+    position: absolute; top: 18px; right: 50%; transform: translateX(50%);
+    margin: 0;
+  }
+  .sidebar.collapsed .sidebar-brand { position: relative; }
+  .sidebar.collapsed .nav-label { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; }
+  .sidebar.collapsed .nav-ico { width: auto; font-size: 19px; }
+  .sidebar.collapsed .sidebar-version { display: none; }
+  .sidebar.collapsed .theme-toggle-track { display: none; }
+  .sidebar.collapsed .theme-toggle { flex-direction: column; gap: 6px; padding: 8px 4px; }
   .sidebar-nav { flex: 1; padding: 18px 14px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
   .nav-item {
     position: relative; display: flex; align-items: center; gap: 13px;
@@ -967,21 +994,22 @@
 
   .gd-toc {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(13, 22, 41, 0.92); backdrop-filter: blur(10px);
+    background: var(--navy-mid); backdrop-filter: blur(10px);
     margin: -24px -20px 28px; padding: 12px 20px;
-    border-bottom: 1px solid rgba(37,99,235,0.18);
+    border-bottom: 1px solid var(--border);
     display: flex; gap: 6px; flex-wrap: wrap;
     font-size: 12px;
   }
+  [data-theme="dark"] .gd-toc { background: rgba(13, 22, 41, 0.92); border-bottom-color: rgba(37,99,235,0.22); }
   .gd-toc a {
     color: var(--text-muted); text-decoration: none;
     padding: 5px 11px; border-radius: 14px;
-    border: 1px solid var(--input-bg);
+    border: 1px solid var(--border);
     transition: all 0.15s ease;
     font-weight: 500;
   }
   .gd-toc a:hover {
-    color: var(--text); border-color: var(--accent2);
+    color: var(--accent2); border-color: var(--accent2);
     background: rgba(37,99,235,0.08);
   }
 
@@ -1007,12 +1035,13 @@
 
   .gd-section {
     background: var(--navy-light);
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 28px 30px;
     margin-bottom: 22px;
     scroll-margin-top: 70px;
   }
+  [data-theme="dark"] .gd-section { border-color: rgba(255,255,255,0.06); }
   .gd-section h2 {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     font-size: 22px; font-weight: 700; letter-spacing: 1px;
@@ -1102,7 +1131,7 @@
   }
   .gd-table td {
     padding: 11px 12px;
-    border-bottom: 1px solid var(--card);
+    border-bottom: 1px solid var(--border);
     color: var(--text-muted); vertical-align: top;
     line-height: 1.6;
   }
@@ -1126,8 +1155,8 @@
   }
   .gd-weight-grid.score-weights { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   .gd-weight-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--input-bg);
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
     border-radius: 10px; padding: 18px;
     text-align: center;
   }
@@ -1147,17 +1176,18 @@
 
   /* Formula box */
   .gd-formula {
-    background: rgba(13,22,41,0.6);
-    border: 1px solid rgba(37,99,235,0.20);
+    background: var(--navy);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 14px 16px;
     margin: 14px 0;
     font-family: 'JetBrains Mono', 'Consolas', monospace;
     font-size: 12.5px;
     line-height: 1.9;
-    color: #cbd5e1;
+    color: var(--text);
     overflow-x: auto;
   }
+  [data-theme="dark"] .gd-formula { background: rgba(13,22,41,0.6); border-color: rgba(37,99,235,0.20); color: #cbd5e1; }
   .gd-formula-lbl {
     font-family: 'Inter', sans-serif;
     font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
@@ -1172,6 +1202,21 @@
     color: #64748b; font-family: 'Inter', sans-serif;
     font-size: 11px; margin-left: 6px;
   }
+
+  /* v19.1 — light-theme contrast overrides for guideline accents
+     (the base values are tuned for the dark surface) */
+  [data-theme="light"] .gd-pill.commit   { color: #047857; }
+  [data-theme="light"] .gd-pill.best     { color: #b45309; }
+  [data-theme="light"] .gd-pill.pipe     { color: #6d28d9; }
+  [data-theme="light"] .gd-pill.closed   { color: #1d4ed8; }
+  [data-theme="light"] .gd-tag.commit    { color: #047857; }
+  [data-theme="light"] .gd-tag.best      { color: #b45309; }
+  [data-theme="light"] .gd-tag.pipe      { color: #6d28d9; }
+  [data-theme="light"] .gd-tag.closed    { color: #1d4ed8; }
+  [data-theme="light"] .gd-tag.blocked   { color: #b91c1c; }
+  [data-theme="light"] .gd-callout.info  { color: var(--text-muted); }
+  [data-theme="light"] .gd-section code  { color: #1d4ed8; }
+  [data-theme="light"] .gd-formula-side  { color: #94a3b8; }
 
   /* Example box */
   .gd-example {
@@ -1763,6 +1808,13 @@
       box-shadow: 0 0 40px rgba(0,0,0,0.5);
     }
     .sidebar.open { transform: translateX(0); }
+    .sidebar.collapsed { width: 248px; }              /* drawer is always full width on mobile */
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .sidebar-brand-fallback,
+    .sidebar.collapsed .sidebar-version { display: revert; }
+    .sidebar.collapsed .nav-item { justify-content: flex-start; padding: 12px 14px; }
+    .sidebar.collapsed .theme-toggle-track { display: block; }
+    .sidebar-collapse-btn { display: none; }          /* collapse is a desktop affordance */
     .sidebar-scrim.open { display: block; }
     .hamburger { display: flex; }
   }
@@ -1780,6 +1832,121 @@
     .topbar-right .sync-chip span,
     .topbar-right .hubspot-chip span { display: none; }
   }
+
+  /* ════════════ EVENT / ON-SITE DEMO REQUESTS (v19.1) ════════════ */
+  .req-hero {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 20px; flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(16,185,129,0.08) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 22px;
+  }
+  .req-hero-title { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; margin: 0; color: var(--text); }
+  .req-hero-sub { margin: 8px 0 0; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; max-width: 680px; }
+  .req-hero-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .req-stat {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 18px; text-align: center; min-width: 84px;
+  }
+  .req-stat-val { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1; }
+  .req-stat-lbl { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-top: 5px; }
+
+  .req-layout { display: grid; grid-template-columns: minmax(320px, 460px) 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 1080px) { .req-layout { grid-template-columns: 1fr; } }
+
+  .req-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px 24px; box-shadow: var(--shadow);
+  }
+  .req-card-title { font-size: 15px; font-weight: 700; letter-spacing: 0.4px; color: var(--text); margin: 0 0 16px; }
+
+  .req-form { position: sticky; top: 84px; }
+  @media (max-width: 1080px) { .req-form { position: static; } }
+  .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .req-field { display: flex; flex-direction: column; gap: 6px; }
+  .req-field.req-col-2 { grid-column: 1 / -1; }
+  .req-field label {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .req-field input, .req-field select, .req-field textarea {
+    width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 9px; color: var(--text);
+    font-family: 'Inter','Segoe UI',system-ui,sans-serif; font-size: 14px;
+    padding: 10px 12px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .req-field textarea { resize: vertical; line-height: 1.5; }
+  .req-field input:focus, .req-field select:focus, .req-field textarea:focus {
+    border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.18);
+  }
+  .req-field input::placeholder, .req-field textarea::placeholder { color: var(--text-muted); opacity: 0.7; }
+  .req-devices { display: flex; gap: 10px; padding-top: 4px; }
+  .req-check {
+    flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer;
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 9px;
+    padding: 9px 12px; font-size: 14px; font-weight: 600; color: var(--text);
+    text-transform: none; letter-spacing: 0;
+  }
+  .req-check input { width: auto; accent-color: var(--accent2); }
+  .req-form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+  .req-list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .req-filter {
+    background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 13px; padding: 7px 11px; cursor: pointer;
+  }
+  .req-item {
+    background: var(--card); border: 1px solid var(--border); border-left-width: 4px;
+    border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .req-item.status-pending  { border-left-color: var(--warn); }
+  .req-item.status-approved { border-left-color: var(--success); }
+  .req-item.status-declined { border-left-color: var(--danger); }
+  .req-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .req-item-title { font-size: 15px; font-weight: 700; color: var(--text); margin: 0; }
+  .req-item-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .req-type-chip {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.6px;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 12px; margin-right: 8px;
+    background: rgba(59,130,246,0.12); color: var(--accent2); border: 1px solid rgba(59,130,246,0.3);
+  }
+  .req-type-chip.event { background: rgba(168,85,247,0.12); color: #7c3aed; border-color: rgba(168,85,247,0.3); }
+  [data-theme="dark"] .req-type-chip.event { color: #c4b5fd; }
+  .req-status {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+    padding: 4px 11px; border-radius: 12px; white-space: nowrap;
+  }
+  .req-status.Pending  { background: rgba(245,158,11,0.14); color: #b45309; border: 1px solid rgba(245,158,11,0.35); }
+  .req-status.Approved { background: rgba(16,185,129,0.14); color: #047857; border: 1px solid rgba(16,185,129,0.35); }
+  .req-status.Declined { background: rgba(239,68,68,0.14); color: #b91c1c; border: 1px solid rgba(239,68,68,0.35); }
+  [data-theme="dark"] .req-status.Pending  { color: #fcd34d; }
+  [data-theme="dark"] .req-status.Approved { color: #6ee7b7; }
+  [data-theme="dark"] .req-status.Declined { color: #fca5a5; }
+  .req-detail-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px 18px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .req-detail { font-size: 13px; }
+  .req-detail .k { font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px; }
+  .req-detail .v { color: var(--text); font-weight: 500; word-break: break-word; }
+  .req-detail.full { grid-column: 1 / -1; }
+  .req-device-tag {
+    display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 8px;
+    background: rgba(37,99,235,0.12); color: var(--accent2); margin-right: 6px;
+  }
+  .req-item-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .req-mini-btn {
+    font-size: 12px; font-weight: 600; padding: 6px 13px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--card); color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .req-mini-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .req-mini-btn.approve:hover { border-color: var(--success); color: var(--success); }
+  .req-mini-btn.decline:hover { border-color: var(--danger); color: var(--danger); }
+  .req-mini-btn.del:hover     { border-color: var(--danger); color: var(--danger); }
+  .req-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 14px;
+    background: var(--card); border: 1px dashed var(--border); border-radius: 14px; }
 
   /* ════════════ DEMO TRACKER (v13) ════════════ */
   .demo-hero {
@@ -2629,7 +2796,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v19.0 · Redesigned sidebar navigation · Light &amp; Dark theme · Multi-deal selection per Commit / Best Case slot · rep-scoped picker · running AED total
+      v19.1 · Collapsible sidebar · Event &amp; On-site Demo requests · Light &amp; Dark theme · Multi-deal selection per Commit / Best Case slot
     </div>
   </div>
 </div>
@@ -2661,28 +2828,32 @@
 <!-- MAIN APP -->
 <div id="app">
 
-  <!-- ░░░ SIDEBAR NAVIGATION (v19.0) ░░░ -->
+  <!-- ░░░ SIDEBAR NAVIGATION (v19.1) ░░░ -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <img src="2.png" alt="OXEFIT" class="sidebar-logo"
+      <img src="2.png" alt="OxeFit" class="sidebar-logo"
            onerror="this.style.display='none';document.getElementById('sidebarBrandFallback').style.display='inline';">
-      <span class="sidebar-brand-fallback" id="sidebarBrandFallback" style="display:none;">OXEFIT</span>
+      <span class="sidebar-brand-fallback" id="sidebarBrandFallback" style="display:none;">CoreV</span>
+      <button class="sidebar-collapse-btn" id="collapseBtn" onclick="toggleCollapse()" title="Collapse menu" aria-label="Collapse menu">‹</button>
     </div>
 
     <nav class="sidebar-nav" id="primaryTabs">
-      <button class="nav-item active" data-tab="tracker" onclick="switchTab('tracker')">
+      <button class="nav-item active" data-tab="tracker" onclick="switchTab('tracker')" title="Sales Tracker">
         <span class="nav-ico">📊</span><span class="nav-label">Sales Tracker</span>
       </button>
-      <button class="nav-item" data-tab="performance" onclick="switchTab('performance')">
+      <button class="nav-item" data-tab="performance" onclick="switchTab('performance')" title="Rep Performance">
         <span class="nav-ico">🎯</span><span class="nav-label">Rep Performance</span>
       </button>
-      <button class="nav-item" data-tab="demos" onclick="switchTab('demos')">
+      <button class="nav-item" data-tab="demos" onclick="switchTab('demos')" title="Demo Tracker">
         <span class="nav-ico">🎬</span><span class="nav-label">Demo Tracker</span>
       </button>
-      <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')">
+      <button class="nav-item" data-tab="requests" onclick="switchTab('requests')" title="Event &amp; On-site Demo Requests">
+        <span class="nav-ico">📝</span><span class="nav-label">Requests</span>
+      </button>
+      <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
         <span class="nav-ico">📈</span><span class="nav-label">Marketing</span>
       </button>
-      <button class="nav-item" data-tab="guidelines" onclick="switchTab('guidelines')">
+      <button class="nav-item" data-tab="guidelines" onclick="switchTab('guidelines')" title="Guidelines">
         <span class="nav-ico">📖</span><span class="nav-label">Guidelines</span>
       </button>
     </nav>
@@ -2693,7 +2864,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.0</div>
+      <div class="sidebar-version">v19.1</div>
     </div>
   </aside>
 
@@ -3046,6 +3217,108 @@
 
     </div>
   </div><!-- /#view-demos -->
+
+  <!-- ░░░ EVENT / ON-SITE DEMO REQUESTS (v19.1) ░░░ -->
+  <div class="tab-view" id="view-requests">
+  <div class="content">
+
+    <section class="req-hero">
+      <div>
+        <h1 class="req-hero-title">Event &amp; On-site Demo Requests</h1>
+        <p class="req-hero-sub">Sales reps submit a request to run an on-site demo or stand up an event. Each submission captures the scope, timeline, commercial path, plan, participants, expected cost and the devices required.</p>
+      </div>
+      <div class="req-hero-stats" id="reqHeroStats"></div>
+    </section>
+
+    <div class="req-layout">
+      <!-- FORM -->
+      <form class="req-card req-form" id="requestForm" onsubmit="submitRequest(event)" autocomplete="off">
+        <h3 class="req-card-title">New Request</h3>
+
+        <div class="req-grid">
+          <div class="req-field">
+            <label>Request Type</label>
+            <select id="reqType" required>
+              <option value="On-site Demo">On-site Demo</option>
+              <option value="Event">Event</option>
+            </select>
+          </div>
+          <div class="req-field">
+            <label>Submitted By</label>
+            <select id="reqRep" required></select>
+          </div>
+          <div class="req-field req-col-2">
+            <label>Client / Account Name</label>
+            <input type="text" id="reqClient" placeholder="e.g. Emirates Wellness Group" required>
+          </div>
+
+          <div class="req-field req-col-2">
+            <label>Details (as per report)</label>
+            <textarea id="reqDetails" rows="3" placeholder="Summarise the opportunity, scope and objective of this demo / event…" required></textarea>
+          </div>
+
+          <div class="req-field">
+            <label>Expected Start Date</label>
+            <input type="date" id="reqStart" required>
+          </div>
+          <div class="req-field">
+            <label>Expected End Date</label>
+            <input type="date" id="reqEnd" required>
+          </div>
+
+          <div class="req-field req-col-2">
+            <label>Path to Commercial</label>
+            <input type="text" id="reqCommercial" placeholder="Link to deal / quote, or who owns the commercial close…">
+          </div>
+
+          <div class="req-field req-col-2">
+            <label>Project Plan</label>
+            <textarea id="reqPlan" rows="3" placeholder="Key milestones, logistics, setup &amp; teardown, dependencies, link to full plan…"></textarea>
+          </div>
+
+          <div class="req-field req-col-2">
+            <label>Who Will Be Participating</label>
+            <input type="text" id="reqParticipants" placeholder="e.g. Hasan (lead), Katy (support), client: 2 stakeholders…">
+          </div>
+
+          <div class="req-field">
+            <label>Expected Cost (AED)</label>
+            <input type="number" id="reqCost" min="0" step="100" placeholder="0">
+          </div>
+          <div class="req-field">
+            <label>Device(s) Needed</label>
+            <div class="req-devices">
+              <label class="req-check"><input type="checkbox" class="reqDevice" value="XS1"><span>XS1</span></label>
+              <label class="req-check"><input type="checkbox" class="reqDevice" value="XP1"><span>XP1</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="req-form-actions">
+          <button type="button" class="btn btn-ghost" onclick="resetRequestForm()">Clear</button>
+          <button type="submit" class="btn btn-primary" id="reqSubmitBtn">Submit Request</button>
+        </div>
+        <input type="hidden" id="reqEditId" value="">
+      </form>
+
+      <!-- LIST -->
+      <div class="req-list-wrap">
+        <div class="req-list-head">
+          <h3 class="req-card-title">Submitted Requests</h3>
+          <select id="reqFilter" class="req-filter" onchange="renderRequests()">
+            <option value="all">All statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Declined">Declined</option>
+          </select>
+        </div>
+        <div id="requestsList"></div>
+      </div>
+    </div>
+
+  </div>
+  </div><!-- /#view-requests -->
+
 
   <!-- DEMO ENTRY MODAL (office admin only) -->
   <div class="modal-backdrop" id="demoModal">
@@ -4589,12 +4862,13 @@ function parseEnvelope(remote) {
     return {
       data : (remote.data && typeof remote.data === 'object') ? remote.data : {},
       demos: Array.isArray(remote.demos) ? remote.demos : [],
+      requests: Array.isArray(remote.requests) ? remote.requests : [],   // v19.1
       hubspot: (remote.hubspot && typeof remote.hubspot === 'object') ? remote.hubspot : null, // v15.4
       meta : remote._meta || null
     };
   }
   // Legacy bare month-keyed object → treat as data, no demos.
-  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], hubspot: null, meta: null };
+  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], hubspot: null, meta: null };
 }
 
 async function fetchRemoteEnvelope(tok) {
@@ -4644,11 +4918,13 @@ async function downloadFromOneDrive() {
     // Merge remote INTO local so we never blow away unsynced local edits, then
     // adopt the merged result as the new truth.
     const merged = mergeEnvelopes(
-      { data: allData, demos: demoEntries },
+      { data: allData, demos: demoEntries, requests: requestEntries },
       r.env
     );
     allData     = merged.data;
     demoEntries = merged.demos;
+    requestEntries = merged.requests;        // v19.1
+    try { saveRequests(); } catch(_) {}
     migrateRenamedRepsInData(allData);   // v15.3 — heal stale names pulled from remote
     // v15.4 — adopt the admin's shared HubSpot connection (token + proxy +
     // owner map) so this rep can open the deal-picker for their own row.
@@ -4818,10 +5094,24 @@ function mergeDemos(localDemos, remoteDemos) {
   (Array.isArray(localDemos)  ? localDemos  : []).forEach(add);
   return Array.from(byId.values());
 }
+/* v19.1 — same id-keyed, newest-wins merge for Event / On-site Demo requests */
+function mergeRequests(localReqs, remoteReqs) {
+  const byId = new Map();
+  const add = (d) => {
+    if (!d || !d.id) return;
+    const ex = byId.get(d.id);
+    if (!ex) { byId.set(d.id, d); return; }
+    byId.set(d.id, rowStamp(d) >= rowStamp(ex) ? d : ex);
+  };
+  (Array.isArray(remoteReqs) ? remoteReqs : []).forEach(add);
+  (Array.isArray(localReqs)  ? localReqs  : []).forEach(add);
+  return Array.from(byId.values());
+}
 function mergeEnvelopes(local, remote) {
   return {
     data : mergeData(local.data,  remote.data),
-    demos: mergeDemos(local.demos, remote.demos)
+    demos: mergeDemos(local.demos, remote.demos),
+    requests: mergeRequests(local.requests, remote.requests)   // v19.1
   };
 }
 function buildEnvelope() {
@@ -4829,7 +5119,8 @@ function buildEnvelope() {
     _envelope: 'oxefit-v1',
     _meta    : { updatedBy: currentUser || 'unknown', updatedAt: new Date().toISOString() },
     data     : allData,
-    demos    : (typeof demoEntries !== 'undefined' && Array.isArray(demoEntries)) ? demoEntries : []
+    demos    : (typeof demoEntries !== 'undefined' && Array.isArray(demoEntries)) ? demoEntries : [],
+    requests : (typeof requestEntries !== 'undefined' && Array.isArray(requestEntries)) ? requestEntries : []  // v19.1
   };
   // v15.4 — ride the admin's HubSpot connection along so reps inherit it.
   // hsBuildSharedConfig() returns null when there's no token, so a rep who
@@ -4860,9 +5151,11 @@ async function uploadToOneDrive() {
       const r = await fetchRemoteEnvelope(tok);
       if (r.status === 200) {
         // 2. MERGE remote into local.
-        const merged = mergeEnvelopes({ data: allData, demos: demoEntries }, r.env);
+        const merged = mergeEnvelopes({ data: allData, demos: demoEntries, requests: requestEntries }, r.env);
         allData     = merged.data;
         demoEntries = merged.demos;
+        requestEntries = merged.requests;     // v19.1
+        try { saveRequests(); renderRequests(); } catch(_) {}
         migrateRenamedRepsInData(allData);   // v15.3 — heal stale names pulled from remote
         // v15.4 — capture/adopt the shared HubSpot block before we re-upload so
         // (a) reps inherit the admin connection, and (b) a rep's own upload
@@ -5124,6 +5417,8 @@ async function signOut() {
 async function launchApp(alreadyAuthed) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
+  restoreSidebarState();          // v19.1 — apply persisted collapsed/expanded menu
+  renderRequests();               // v19.1 — populate Event / On-site Demo request tab
 
   // v13: drive role-based CSS visibility (office-only buttons / columns)
   document.body.setAttribute('data-role', currentRole || 'viewer');
@@ -8067,11 +8362,29 @@ function closeSidebar() {
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebarScrim')?.classList.remove('open');
 }
+function setCollapsed(on) {
+  const sb = document.getElementById('sidebar');
+  const btn = document.getElementById('collapseBtn');
+  if (!sb) return;
+  sb.classList.toggle('collapsed', on);
+  if (btn) { btn.textContent = on ? '›' : '‹'; btn.title = on ? 'Expand menu' : 'Collapse menu'; }
+  try { localStorage.setItem('oxefit_sidebar_collapsed', on ? '1' : '0'); } catch (e) {}
+}
+function toggleCollapse() {
+  const sb = document.getElementById('sidebar');
+  setCollapsed(!(sb && sb.classList.contains('collapsed')));
+}
+function restoreSidebarState() {
+  let on = false;
+  try { on = localStorage.getItem('oxefit_sidebar_collapsed') === '1'; } catch (e) {}
+  setCollapsed(on);
+}
 
 const TAB_HEADINGS = {
   tracker:     'Sales Tracker',
   performance: 'Sales Rep Performance',
   demos:       'Demo Tracker',
+  requests:    'Event & On-site Demo Requests',
   marketing:   'Marketing Consumer Performance',
   guidelines:  'Guidelines'
 };
@@ -8096,6 +8409,251 @@ function switchTab(tabName) {
   if (tabName === 'demos') {
     renderDemoTab();
   }
+  if (tabName === 'requests') {
+    renderRequests();
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   EVENT / ON-SITE DEMO REQUESTS (v19.1)
+   Storage: localStorage key 'oxefit_requests_v1', mirrored into the
+   shared OneDrive envelope (requests[]) so admins see what reps submit.
+
+   Roles:
+     • rep            → submit requests; sees & edits OWN requests (while Pending)
+     • admin / office → see ALL; can Approve / Decline / delete any request
+     • viewer         → read-only
+   Each request stores: type, rep, client, details, expectedStart,
+   expectedEnd, commercial, plan, participants, cost, devices[], status.
+════════════════════════════════════════════════════════════════════ */
+const REQUESTS_KEY = 'oxefit_requests_v1';
+let requestEntries = [];
+
+function loadRequests() {
+  try {
+    const raw = localStorage.getItem(REQUESTS_KEY);
+    requestEntries = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(requestEntries)) requestEntries = [];
+  } catch (e) { requestEntries = []; }
+}
+function saveRequests() {
+  try { localStorage.setItem(REQUESTS_KEY, JSON.stringify(requestEntries)); } catch (e) {}
+}
+function reqIsManager() { return currentRole === 'admin' || currentRole === 'office'; }
+function reqCanWrite()  { return currentRole === 'admin' || currentRole === 'office' || currentRole === 'rep'; }
+
+function reqFmtDate(s) {
+  if (!s) return '—';
+  try {
+    const d = new Date(s + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch (e) { return s; }
+}
+function reqFmtAED(n) {
+  const v = Number(n) || 0;
+  return 'AED ' + v.toLocaleString('en-US');
+}
+
+function populateReqRepSelect() {
+  const sel = document.getElementById('reqRep');
+  if (!sel) return;
+  sel.innerHTML = ALL_REPS.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
+  // Reps submit as themselves and cannot pick another rep.
+  if (currentRole === 'rep' && ALL_REPS.includes(currentUser)) {
+    sel.value = currentUser;
+    sel.disabled = true;
+  } else {
+    sel.disabled = false;
+    if (ALL_REPS.includes(currentUser)) sel.value = currentUser;
+  }
+}
+
+function resetRequestForm() {
+  const f = document.getElementById('requestForm');
+  if (!f) return;
+  f.reset();
+  document.getElementById('reqEditId').value = '';
+  document.getElementById('reqSubmitBtn').textContent = 'Submit Request';
+  document.querySelectorAll('.reqDevice').forEach(c => c.checked = false);
+  populateReqRepSelect();
+}
+
+function submitRequest(ev) {
+  if (ev) ev.preventDefault();
+  if (!reqCanWrite()) { showToast('You do not have permission to submit requests', 'error'); return; }
+
+  const start = document.getElementById('reqStart').value;
+  const end   = document.getElementById('reqEnd').value;
+  if (start && end && end < start) {
+    showToast('End date cannot be before the start date', 'error');
+    return;
+  }
+  const devices = Array.from(document.querySelectorAll('.reqDevice:checked')).map(c => c.value);
+  if (!devices.length) { showToast('Select at least one device', 'error'); return; }
+
+  const editId = document.getElementById('reqEditId').value;
+  const repVal = (currentRole === 'rep' && ALL_REPS.includes(currentUser))
+                 ? currentUser
+                 : (document.getElementById('reqRep').value || currentUser);
+
+  const payload = {
+    type:          document.getElementById('reqType').value,
+    rep:           repVal,
+    client:        document.getElementById('reqClient').value.trim(),
+    details:       document.getElementById('reqDetails').value.trim(),
+    expectedStart: start,
+    expectedEnd:   end,
+    commercial:    document.getElementById('reqCommercial').value.trim(),
+    plan:          document.getElementById('reqPlan').value.trim(),
+    participants:  document.getElementById('reqParticipants').value.trim(),
+    cost:          parseFloat(document.getElementById('reqCost').value) || 0,
+    devices:       devices,
+    updatedAt:     new Date().toISOString()
+  };
+
+  if (editId) {
+    const idx = requestEntries.findIndex(r => r.id === editId);
+    if (idx >= 0) {
+      // editing keeps original submitter/status unless a manager edits
+      requestEntries[idx] = { ...requestEntries[idx], ...payload };
+      showToast('Request updated', 'success');
+    }
+  } else {
+    payload.id        = 'r_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    payload.status    = 'Pending';
+    payload.submittedBy = currentUser;
+    payload.createdAt = new Date().toISOString();
+    requestEntries.push(payload);
+    showToast('Request submitted', 'success');
+  }
+
+  saveRequests();
+  if (typeof saveAll === 'function') saveAll();   // push into shared OneDrive envelope
+  resetRequestForm();
+  renderRequests();
+}
+
+function editRequest(id) {
+  const r = requestEntries.find(x => x.id === id);
+  if (!r) return;
+  if (!reqIsManager() && !(currentRole === 'rep' && r.rep === currentUser)) {
+    showToast('You can only edit your own requests', 'error'); return;
+  }
+  document.getElementById('reqType').value         = r.type || 'On-site Demo';
+  populateReqRepSelect();
+  if (!document.getElementById('reqRep').disabled) document.getElementById('reqRep').value = r.rep || currentUser;
+  document.getElementById('reqClient').value       = r.client || '';
+  document.getElementById('reqDetails').value      = r.details || '';
+  document.getElementById('reqStart').value        = r.expectedStart || '';
+  document.getElementById('reqEnd').value          = r.expectedEnd || '';
+  document.getElementById('reqCommercial').value   = r.commercial || '';
+  document.getElementById('reqPlan').value         = r.plan || '';
+  document.getElementById('reqParticipants').value = r.participants || '';
+  document.getElementById('reqCost').value         = r.cost || '';
+  document.querySelectorAll('.reqDevice').forEach(c => { c.checked = (r.devices || []).includes(c.value); });
+  document.getElementById('reqEditId').value       = r.id;
+  document.getElementById('reqSubmitBtn').textContent = 'Save Changes';
+  document.getElementById('requestForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setRequestStatus(id, status) {
+  if (!reqIsManager()) { showToast('Admin only', 'error'); return; }
+  const r = requestEntries.find(x => x.id === id);
+  if (!r) return;
+  r.status = status;
+  r.updatedAt = new Date().toISOString();
+  saveRequests();
+  if (typeof saveAll === 'function') saveAll();
+  renderRequests();
+  showToast('Request marked ' + status, 'success');
+}
+
+function deleteRequest(id) {
+  const r = requestEntries.find(x => x.id === id);
+  if (!r) return;
+  if (!reqIsManager() && !(currentRole === 'rep' && r.rep === currentUser)) {
+    showToast('You can only delete your own requests', 'error'); return;
+  }
+  if (!confirm('Delete this request? This cannot be undone.')) return;
+  requestEntries = requestEntries.filter(x => x.id !== id);
+  saveRequests();
+  if (typeof saveAll === 'function') saveAll();
+  renderRequests();
+  showToast('Request deleted', 'success');
+}
+
+function renderRequests() {
+  const list = document.getElementById('requestsList');
+  if (!list) return;            // tab not in DOM yet
+  populateReqRepSelect();
+
+  // role-scoped visibility: reps see only their own
+  let rows = requestEntries.slice();
+  if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
+
+  // stats (over the visible scope)
+  const stats = { total: rows.length, Pending: 0, Approved: 0, Declined: 0 };
+  rows.forEach(r => { stats[r.status] = (stats[r.status] || 0) + 1; });
+  const statsEl = document.getElementById('reqHeroStats');
+  if (statsEl) {
+    statsEl.innerHTML = [
+      ['Total', stats.total],
+      ['Pending', stats.Pending || 0],
+      ['Approved', stats.Approved || 0]
+    ].map(([lbl, v]) => `<div class="req-stat"><div class="req-stat-val">${v}</div><div class="req-stat-lbl">${lbl}</div></div>`).join('');
+  }
+
+  // status filter
+  const filter = document.getElementById('reqFilter')?.value || 'all';
+  if (filter !== 'all') rows = rows.filter(r => r.status === filter);
+
+  // newest first
+  rows.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+  if (!rows.length) {
+    list.innerHTML = `<div class="req-empty">No requests yet.${reqCanWrite() ? ' Use the form to submit one.' : ''}</div>`;
+    return;
+  }
+
+  const manager = reqIsManager();
+  list.innerHTML = rows.map(r => {
+    const status = r.status || 'Pending';
+    const canEdit = manager || (currentRole === 'rep' && r.rep === currentUser);
+    const devices = (r.devices || []).map(d => `<span class="req-device-tag">${escapeHtml(d)}</span>`).join('') || '—';
+    const isEvent = (r.type === 'Event');
+    return `
+    <div class="req-item status-${status.toLowerCase()}">
+      <div class="req-item-top">
+        <div>
+          <p class="req-item-title">
+            <span class="req-type-chip ${isEvent ? 'event' : ''}">${escapeHtml(r.type || '')}</span>
+            ${escapeHtml(r.client || 'Untitled')}
+          </p>
+          <div class="req-item-meta">By ${escapeHtml(r.rep || '—')} · submitted ${r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-GB') : '—'}</div>
+        </div>
+        <span class="req-status ${status}">${status}</span>
+      </div>
+
+      <div class="req-detail-grid">
+        ${r.details ? `<div class="req-detail full"><span class="k">Details</span><span class="v">${escapeHtml(r.details)}</span></div>` : ''}
+        <div class="req-detail"><span class="k">Expected Start</span><span class="v">${reqFmtDate(r.expectedStart)}</span></div>
+        <div class="req-detail"><span class="k">Expected End</span><span class="v">${reqFmtDate(r.expectedEnd)}</span></div>
+        <div class="req-detail"><span class="k">Expected Cost</span><span class="v">${reqFmtAED(r.cost)}</span></div>
+        <div class="req-detail"><span class="k">Devices</span><span class="v">${devices}</span></div>
+        ${r.participants ? `<div class="req-detail full"><span class="k">Participants</span><span class="v">${escapeHtml(r.participants)}</span></div>` : ''}
+        ${r.commercial ? `<div class="req-detail full"><span class="k">Path to Commercial</span><span class="v">${escapeHtml(r.commercial)}</span></div>` : ''}
+        ${r.plan ? `<div class="req-detail full"><span class="k">Project Plan</span><span class="v">${escapeHtml(r.plan)}</span></div>` : ''}
+      </div>
+
+      ${(canEdit || manager) ? `<div class="req-item-actions">
+        ${manager && status !== 'Approved' ? `<button class="req-mini-btn approve" onclick="setRequestStatus('${r.id}','Approved')">✓ Approve</button>` : ''}
+        ${manager && status !== 'Declined' ? `<button class="req-mini-btn decline" onclick="setRequestStatus('${r.id}','Declined')">✕ Decline</button>` : ''}
+        ${manager && status !== 'Pending'  ? `<button class="req-mini-btn" onclick="setRequestStatus('${r.id}','Pending')">↺ Reset</button>` : ''}
+        ${canEdit ? `<button class="req-mini-btn" onclick="editRequest('${r.id}')">Edit</button>` : ''}
+        ${canEdit ? `<button class="req-mini-btn del" onclick="deleteRequest('${r.id}')">Delete</button>` : ''}
+      </div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 /* ════════════════════════════════════════════════════════════════════
@@ -10357,6 +10915,7 @@ function saveThresh() {
 ════════════════════════════════════════ */
 loadLocal();
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
+loadRequests(); // v19.1 — Event / On-site Demo requests
 hsLoadTokens();
 
 /* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
