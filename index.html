@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v19.4</title>
+<title>CoreV | OxeFit Sales Tracker v19.5</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -260,7 +260,7 @@
     background: linear-gradient(90deg, rgba(37,99,235,0.25), rgba(37,99,235,0.1));
     border-bottom: 1px solid rgba(37,99,235,0.3); padding: 8px 24px;
     display: flex; align-items: center; gap: 10px;
-    font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #93c5fd;
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent-glow);
   }
   .view-banner-dot { width:7px; height:7px; border-radius:50%; background:#3b82f6; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
@@ -388,7 +388,7 @@
   .theme-toggle-ico.sun  { color: #f59e0b; }
   .theme-toggle-ico.moon { color: #2563eb; }
   [data-theme="dark"]  .theme-toggle-ico.sun  { opacity: 0.35; }
-  [data-theme="dark"]  .theme-toggle-ico.moon { color: #93c5fd; }
+  [data-theme="dark"]  .theme-toggle-ico.moon { color: var(--accent-glow); }
   [data-theme="light"] .theme-toggle-ico.moon { opacity: 0.4; }
   .theme-toggle-track {
     position: relative; width: 40px; height: 20px; border-radius: 20px;
@@ -437,10 +437,10 @@
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
   }
-  .role-badge.admin { background: rgba(30,51,112,0.5); border: 1px solid rgba(37,99,235,0.5); color: #93c5fd; }
-  .role-badge.viewer { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); color: #93c5fd; }
+  .role-badge.admin { background: rgba(30,51,112,0.5); border: 1px solid rgba(37,99,235,0.5); color: var(--accent-glow); }
+  .role-badge.viewer { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); color: var(--accent-glow); }
   .role-badge.rep { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
-  .role-badge.office { background: rgba(168,85,247,0.18); border: 1px solid rgba(168,85,247,0.4); color: #d8b4fe; }
+  .role-badge.office { background: rgba(13,148,136,0.18); border: 1px solid rgba(13,148,136,0.4); color: var(--teal2); }
   .user-chip {
     display: flex; align-items: center; gap: 8px;
     background: var(--card); border: 1px solid var(--border);
@@ -606,7 +606,7 @@
     background: var(--navy-light); padding: 16px 20px;
     display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   }
-  .table-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #1e40af; }
+  .table-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: var(--accent2); }
   .table-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .table-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .tracker-filter-wrap { display: flex; align-items: center; gap: 4px; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 12px; }
@@ -622,7 +622,7 @@
   .btn-danger:hover { background: rgba(239,68,68,0.18); }
   .btn-success { background: linear-gradient(135deg, #059669, var(--success)); color: #fff; box-shadow: 0 2px 12px rgba(16,185,129,0.35); }
   .btn-success:hover { opacity: 0.88; }
-  .btn-sync { background: rgba(37,99,235,0.10); border: 1px solid rgba(37,99,235,0.35); color: #1e40af; }
+  .btn-sync { background: rgba(37,99,235,0.10); border: 1px solid rgba(37,99,235,0.35); color: var(--accent2); }
   .btn-sync:hover { background: rgba(37,99,235,0.18); }
 
   /* TEAM SECTION ROW (visual group header inside the table) */
@@ -662,7 +662,7 @@
   thead th.col-forecast { color: var(--accent-glow); }
   thead th.col-blocked { color: #fca5a5; min-width: 220px; }
   thead th.col-stage   { color: var(--text-muted); min-width: 170px; }
-  thead th.col-signals { color: #93c5fd; min-width: 200px; }
+  thead th.col-signals { color: var(--accent-glow); min-width: 200px; }
   thead th.col-qual    { color: var(--gold-light); min-width: 90px; text-align:center; }
   /* widen the stage-select dropdown so 'Negotiation' isn't truncated */
   td .stage-select, td select.cell-input { min-width: 138px; }
@@ -703,7 +703,7 @@
     display: inline-block; padding: 2px 8px; border-radius: 10px;
     font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
   }
-  .team-badge.dubai { background: rgba(37,99,235,0.2); color: #93c5fd; border: 1px solid rgba(37,99,235,0.4); }
+  .team-badge.dubai { background: rgba(37,99,235,0.2); color: var(--accent-glow); border: 1px solid rgba(37,99,235,0.4); }
   .team-badge.abu-dhabi { background: rgba(245,158,11,0.2); color: var(--gold-light); border: 1px solid rgba(245,158,11,0.4); }
   .num-input { min-width: 90px; text-align: right; }
   .deal-text-input { min-width: 160px; }
@@ -752,7 +752,7 @@
     transition: border-color .15s, box-shadow .15s;
   }
   .deal-picker-btn:hover { border-color: #94a3b8; box-shadow: 0 1px 3px rgba(15,23,42,.08); }
-  .deal-picker-btn.has-value { border-color: #0ea5e9; background: #f0f9ff; color: #0c4a6e; }
+  .deal-picker-btn.has-value { border-color: #0ea5e9; background: #f0f9ff; color: var(--accent2); }
   .deal-picker-btn .dp-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .deal-picker-btn .dp-caret { color: #64748b; font-size: 10px; flex-shrink: 0; }
   .deal-picker-btn.locked-field { background: #f1f5f9; cursor: default; pointer-events: none; }
@@ -782,17 +782,17 @@
   .deal-picker-menu .dp-item:hover { background: #f8fafc; }
   .deal-picker-menu .dp-item.dp-disabled { opacity: .45; cursor: not-allowed; }
   .deal-picker-menu .dp-item .dp-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .deal-picker-menu .dp-item .dp-amt  { font-variant-numeric: tabular-nums; color: #0369a1; font-weight: 600; font-size: 11.5px; }
+  .deal-picker-menu .dp-item .dp-amt  { font-variant-numeric: tabular-nums; color: var(--accent2); font-weight: 600; font-size: 11.5px; }
   .deal-picker-menu .dp-item .dp-stage {
     font-size: 9.5px; padding: 1px 6px; border-radius: 10px; font-weight: 600;
-    background: #e0f2fe; color: #075985; margin-left: 6px;
+    background: #e0f2fe; color: var(--accent2); margin-left: 6px;
   }
   /* v18.2 — owner-rep badge for Direct Engagement (Kamal/Sami/Ahmed) */
   .deal-picker-menu .dp-item .dp-owner {
     font-size: 9.5px; padding: 1px 7px; border-radius: 10px; font-weight: 700;
     background: linear-gradient(135deg, #ede9fe, #ddd6fe);
     color: #5b21b6; margin-left: 4px; letter-spacing: .3px;
-    border: 1px solid #c4b5fd;
+    border: 1px solid var(--teal2);
   }
   .deal-picker-menu .dp-clear {
     padding: 7px 10px; text-align: center; cursor: pointer;
@@ -810,10 +810,10 @@
     padding: 8px 10px;
     background: linear-gradient(180deg, #ecfeff 0%, #e0f2fe 100%);
     border-bottom: 1px solid #bae6fd;
-    font: 600 11.5px 'Inter', system-ui, sans-serif; color: #075985;
+    font: 600 11.5px 'Inter', system-ui, sans-serif; color: var(--accent2);
   }
-  .deal-picker-menu .dp-multi-count { color: #0c4a6e; }
-  .deal-picker-menu .dp-multi-total { font-variant-numeric: tabular-nums; color: #0369a1; }
+  .deal-picker-menu .dp-multi-count { color: var(--accent2); }
+  .deal-picker-menu .dp-multi-total { font-variant-numeric: tabular-nums; color: var(--accent2); }
 
   /* ── v18.2 SEARCH BAR ─────────────────────────────────────────
      Sticky search field below the multi-header. Filters deal rows
@@ -832,8 +832,8 @@
     outline: none; transition: border-color .12s ease, background-color .12s ease;
   }
   .deal-picker-menu .dp-search:focus {
-    border-color: #0369a1; background-color: var(--card);
-    box-shadow: 0 0 0 3px rgba(3,105,161,0.12);
+    border-color: var(--accent2); background-color: var(--card);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
   }
   .deal-picker-menu .dp-search::placeholder { color: #94a3b8; }
   .deal-picker-menu .dp-no-match {
@@ -848,9 +848,9 @@
   }
   .deal-picker-menu .dp-item.dp-item-multi:hover { background: #f0f9ff; }
   .deal-picker-menu .dp-item.dp-item-multi.dp-checked { background: #ecfeff; }
-  .deal-picker-menu .dp-item.dp-item-multi.dp-checked .dp-name { font-weight: 600; color: #0c4a6e; }
+  .deal-picker-menu .dp-item.dp-item-multi.dp-checked .dp-name { font-weight: 600; color: var(--accent2); }
   .deal-picker-menu .dp-item.dp-item-multi .dp-check {
-    flex: 0 0 auto; margin: 0 4px 0 0; accent-color: #0369a1;
+    flex: 0 0 auto; margin: 0 4px 0 0; accent-color: var(--accent2);
     width: 14px; height: 14px; cursor: pointer;
   }
   .deal-picker-menu .dp-item.dp-disabled .dp-check { cursor: not-allowed; }
@@ -870,9 +870,9 @@
   }
   .deal-picker-menu .dp-clear-btn:hover { background: #fee2e2; }
   .deal-picker-menu .dp-done-btn {
-    color: #ffffff; background: #0369a1; border-color: #0369a1;
+    color: #ffffff; background: var(--accent2); border-color: var(--accent2);
   }
-  .deal-picker-menu .dp-done-btn:hover { background: #0c4a6e; }
+  .deal-picker-menu .dp-done-btn:hover { background: var(--accent2); }
 
   /* Hard-block pill when HubSpot disconnected */
   .deal-picker-block {
@@ -901,7 +901,7 @@
   }
   .deal-value-display .dvd-val {
     flex: 1; font: 600 13px 'Inter', system-ui, sans-serif;
-    color: #0c4a6e; font-variant-numeric: tabular-nums;
+    color: var(--accent2); font-variant-numeric: tabular-nums;
     text-align: right;
   }
   .deal-value-display .dvd-val.empty { color: #94a3b8; font-weight: 400; }
@@ -976,7 +976,7 @@
 
   /* MONTHLY COMMITMENTS PANEL */
   .commit-panel { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 24px; margin-bottom: 20px; }
-  .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #1e40af; margin-bottom: 14px; }
+  .commit-title { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin-bottom: 14px; }
   .commit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .commit-card { background: var(--card); border: 1px solid var(--border); color: var(--text); background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; }
   .commit-card.dubai     { border-left: 3px solid var(--accent-glow); }
@@ -1052,7 +1052,7 @@
 
   .gd-hero {
     display: flex; align-items: center; gap: 22px;
-    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(124,58,237,0.08));
+    background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(13,148,136,0.08));
     border: 1px solid rgba(37,99,235,0.25);
     padding: 24px 28px; border-radius: 14px; margin-bottom: 32px;
   }
@@ -1103,7 +1103,7 @@
     font-family: 'JetBrains Mono', 'Consolas', monospace;
     font-size: 12.5px;
     background: rgba(37,99,235,0.10);
-    color: #93c5fd;
+    color: var(--accent-glow);
     padding: 2px 7px; border-radius: 4px;
     border: 1px solid rgba(37,99,235,0.18);
   }
@@ -1117,8 +1117,8 @@
   }
   .gd-pill.commit { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.35); color: #6ee7b7; }
   .gd-pill.best   { background: rgba(251,191,36,0.10); border-color: rgba(251,191,36,0.35); color: #fcd34d; }
-  .gd-pill.pipe   { background: rgba(124,58,237,0.10); border-color: rgba(124,58,237,0.35); color: #c4b5fd; }
-  .gd-pill.closed { background: rgba(37,99,235,0.10); border-color: rgba(37,99,235,0.35); color: #93c5fd; }
+  .gd-pill.pipe   { background: rgba(13,148,136,0.10); border-color: rgba(13,148,136,0.35); color: var(--teal2); }
+  .gd-pill.closed { background: rgba(37,99,235,0.10); border-color: rgba(37,99,235,0.35); color: var(--accent-glow); }
 
   /* Callout */
   .gd-callout {
@@ -1181,8 +1181,8 @@
   }
   .gd-tag.commit  { background: rgba(16,185,129,0.15); color: #6ee7b7; }
   .gd-tag.best    { background: rgba(251,191,36,0.15); color: #fcd34d; }
-  .gd-tag.pipe    { background: rgba(124,58,237,0.15); color: #c4b5fd; }
-  .gd-tag.closed  { background: rgba(37,99,235,0.15); color: #93c5fd; }
+  .gd-tag.pipe    { background: rgba(13,148,136,0.15); color: var(--teal2); }
+  .gd-tag.closed  { background: rgba(37,99,235,0.15); color: var(--accent-glow); }
   .gd-tag.blocked { background: rgba(239,68,68,0.15);  color: #fca5a5; }
 
   /* Stage weight cards */
@@ -1244,15 +1244,15 @@
      (the base values are tuned for the dark surface) */
   [data-theme="light"] .gd-pill.commit   { color: #047857; }
   [data-theme="light"] .gd-pill.best     { color: #b45309; }
-  [data-theme="light"] .gd-pill.pipe     { color: #6d28d9; }
-  [data-theme="light"] .gd-pill.closed   { color: #1d4ed8; }
+  [data-theme="light"] .gd-pill.pipe     { color: var(--teal2); }
+  [data-theme="light"] .gd-pill.closed   { color: var(--accent2); }
   [data-theme="light"] .gd-tag.commit    { color: #047857; }
   [data-theme="light"] .gd-tag.best      { color: #b45309; }
-  [data-theme="light"] .gd-tag.pipe      { color: #6d28d9; }
-  [data-theme="light"] .gd-tag.closed    { color: #1d4ed8; }
+  [data-theme="light"] .gd-tag.pipe      { color: var(--teal2); }
+  [data-theme="light"] .gd-tag.closed    { color: var(--accent2); }
   [data-theme="light"] .gd-tag.blocked   { color: #b91c1c; }
   [data-theme="light"] .gd-callout.info  { color: var(--text-muted); }
-  [data-theme="light"] .gd-section code  { color: #1d4ed8; }
+  [data-theme="light"] .gd-section code  { color: var(--accent2); }
   [data-theme="light"] .gd-formula-side  { color: #94a3b8; }
 
   /* Example box */
@@ -1326,7 +1326,7 @@
     border-radius: 12px; letter-spacing: 0.5px; text-transform: uppercase;
   }
   .gd-metric-tag.good { background: rgba(16,185,129,0.15); color: #6ee7b7; }
-  .gd-metric-tag.info { background: rgba(37,99,235,0.15); color: #93c5fd; }
+  .gd-metric-tag.info { background: rgba(37,99,235,0.15); color: var(--accent-glow); }
   .gd-fineprint { font-size: 11.5px; color: var(--text-muted); font-style: italic; margin: 4px 0 0; }
 
   /* Color legend */
@@ -1425,7 +1425,7 @@
     margin-left: 6px; opacity: 0.75; font-weight: 600; font-size: 9px;
   }
   .stage-qualified {
-    background: rgba(59,130,246,0.12); color: #93c5fd;
+    background: rgba(59,130,246,0.12); color: var(--accent-glow);
     border-color: rgba(59,130,246,0.35);
   }
   .stage-proposal {
@@ -1433,8 +1433,8 @@
     border-color: rgba(245,158,11,0.35);
   }
   .stage-negotiation {
-    background: rgba(168,85,247,0.14); color: #d8b4fe;
-    border-color: rgba(168,85,247,0.4);
+    background: rgba(13,148,136,0.14); color: var(--teal2);
+    border-color: rgba(13,148,136,0.4);
   }
   .stage-select {
     background: var(--card); color: var(--text);
@@ -1482,7 +1482,7 @@
   .buyer-signals-grid input[type="checkbox"] {
     margin: 0; width: 12px; height: 12px; cursor: pointer; accent-color: var(--accent-glow);
   }
-  .buyer-signals-grid label.checked { color: #93c5fd; font-weight: 600; }
+  .buyer-signals-grid label.checked { color: var(--accent-glow); font-weight: 600; }
   .buyer-signals-locked {
     display: flex; flex-wrap: wrap; gap: 3px; min-width: 160px;
   }
@@ -1490,7 +1490,7 @@
     display: inline-flex; align-items: center;
     padding: 2px 6px; border-radius: 4px;
     font-size: 9px; font-weight: 600; letter-spacing: 0.3px;
-    background: rgba(59,130,246,0.15); color: #93c5fd;
+    background: rgba(59,130,246,0.15); color: var(--accent-glow);
     border: 1px solid rgba(59,130,246,0.3);
   }
   .buyer-signal-chip.muted {
@@ -1588,7 +1588,7 @@
     transition: color 0.15s ease;
   }
   .primary-tab:hover { color: var(--text); }
-  .primary-tab.active { color: #1e40af; }
+  .primary-tab.active { color: var(--accent2); }
   .primary-tab.active::after {
     content: ''; position: absolute; left: 12px; right: 12px; bottom: -1px;
     height: 3px; border-radius: 3px 3px 0 0;
@@ -1622,7 +1622,7 @@
     display: inline-flex; align-items: center; gap: 6px;
     padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;
     background: rgba(66,133,244,0.10); border: 1px solid rgba(66,133,244,0.35);
-    color: #93c5fd;
+    color: var(--accent-glow);
   }
   .gdrive-chip .gd-dot {
     width: 7px; height: 7px; border-radius: 50%;
@@ -1638,7 +1638,7 @@
   }
   .gdrive-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(66,133,244,0.35); }
   .gdrive-btn.ghost {
-    background: transparent; color: #93c5fd; border: 1px solid rgba(66,133,244,0.35);
+    background: transparent; color: var(--accent-glow); border: 1px solid rgba(66,133,244,0.35);
   }
   .gdrive-config-card {
     background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.3);
@@ -1684,7 +1684,7 @@
     display: flex; align-items: center; gap: 8px; font-size: 12px;
     color: var(--text-muted); margin-bottom: 12px; flex-wrap: wrap;
   }
-  .gdrive-breadcrumb a { color: #93c5fd; cursor: pointer; text-decoration: none; }
+  .gdrive-breadcrumb a { color: var(--accent-glow); cursor: pointer; text-decoration: none; }
   .gdrive-breadcrumb a:hover { text-decoration: underline; }
 
   /* ── CLOSED (WIN) COLUMN ── */
@@ -2122,8 +2122,8 @@
     text-transform: uppercase; padding: 3px 9px; border-radius: 12px; margin-right: 8px;
     background: rgba(59,130,246,0.12); color: var(--accent2); border: 1px solid rgba(59,130,246,0.3);
   }
-  .req-type-chip.event { background: rgba(168,85,247,0.12); color: #7c3aed; border-color: rgba(168,85,247,0.3); }
-  [data-theme="dark"] .req-type-chip.event { color: #c4b5fd; }
+  .req-type-chip.event { background: rgba(13,148,136,0.12); color: var(--teal2); border-color: rgba(13,148,136,0.3); }
+  [data-theme="dark"] .req-type-chip.event { color: var(--teal2); }
   .req-status {
     font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
     padding: 4px 11px; border-radius: 12px; white-space: nowrap;
@@ -2175,8 +2175,8 @@
 
   /* ════════════ DEMO TRACKER (v13) ════════════ */
   .demo-hero {
-    background: linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(59,130,246,0.10) 100%);
-    border: 1px solid rgba(168,85,247,0.3); border-radius: 16px;
+    background: linear-gradient(135deg, rgba(13,148,136,0.15) 0%, rgba(59,130,246,0.10) 100%);
+    border: 1px solid rgba(13,148,136,0.3); border-radius: 16px;
     padding: 24px 28px; margin-bottom: 20px;
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 16px;
@@ -2204,10 +2204,10 @@
   }
   .demo-btn:hover { background: rgba(255,255,255,0.05); }
   .demo-btn.primary {
-    background: linear-gradient(135deg, #a855f7, #6366f1); border-color: transparent;
+    background: linear-gradient(135deg, #0d9488, #2563eb); border-color: transparent;
     color: white; font-weight: 700;
   }
-  .demo-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(168,85,247,0.4); }
+  .demo-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(13,148,136,0.4); }
   .demo-btn.ghost { background: transparent; }
   .demo-btn.danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #fca5a5; }
   .demo-btn.danger:hover { background: rgba(239,68,68,0.25); }
@@ -2258,9 +2258,9 @@
     padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600;
     background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1);
   }
-  .outlook-chip.primary { background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.4); color: #d8b4fe; }
+  .outlook-chip.primary { background: rgba(13,148,136,0.18); border-color: rgba(13,148,136,0.4); color: var(--teal2); }
   .outlook-chip.primary em { font-style: normal; opacity: 0.7; font-size: 9px; margin-left: 4px; }
-  .outlook-chip.support { background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.25); color: #c4b5fd; }
+  .outlook-chip.support { background: rgba(13,148,136,0.08); border-color: rgba(13,148,136,0.25); color: var(--teal2); }
   .outlook-chip.client  { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #86efac; }
   .outlook-chip.warn    { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
   .outlook-arrow { color: var(--text-muted); padding: 0 4px; }
@@ -2375,7 +2375,7 @@
   .outlook-edit-actions .btn-cancel:hover { background: rgba(255,255,255,0.1); color: var(--text); }
   .outlook-helper {
     margin-top: 14px; padding: 10px 12px; border-radius: 8px; font-size: 12px;
-    background: rgba(0,120,212,0.06); border: 1px solid rgba(0,120,212,0.2); color: #93c5fd;
+    background: rgba(0,120,212,0.06); border: 1px solid rgba(0,120,212,0.2); color: var(--accent-glow);
     line-height: 1.55;
   }
 
@@ -2384,7 +2384,7 @@
     display: none;
   }
   .demo-perm-banner.office {
-    background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); color: #d8b4fe;
+    background: rgba(13,148,136,0.12); border: 1px solid rgba(13,148,136,0.3); color: var(--teal2);
     display: block;
   }
   .demo-perm-banner.rep {
@@ -2392,7 +2392,7 @@
     display: block;
   }
   .demo-perm-banner.viewer {
-    background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd;
+    background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.3); color: var(--accent-glow);
     display: block;
   }
 
@@ -2407,7 +2407,7 @@
   }
   .demo-kpi::before {
     content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%;
-    background: var(--kpi-color, #a855f7);
+    background: var(--kpi-color, #0d9488);
   }
   .demo-kpi-label {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
@@ -2442,7 +2442,7 @@
     cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.15s;
   }
   .demo-bar-row:hover { background: var(--card); }
-  .demo-bar-row.active { background: rgba(168,85,247,0.15); }
+  .demo-bar-row.active { background: rgba(13,148,136,0.15); }
   .demo-bar-name { font-size: 12px; font-weight: 600; color: var(--text); }
   .demo-bar-name .team-tag {
     display: inline-block; font-size: 9px; padding: 1px 6px; border-radius: 4px;
@@ -2452,7 +2452,7 @@
     background: var(--input-bg); height: 22px; border-radius: 6px; overflow: hidden; position: relative;
   }
   .demo-bar-fill {
-    height: 100%; background: linear-gradient(90deg, #a855f7, #6366f1);
+    height: 100%; background: linear-gradient(90deg, #0d9488, #2563eb);
     border-radius: 6px; transition: width 0.4s ease;
     display: flex; align-items: center; padding-left: 8px;
   }
@@ -2473,12 +2473,12 @@
   .demo-funnel-step {
     background: var(--card); border-radius: 8px;
     padding: 14px 16px; position: relative;
-    border-left: 3px solid var(--step-color, #a855f7);
+    border-left: 3px solid var(--step-color, #0d9488);
   }
   .demo-funnel-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
   .demo-funnel-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-top: 2px; }
   .demo-funnel-pct { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
-  .demo-funnel-step.step-demos    { --step-color: #a855f7; }
+  .demo-funnel-step.step-demos    { --step-color: #0d9488; }
   .demo-funnel-step.step-converted { --step-color: #10b981; }
   .demo-funnel-step.step-won      { --step-color: #fbbf24; }
 
@@ -2549,7 +2549,7 @@
     border: 1px solid var(--border); border-radius: 6px;
     padding: 6px 8px; font-family: inherit; font-size: 12px; resize: vertical;
   }
-  .demo-reason-textarea:focus { outline: none; border-color: rgba(168,85,247,0.5); }
+  .demo-reason-textarea:focus { outline: none; border-color: rgba(13,148,136,0.5); }
   .demo-reason-textarea:disabled { opacity: 0.6; cursor: not-allowed; }
   .demo-reason-static {
     font-size: 12px; color: var(--text); white-space: pre-wrap;
@@ -2590,7 +2590,7 @@
     padding: 8px 10px; font-family: inherit; font-size: 13px;
   }
   .demo-form-row input:focus, .demo-form-row select:focus, .demo-form-row textarea:focus {
-    outline: none; border-color: rgba(168,85,247,0.5);
+    outline: none; border-color: rgba(13,148,136,0.5);
   }
 
   /* Supporting-reps multi-select grid (v13.8) */
@@ -2609,11 +2609,11 @@
     font-size: 12px; color: var(--text);
     transition: all 0.12s;
   }
-  .demo-support-chip:hover { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.4); }
-  .demo-support-chip input[type="checkbox"] { accent-color: #a855f7; cursor: pointer; }
+  .demo-support-chip:hover { background: rgba(13,148,136,0.1); border-color: rgba(13,148,136,0.4); }
+  .demo-support-chip input[type="checkbox"] { accent-color: #0d9488; cursor: pointer; }
   .demo-support-chip.is-primary {
     opacity: 0.45; cursor: not-allowed;
-    background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.3);
+    background: rgba(13,148,136,0.08); border-color: rgba(13,148,136,0.3);
   }
   .demo-support-chip.is-primary input { pointer-events: none; }
   .demo-support-chip-team {
@@ -2626,9 +2626,9 @@
   .demo-support-pill {
     display: inline-block;
     font-size: 10px;
-    background: rgba(168,85,247,0.12);
-    color: #c4b5fd;
-    border: 1px solid rgba(168,85,247,0.3);
+    background: rgba(13,148,136,0.12);
+    color: var(--teal2);
+    border: 1px solid rgba(13,148,136,0.3);
     border-radius: 4px;
     padding: 1px 6px;
     line-height: 1.4;
@@ -2918,7 +2918,7 @@
      v17.1 — READABILITY OVERRIDES (Sales Rep Performance tab)
      Old dark-theme `color:#fff` is invisible on the new light cards.
      Recolor data values to dark slate (#1a202c) and section titles to
-     the unified dark blue (#1e40af). Colored buttons / pills / gradient
+     the unified dark blue (var(--accent2)). Colored buttons / pills / gradient
      ranks keep their white text (handled by more specific rules above).
      ════════════════════════════════════════════════════════════ */
   .perf-team-metric,
@@ -2933,14 +2933,14 @@
   .rep-metric .val.good { color: var(--success); }
 
   /* Section + leaderboard titles → unified dark blue */
-  .perf-section-head h2 { color: #1e40af; }
-  .perf-leaderboard th:hover { color: #1e40af; }
+  .perf-section-head h2 { color: var(--accent2); }
+  .perf-leaderboard th:hover { color: var(--accent2); }
 
   /* ── Low-contrast light-blue (accent-glow) text on white cards → dark blue ── */
-  .kpi-value.accent          { color: #1e40af; }
-  tbody tr.totals-row td     { color: #1e40af; }
-  .commit-metric-value       { color: #1e40af; }            /* Dubai/default tint */
-  .commit-card.dubai .commit-metric-value { color: #1e40af; }
+  .kpi-value.accent          { color: var(--accent2); }
+  tbody tr.totals-row td     { color: var(--accent2); }
+  .commit-metric-value       { color: var(--accent2); }            /* Dubai/default tint */
+  .commit-card.dubai .commit-metric-value { color: var(--accent2); }
 
   /* ── Low-contrast light-orange (gold-light #fbbf24) text on white → deep amber ── */
   .kpi-value.gold            { color: #b45309; }
@@ -2984,7 +2984,7 @@
 
   /* R5 — Dubai team tag next to each rep name → dark blue */
   .team-badge.dubai {
-    background: rgba(30,64,175,0.12); color: #1e40af;
+    background: rgba(30,64,175,0.12); color: var(--accent2);
     border: 1px solid rgba(30,64,175,0.35);
   }
 
@@ -3349,7 +3349,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v19.4 · Executive dashboard &amp; command bar · Detailed Event requests · Deal Ownership rules · Light &amp; Dark theme
+      v19.5 · Unified teal-blue theme · Executive dashboard &amp; command bar · Detailed Event requests · Light &amp; Dark theme
     </div>
   </div>
 </div>
@@ -3408,7 +3408,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.4</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.5</strong></p>
     </div>
   </div>
 </div>
@@ -3474,7 +3474,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.4</div>
+      <div class="sidebar-version">v19.5</div>
     </div>
   </aside>
 
@@ -4210,7 +4210,7 @@
         <code>GDRIVE_CONFIG.clientId</code> and <code>GDRIVE_CONFIG.apiKey</code> at the top of the script.
         Steps:
         <ol style="margin:8px 0 0 18px; padding:0;">
-          <li>Go to <a href="https://console.cloud.google.com/" target="_blank" style="color:#93c5fd;">Google Cloud Console</a> → APIs &amp; Services → Credentials.</li>
+          <li>Go to <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--accent-glow);">Google Cloud Console</a> → APIs &amp; Services → Credentials.</li>
           <li>Create an <strong>OAuth 2.0 Client ID</strong> (type: Web application). Add this page's URL to Authorized JavaScript origins.</li>
           <li>Create an <strong>API key</strong> (restrict to Google Drive API).</li>
           <li>Enable the <strong>Google Drive API</strong> and the <strong>Picker API</strong>.</li>
@@ -4534,7 +4534,7 @@
         </div>
         <p>Each of these flows into one or more performance metrics. The dashboard then rolls them up per rep, per team, and aggregated across whatever <em>Period</em> you select (current month, last 3, last 6, YTD).</p>
         
-        <div class="gd-callout info" style="border-color: #0369a1; background: rgba(3, 105, 161, 0.06);">
+        <div class="gd-callout info" style="border-color: var(--accent2); background: rgba(37,99,235, 0.06);">
           <strong>v18.1 — Multi-Deal Selection per Slot.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
             <li><strong>Pick more than one deal:</strong> Each rep can now check multiple deals under their Commit and under their Best Case. The picker is a checkbox list — Commit AED and Best Case AED sum automatically from the selection.</li>
@@ -4856,7 +4856,7 @@
           <span class="gd-chip bad">&lt; 60 Needs attention</span>
         </div>
         
-        <div class="gd-callout info" style="border-color: #0369a1; background: rgba(3, 105, 161, 0.06);">
+        <div class="gd-callout info" style="border-color: var(--accent2); background: rgba(37,99,235, 0.06);">
           <strong>v18.1 — Multi-Deal Selection per Slot.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
             <li><strong>Pick more than one deal:</strong> Each rep can now check multiple deals under their Commit and under their Best Case. The picker is a checkbox list — Commit AED and Best Case AED sum automatically from the selection.</li>
@@ -4890,7 +4890,7 @@
           <div style="margin-top: 10px;"><strong>Permissions:</strong> Azure AD app needs <code>Calendars.Read.Shared</code> delegated permission with admin consent. Each signed-in user must have at least Reviewer access to the demo@ mailbox calendar (configured by IT once, applied to the whole sales group).</div>
         </div>
         <div class="gd-callout info" style="border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.08);">
-          <strong>v13.8 — Shared demo credit.</strong> Many demos are joint efforts: one rep books the meeting, another runs the technical demonstration on-site. When Gladys logs a demo, she now picks a <em>primary rep</em> AND optionally tags <em>supporting reps</em>. Every credited rep gets the demo counted toward their Demo Effectiveness score, their Demo Tracker rep card, and the KPI strip — the demo itself is still one row in the log, but it powers multiple reps' scores. Supporting credits are shown as <span style="color:#a855f7;">+ Rep Name</span> chips under the primary in the log table, and as a <span style="color:#a855f7;">(+N supporting)</span> badge on the rep card. The <strong>Edit</strong> and <strong>Delete</strong> actions are now full text buttons in the Actions column (no more guessing what the 🗑 icon does).
+          <strong>v13.8 — Shared demo credit.</strong> Many demos are joint efforts: one rep books the meeting, another runs the technical demonstration on-site. When Gladys logs a demo, she now picks a <em>primary rep</em> AND optionally tags <em>supporting reps</em>. Every credited rep gets the demo counted toward their Demo Effectiveness score, their Demo Tracker rep card, and the KPI strip — the demo itself is still one row in the log, but it powers multiple reps' scores. Supporting credits are shown as <span style="color:#0d9488;">+ Rep Name</span> chips under the primary in the log table, and as a <span style="color:#0d9488;">(+N supporting)</span> badge on the rep card. The <strong>Edit</strong> and <strong>Delete</strong> actions are now full text buttons in the Actions column (no more guessing what the 🗑 icon does).
         </div>
         <div class="gd-example">
           <div class="gd-example-head">📌 Worked Example A — Milena (hits goal, decent demos)</div>
@@ -4967,7 +4967,7 @@
           </tbody>
         </table></div>
         
-        <div class="gd-callout info" style="border-color: #0369a1; background: rgba(3, 105, 161, 0.06);">
+        <div class="gd-callout info" style="border-color: var(--accent2); background: rgba(37,99,235, 0.06);">
           <strong>v18.1 — Multi-Deal Selection per Slot.</strong>
           <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
             <li><strong>Pick more than one deal:</strong> Each rep can now check multiple deals under their Commit and under their Best Case. The picker is a checkbox list — Commit AED and Best Case AED sum automatically from the selection.</li>
@@ -10381,7 +10381,7 @@ function renderDemoKpis(rows) {
   const uniqueClients= new Set(rows.map(r => (r.client||'').toLowerCase().trim()).filter(Boolean)).size;
 
   el.innerHTML = [
-    { lbl: 'Total Demos',      val: total,        sub: uniqueReps + ' reps active',  c: '#a855f7' },
+    { lbl: 'Total Demos',      val: total,        sub: uniqueReps + ' reps active',  c: '#0d9488' },
     { lbl: 'Converted',        val: converted,    sub: convRate + '% conversion',    c: '#10b981' },
     { lbl: 'Pending',          val: pending,      sub: 'Awaiting outcome',           c: '#f59e0b' },
     { lbl: 'Lost',             val: lost,         sub: 'No deal',                    c: '#ef4444' },
@@ -10499,7 +10499,7 @@ function renderDemoRepGrid(rows) {
             <div class="demo-rep-card-name">${rep}</div>
             <div class="demo-rep-card-team">${team}</div>
           </div>
-          <div class="demo-rep-card-team"><strong>${v.total}</strong> demos${v.asSupport ? ` <span style="color:#a855f7;font-size:10px;">(+${v.asSupport} supporting)</span>` : ''}</div>
+          <div class="demo-rep-card-team"><strong>${v.total}</strong> demos${v.asSupport ? ` <span style="color:#0d9488;font-size:10px;">(+${v.asSupport} supporting)</span>` : ''}</div>
         </div>
         <div class="demo-rep-card-stats">
           <div class="demo-rep-stat"><div class="demo-rep-stat-val converted">${v.converted}</div><div class="demo-rep-stat-lbl">Won</div></div>
@@ -10545,7 +10545,7 @@ function renderDemoLog() {
     return `
       <tr>
         <td>${formatDemoDate(r.date)}</td>
-        <td>${escapeHtml(r.rep)}${(Array.isArray(r.supportReps) && r.supportReps.length) ? `<br><span style="font-size:10px;color:#a855f7;" title="Supporting reps — also credited">+ ${r.supportReps.map(escapeHtml).join(', ')}</span>` : ''}</td>
+        <td>${escapeHtml(r.rep)}${(Array.isArray(r.supportReps) && r.supportReps.length) ? `<br><span style="font-size:10px;color:#0d9488;" title="Supporting reps — also credited">+ ${r.supportReps.map(escapeHtml).join(', ')}</span>` : ''}</td>
         <td><strong>${escapeHtml(r.client || '—')}</strong></td>
         <td>${escapeHtml(r.type || '—')}${r.product ? `<br><span style="font-size:10px;color:var(--text-muted);">${escapeHtml(r.product)}</span>` : ''}</td>
         <td>${escapeHtml(r.location || '—')}</td>
