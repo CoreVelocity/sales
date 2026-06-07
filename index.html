@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.4</title>
+<title>CoreV | OxeFit Sales Tracker v20.5</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3420,7 +3420,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.4 · Accurate HubSpot pipeline across all deal pipelines · Configurable role-based access · Rep-scoped visibility
+      v20.5 · Full HubSpot pipeline (all deals, paginated) · Access Control visible to admins · Rep-scoped visibility
     </div>
   </div>
 </div>
@@ -3493,7 +3493,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.4</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.5</strong></p>
     </div>
   </div>
 </div>
@@ -3559,7 +3559,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.4</div>
+      <div class="sidebar-version">v20.5</div>
     </div>
   </aside>
 
@@ -9137,35 +9137,45 @@ async function hubspotFetchDealsForRep(repName) {
     if (!ownerId) throw new Error('Owner not found in HubSpot for ' + email);
   }
 
-  // Pull EVERYTHING not Closed-Lost. We split open vs closed-won client-side
-  // so we can populate Closed Won (CRM actuals) AND Total Pipeline (true open
-  // pipeline sum) in addition to Commit/BestCase picks.
-  const body = {
-    filterGroups: [{ filters: [
-      { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId },
-      { propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }
-    ]}],
-    properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed'],
-    sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
-    limit: 100
-  };
-  const data = await hubspotApi('/crm/v3/objects/deals/search', {
-    method: 'POST', body: JSON.stringify(body)
-  });
-  return (data.results || []).map(d => {
+  // v20.5 — fetch EVERY matching deal via pagination (the old single call
+  // capped at 100, which under-counted owners with large pipelines such as
+  // Direct Engagement). Loop on the search cursor until HubSpot has no more.
+  const allResults = [];
+  let after = undefined;
+  let guard = 0;   // safety: max 50 pages (5000 deals)
+  do {
+    const body = {
+      filterGroups: [{ filters: [
+        { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId },
+        { propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }
+      ]}],
+      properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed'],
+      sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
+      limit: 100
+    };
+    if (after) body.after = after;
+    const data = await hubspotApi('/crm/v3/objects/deals/search', {
+      method: 'POST', body: JSON.stringify(body)
+    });
+    (data.results || []).forEach(r => allResults.push(r));
+    after = data.paging && data.paging.next && data.paging.next.after;
+    guard++;
+  } while (after && guard < 50);
+
+  return allResults.map(d => {
     const rawStage = (d.properties.dealstage || '').toLowerCase();
     const isWon    = d.properties.hs_is_closed_won === 'true'
                   || rawStage === 'closedwon'
                   || rawStage.includes('closed won');
-    // v20.4 — reliable closed detection across ALL pipelines (won OR lost).
-    // hs_is_closed is HubSpot's computed flag and works regardless of the
-    // pipeline's custom stage internal names — so a Direct Engagement pipeline's
-    // closed/lost deals are excluded from open pipeline just like the default one.
-    const isClosed = d.properties.hs_is_closed === 'true'
-                  || isWon
-                  || rawStage === 'closedlost'
-                  || rawStage.includes('closed lost')
-                  || rawStage.includes('closed won');
+    // v20.5 — trust HubSpot's computed hs_is_closed flag as authoritative for
+    // BOTH states: 'true' → closed (won or lost), 'false' → genuinely open.
+    // Only fall back to stage-name heuristics when the flag is missing, so an
+    // open deal is never wrongly dropped from the pipeline total.
+    const hsClosed = d.properties.hs_is_closed;
+    let isClosed;
+    if (hsClosed === 'true')       isClosed = true;
+    else if (hsClosed === 'false') isClosed = false;
+    else isClosed = isWon || rawStage === 'closedlost' || rawStage.includes('closed lost');
     return {
       id      : d.id,
       name    : d.properties.dealname || '(untitled)',
@@ -9735,10 +9745,11 @@ function openSettings() {
   // reflect current theme label
   const tl = document.getElementById('settingsThemeLabel');
   if (tl) tl.textContent = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'Dark' : 'Light';
-  // v20.3 — Access Control: only the primary admin (Ahmed) can manage it
+  // v20.5 — Access Control is visible to all admins so it's easy to find;
+  // only the primary admin (Ahmed) can actually change it.
   const accSec = document.getElementById('settingsAccessSection');
-  if (accSec) accSec.style.display = isPrimaryAdmin() ? 'block' : 'none';
-  if (isPrimaryAdmin()) renderAccessMatrix();
+  if (accSec) accSec.style.display = (currentRole === 'admin') ? 'block' : 'none';
+  if (currentRole === 'admin') renderAccessMatrix();
   document.getElementById('settingsModal').classList.add('open');
 }
 
@@ -9772,15 +9783,21 @@ function renderAccessMatrix() {
     html += `<div class="access-group-label">${escapeHtml(section.group)}</div>`;
     section.users.forEach(u => {
       const cur = map[u] || defaultAccessFor(u);
+      const dis = isPrimaryAdmin() ? '' : ' disabled';
       html += `<div class="access-row">
           <div><span class="access-user">${escapeHtml(u)}</span></div>
-          <select data-access-user="${escapeHtml(u)}">${optsFor(cur)}</select>
+          <select data-access-user="${escapeHtml(u)}"${dis}>${optsFor(cur)}</select>
         </div>`;
     });
   });
   host.innerHTML = html;
+  // Read-only for admins other than Ahmed
+  const saveBtn = document.querySelector('#settingsAccessSection .btn-primary');
+  const resetBtn = document.querySelector('#settingsAccessSection .btn-ghost');
+  if (saveBtn)  saveBtn.style.display  = isPrimaryAdmin() ? '' : 'none';
+  if (resetBtn) resetBtn.style.display = isPrimaryAdmin() ? '' : 'none';
   const st = document.getElementById('accessSaveStatus');
-  if (st) st.textContent = '';
+  if (st) st.textContent = isPrimaryAdmin() ? '' : 'View only — ask Ahmed to change access levels.';
 }
 function saveAccessFromUI() {
   if (!isPrimaryAdmin()) { showToast('Only Ahmed can change access', 'error'); return; }
