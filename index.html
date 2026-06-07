@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.0</title>
+<title>CoreV | OxeFit Sales Tracker v20.1</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3394,7 +3394,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.0 · Direct Engagement per-admin rows · Original logo when minimized · Unified teal-blue theme
+      v20.1 · Rep-scoped visibility · Direct Engagement HubSpot pipeline · Per-admin deal links
     </div>
   </div>
 </div>
@@ -3453,7 +3453,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.0</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.1</strong></p>
     </div>
   </div>
 </div>
@@ -3519,7 +3519,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.0</div>
+      <div class="sidebar-version">v20.1</div>
     </div>
   </aside>
 
@@ -3687,7 +3687,7 @@
       </div>
     </div>
 
-    <div class="summary-bar">
+    <div class="summary-bar" id="summaryBar">
       <div class="summary-bar-title">Monthly Forecast Overview (AED)</div>
       <div class="summary-weeks" id="summaryWeeks"></div>
     </div>
@@ -5295,6 +5295,10 @@ const ADMIN_USER  = 'Ahmed';
 // 'admin' role on login. Keep ADMIN_USER for the hard-coded password path.
 const ADMIN_USERS = ['Ahmed', 'Sami', 'Kamal'];
 function isAdminUser(name) { return ADMIN_USERS.includes(name); }
+// v20.1 — Ahmed is the ONLY admin allowed to edit sales reps' tracker entries.
+// Sami & Kamal keep full read access + edit their own Direct Engagement row only.
+const PRIMARY_ADMIN = 'Ahmed';
+function isPrimaryAdmin() { return currentUser === PRIMARY_ADMIN; }
 // v20.0 — Direct Engagement is split into one row per admin, in this order.
 const DE_OWNERS = ['Ahmed', 'Sami', 'Kamal'];
 const ADMIN_PASS  = 'Liverp00l';
@@ -6522,6 +6526,17 @@ async function launchApp(alreadyAuthed) {
       `Sales Rep Mode — ${currentUser}: you can only edit your own row.`;
   }
 
+  // v20.1 — reps must not see team-wide leaderboards. Hide the Executive
+  // Dashboard and Rep Performance nav items for reps, and land them on the
+  // Sales Tracker (their own scoped view) instead of the dashboard.
+  ['exec', 'performance'].forEach(tab => {
+    const btn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+    if (btn) btn.style.display = (currentRole === 'rep') ? 'none' : '';
+  });
+  if (currentRole === 'rep') {
+    switchTab('tracker');
+  }
+
   // OneDrive: when SSO already provided the account, just pull the file.
   // Otherwise (viewer flow), do the standard init which will show "Sign in
   // to OneDrive" if no cached account is found.
@@ -6626,22 +6641,31 @@ function fmtNum(n) {
 ════════════════════════════════════════ */
 function canEditRow(row) {
   if (currentRole === 'viewer') return false;
-  // v15.9 — Direct Engagement is editable only by the three admins
+  // v20.1 — Direct Engagement rows: Ahmed (primary admin) edits any; Sami/Kamal edit only their own row.
   if (row.team === 'Direct Engagement') {
-    if (row.locked) return isAdminUser(currentUser);
-    return isAdminUser(currentUser);
+    if (isPrimaryAdmin()) return true;
+    if (isAdminUser(currentUser)) return row.rep === currentUser;
+    return false;
   }
-  if (row.locked) return currentRole === 'admin'; // only admin overrides after submission
-  if (currentRole === 'admin') return true;
-  if (currentRole === 'rep')   return row.rep === currentUser;
-  return false;
+  // v20.1 — normal sales-rep entries:
+  //   • a rep may edit only their OWN unlocked row
+  //   • among admins, ONLY Ahmed may edit reps' entries (Sami/Kamal & Gladys are read-only here)
+  if (currentRole === 'rep') {
+    if (row.locked) return false;
+    return row.rep === currentUser;
+  }
+  if (isPrimaryAdmin()) return true;       // Ahmed can edit (and override locked)
+  return false;                            // Sami, Kamal, Gladys, others: view-only on rep rows
 }
 function canSubmitRow(row) {
   if (row.locked) return false;
   if (currentRole === 'viewer') return false;
-  if (currentRole === 'admin')  return true;
-  if (currentRole === 'rep')    return row.rep === currentUser;
-  return false;
+  if (row.team === 'Direct Engagement') {
+    if (isPrimaryAdmin()) return true;
+    return isAdminUser(currentUser) && row.rep === currentUser;
+  }
+  if (currentRole === 'rep') return row.rep === currentUser;
+  return isPrimaryAdmin();                  // only Ahmed submits reps' entries
 }
 
 /* ════════════════════════════════════════
@@ -6669,6 +6693,11 @@ function renderAll() {
    with a non-zero commit / best case / closed-won / unit value is included,
    and a separate locked-vs-pending sub-count tells you how many are final. */
 function renderCommitPanel() {
+  // v20.1 — the team commitment rollup is hidden for sales reps (it aggregates
+  // other reps); reps see only their own row + KPIs scoped to themselves.
+  const panel = document.getElementById('commitPanel');
+  if (currentRole === 'rep') { if (panel) panel.style.display = 'none'; return; }
+  if (panel) panel.style.display = '';
   const md = getCurMonthData();
   const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, truePipeline:0, xs1:0, xp1:0, count:0, locked:0, pending:0, syncedReps:new Set() });
   const agg = { 'Dubai': blank(), 'Abu Dhabi': blank(), 'Direct Engagement': blank() };
@@ -6787,6 +6816,10 @@ function renderWeekTabs() {
   }
 }
 function renderSummaryBar() {
+  // v20.1 — team forecast overview is hidden for sales reps.
+  const bar = document.getElementById('summaryBar');
+  if (currentRole === 'rep') { if (bar) bar.style.display = 'none'; return; }
+  if (bar) bar.style.display = '';
   const container = document.getElementById('summaryWeeks');
   container.innerHTML = '';
   const md = getCurMonthData();
@@ -6847,6 +6880,8 @@ function renderTable() {
   // v15.9 — Filter controls: Team + Sales Rep
   const filterWrap = document.createElement('div');
   filterWrap.className = 'tracker-filter-wrap';
+  // v20.1 — reps have no filters (their view is locked to their own row)
+  if (currentRole === 'rep') filterWrap.style.display = 'none';
 
   // Team filter
   const teamLabel = document.createElement('label');
@@ -6939,14 +6974,20 @@ function renderTable() {
   tbody.innerHTML = '';
   const rows = getCurWeekRows();
 
+  // v20.1 — Sales reps see ONLY their own row. Admins (Ahmed/Sami/Kamal) and the
+  // Office Admin (Gladys) keep full visibility and may use the team/rep filters.
+  const repScoped = (currentRole === 'rep');
+  const effTeam = repScoped ? null : trackerFilterTeam;
+  const effRep  = repScoped ? currentUser : trackerFilterRep;
+
   Object.entries(TEAMS).forEach(([teamName, members]) => {
     // v15.9 — Team filter: skip entire group if a different team is selected
-    if (trackerFilterTeam && teamName !== trackerFilterTeam) return;
+    if (effTeam && teamName !== effTeam) return;
 
     // Determine which members are visible (Direct Engagement is rendered
     // separately as its own standalone section, not under any team)
-    const visibleMembers = trackerFilterRep
-      ? members.filter(n => n === trackerFilterRep)
+    const visibleMembers = effRep
+      ? members.filter(n => n === effRep)
       : members;
 
     // If nothing in this team matches the active filters, skip the header too
@@ -6969,11 +7010,12 @@ function renderTable() {
   });
 
   // v20.0 — Direct Engagement Standalone Section (3 rows: Ahmed, Sami, Kamal)
-  if (!trackerFilterTeam || trackerFilterTeam === 'Direct Engagement') {
+  // Reps never see this section (effRep is their own name, which is never a DE owner).
+  if (!effTeam || effTeam === 'Direct Engagement') {
     const deRows = rows
       .map((r, i) => ({ r, i }))
       .filter(x => x.r.team === 'Direct Engagement'
-        && (!trackerFilterRep || trackerFilterRep === 'Direct Engagement' || x.r.rep === trackerFilterRep))
+        && (!effRep || effRep === 'Direct Engagement' || x.r.rep === effRep))
       .sort((a, b) => DE_OWNERS.indexOf(a.r.rep) - DE_OWNERS.indexOf(b.r.rep));
     if (deRows.length) {
       const deHeaderTr = document.createElement('tr');
@@ -6989,7 +7031,9 @@ function renderTable() {
     }
   }
 
-  renderTotalsRow(rows, tbody, cols.length);
+  // v20.1 — totals reflect only the rep's own row when a rep is viewing
+  const totalsRows = (currentRole === 'rep') ? rows.filter(r => r.rep === currentUser) : rows;
+  renderTotalsRow(totalsRows, tbody, cols.length);
 }
 
 function renderRow(row, ri, tbody) {
@@ -7030,13 +7074,12 @@ function renderRow(row, ri, tbody) {
   // immediately after Sales Rep. Sourced EXCLUSIVELY from HubSpot (sum of all
   // open deals for the rep). Read-only with HS badge; empty-state prompt
   // when not yet synced.
-  // v15.9 — Direct Engagement has no HubSpot pipeline; show a plain dash.
+  // v20.1 — Direct Engagement rows now show each admin's OWN HubSpot pipeline
+  // (sourced from their HubSpot owner deals), exactly like a normal rep row.
   {
     const tpTd = document.createElement('td');
     tpTd.className = 'col-closed-bg';
-    if (row.team === 'Direct Engagement') {
-      tpTd.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">—</span>';
-    } else if (row.hubspotSynced) {
+    if (row.hubspotSynced) {
       const tpVal = parseFloat(row.truePipeline) || 0;
       tpTd.innerHTML = `
         <div class="hs-sourced-cell" title="From HubSpot · open deals · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
@@ -7128,13 +7171,11 @@ function renderRow(row, ri, tbody) {
   // Closed (Win) AED — sourced EXCLUSIVELY from HubSpot. Manual entry is
   // disabled by design. If HubSpot has not been synced yet, show a clear
   // empty-state prompting admin to sync the CRM.
-  // v15.9 — Direct Engagement has no HubSpot closed-won figure; plain dash.
+  // v20.1 — Direct Engagement rows show each admin's OWN HubSpot closed-won.
   {
     const cwTd = document.createElement('td');
     cwTd.className = 'col-closed-bg';
-    if (row.team === 'Direct Engagement') {
-      cwTd.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">—</span>';
-    } else if (row.hubspotSynced) {
+    if (row.hubspotSynced) {
       const cwVal = parseFloat(row.closedWon) || 0;
       cwTd.innerHTML = `
         <div class="hs-sourced-cell" title="From HubSpot · ${row.hubspotSyncedAt ? new Date(row.hubspotSyncedAt).toLocaleString('en-GB') : ''}">
@@ -7936,7 +7977,9 @@ function renderTotalsRow(rows, tbody, colCount) {
    KPIs
 ════════════════════════════════════════ */
 function renderKPIs() {
-  const rows    = getCurWeekRows();
+  let rows      = getCurWeekRows();
+  // v20.1 — reps see KPIs for their OWN row only, never team-wide figures.
+  if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
   const weekKey = `${curYear}-${curMonth}-${curWeek}`;
 
   // Effective multiplier: stage weight × stale penalty (halved if stale)
@@ -9255,7 +9298,10 @@ async function hubspotSyncAllReps() {
     return;
   }
   const ownerMap = hsGetOwnerMap();
-  const mappedReps = ALL_REPS.filter(r => !!ownerMap[r]);
+  // v20.1 — sync the team reps AND the three Direct Engagement admins (Ahmed/Sami/Kamal)
+  // so each Direct Engagement row shows that admin's own HubSpot pipeline & closed-won.
+  const syncList = ALL_REPS.concat(DE_OWNERS);
+  const mappedReps = syncList.filter(r => !!ownerMap[r]);
   if (!mappedReps.length) {
     showToast('No reps mapped to HubSpot owners yet — open Connect HubSpot → Owner Mapping', 'error');
     return;
@@ -9896,18 +9942,23 @@ function updateRequestsBadge() {
 let _cmdMatches = [];
 function buildCmdIndex() {
   const idx = [];
-  // Tabs
+  const isRep = (currentRole === 'rep');
+  const hiddenForRep = new Set(['exec', 'performance']);
+  // Tabs (reps don't get team-wide dashboards in search)
   Object.entries(TAB_HEADINGS).forEach(([tab, label]) => {
+    if (isRep && hiddenForRep.has(tab)) return;
     idx.push({ type: 'Tab', label: label, hint: 'Open', tab: tab });
   });
-  // Reps -> performance
-  (typeof ALL_REPS !== 'undefined' ? ALL_REPS : []).forEach(rep => {
-    idx.push({ type: 'Rep', label: rep, hint: 'Rep Performance', tab: 'performance' });
-  });
+  // Reps -> performance (reps can't browse other reps; managers can)
+  if (!isRep) {
+    (typeof ALL_REPS !== 'undefined' ? ALL_REPS : []).forEach(rep => {
+      idx.push({ type: 'Rep', label: rep, hint: 'Rep Performance', tab: 'performance' });
+    });
+  }
   // Requests -> requests tab
   if (typeof requestEntries !== 'undefined') {
     requestEntries.forEach(r => {
-      if (currentRole === 'rep' && r.rep !== currentUser) return;
+      if (isRep && r.rep !== currentUser) return;
       idx.push({ type: 'Request', label: `${r.client || 'Untitled'} — ${r.type}`, hint: (r.status||'Pending'), tab: 'requests' });
     });
   }
