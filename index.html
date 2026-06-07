@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v19.9</title>
+<title>CoreV | OxeFit Sales Tracker v20.0</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -348,9 +348,12 @@
   /* ── COLLAPSED STATE (desktop) — keeps the brand logo visible, like the Delivery Tracker ── */
   .sidebar.collapsed { width: 76px; }
   .sidebar.collapsed .sidebar-brand { padding: 0; justify-content: center; }
-  .sidebar.collapsed .sidebar-logo { display: block; height: 34px; width: auto; max-width: 48px; object-fit: contain; }
-  .sidebar.collapsed .sidebar-brand-fallback { display: flex !important; justify-content: center; }
-  .sidebar.collapsed .brand-word { display: none; }              /* hide wordmark, keep the gradient logo box */
+  .sidebar.collapsed .sidebar-logo { display: block; height: 36px; width: auto; max-width: 60px; object-fit: contain; margin: 0 auto; }
+  /* v20.0 — when collapsed, show the REAL logo; only fall back to the CV mark
+     if the image actually failed (the onerror handler sets it to flex). Do NOT
+     force the fallback on, or it covers the real logo. */
+  .sidebar.collapsed .sidebar-brand-fallback { justify-content: center; }
+  .sidebar.collapsed .brand-word { display: none; }              /* hide wordmark, keep just the mark */
   .sidebar.collapsed .sidebar-collapse-btn { display: none; }    /* expand via the topbar burger when collapsed */
   .sidebar.collapsed .nav-label { display: none; }
   .sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; }
@@ -3391,7 +3394,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v19.9 · Visible menu minimize control · Unified commitment figures · Tuesday entry reminders · Unified teal-blue theme
+      v20.0 · Direct Engagement per-admin rows · Original logo when minimized · Unified teal-blue theme
     </div>
   </div>
 </div>
@@ -3450,7 +3453,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.9</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.0</strong></p>
     </div>
   </div>
 </div>
@@ -3516,7 +3519,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.9</div>
+      <div class="sidebar-version">v20.0</div>
     </div>
   </aside>
 
@@ -5292,6 +5295,8 @@ const ADMIN_USER  = 'Ahmed';
 // 'admin' role on login. Keep ADMIN_USER for the hard-coded password path.
 const ADMIN_USERS = ['Ahmed', 'Sami', 'Kamal'];
 function isAdminUser(name) { return ADMIN_USERS.includes(name); }
+// v20.0 — Direct Engagement is split into one row per admin, in this order.
+const DE_OWNERS = ['Ahmed', 'Sami', 'Kamal'];
 const ADMIN_PASS  = 'Liverp00l';
 const PW_STORE_KEY = 'oxefit_pw_hashes_v1';
 const MIN_PW_LEN   = 8;
@@ -5481,9 +5486,15 @@ function ensureWeekSeeded(md, w) {
         added = true;
       }
     });
-    // v15.9 — ensure Direct Engagement row exists as a standalone section
-    if (!existingReps.has('Direct Engagement')) {
-      md.weeks[w].push(defaultRow('Direct Engagement', 'Direct Engagement'));
+  });
+  // v20.0 — Direct Engagement is now THREE standalone rows (Ahmed, Sami, Kamal)
+  // instead of one aggregate row. Migrate away any legacy 'Direct Engagement'
+  // row, then ensure one row per admin under the 'Direct Engagement' team.
+  const legacyDeIdx = md.weeks[w].findIndex(r => r.rep === 'Direct Engagement');
+  if (legacyDeIdx >= 0) { md.weeks[w].splice(legacyDeIdx, 1); added = true; }
+  DE_OWNERS.forEach(name => {
+    if (!md.weeks[w].some(r => r.team === 'Direct Engagement' && r.rep === name)) {
+      md.weeks[w].push(defaultRow('Direct Engagement', name));
       added = true;
     }
   });
@@ -6616,7 +6627,7 @@ function fmtNum(n) {
 function canEditRow(row) {
   if (currentRole === 'viewer') return false;
   // v15.9 — Direct Engagement is editable only by the three admins
-  if (row.rep === 'Direct Engagement') {
+  if (row.team === 'Direct Engagement') {
     if (row.locked) return isAdminUser(currentUser);
     return isAdminUser(currentUser);
   }
@@ -6957,22 +6968,24 @@ function renderTable() {
     });
   });
 
-  // v15.9 — Direct Engagement Standalone Section
+  // v20.0 — Direct Engagement Standalone Section (3 rows: Ahmed, Sami, Kamal)
   if (!trackerFilterTeam || trackerFilterTeam === 'Direct Engagement') {
-    if (!trackerFilterRep || trackerFilterRep === 'Direct Engagement') {
-      const deRi = rows.findIndex(r => r.rep === 'Direct Engagement');
-      if (deRi >= 0) {
-        const deHeaderTr = document.createElement('tr');
-        deHeaderTr.className = 'team-header direct-engagement';
-        deHeaderTr.style.background = '#f3f4f6';
-        deHeaderTr.style.color = '#374151';
-        const deHeaderTd = document.createElement('td');
-        deHeaderTd.colSpan = cols.length;
-        deHeaderTd.textContent = '🤝 Direct Engagement';
-        deHeaderTr.appendChild(deHeaderTd);
-        tbody.appendChild(deHeaderTr);
-        renderRow(rows[deRi], deRi, tbody);
-      }
+    const deRows = rows
+      .map((r, i) => ({ r, i }))
+      .filter(x => x.r.team === 'Direct Engagement'
+        && (!trackerFilterRep || trackerFilterRep === 'Direct Engagement' || x.r.rep === trackerFilterRep))
+      .sort((a, b) => DE_OWNERS.indexOf(a.r.rep) - DE_OWNERS.indexOf(b.r.rep));
+    if (deRows.length) {
+      const deHeaderTr = document.createElement('tr');
+      deHeaderTr.className = 'team-header direct-engagement';
+      deHeaderTr.style.background = '#f3f4f6';
+      deHeaderTr.style.color = '#374151';
+      const deHeaderTd = document.createElement('td');
+      deHeaderTd.colSpan = cols.length;
+      deHeaderTd.textContent = '🤝 Direct Engagement';
+      deHeaderTr.appendChild(deHeaderTd);
+      tbody.appendChild(deHeaderTr);
+      deRows.forEach(x => renderRow(x.r, x.i, tbody));
     }
   }
 
@@ -7007,7 +7020,7 @@ function renderRow(row, ri, tbody) {
   const repTd = document.createElement('td');
   repTd.className = 'rep-name-cell';
   repTd.innerHTML = `
-    ${row.rep === 'Direct Engagement'
+    ${row.team === 'Direct Engagement'
       ? ''
       : `<span class="team-badge ${row.team === 'Abu Dhabi' ? 'abu-dhabi' : 'dubai'}">${row.team || '-'}</span>`}
     <span>${row.rep || '-'}</span>`;
@@ -7021,7 +7034,7 @@ function renderRow(row, ri, tbody) {
   {
     const tpTd = document.createElement('td');
     tpTd.className = 'col-closed-bg';
-    if (row.rep === 'Direct Engagement') {
+    if (row.team === 'Direct Engagement') {
       tpTd.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">—</span>';
     } else if (row.hubspotSynced) {
       const tpVal = parseFloat(row.truePipeline) || 0;
@@ -7119,7 +7132,7 @@ function renderRow(row, ri, tbody) {
   {
     const cwTd = document.createElement('td');
     cwTd.className = 'col-closed-bg';
-    if (row.rep === 'Direct Engagement') {
+    if (row.team === 'Direct Engagement') {
       cwTd.innerHTML = '<span style="color:var(--text-muted);font-size:12px;">—</span>';
     } else if (row.hubspotSynced) {
       const cwVal = parseFloat(row.closedWon) || 0;
@@ -7154,7 +7167,7 @@ function renderRow(row, ri, tbody) {
   // v15.9 — Direct Engagement row has no submit/lock mechanic: admins edit it
   // freely; it is never locked or submitted like a rep row.
   const subTd = document.createElement('td'); subTd.className = 'submit-cell';
-  if (row.rep === 'Direct Engagement') {
+  if (row.team === 'Direct Engagement') {
     subTd.innerHTML = '<span class="de-submit-label" style="color:var(--text-muted);font-size:11px;font-style:italic;">Direct Engagement</span>';
   } else if (row.locked) {
     const when = row.submittedAt ? new Date(row.submittedAt).toLocaleDateString('en-GB', {day:'2-digit', month:'short'}) : '';
