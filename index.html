@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v19.6</title>
+<title>CoreV | OxeFit Sales Tracker v19.9</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -350,6 +351,7 @@
   .sidebar.collapsed .sidebar-logo { display: block; height: 34px; width: auto; max-width: 48px; object-fit: contain; }
   .sidebar.collapsed .sidebar-brand-fallback { display: flex !important; justify-content: center; }
   .sidebar.collapsed .brand-word { display: none; }              /* hide wordmark, keep the gradient logo box */
+  .sidebar.collapsed .sidebar-collapse-btn { display: none; }    /* expand via the topbar burger when collapsed */
   .sidebar.collapsed .nav-label { display: none; }
   .sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; }
   .sidebar.collapsed .nav-ico { width: auto; font-size: 19px; }
@@ -1872,7 +1874,7 @@
     font-size: 13px;
   }
 
-  @media (max-width: 980px) {
+  @media (max-width: 760px) {
     .sidebar {
       position: fixed; left: 0; top: 0; height: 100vh;
       transform: translateX(-100%);
@@ -1889,6 +1891,7 @@
     .sidebar.collapsed .theme-toggle-track { display: block; }
     .sidebar.collapsed .theme-toggle { flex-direction: row; }
     .sidebar.collapsed .sidebar-foot-btn .nav-label { display: revert; }
+    .sidebar-collapse-btn { display: none; }          /* drawer mode uses the topbar burger */
     .sidebar-scrim.open { display: block; }
   }
 
@@ -2975,15 +2978,18 @@
   /* ── Low-contrast light-blue (accent-glow) text on white cards → dark blue ── */
   .kpi-value.accent          { color: var(--accent2); }
   tbody tr.totals-row td     { color: var(--accent2); }
-  .commit-metric-value       { color: var(--accent2); }            /* Dubai/default tint */
-  .commit-card.dubai .commit-metric-value { color: var(--accent2); }
+  /* v19.7 — Monthly Commitments figures are unified to the neutral text colour
+     (black on light, white on dark) for ALL teams, matching Abu Dhabi. Team
+     identity is carried by the coloured left border, not the numbers. */
+  .commit-metric-value       { color: var(--text); }
+  .commit-card.dubai .commit-metric-value { color: var(--text); }
 
   /* ── Low-contrast light-orange (gold-light #fbbf24) text on white → deep amber ── */
   .kpi-value.gold            { color: #b45309; }
   .aed-readout.has-val       { color: #b45309; }
 
   /* Keep status / team-specific tints already defined above (won=green,
-     abu-dhabi=purple, total=green, warn=red) — those win by specificity. */
+     won=green status pills, warn=red) — commitment figures stay neutral for all teams. */
 
   /* ════════════════════════════════════════════════════════════
      v17.3 — COLOR UNIFICATION (table headers, buyer signals, team tag)
@@ -3385,7 +3391,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v19.6 · Persistent collapsed logo · Tuesday entry reminders · Direct Engagement deal mapping · Unified teal-blue theme
+      v19.9 · Visible menu minimize control · Unified commitment figures · Tuesday entry reminders · Unified teal-blue theme
     </div>
   </div>
 </div>
@@ -3444,7 +3450,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.6</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.9</strong></p>
     </div>
   </div>
 </div>
@@ -3461,6 +3467,7 @@
         <span class="brand-logo-box">CV</span>
         <span class="brand-word"><span class="brand-name">CoreV</span><span class="brand-sub">OxeFit Sales</span></span>
       </div>
+      <button class="sidebar-collapse-btn" id="collapseBtn" onclick="toggleCollapse()" title="Minimize menu" aria-label="Minimize menu">‹</button>
     </div>
 
     <nav class="sidebar-nav" id="primaryTabs">
@@ -3509,7 +3516,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.6</div>
+      <div class="sidebar-version">v19.9</div>
     </div>
   </aside>
 
@@ -9437,15 +9444,23 @@ function closeSidebar() {
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebarScrim')?.classList.remove('open');
 }
-/* Single burger in the topbar: collapses the rail on desktop, opens the drawer on mobile */
+/* Single burger in the topbar. Decide by the sidebar's actual rendered mode:
+   a visible rail (position:sticky) → minimize/expand; an overlay (position:fixed
+   on small screens) → open/close the drawer. Using the computed position instead
+   of a hard-coded width keeps "minimize" working on every desktop size. */
 function menuToggle() {
-  if (window.matchMedia('(max-width: 980px)').matches) { toggleSidebar(); }
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  const isOverlay = getComputedStyle(sb).position === 'fixed';
+  if (isOverlay) { toggleSidebar(); }
   else { toggleCollapse(); }
 }
 function setCollapsed(on) {
   const sb = document.getElementById('sidebar');
   if (!sb) return;
   sb.classList.toggle('collapsed', on);
+  const btn = document.getElementById('collapseBtn');
+  if (btn) { btn.textContent = on ? '›' : '‹'; btn.title = on ? 'Expand menu' : 'Minimize menu'; }
   try { localStorage.setItem('oxefit_sidebar_collapsed', on ? '1' : '0'); } catch (e) {}
 }
 function toggleCollapse() {
