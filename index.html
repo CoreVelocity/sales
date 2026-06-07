@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v19.5</title>
+<title>CoreV | OxeFit Sales Tracker v19.6</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -272,6 +272,37 @@
     font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #6ee7b7;
   }
 
+  /* ── Tuesday entry reminder (v19.6) ── */
+  .reminder-banner {
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(90deg, rgba(13,148,136,0.16), rgba(37,99,235,0.10));
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+  }
+  .reminder-ico { font-size: 20px; flex-shrink: 0; }
+  .reminder-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .reminder-text strong { font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .reminder-text span { font-size: 12.5px; color: var(--text-muted); }
+  .reminder-text b { color: var(--teal2); font-weight: 700; }
+  [data-theme="dark"] .reminder-text b { color: var(--teal); }
+  .reminder-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .reminder-btn {
+    font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: 9px; cursor: pointer;
+    background: var(--card); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.15s;
+  }
+  .reminder-btn:hover { border-color: var(--teal); color: var(--teal2); }
+  .reminder-btn.primary { background: var(--brand-grad); color: #fff; border: none; }
+  .reminder-btn.primary:hover { filter: brightness(1.07); color: #fff; }
+  .reminder-close {
+    background: none; border: none; cursor: pointer; color: var(--text-muted);
+    font-size: 15px; width: 30px; height: 30px; border-radius: 8px; transition: all 0.15s;
+  }
+  .reminder-close:hover { background: var(--card-hover); color: var(--text); }
+  @media (max-width: 760px) {
+    .reminder-banner { flex-wrap: wrap; padding: 10px 14px; }
+    .reminder-actions { width: 100%; justify-content: flex-end; }
+  }
+
   /* ═══════════════ SIDEBAR (v19.0) ═══════════════ */
   .sidebar {
     width: 248px; flex-shrink: 0;
@@ -313,14 +344,12 @@
   }
   .sidebar-collapse-btn:hover { background: rgba(255,255,255,0.1); color: var(--sidebar-text-hi); }
 
-  /* ── COLLAPSED STATE (desktop) ── */
+  /* ── COLLAPSED STATE (desktop) — keeps the brand logo visible, like the Delivery Tracker ── */
   .sidebar.collapsed { width: 76px; }
-  .sidebar.collapsed .sidebar-brand { padding: 0; justify-content: center; position: relative; }
-  .sidebar.collapsed .sidebar-logo { display: none; }                 /* hide logo so it can't cover the toggle */
-  .sidebar.collapsed .sidebar-brand-fallback { display: none !important; }
-  .sidebar.collapsed .sidebar-collapse-btn {
-    position: static; margin: 0; width: 34px; height: 34px; font-size: 20px;
-  }
+  .sidebar.collapsed .sidebar-brand { padding: 0; justify-content: center; }
+  .sidebar.collapsed .sidebar-logo { display: block; height: 34px; width: auto; max-width: 48px; object-fit: contain; }
+  .sidebar.collapsed .sidebar-brand-fallback { display: flex !important; justify-content: center; }
+  .sidebar.collapsed .brand-word { display: none; }              /* hide wordmark, keep the gradient logo box */
   .sidebar.collapsed .nav-label { display: none; }
   .sidebar.collapsed .nav-item { justify-content: center; padding: 12px 0; }
   .sidebar.collapsed .nav-ico { width: auto; font-size: 19px; }
@@ -329,6 +358,7 @@
   .sidebar.collapsed .sidebar-version { display: none; }
   .sidebar.collapsed .theme-toggle-track { display: none; }
   .sidebar.collapsed .theme-toggle { flex-direction: column; gap: 6px; padding: 8px 4px; }
+  .sidebar.collapsed .sidebar-foot-btn .nav-label { display: none; }
   .sidebar-nav { flex: 1; padding: 18px 14px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
   .nav-item {
     position: relative; display: flex; align-items: center; gap: 13px;
@@ -411,13 +441,14 @@
   /* MAIN COLUMN */
   .main-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
 
-  /* HAMBURGER (mobile menu trigger) */
+  /* MENU BURGER (collapses rail on desktop, opens drawer on mobile) */
   .hamburger {
-    display: none; flex-direction: column; justify-content: center; gap: 4px;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
     width: 38px; height: 38px; border-radius: 9px; cursor: pointer;
     background: var(--card); border: 1px solid var(--border);
-    margin-right: 4px; flex-shrink: 0;
+    margin-right: 4px; flex-shrink: 0; transition: border-color 0.15s, background 0.15s;
   }
+  .hamburger:hover { border-color: var(--accent2); }
   .hamburger span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--text); margin: 0 auto; transition: 0.2s; }
 
   /* TOPBAR */
@@ -986,14 +1017,14 @@
   /* v17.3 — 2-row layout: row1 = Commit/Total Forecast/Best Case/Closed, row2 = Total Pipeline/XS1/XP1 */
   .commit-card-rows  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 14px; }
   .commit-metric-label { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-  .commit-metric-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 800; color: var(--accent-glow); margin-top: 2px; }
-  .commit-card.abu-dhabi .commit-metric-value { color: #6b21a8; }
-  .commit-card.abu-dhabi { border-left-color: #6b21a8; }
-  .commit-card.total     .commit-metric-value { color: var(--success); }
-  /* Closed (Win) values always render green, overriding team tint */
+  /* v19.6 — all team numbers render in the neutral text colour (black on light, white on dark);
+     team identity is carried by the coloured left border, not the figures themselves */
+  .commit-metric-value { font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 18px; font-weight: 800; color: var(--text); margin-top: 2px; }
+  .commit-card.abu-dhabi .commit-metric-value,
+  .commit-card.total .commit-metric-value,
   .commit-metric-value.won,
   .commit-card.abu-dhabi .commit-metric-value.won,
-  .commit-card.total .commit-metric-value.won { color: #059669; }
+  .commit-card.total .commit-metric-value.won { color: var(--text); }
   .commit-card-sub { font-size: 10px; color: var(--text-muted); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .commit-locked-pill  { background: rgba(34,197,94,0.12);  color: #4ade80; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
   .commit-pending-pill { background: rgba(251,191,36,0.12); color: #fbbf24; padding: 2px 8px; border-radius: 10px; font-weight: 700; font-size: 10px; }
@@ -1746,6 +1777,10 @@
   }
   .hs-token-body { overflow-y: auto; }
   /* ── Owner Mapping Panel (latest9) ───────────────────────── */
+  .hs-ownermap-divider {
+    font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--teal2); padding: 10px 6px 4px; border-top: 1px dashed var(--border); margin-top: 6px;
+  }
   .hs-ownermap-list {
     display: flex; flex-direction: column; gap: 6px;
     background: var(--bg-elev); border: 1px solid var(--border);
@@ -1847,13 +1882,14 @@
     .sidebar.open { transform: translateX(0); }
     .sidebar.collapsed { width: 248px; }              /* drawer is always full width on mobile */
     .sidebar.collapsed .nav-label,
-    .sidebar.collapsed .sidebar-brand-fallback,
     .sidebar.collapsed .sidebar-version { display: revert; }
+    .sidebar.collapsed .brand-word { display: flex; }
+    .sidebar.collapsed .sidebar-logo { height: 38px; max-width: none; }
     .sidebar.collapsed .nav-item { justify-content: flex-start; padding: 12px 14px; }
     .sidebar.collapsed .theme-toggle-track { display: block; }
-    .sidebar-collapse-btn { display: none; }          /* collapse is a desktop affordance */
+    .sidebar.collapsed .theme-toggle { flex-direction: row; }
+    .sidebar.collapsed .sidebar-foot-btn .nav-label { display: revert; }
     .sidebar-scrim.open { display: block; }
-    .hamburger { display: flex; }
   }
 
   @media (max-width: 768px) {
@@ -3349,7 +3385,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v19.5 · Unified teal-blue theme · Executive dashboard &amp; command bar · Detailed Event requests · Light &amp; Dark theme
+      v19.6 · Persistent collapsed logo · Tuesday entry reminders · Direct Engagement deal mapping · Unified teal-blue theme
     </div>
   </div>
 </div>
@@ -3408,7 +3444,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.5</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v19.6</strong></p>
     </div>
   </div>
 </div>
@@ -3425,7 +3461,6 @@
         <span class="brand-logo-box">CV</span>
         <span class="brand-word"><span class="brand-name">CoreV</span><span class="brand-sub">OxeFit Sales</span></span>
       </div>
-      <button class="sidebar-collapse-btn" id="collapseBtn" onclick="toggleCollapse()" title="Collapse menu" aria-label="Collapse menu">‹</button>
     </div>
 
     <nav class="sidebar-nav" id="primaryTabs">
@@ -3474,7 +3509,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v19.5</div>
+      <div class="sidebar-version">v19.6</div>
     </div>
   </aside>
 
@@ -3490,7 +3525,7 @@
   </div>
 
   <div class="topbar">
-    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Open menu">
+    <button class="hamburger" id="hamburger" onclick="menuToggle()" aria-label="Toggle menu" title="Toggle menu">
       <span></span><span></span><span></span>
     </button>
     <div class="topbar-heading" id="topbarHeading">Executive Dashboard</div>
@@ -3522,6 +3557,20 @@
         <div class="user-name" id="userNameDisplay">-</div>
       </div>
       <button class="signout-btn" onclick="signOut()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- ░░░ TUESDAY ENTRY REMINDER (v19.6) — reps only ░░░ -->
+  <div class="reminder-banner" id="tuesdayReminder" style="display:none;">
+    <span class="reminder-ico">🔔</span>
+    <div class="reminder-text">
+      <strong>It's Tuesday — time to complete your weekly entry.</strong>
+      <span>Update your <b>Commit</b> and <b>Best Case</b> on the Sales Tracker, and log your <b>Demo</b> results &amp; outcomes.</span>
+    </div>
+    <div class="reminder-actions">
+      <button class="reminder-btn primary" onclick="reminderGoToEntry()">Complete now</button>
+      <button class="reminder-btn" id="reminderEnableBtn" onclick="reminderEnableNotifications()">Enable alerts</button>
+      <button class="reminder-close" onclick="reminderDismiss()" title="Dismiss for today">✕</button>
     </div>
   </div>
 
@@ -4056,6 +4105,9 @@
         <div class="req-list-head">
           <h3 class="req-card-title">Submitted Requests</h3>
           <div class="req-list-tools">
+            <select id="reqRepFilter" class="req-filter" onchange="renderRequests()">
+              <option value="all">All reps</option>
+            </select>
             <select id="reqFilter" class="req-filter" onchange="renderRequests()">
               <option value="all">All statuses</option>
               <option value="Pending">Pending</option>
@@ -6218,7 +6270,10 @@ async function uploadToOneDrive() {
     // entry "disappeared". Only refresh when nothing in the grid is focused.
     const ae = document.activeElement;
     const editingGrid = ae && (ae.classList && ae.classList.contains('cell-input'));
-    if (!editingGrid && typeof renderAll === 'function') { try { renderAll(); } catch(_) {} }
+    // v19.6 — also hold the re-render if a deal picker is open; rebuilding the
+    // grid would tear the open menu out of the DOM and look like it "closed".
+    const pickerOpen = (typeof _dpOpenMenu !== 'undefined' && _dpOpenMenu);
+    if (!editingGrid && !pickerOpen && typeof renderAll === 'function') { try { renderAll(); } catch(_) {} }
   } catch(e) {
     console.error('Upload failed', e);
     setSyncStatus('error', 'Sync error');
@@ -6430,6 +6485,7 @@ async function launchApp(alreadyAuthed) {
   applyStoredLogo();              // v19.2 — apply admin-uploaded logo if present
   renderRequests();               // v19.1 — populate Event / On-site Demo request tab
   renderExecDashboard();          // v19.2 — populate Executive Dashboard
+  checkTuesdayReminder();         // v19.6 — Tuesday entry reminder for reps
 
   // v13: drive role-based CSS visibility (office-only buttons / columns)
   document.body.setAttribute('data-role', currentRole || 'viewer');
@@ -6665,7 +6721,7 @@ function renderCommitPanel() {
         <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">${fmtNum(d.forecast)||'0'}</div></div>
         <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">${fmtNum(d.bestCase)||'0'}</div></div>
         <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value won">${fmtNum(d.closedWon)||'0'}</div></div>
-        <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value" style="color:#fb923c;">${d.truePipeline ? fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? '0' : '—')}</div></div>
+        <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value">${d.truePipeline ? fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? '0' : '—')}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
       </div>
@@ -8832,9 +8888,8 @@ async function hsRenderOwnerMappingPanel() {
     return `<option value="${escapeHtml(o.id)}">${escapeHtml(o.fullName)}${escapeHtml(labelEmail)}</option>`;
   }).join('');
 
-  const rows = ALL_REPS.map(rep => {
+  const mkRow = (rep, isAdmin) => {
     const selected = map[rep] || '';
-    // Build options with the correct one pre-selected
     const optsWithSel = optBlank + owners.map(o => {
       const sel = (o.id === selected) ? ' selected' : '';
       const labelEmail = o.email ? ' (' + o.email + ')' : '';
@@ -8845,13 +8900,19 @@ async function hsRenderOwnerMappingPanel() {
       : '<span style="color:var(--text-muted);font-size:10px;">○</span>';
     return `
       <div class="hs-ownermap-row">
-        <div class="hs-ownermap-rep">${statusBadge}&nbsp;${escapeHtml(rep)}</div>
+        <div class="hs-ownermap-rep">${statusBadge}&nbsp;${escapeHtml(rep)}${isAdmin ? ' <span style="font-size:9px;color:var(--teal2);font-weight:700;">DIRECT ENG.</span>' : ''}</div>
         <div class="hs-ownermap-arrow">→</div>
         <select class="hs-ownermap-select" data-rep="${escapeHtml(rep)}">
           ${optsWithSel}
         </select>
       </div>`;
-  }).join('');
+  };
+  // v19.6 — also map the three Direct Engagement admins (Ahmed / Sami / Kamal)
+  // so their HubSpot deals load in the Direct Engagement deal picker.
+  const engagementOwners = (typeof ADMIN_USERS !== 'undefined') ? ADMIN_USERS : ['Ahmed','Sami','Kamal'];
+  const rows = ALL_REPS.map(rep => mkRow(rep, false)).join('')
+    + '<div class="hs-ownermap-divider">Direct Engagement owners</div>'
+    + engagementOwners.map(rep => mkRow(rep, true)).join('');
 
   container.innerHTML = `
     <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">
@@ -9376,12 +9437,15 @@ function closeSidebar() {
   document.getElementById('sidebar')?.classList.remove('open');
   document.getElementById('sidebarScrim')?.classList.remove('open');
 }
+/* Single burger in the topbar: collapses the rail on desktop, opens the drawer on mobile */
+function menuToggle() {
+  if (window.matchMedia('(max-width: 980px)').matches) { toggleSidebar(); }
+  else { toggleCollapse(); }
+}
 function setCollapsed(on) {
   const sb = document.getElementById('sidebar');
-  const btn = document.getElementById('collapseBtn');
   if (!sb) return;
   sb.classList.toggle('collapsed', on);
-  if (btn) { btn.textContent = on ? '›' : '‹'; btn.title = on ? 'Expand menu' : 'Collapse menu'; }
   try { localStorage.setItem('oxefit_sidebar_collapsed', on ? '1' : '0'); } catch (e) {}
 }
 function toggleCollapse() {
@@ -9392,6 +9456,71 @@ function restoreSidebarState() {
   let on = false;
   try { on = localStorage.getItem('oxefit_sidebar_collapsed') === '1'; } catch (e) {}
   setCollapsed(on);
+}
+
+/* ════════════════════════════════════════
+   TUESDAY ENTRY REMINDER (v19.6)
+   Reps get a reminder every Tuesday to complete Commit / Best Case on the
+   Sales Tracker and to log their Demo results. Surfaces as an in-app banner
+   plus an optional browser notification (once permission is granted).
+════════════════════════════════════════ */
+const REMIND_DISMISS_KEY = 'corev_reminder_dismissed';   // YYYY-MM-DD the banner was dismissed
+const REMIND_NOTIFY_KEY  = 'corev_reminder_notified';    // YYYY-MM-DD a browser notification fired
+function _todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function _isTuesday() { return new Date().getDay() === 2; }   // 0=Sun … 2=Tue
+
+function reminderGoToEntry() {
+  if (typeof switchTab === 'function') switchTab('tracker');
+  reminderDismiss();
+}
+function reminderDismiss() {
+  try { localStorage.setItem(REMIND_DISMISS_KEY, _todayKey()); } catch (e) {}
+  const el = document.getElementById('tuesdayReminder');
+  if (el) el.style.display = 'none';
+}
+function _reminderRefreshEnableBtn() {
+  const btn = document.getElementById('reminderEnableBtn');
+  if (!btn || typeof Notification === 'undefined') { if (btn) btn.style.display = 'none'; return; }
+  if (Notification.permission === 'granted') { btn.style.display = 'none'; }
+  else if (Notification.permission === 'denied') { btn.textContent = 'Alerts blocked'; btn.disabled = true; }
+  else { btn.style.display = ''; btn.textContent = 'Enable alerts'; btn.disabled = false; }
+}
+function reminderFireNotification(force) {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  if (!force) {
+    let last = null; try { last = localStorage.getItem(REMIND_NOTIFY_KEY); } catch (e) {}
+    if (last === _todayKey()) return;   // already notified today
+  }
+  try {
+    new Notification('CoreV | OxeFit — weekly entry due', {
+      body: 'It\u2019s Tuesday. Please update your Commit & Best Case and log your demo results in the Sales Tracker.',
+      tag: 'corev-tuesday-reminder'
+    });
+    localStorage.setItem(REMIND_NOTIFY_KEY, _todayKey());
+  } catch (e) {}
+}
+function reminderEnableNotifications() {
+  if (typeof Notification === 'undefined') { showToast('Notifications are not supported in this browser', 'error'); return; }
+  Notification.requestPermission().then(perm => {
+    _reminderRefreshEnableBtn();
+    if (perm === 'granted') { reminderFireNotification(true); showToast('Weekly reminders enabled', 'success'); }
+    else if (perm === 'denied') { showToast('Notifications were blocked in the browser', 'error'); }
+  }).catch(() => {});
+}
+function checkTuesdayReminder() {
+  const el = document.getElementById('tuesdayReminder');
+  if (!el) return;
+  // Reps only, and only on Tuesdays
+  if (currentRole !== 'rep' || !_isTuesday()) { el.style.display = 'none'; return; }
+  // Respect a same-day dismissal
+  let dismissed = null; try { dismissed = localStorage.getItem(REMIND_DISMISS_KEY); } catch (e) {}
+  if (dismissed === _todayKey()) { el.style.display = 'none'; }
+  else { el.style.display = 'flex'; _reminderRefreshEnableBtn(); }
+  // Fire a browser notification if already permitted (once per day)
+  reminderFireNotification(false);
 }
 
 /* ════════════════════════════════════════
@@ -10127,6 +10256,22 @@ function renderRequests() {
   // role-scoped visibility: reps see only their own
   let rows = requestEntries.slice();
   if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
+
+  // v19.6 — per-rep filter (managers only; reps already see just their own)
+  const repFilterEl = document.getElementById('reqRepFilter');
+  if (repFilterEl) {
+    if (reqIsManager()) {
+      repFilterEl.style.display = '';
+      const cur = repFilterEl.value || 'all';
+      const reps = Array.from(new Set(requestEntries.map(r => r.rep).filter(Boolean))).sort();
+      repFilterEl.innerHTML = '<option value="all">All reps</option>'
+        + reps.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
+      repFilterEl.value = reps.includes(cur) || cur === 'all' ? cur : 'all';
+      if (repFilterEl.value !== 'all') rows = rows.filter(r => r.rep === repFilterEl.value);
+    } else {
+      repFilterEl.style.display = 'none';
+    }
+  }
 
   // stats (over the visible scope)
   const stats = { total: rows.length, Pending: 0, Approved: 0, Declined: 0 };
