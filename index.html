@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.3</title>
+<title>CoreV | OxeFit Sales Tracker v20.4</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3420,7 +3420,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.3 · Configurable role-based access (Settings) · Rep-scoped visibility · Direct Engagement HubSpot
+      v20.4 · Accurate HubSpot pipeline across all deal pipelines · Configurable role-based access · Rep-scoped visibility
     </div>
   </div>
 </div>
@@ -3493,7 +3493,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.3</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.4</strong></p>
     </div>
   </div>
 </div>
@@ -3559,7 +3559,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.3</div>
+      <div class="sidebar-version">v20.4</div>
     </div>
   </aside>
 
@@ -7583,7 +7583,7 @@ function makeDealPickerCell(ri, slot, row, editable) {
       menu.appendChild(e);
       return;
     }
-    const deals = (state.deals || []).filter(d => !d.isClosedWon);
+    const deals = (state.deals || []).filter(d => !d.isClosed);   // v20.4 — pick only open deals
     if (!deals.length) {
       menu.innerHTML = '<div class="dp-empty">No open deals in HubSpot for this rep.</div>';
       return;
@@ -9145,7 +9145,7 @@ async function hubspotFetchDealsForRep(repName) {
       { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId },
       { propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }
     ]}],
-    properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won'],
+    properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed'],
     sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
     limit: 100
   };
@@ -9157,6 +9157,15 @@ async function hubspotFetchDealsForRep(repName) {
     const isWon    = d.properties.hs_is_closed_won === 'true'
                   || rawStage === 'closedwon'
                   || rawStage.includes('closed won');
+    // v20.4 — reliable closed detection across ALL pipelines (won OR lost).
+    // hs_is_closed is HubSpot's computed flag and works regardless of the
+    // pipeline's custom stage internal names — so a Direct Engagement pipeline's
+    // closed/lost deals are excluded from open pipeline just like the default one.
+    const isClosed = d.properties.hs_is_closed === 'true'
+                  || isWon
+                  || rawStage === 'closedlost'
+                  || rawStage.includes('closed lost')
+                  || rawStage.includes('closed won');
     return {
       id      : d.id,
       name    : d.properties.dealname || '(untitled)',
@@ -9165,7 +9174,8 @@ async function hubspotFetchDealsForRep(repName) {
       rawStage: d.properties.dealstage || '',
       close   : d.properties.closedate || '',
       prob    : Number(d.properties.hs_deal_stage_probability || 0),
-      isClosedWon: isWon
+      isClosedWon: isWon,
+      isClosed: isClosed
     };
   });
 }
@@ -9281,7 +9291,12 @@ function renderHubspotDealList() {
    ════════════════════════════════════════════════════════════════════ */
 function hubspotApplyCrmTotalsForRep(repName, dealsForRep) {
   const fetched = dealsForRep || [];
-  const open = fetched.filter(d => !d.isClosedWon);
+  // v20.4 — open pipeline excludes ALL closed deals (won or lost), reliably
+  // across every pipeline via hs_is_closed. Previously only closed-WON was
+  // removed client-side and closed-LOST relied on the default pipeline's
+  // 'closedlost' stage name, so deals in a custom pipeline (e.g. Direct
+  // Engagement) leaked closed/lost amounts into the pipeline total.
+  const open = fetched.filter(d => !d.isClosed);
   const won  = fetched.filter(d =>  d.isClosedWon);
   const truePipeline = open.reduce((s, d) => s + (d.amount || 0), 0);
   const nowIso = new Date().toISOString();
@@ -9448,11 +9463,11 @@ function hubspotApplySelected() {
   // the FULL fetched list (not just user selection) so they reflect the
   // CRM's source of truth, while Commit/BestCase come from picks.
   const allFetched = hubspotState.fetchedDeals || [];
-  const allOpen   = allFetched.filter(d => !d.isClosedWon);
+  const allOpen   = allFetched.filter(d => !d.isClosed);   // v20.4 — exclude won AND lost
   const allWon    = allFetched.filter(d =>  d.isClosedWon);
 
   // From the user's SELECTION, pick Commit + BestCase among open deals.
-  const openSelected = deals.filter(d => !d.isClosedWon);
+  const openSelected = deals.filter(d => !d.isClosed);
   const stageRank = { Negotiation: 3, Proposal: 2, Discovery: 1, Qualified: 0 };
   openSelected.sort((a,b) => (stageRank[b.stage]-stageRank[a.stage]) || (b.amount-a.amount));
   const commit   = openSelected[0];
