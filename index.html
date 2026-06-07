@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.1</title>
+<title>CoreV | OxeFit Sales Tracker v20.3</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2064,6 +2064,15 @@
   .settings-block-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
   .settings-note { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0 0 12px; }
   .settings-note strong { color: var(--text); }
+  /* v20.3 — Access Control matrix */
+  .access-matrix { display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: var(--bg-elev); }
+  .access-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; }
+  .access-row:hover { background: var(--row-hover); }
+  .access-row .access-user { font-size: 13px; font-weight: 600; color: var(--text); }
+  .access-row .access-team { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-left: 6px; }
+  .access-row select { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 12.5px; font-weight: 600; min-width: 210px; }
+  .access-group-label { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--teal2); padding: 8px 8px 2px; }
+  .access-row.fixed select { opacity: 0.6; }
   .settings-logo-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .settings-logo-preview { height: 52px; width: auto; max-width: 160px; border-radius: 8px; background: var(--sidebar-bg); padding: 6px 10px; }
   .settings-logo-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -2902,7 +2911,24 @@
   .perf-leaderboard .mini-bar { display:inline-block; width:60px; height:6px; background:rgba(0,0,0,0.3); border-radius:3px; overflow:hidden; vertical-align:middle; margin-left:6px; }
   .perf-leaderboard .mini-bar > div { height:100%; border-radius:3px; }
 
-  /* Modals (goals + thresholds) */
+  /* v20.2 — rep "Your Leadership Standing" view */
+  .perf-standing-banner {
+    display:flex; align-items:center; gap:22px; flex-wrap:wrap;
+    background: linear-gradient(135deg, rgba(13,148,136,0.14), rgba(37,99,235,0.10));
+    border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin-bottom:12px;
+  }
+  .perf-standing-rank { text-align:center; line-height:1; flex-shrink:0; }
+  .perf-standing-rank-num { font-size:34px; font-weight:800; color:var(--accent2); letter-spacing:-1px; }
+  .perf-standing-rank-of { font-size:11px; font-weight:600; color:var(--text-muted); margin-top:4px; text-transform:uppercase; letter-spacing:1px; }
+  .perf-standing-meta { display:flex; gap:26px; flex-wrap:wrap; }
+  .perf-standing-line { display:flex; flex-direction:column; gap:3px; }
+  .perf-standing-line span { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+  .perf-standing-line strong { font-size:20px; font-weight:800; color:var(--text); }
+  .perf-standing-me td { background: rgba(13,148,136,0.10); font-weight:600; }
+  .perf-standing-peer td { font-style:italic; }
+  .perf-standing-banner-row td { background:transparent !important; }
+
+
   .modal-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000;
     display:none; align-items:center; justify-content:center; padding:20px;
@@ -3394,7 +3420,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.1 · Rep-scoped visibility · Direct Engagement HubSpot pipeline · Per-admin deal links
+      v20.3 · Configurable role-based access (Settings) · Rep-scoped visibility · Direct Engagement HubSpot
     </div>
   </div>
 </div>
@@ -3446,6 +3472,20 @@
       </div>
     </div>
 
+    <div class="settings-block" id="settingsAccessSection" style="display:none;">
+      <div class="settings-block-title">Access Control</div>
+      <p class="settings-note">Set each team member's access level. This applies across all tabs.
+        <br><strong>Full access (read &amp; write)</strong> — sees and edits everything.
+        <strong>Full access (view)</strong> — sees everything, edits nothing.
+        <strong>Sales Rep (own data)</strong> — sees and edits only their own row.</p>
+      <div id="accessMatrix" class="access-matrix"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button class="btn btn-ghost" onclick="resetAccessDefaults()">Reset to defaults</button>
+        <button class="btn btn-primary" onclick="saveAccessFromUI()">Save Access</button>
+      </div>
+      <div id="accessSaveStatus" class="settings-note" style="text-align:right;margin-top:6px;"></div>
+    </div>
+
     <div class="settings-block">
       <div class="settings-block-title">Appearance</div>
       <p class="settings-note">Current theme: <strong id="settingsThemeLabel">Light</strong>. Use the toggle at the bottom of the side menu to switch between light and dark mode at any time.</p>
@@ -3453,7 +3493,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.1</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.3</strong></p>
     </div>
   </div>
 </div>
@@ -3519,7 +3559,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.1</div>
+      <div class="sidebar-version">v20.3</div>
     </div>
   </aside>
 
@@ -3783,8 +3823,8 @@
       <div class="perf-section">
         <div class="perf-section-head">
           <div>
-            <h2>Leaderboard</h2>
-            <p class="perf-section-sub">Ranked by goal achievement %. Click a column header to re-sort.</p>
+            <h2 id="perfLbHeading">Leaderboard</h2>
+            <p class="perf-section-sub" id="perfLbSub">Ranked by goal achievement %. Click a column header to re-sort.</p>
           </div>
         </div>
         <div class="perf-leaderboard-wrap">
@@ -5301,6 +5341,48 @@ const PRIMARY_ADMIN = 'Ahmed';
 function isPrimaryAdmin() { return currentUser === PRIMARY_ADMIN; }
 // v20.0 — Direct Engagement is split into one row per admin, in this order.
 const DE_OWNERS = ['Ahmed', 'Sami', 'Kamal'];
+
+/* ════════════════════════════════════════
+   v20.3 — CONFIGURABLE ROLE-BASED ACCESS
+   Ahmed (primary admin) assigns each team member one of three access levels
+   from Settings → Access Control. The level governs visibility & editing
+   across the tool:
+     • 'write' — Full access (read & write): sees everything, edits everything.
+     • 'view'  — Full access (view): sees everything, edits nothing.
+     • 'own'   — Sales Rep access (own data): sees & edits only their own row.
+   Defaults reproduce the prior (v20.2) behaviour exactly; Ahmed can override.
+════════════════════════════════════════ */
+const ACCESS_KEY = 'oxefit_access_v1';
+const ACCESS_LEVELS = ['write', 'view', 'own'];
+const ACCESS_LABELS = {
+  write: 'Full access (read & write)',
+  view:  'Full access (view only)',
+  own:   'Sales Rep (own data)'
+};
+function getAccessMap() {
+  try { return JSON.parse(localStorage.getItem(ACCESS_KEY) || '{}') || {}; }
+  catch (e) { return {}; }
+}
+function saveAccessMap(map) {
+  try { localStorage.setItem(ACCESS_KEY, JSON.stringify(map || {})); } catch (e) {}
+}
+function defaultAccessFor(user) {
+  if (user === PRIMARY_ADMIN) return 'write';   // Ahmed
+  if (isAdminUser(user))      return 'view';     // Sami, Kamal — full view by default
+  if (user === OFFICE_ADMIN)  return 'view';     // Gladys — full view (demo editing preserved separately)
+  return 'own';                                  // sales reps
+}
+function getAccessLevel(user) {
+  if (user === PRIMARY_ADMIN) return 'write';    // owner can never be locked out
+  const lvl = getAccessMap()[user];
+  return ACCESS_LEVELS.includes(lvl) ? lvl : defaultAccessFor(user);
+}
+// Helpers scoped to the signed-in user
+function myAccess()    { return getAccessLevel(currentUser); }
+function isOwnOnly()   { return myAccess() === 'own'; }
+function isFullView()  { return myAccess() === 'view'; }
+function canWriteAll() { return myAccess() === 'write'; }
+
 const ADMIN_PASS  = 'Liverp00l';
 const PW_STORE_KEY = 'oxefit_pw_hashes_v1';
 const MIN_PW_LEN   = 8;
@@ -6012,6 +6094,7 @@ async function downloadFromOneDrive() {
     // v15.4 — adopt the admin's shared HubSpot connection (token + proxy +
     // owner map) so this rep can open the deal-picker for their own row.
     if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
+    if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -6213,6 +6296,9 @@ function buildEnvelope() {
   const hs = (typeof hsBuildSharedConfig === 'function') ? hsBuildSharedConfig() : null;
   if (hs) env.hubspot = hs;
   else if (_lastRemoteHubspot) env.hubspot = _lastRemoteHubspot; // preserve admin's block on rep writes
+  // v20.3 — Ahmed is authoritative for access rules; everyone else preserves the synced map
+  if (isPrimaryAdmin()) { const am = getAccessMap(); if (am && Object.keys(am).length) env.access = am; }
+  else if (_lastRemoteAccess) env.access = _lastRemoteAccess;
   return env;
 }
 
@@ -6244,6 +6330,7 @@ async function uploadToOneDrive() {
         // (a) reps inherit the admin connection, and (b) a rep's own upload
         // re-emits the admin's block instead of dropping it.
         if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
+    if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -6520,20 +6607,23 @@ async function launchApp(alreadyAuthed) {
   document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
   document.getElementById('userNameDisplay').textContent = currentUser;
 
-  document.getElementById('repBanner').style.display  = (currentRole === 'rep') ? 'flex' : 'none';
-  if (currentRole === 'rep') {
+  document.getElementById('repBanner').style.display  = isOwnOnly() ? 'flex' : 'none';
+  if (isOwnOnly()) {
     document.getElementById('repBannerText').textContent =
       `Sales Rep Mode — ${currentUser}: you can only edit your own row.`;
   }
 
-  // v20.1 — reps must not see team-wide leaderboards. Hide the Executive
-  // Dashboard and Rep Performance nav items for reps, and land them on the
-  // Sales Tracker (their own scoped view) instead of the dashboard.
-  ['exec', 'performance'].forEach(tab => {
+  // v20.2 — reps may now open Rep Performance (scoped to their OWN scorecard,
+  // plus their standing on the leaderboard). Only the Executive Dashboard
+  // remains hidden for reps. Reps still land on the Sales Tracker by default.
+  ['exec'].forEach(tab => {
     const btn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
-    if (btn) btn.style.display = (currentRole === 'rep') ? 'none' : '';
+    if (btn) btn.style.display = isOwnOnly() ? 'none' : '';
   });
-  if (currentRole === 'rep') {
+  // ensure Performance nav is visible again for everyone
+  const perfNav = document.querySelector('.nav-item[data-tab="performance"]');
+  if (perfNav) perfNav.style.display = '';
+  if (isOwnOnly()) {
     switchTab('tracker');
   }
 
@@ -6641,31 +6731,34 @@ function fmtNum(n) {
 ════════════════════════════════════════ */
 function canEditRow(row) {
   if (currentRole === 'viewer') return false;
-  // v20.1 — Direct Engagement rows: Ahmed (primary admin) edits any; Sami/Kamal edit only their own row.
+  // v20.3 — Direct Engagement rows: write-access edits any; each admin always
+  // keeps edit rights on their OWN Direct Engagement row (baseline).
   if (row.team === 'Direct Engagement') {
-    if (isPrimaryAdmin()) return true;
+    if (canWriteAll()) return true;
     if (isAdminUser(currentUser)) return row.rep === currentUser;
     return false;
   }
-  // v20.1 — normal sales-rep entries:
-  //   • a rep may edit only their OWN unlocked row
-  //   • among admins, ONLY Ahmed may edit reps' entries (Sami/Kamal & Gladys are read-only here)
-  if (currentRole === 'rep') {
+  // v20.3 — normal sales-rep entries, governed by the access level:
+  //   • 'write' → may edit any row (and override a locked row)
+  //   • 'own'   → may edit only their OWN unlocked row
+  //   • 'view'  → read-only
+  if (canWriteAll()) return true;
+  if (isOwnOnly()) {
     if (row.locked) return false;
     return row.rep === currentUser;
   }
-  if (isPrimaryAdmin()) return true;       // Ahmed can edit (and override locked)
-  return false;                            // Sami, Kamal, Gladys, others: view-only on rep rows
+  return false;
 }
 function canSubmitRow(row) {
   if (row.locked) return false;
   if (currentRole === 'viewer') return false;
   if (row.team === 'Direct Engagement') {
-    if (isPrimaryAdmin()) return true;
+    if (canWriteAll()) return true;
     return isAdminUser(currentUser) && row.rep === currentUser;
   }
-  if (currentRole === 'rep') return row.rep === currentUser;
-  return isPrimaryAdmin();                  // only Ahmed submits reps' entries
+  if (canWriteAll()) return true;
+  if (isOwnOnly()) return row.rep === currentUser;
+  return false;
 }
 
 /* ════════════════════════════════════════
@@ -6696,7 +6789,7 @@ function renderCommitPanel() {
   // v20.1 — the team commitment rollup is hidden for sales reps (it aggregates
   // other reps); reps see only their own row + KPIs scoped to themselves.
   const panel = document.getElementById('commitPanel');
-  if (currentRole === 'rep') { if (panel) panel.style.display = 'none'; return; }
+  if (isOwnOnly()) { if (panel) panel.style.display = 'none'; return; }
   if (panel) panel.style.display = '';
   const md = getCurMonthData();
   const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, truePipeline:0, xs1:0, xp1:0, count:0, locked:0, pending:0, syncedReps:new Set() });
@@ -6818,7 +6911,7 @@ function renderWeekTabs() {
 function renderSummaryBar() {
   // v20.1 — team forecast overview is hidden for sales reps.
   const bar = document.getElementById('summaryBar');
-  if (currentRole === 'rep') { if (bar) bar.style.display = 'none'; return; }
+  if (isOwnOnly()) { if (bar) bar.style.display = 'none'; return; }
   if (bar) bar.style.display = '';
   const container = document.getElementById('summaryWeeks');
   container.innerHTML = '';
@@ -6849,10 +6942,10 @@ function renderTable() {
   const actDiv = document.getElementById('tableActions');
   actDiv.innerHTML = '';
 
-  if (currentRole === 'admin' || currentRole === 'rep') {
+  if (canWriteAll() || isOwnOnly()) {
     const submitAllBtn = document.createElement('button');
     submitAllBtn.className = 'btn btn-success';
-    submitAllBtn.textContent = currentRole === 'rep' ? 'Submit My Entry' : 'Submit All Unlocked';
+    submitAllBtn.textContent = isOwnOnly() ? 'Submit My Entry' : 'Submit All Unlocked';
     submitAllBtn.onclick = submitAllOrMine;
     actDiv.appendChild(submitAllBtn);
   }
@@ -6881,7 +6974,7 @@ function renderTable() {
   const filterWrap = document.createElement('div');
   filterWrap.className = 'tracker-filter-wrap';
   // v20.1 — reps have no filters (their view is locked to their own row)
-  if (currentRole === 'rep') filterWrap.style.display = 'none';
+  if (isOwnOnly()) filterWrap.style.display = 'none';
 
   // Team filter
   const teamLabel = document.createElement('label');
@@ -6976,7 +7069,7 @@ function renderTable() {
 
   // v20.1 — Sales reps see ONLY their own row. Admins (Ahmed/Sami/Kamal) and the
   // Office Admin (Gladys) keep full visibility and may use the team/rep filters.
-  const repScoped = (currentRole === 'rep');
+  const repScoped = isOwnOnly();
   const effTeam = repScoped ? null : trackerFilterTeam;
   const effRep  = repScoped ? currentUser : trackerFilterRep;
 
@@ -7032,7 +7125,7 @@ function renderTable() {
   }
 
   // v20.1 — totals reflect only the rep's own row when a rep is viewing
-  const totalsRows = (currentRole === 'rep') ? rows.filter(r => r.rep === currentUser) : rows;
+  const totalsRows = isOwnOnly() ? rows.filter(r => r.rep === currentUser) : rows;
   renderTotalsRow(totalsRows, tbody, cols.length);
 }
 
@@ -7979,7 +8072,7 @@ function renderTotalsRow(rows, tbody, colCount) {
 function renderKPIs() {
   let rows      = getCurWeekRows();
   // v20.1 — reps see KPIs for their OWN row only, never team-wide figures.
-  if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
+  if (isOwnOnly()) rows = rows.filter(r => r.rep === currentUser);
   const weekKey = `${curYear}-${curMonth}-${curWeek}`;
 
   // Effective multiplier: stage weight × stale penalty (halved if stale)
@@ -8454,6 +8547,7 @@ let hubspotState = {
 // their own) re-emits this on upload so their write never strips the admin's
 // shared connection out of the envelope.
 let _lastRemoteHubspot = null;
+let _lastRemoteAccess = null;   // v20.3 — last access map received from sync
 
 function hsLoadTokens() {
   try {
@@ -9084,7 +9178,7 @@ async function openHubspotModal() {
   if (currentRole === 'viewer') { showToast('View-only mode', 'error'); return; }
   // v18.0 — invalidate row picker cache so reopening picks up new deals
   if (typeof hsRowDealsCache !== 'undefined') hsRowDealsCache.clear();
-  hsCurrentRep = (currentRole === 'rep') ? currentUser : (ALL_REPS[0]);
+  hsCurrentRep = isOwnOnly() ? currentUser : (ALL_REPS[0]);
   document.getElementById('hsModalOwner').textContent = hsCurrentRep;
   document.getElementById('hsModalBody').innerHTML = '<div class="hs-empty">Loading deals…</div>';
   document.getElementById('hsModal').classList.add('show');
@@ -9626,7 +9720,76 @@ function openSettings() {
   // reflect current theme label
   const tl = document.getElementById('settingsThemeLabel');
   if (tl) tl.textContent = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'Dark' : 'Light';
+  // v20.3 — Access Control: only the primary admin (Ahmed) can manage it
+  const accSec = document.getElementById('settingsAccessSection');
+  if (accSec) accSec.style.display = isPrimaryAdmin() ? 'block' : 'none';
+  if (isPrimaryAdmin()) renderAccessMatrix();
   document.getElementById('settingsModal').classList.add('open');
+}
+
+/* ── v20.3 Access Control matrix (Ahmed only) ── */
+function accessManagedUsers() {
+  // Everyone whose access Ahmed can set: the two other admins, the office admin,
+  // and every sales rep. Ahmed himself is fixed at full write.
+  const others = ADMIN_USERS.filter(u => u !== PRIMARY_ADMIN);
+  return [
+    { group: 'Admins',        users: others },
+    { group: 'Office',        users: [OFFICE_ADMIN] },
+    { group: 'Dubai',         users: TEAMS['Dubai'] || [] },
+    { group: 'Abu Dhabi',     users: TEAMS['Abu Dhabi'] || [] }
+  ];
+}
+function renderAccessMatrix() {
+  const host = document.getElementById('accessMatrix');
+  if (!host) return;
+  const map = getAccessMap();
+  const optsFor = (cur) => ACCESS_LEVELS.map(lv =>
+    `<option value="${lv}"${lv === cur ? ' selected' : ''}>${ACCESS_LABELS[lv]}</option>`).join('');
+  let html = '';
+  // Ahmed — fixed owner row
+  html += `<div class="access-group-label">Owner</div>`;
+  html += `<div class="access-row fixed">
+      <div><span class="access-user">${escapeHtml(PRIMARY_ADMIN)}</span><span class="access-team">you · owner</span></div>
+      <select disabled><option>${ACCESS_LABELS.write}</option></select>
+    </div>`;
+  accessManagedUsers().forEach(section => {
+    if (!section.users.length) return;
+    html += `<div class="access-group-label">${escapeHtml(section.group)}</div>`;
+    section.users.forEach(u => {
+      const cur = map[u] || defaultAccessFor(u);
+      html += `<div class="access-row">
+          <div><span class="access-user">${escapeHtml(u)}</span></div>
+          <select data-access-user="${escapeHtml(u)}">${optsFor(cur)}</select>
+        </div>`;
+    });
+  });
+  host.innerHTML = html;
+  const st = document.getElementById('accessSaveStatus');
+  if (st) st.textContent = '';
+}
+function saveAccessFromUI() {
+  if (!isPrimaryAdmin()) { showToast('Only Ahmed can change access', 'error'); return; }
+  const map = {};
+  document.querySelectorAll('#accessMatrix select[data-access-user]').forEach(sel => {
+    const u = sel.getAttribute('data-access-user');
+    const lv = sel.value;
+    // store only non-default values to keep the map small
+    if (ACCESS_LEVELS.includes(lv) && lv !== defaultAccessFor(u)) map[u] = lv;
+  });
+  saveAccessMap(map);
+  if (typeof saveAll === 'function') saveAll();
+  const st = document.getElementById('accessSaveStatus');
+  if (st) st.textContent = 'Saved. Changes apply on each person\u2019s next sign-in (and immediately for you).';
+  showToast('Access levels saved', 'success');
+  // re-apply to the current session in case Ahmed changed his own view (no-op normally)
+  if (typeof renderAll === 'function') renderAll();
+}
+function resetAccessDefaults() {
+  if (!isPrimaryAdmin()) return;
+  saveAccessMap({});
+  renderAccessMatrix();
+  if (typeof saveAll === 'function') saveAll();
+  showToast('Access reset to defaults', 'success');
 }
 function closeSettings(ev) {
   if (ev && ev.target !== ev.currentTarget) return;
@@ -9930,7 +10093,7 @@ function updateRequestsBadge() {
   const badge = document.getElementById('requestsBadge');
   if (!badge || typeof requestEntries === 'undefined') return;
   let pending = requestEntries.filter(r => (r.status || 'Pending') === 'Pending');
-  if (currentRole === 'rep') pending = pending.filter(r => r.rep === currentUser);
+  if (isOwnOnly()) pending = pending.filter(r => r.rep === currentUser);
   const n = pending.length;
   badge.textContent = n;
   badge.style.display = n > 0 ? '' : 'none';
@@ -9942,8 +10105,8 @@ function updateRequestsBadge() {
 let _cmdMatches = [];
 function buildCmdIndex() {
   const idx = [];
-  const isRep = (currentRole === 'rep');
-  const hiddenForRep = new Set(['exec', 'performance']);
+  const isRep = isOwnOnly();
+  const hiddenForRep = new Set(['exec']);
   // Tabs (reps don't get team-wide dashboards in search)
   Object.entries(TAB_HEADINGS).forEach(([tab, label]) => {
     if (isRep && hiddenForRep.has(tab)) return;
@@ -10076,8 +10239,8 @@ function loadRequests() {
 function saveRequests() {
   try { localStorage.setItem(REQUESTS_KEY, JSON.stringify(requestEntries)); } catch (e) {}
 }
-function reqIsManager() { return currentRole === 'admin' || currentRole === 'office'; }
-function reqCanWrite()  { return currentRole === 'admin' || currentRole === 'office' || currentRole === 'rep'; }
+function reqIsManager() { return !isOwnOnly(); }   // v20.3 — view & write see/manage all requests
+function reqCanWrite()  { return true; }            // everyone can submit their own request
 
 function reqFmtDate(s) {
   if (!s) return '—';
@@ -10096,7 +10259,7 @@ function populateReqRepSelect() {
   if (!sel) return;
   sel.innerHTML = ALL_REPS.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
   // Reps submit as themselves and cannot pick another rep.
-  if (currentRole === 'rep' && ALL_REPS.includes(currentUser)) {
+  if (isOwnOnly() && ALL_REPS.includes(currentUser)) {
     sel.value = currentUser;
     sel.disabled = true;
   } else {
@@ -10144,7 +10307,7 @@ function submitRequest(ev) {
   if (type === 'On-site Demo' && !devices.length) { showToast('Select at least one device', 'error'); return; }
 
   const editId = document.getElementById('reqEditId').value;
-  const repVal = (currentRole === 'rep' && ALL_REPS.includes(currentUser))
+  const repVal = (isOwnOnly() && ALL_REPS.includes(currentUser))
                  ? currentUser
                  : (document.getElementById('reqRep').value || currentUser);
   const val = (id) => { const e = document.getElementById(id); return e ? (e.value || '').trim() : ''; };
@@ -10206,7 +10369,7 @@ function submitRequest(ev) {
 function editRequest(id) {
   const r = requestEntries.find(x => x.id === id);
   if (!r) return;
-  if (!reqIsManager() && !(currentRole === 'rep' && r.rep === currentUser)) {
+  if (!reqIsManager() && !(isOwnOnly() && r.rep === currentUser)) {
     showToast('You can only edit your own requests', 'error'); return;
   }
   const set = (elid, v) => { const e = document.getElementById(elid); if (e) e.value = (v == null ? '' : v); };
@@ -10260,7 +10423,7 @@ function setRequestStatus(id, status) {
 function deleteRequest(id) {
   const r = requestEntries.find(x => x.id === id);
   if (!r) return;
-  if (!reqIsManager() && !(currentRole === 'rep' && r.rep === currentUser)) {
+  if (!reqIsManager() && !(isOwnOnly() && r.rep === currentUser)) {
     showToast('You can only delete your own requests', 'error'); return;
   }
   if (!confirm('Delete this request? This cannot be undone.')) return;
@@ -10303,7 +10466,7 @@ function renderEventDetails(r) {
 
 function exportRequestsCSV() {
   let rows = (typeof requestEntries !== 'undefined') ? requestEntries.slice() : [];
-  if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
+  if (isOwnOnly()) rows = rows.filter(r => r.rep === currentUser);
   const filter = document.getElementById('reqFilter')?.value || 'all';
   if (filter !== 'all') rows = rows.filter(r => (r.status || 'Pending') === filter);
   if (!rows.length) { showToast('No requests to export', 'error'); return; }
@@ -10334,7 +10497,7 @@ function renderRequests() {
 
   // role-scoped visibility: reps see only their own
   let rows = requestEntries.slice();
-  if (currentRole === 'rep') rows = rows.filter(r => r.rep === currentUser);
+  if (isOwnOnly()) rows = rows.filter(r => r.rep === currentUser);
 
   // v19.6 — per-rep filter (managers only; reps already see just their own)
   const repFilterEl = document.getElementById('reqRepFilter');
@@ -12267,18 +12430,19 @@ function renderPerformance() {
   const view = document.getElementById('view-performance');
   if (!view || !view.classList.contains('active')) return;
 
-  // Show admin-only buttons
-  const isAdmin = (currentRole === 'admin');
+  // v20.3 — admin-only buttons (goals, thresholds, etc.) require write access
+  const isAdmin = canWriteAll();
   document.querySelectorAll('#view-performance .admin-only').forEach(el => {
     el.style.display = isAdmin ? 'inline-flex' : 'none';
   });
 
-  // Populate rep filter dropdown (per-role)
+  // Populate rep filter dropdown: full picker for view/write access, locked for own-data
   const repSel = document.getElementById('perfRepSel');
+  const fullPerfAccess = !isOwnOnly();
   if (repSel) {
     const prevValue = repSel.value;
     let opts = '';
-    if (isAdmin) {
+    if (fullPerfAccess) {
       opts += `<option value="__ALL__">All Reps</option>`;
       ['Dubai', 'Abu Dhabi'].forEach(team => {
         opts += `<optgroup label="${team}">`;
@@ -12296,7 +12460,7 @@ function renderPerformance() {
         repSel.value = '__ALL__';
       }
     } else {
-      // Rep: locked to themselves
+      // Own-data: locked to themselves
       opts = `<option value="${escapeHtml(currentUser)}">${escapeHtml(currentUser)} (you)</option>`;
       repSel.innerHTML = opts;
       repSel.value = currentUser;
@@ -12315,22 +12479,105 @@ function renderPerformance() {
     ? allRepPerf.filter(p => p.rep === selectedRep)
     : allRepPerf;
 
+  const isRep = isOwnOnly();
+
   // Hide team rollup row when scoped to a single rep
   const teamRow = document.getElementById('perfTeamRow');
   if (teamRow) teamRow.style.display = filterSingle ? 'none' : '';
 
-  // Hide leaderboard section when scoped to a single rep (one row isn't a leaderboard)
+  // Leaderboard section visibility:
+  //  • Reps (v20.2): SHOW it as a "Your Leadership Standing" view — their own
+  //    rank & score among the team, with peers anonymized (no other-member detail).
+  //  • Admin viewing a single rep: hide (one row isn't a leaderboard).
+  //  • Otherwise: full leaderboard.
   const leaderboardWrap = document.getElementById('perfLeaderboard');
+  const lbHeading = document.getElementById('perfLbHeading');
+  const lbSub = document.getElementById('perfLbSub');
   if (leaderboardWrap) {
     const lbSection = leaderboardWrap.closest('.perf-section');
-    if (lbSection) lbSection.style.display = filterSingle ? 'none' : '';
+    if (lbSection) lbSection.style.display = (isRep ? '' : (filterSingle ? 'none' : ''));
   }
 
   if (!filterSingle) renderPerfTeamRow(repPerf);
   renderPerfKpiStrip(repPerf, months, filterSingle ? selectedRep : null);
   renderPerfPcrGrid(repPerf);
   renderPerfRepCards(repPerf);
-  if (!filterSingle) renderPerfLeaderboard(repPerf);
+  if (isRep) {
+    if (lbHeading) lbHeading.textContent = 'Your Leadership Standing';
+    if (lbSub) lbSub.textContent = 'Where you rank on the team — your peers are kept anonymous.';
+    renderPerfStandingForRep(allRepPerf);
+  } else {
+    if (lbHeading) lbHeading.textContent = 'Leaderboard';
+    if (lbSub) lbSub.textContent = 'Ranked by goal achievement %. Click a column header to re-sort.';
+    if (!filterSingle) renderPerfLeaderboard(repPerf);
+  }
+}
+
+/* v20.2 — Rep-facing standing view.
+   Shows the rep's rank and score among the FULL team (so the rank is accurate),
+   but anonymizes every other member: peers appear as "Team member" with their
+   metrics masked. Only the signed-in rep's own row is shown in full. */
+function renderPerfStandingForRep(allRepPerf) {
+  const wrap = document.getElementById('perfLeaderboard');
+  if (!wrap) return;
+  // Rank by score (desc); blanks sink to the bottom.
+  const ranked = [...allRepPerf].sort((a, b) => {
+    const av = (a.score == null || !isFinite(a.score)) ? -Infinity : a.score;
+    const bv = (b.score == null || !isFinite(b.score)) ? -Infinity : b.score;
+    return bv - av;
+  });
+  const total = ranked.length;
+  const myIdx = ranked.findIndex(p => p.rep === currentUser);
+  const me = myIdx >= 0 ? ranked[myIdx] : null;
+  const myRank = myIdx >= 0 ? myIdx + 1 : null;
+  const topScore = ranked.length && isFinite(ranked[0].score) ? ranked[0].score : null;
+  const validScores = ranked.map(p => p.score).filter(s => s != null && isFinite(s));
+  const avgScore = validScores.length ? Math.round(validScores.reduce((s,v)=>s+v,0) / validScores.length) : null;
+
+  const rankClass = (i) => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+
+  // Summary banner
+  const banner = `
+    <tr class="perf-standing-banner-row"><td colspan="11" style="padding:0;border:none;">
+      <div class="perf-standing-banner">
+        <div class="perf-standing-rank">
+          <div class="perf-standing-rank-num">#${myRank ?? '—'}</div>
+          <div class="perf-standing-rank-of">of ${total}</div>
+        </div>
+        <div class="perf-standing-meta">
+          <div class="perf-standing-line"><span>Your score</span><strong class="${me ? scoreClass(me.score) : ''}">${me ? me.score : '—'}</strong></div>
+          <div class="perf-standing-line"><span>Top score on team</span><strong>${topScore ?? '—'}</strong></div>
+          <div class="perf-standing-line"><span>Team average</span><strong>${avgScore ?? '—'}</strong></div>
+        </div>
+      </div>
+    </td></tr>`;
+
+  const thead = `<thead><tr>
+    <th>Rank</th><th>Rep</th><th>Score</th><th>Goal %</th><th>Closed Won</th>
+  </tr></thead>`;
+
+  const rows = ranked.map((p, i) => {
+    const mine = (p.rep === currentUser);
+    if (mine) {
+      return `<tr class="perf-standing-me">
+        <td><span class="rank ${rankClass(i)}">${i+1}</span></td>
+        <td><strong>${escapeHtml(p.rep)} (you)</strong></td>
+        <td class="${scoreClass(p.score)}">${p.score}</td>
+        <td class="${goalClass(p.goalAttain)}">${fmtPct(p.goalAttain)}</td>
+        <td>${fmtAED(p.totals.closed)}</td>
+      </tr>`;
+    }
+    // anonymized peer — no name, no score, no metrics
+    return `<tr class="perf-standing-peer">
+      <td><span class="rank ${rankClass(i)}">${i+1}</span></td>
+      <td style="color:var(--text-muted);">Team member</td>
+      <td style="color:var(--text-muted);">•••</td>
+      <td style="color:var(--text-muted);">•••</td>
+      <td style="color:var(--text-muted);">•••</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = thead + `<tbody>${banner}${rows}</tbody>`;
 }
 
 function renderPerfTeamRow(repPerf) {
