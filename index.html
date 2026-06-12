@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.8</title>
+<title>CoreV | OxeFit Sales Tracker v21.9</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3410,6 +3410,19 @@
   }
   .quotes-subtab:hover { color: var(--text); }
   .quotes-subtab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+  /* v21.9 — Terms Library + locked terms view */
+  .terms-sub { font-weight: 500; font-size: 11.5px; color: var(--text-muted); }
+  .terms-intro { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+  .term-editor-actions { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .term-saved-note { font-size: 12px; color: var(--success); font-weight: 700; }
+  .terms-readonly { font-size: 12.5px; color: var(--text-muted); padding: 12px; }
+  .qb-terms-view { display: flex; flex-direction: column; gap: 2px; }
+  .qb-terms-view .qtv-type { font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--accent2); margin: 12px 0 6px; padding: 3px 9px; background: rgba(37,99,235,0.10); border-radius: 6px; align-self: flex-start; }
+  .qb-terms-view .qtv-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  .qb-terms-view .qtv-label { font-weight: 700; color: var(--text); }
+  .qb-terms-view .qtv-detail { color: var(--text-muted); line-height: 1.55; white-space: pre-wrap; }
+  .qb-terms-empty { padding: 16px; border: 1px dashed var(--border); border-radius: 10px; color: var(--text-muted); font-size: 12.5px; line-height: 1.6; }
+  @media (max-width: 700px) { .qb-terms-view .qtv-row { grid-template-columns: 1fr; gap: 2px; } }
   .quotes-subview { display: none; }
   .quotes-subview.active { display: block; }
   .prod-panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
@@ -3609,7 +3622,9 @@
   .qp-summary .qp-srow { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12.5px; }
   .qp-summary .qp-sgrand { border-top: 2px solid #cbd5e1; margin-top: 6px; padding-top: 8px; font-weight: 800; font-size: 14px; }
   .qp-section-h { font-size: 15px; font-weight: 800; color: #0f172a; margin: 26px 0 8px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
-  .qp-terms-row { margin-bottom: 8px; }
+  .qp-terms-row { margin-bottom: 8px; white-space: pre-line; }
+  .qp-terms-head { font-size: 12px; font-weight: 800; color: #1e3a8a; margin: 12px 0 6px; letter-spacing: 0.4px; }
+  .qb-terms textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 400 12.5px 'Inter', system-ui, sans-serif; resize: vertical; min-height: 42px; }
   .qp-terms-row b { color: #0f172a; }
   .qp-sign-img { max-height: 90px; max-width: 280px; display: block; margin-top: 6px; }
   .qp-sign-name { font-family: 'Georgia', serif; font-size: 22px; color: #1e293b; border-bottom: 1px solid #94a3b8; display: inline-block; padding: 4px 20px 2px; margin-top: 6px; }
@@ -3668,7 +3683,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.8 · Fixed acceptance clause at the bottom of every quote
+      v21.9 · Admin Terms Library — fixed Purchase Terms auto-applied       v21.8 · Fixed acceptance clause at the bottom of every quote locked per product Type
     </div>
   </div>
 </div>
@@ -3741,7 +3756,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.8</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.9</strong></p>
     </div>
   </div>
 </div>
@@ -3810,7 +3825,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.8</div>
+      <div class="sidebar-version">v21.9</div>
     </div>
   </aside>
 
@@ -4600,10 +4615,11 @@
       </div>
     </section>
 
-    <!-- Sub-tabs: Products | Quotes -->
+    <!-- Sub-tabs: Products | Quotes | Terms -->
     <div class="quotes-subtabs">
       <button class="quotes-subtab active" data-qsub="products" onclick="quotesSwitchSub('products')">Products</button>
       <button class="quotes-subtab" data-qsub="quotes" onclick="quotesSwitchSub('quotes')">Quotes</button>
+      <button class="quotes-subtab" data-qsub="terms" onclick="quotesSwitchSub('terms')">Terms Library</button>
     </div>
 
     <!-- ── PRODUCTS ── -->
@@ -4925,13 +4941,9 @@
           <!-- STEP 6 · Terms -->
           <div class="qb-step" data-step="5">
             <section class="qb-card qb-card-wide">
-              <h4 class="qb-card-title">Purchase Terms</h4>
-              <div class="qb-inline-note">Each row is a term (label + detail). A sensible default is pre-filled from the CoreV template.</div>
-              <table class="qb-items qb-terms">
-                <thead><tr><th style="width:30%;">Term</th><th>Detail</th><th></th></tr></thead>
-                <tbody id="qbTermsBody"></tbody>
-              </table>
-              <button class="qb-fetch-btn" onclick="qbAddTerm()">+ Add term</button>
+              <h4 class="qb-card-title">Purchase Terms <span class="qb-sub">— set automatically by product Type · locked</span></h4>
+              <div class="qb-inline-note">These terms are fixed per product Type and are applied automatically based on the products in this quote. They can't be edited here; an admin manages them under <strong>Quotes → Terms Library</strong>.</div>
+              <div id="qbTermsView" class="qb-terms-view"></div>
             </section>
             <section class="qb-card">
               <h4 class="qb-card-title">Comments to Buyer</h4>
@@ -4962,6 +4974,32 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ── TERMS LIBRARY (admin-managed, per product Type) ── -->
+    <div class="quotes-subview" id="qsub-terms">
+      <div class="prod-panel">
+        <div class="prod-panel-head">
+          <h3 class="prod-panel-title">Terms Library <span class="terms-sub">— fixed Purchase Terms per product Type</span></h3>
+          <div class="prod-panel-tools">
+            <select id="termTypeSelect" class="prod-filter" onchange="renderTermEditor()"></select>
+          </div>
+        </div>
+        <div class="terms-intro" id="termsIntro"></div>
+        <div class="prod-form" id="termForm">
+          <div class="qb-inline-note">These terms are <strong>fixed</strong> and applied automatically to any quote that contains a product of this Type. Reps cannot change them on a quote.</div>
+          <table class="qb-items qb-terms" id="termEditorTable">
+            <thead><tr><th style="width:28%;">Term Label</th><th>Detail</th><th></th></tr></thead>
+            <tbody id="termEditorBody"></tbody>
+          </table>
+          <div class="term-editor-actions">
+            <button class="qb-fetch-btn" onclick="termAddRow()">+ Add term row</button>
+            <button class="prod-add-btn" id="termSaveBtn" onclick="saveTermTemplate()">💾 Save terms for this Type</button>
+            <span class="term-saved-note" id="termSavedNote"></span>
+          </div>
+        </div>
+        <div class="terms-readonly" id="termsReadonly" style="display:none;"></div>
+      </div>
     </div>
 
   </div>
@@ -6740,6 +6778,7 @@ async function downloadFromOneDrive() {
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
+    if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -6951,6 +6990,9 @@ function buildEnvelope() {
   // v20.8 — quotes ride along too (merged by id, last-write-wins per quote)
   if (typeof quoteEntries !== 'undefined' && Array.isArray(quoteEntries) && quoteEntries.length) env.quotes = quoteEntries;
   else if (_lastRemoteQuotes) env.quotes = _lastRemoteQuotes;
+  // v21.9 — per-Type terms library (admin-managed, last-write-wins)
+  if (typeof termTemplates !== 'undefined' && termTemplates && Object.keys(termTemplates).length) env.termtemplates = termTemplates;
+  else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   return env;
 }
 
@@ -6985,6 +7027,7 @@ async function uploadToOneDrive() {
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
+    if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -11006,6 +11049,7 @@ function renderQuotesTab() {
   const form = document.getElementById('prodForm');
   if (form) form.style.display = canEditProducts() ? '' : 'none';
   renderProductsTable();
+  populateTermTypeSelect();
   // quotes: default to list view (hide builder)
   const builder = document.getElementById('quoteBuilder');
   const listPanel = document.getElementById('quotesListPanel');
@@ -11018,6 +11062,7 @@ function renderQuotesTab() {
 function quotesSwitchSub(sub) {
   document.querySelectorAll('.quotes-subtab').forEach(b => b.classList.toggle('active', b.dataset.qsub === sub));
   document.querySelectorAll('.quotes-subview').forEach(v => v.classList.toggle('active', v.id === 'qsub-' + sub));
+  if (sub === 'terms') { populateTermTypeSelect(); renderTermEditor(); }
 }
 
 function fmtMoney(n) {
@@ -11192,6 +11237,135 @@ function quoteDefaultTerms() {
     { label: 'Delivery', detail: 'Delivery to customer address within 1-2 days.' }
   ];
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   TERMS LIBRARY (v21.9) — fixed Purchase Terms per product Type.
+   Admin-managed under Quotes → Terms Library; auto-applied & locked on
+   any quote that contains a product of that Type.
+   Storage: localStorage 'oxefit_termtemplates_v1' = { type: [{label,detail}] }
+════════════════════════════════════════════════════════════════════ */
+const PRODUCT_LINE_TYPES = ['XFIT-FLOW','XFIT-FLOW+','XFIT-PEAK','XFIT-PEAK+','XP1-XFIT-3YR','APEX-FLOW+','APEX-PEAK+','XP1-APEX+','OXLEAD','Services','Shipping'];
+const TERMTPL_KEY = 'oxefit_termtemplates_v1';
+let termTemplates = {};
+let _termEditorType = null, _termEditorRows = [];
+let _lastRemoteTermTemplates = null;
+const TERMS_SEED = {
+  'XFIT-FLOW': [
+    { label: 'CONSUMER AGREEMENT', detail: 'This quotation is subject to the Terms & Conditions of Sale & Terms of Service located at: https://www.core-velocity.com/terms-policies' },
+    { label: 'PRICE INCLUDES', detail: '1 Year of OXEFIT Consumer Membership (7 Family Profiles) and White Glove Delivery Services' },
+    { label: 'CONSUMER MEMBERSHIP RENEWAL', detail: 'After the 1st Year, Annual Renewal of OxeFit Membership is AED 2,752.50, subject to change' },
+    { label: 'LIMITED WARRANTY', detail: '36 MONTHS WARRANTY ON FRAME + 12 MONTHS WARRANTY ON MOVING PARTS, ACCESSORIES, ELECTRONICS, LABOR' },
+    { label: 'PAYMENT TERMS', detail: '100% On Placement Of Order' },
+    { label: 'ADDITIONAL NOTE', detail: '- Delivery To Customer Address within 1-2 Days\n- Any of the offered Training session must be scheduled within 14 days from the installation date. Any cancellation must be requested at least 36 hours prior to the scheduled session. Failure to do so will result in the session being deemed delivered. Each customer is entitled to reschedule the session once only' },
+    { label: 'PLATFORM ACCESSORIES', detail: 'FLOW - Multi-Function Bench & Bar, OxeDot, 12 lb Barbells, Rope, Handgrips, Ankle Straps, Ski Handles, Harness, WaterSports, Extenders + Accessory Tree + High Performance Barbell' }
+  ]
+};
+function loadTermTemplates() {
+  try { termTemplates = JSON.parse(localStorage.getItem(TERMTPL_KEY) || '{}') || {}; }
+  catch (e) { termTemplates = {}; }
+  if (!termTemplates || typeof termTemplates !== 'object') termTemplates = {};
+  // seed defaults for any seeded type that has no entry yet
+  let seeded = false;
+  Object.keys(TERMS_SEED).forEach(t => {
+    if (!Array.isArray(termTemplates[t]) || !termTemplates[t].length) { termTemplates[t] = TERMS_SEED[t].map(r => ({ ...r })); seeded = true; }
+  });
+  if (seeded) saveTermTemplatesLocal();
+}
+function saveTermTemplatesLocal() { try { localStorage.setItem(TERMTPL_KEY, JSON.stringify(termTemplates)); } catch (e) {} }
+function saveTermTemplates() {
+  saveTermTemplatesLocal();
+  if (typeof msalAccount !== 'undefined' && msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
+}
+
+// distinct product-line types present in the quote (in first-seen order)
+function quoteLineTypes(q) { return [...new Set(((q && q.lineItems) || []).map(it => it.lineType).filter(Boolean))]; }
+// groups of {type, rows} for the types present that have terms configured
+function resolveQuoteTermGroups(q) {
+  return quoteLineTypes(q).map(t => ({ type: t, rows: (termTemplates[t] || []) })).filter(g => g.rows.length);
+}
+// flat term list (with synthetic header rows when >1 type) — what gets stored & printed
+function resolveQuoteTermsFlat(q) {
+  const groups = resolveQuoteTermGroups(q);
+  const multi = groups.length > 1;
+  const out = [];
+  groups.forEach(g => {
+    if (multi) out.push({ label: g.type, detail: '', isHeader: true });
+    g.rows.forEach(r => out.push({ label: r.label, detail: r.detail }));
+  });
+  return out;
+}
+
+/* ── Admin Terms editor ─────────────────────────────────────────── */
+function populateTermTypeSelect() {
+  const sel = document.getElementById('termTypeSelect');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = PRODUCT_LINE_TYPES.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  if (cur) sel.value = cur;
+}
+function renderTermEditor() {
+  const sel = document.getElementById('termTypeSelect');
+  if (!sel) return;
+  if (!sel.options.length) populateTermTypeSelect();
+  const type = sel.value || PRODUCT_LINE_TYPES[0];
+  _termEditorType = type;
+  _termEditorRows = JSON.parse(JSON.stringify(termTemplates[type] || []));
+  const admin = canEditProducts();
+  const form = document.getElementById('termForm');
+  const ro = document.getElementById('termsReadonly');
+  document.getElementById('termsIntro').innerHTML =
+    `Fixed Purchase Terms for Type <strong>${escapeHtml(type)}</strong>. These are applied automatically — and locked — on any quote that contains a ${escapeHtml(type)} product.`;
+  if (admin) {
+    form.style.display = ''; ro.style.display = 'none';
+    const body = document.getElementById('termEditorBody');
+    body.innerHTML = _termEditorRows.map((r, i) =>
+      `<tr>` +
+        `<td><input type="text" value="${escapeHtml(r.label || '')}" oninput="termRowChanged(${i},'label',this.value)"></td>` +
+        `<td><textarea rows="2" oninput="termRowChanged(${i},'detail',this.value)">${escapeHtml(r.detail || '')}</textarea></td>` +
+        `<td><button class="qb-del-row" onclick="termDeleteRow(${i})">✕</button></td>` +
+      `</tr>`
+    ).join('') || `<tr><td colspan="3" style="color:var(--text-muted);padding:10px;">No terms yet — add rows below.</td></tr>`;
+    document.getElementById('termSavedNote').textContent = '';
+  } else {
+    form.style.display = 'none'; ro.style.display = '';
+    ro.innerHTML = _termEditorRows.length
+      ? `<div class="qb-terms-view">` + _termEditorRows.map(r => `<div class="qtv-row"><div class="qtv-label">${escapeHtml(r.label)}</div><div class="qtv-detail">${escapeHtml(r.detail)}</div></div>`).join('') + `</div>`
+      : 'No terms set for this Type yet.';
+  }
+}
+function termRowChanged(i, field, val) { if (_termEditorRows[i]) _termEditorRows[i][field] = val; }
+function termAddRow() { _termEditorRows.push({ label: '', detail: '' }); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
+function termDeleteRow(i) { _termEditorRows.splice(i, 1); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
+function saveTermTemplate() {
+  if (!canEditProducts()) { showToast('Only admins can edit terms', 'error'); return; }
+  const rows = _termEditorRows.filter(r => (r.label || '').trim() || (r.detail || '').trim());
+  termTemplates[_termEditorType] = rows;
+  saveTermTemplates();
+  const note = document.getElementById('termSavedNote');
+  if (note) { note.textContent = '✓ Saved for ' + _termEditorType; setTimeout(() => { note.textContent = ''; }, 2500); }
+  showToast('Terms saved for ' + _termEditorType, 'success');
+}
+
+// read-only terms shown in the quote builder Terms step
+function renderQbTermsView() {
+  const host = document.getElementById('qbTermsView');
+  if (!host || !_currentQuote) return;
+  const groups = resolveQuoteTermGroups(_currentQuote);
+  if (!groups.length) {
+    const types = quoteLineTypes(_currentQuote);
+    host.innerHTML = `<div class="qb-terms-empty">` +
+      (types.length
+        ? `No fixed terms are configured for the product Type(s) in this quote: <strong>${types.map(escapeHtml).join(', ')}</strong>. An admin can set them under <strong>Quotes → Terms Library</strong>.`
+        : `No products with a Type have been added yet. Terms appear automatically once you add products (each product carries its Type).`) +
+      `</div>`;
+    return;
+  }
+  host.innerHTML = groups.map(g => {
+    const rows = g.rows.map(r => `<div class="qtv-row"><div class="qtv-label">${escapeHtml(r.label)}</div><div class="qtv-detail">${escapeHtml(r.detail)}</div></div>`).join('');
+    return `<div class="qtv-type">${escapeHtml(g.type)}</div>${rows}`;
+  }).join('');
+}
+
 
 function loadQuotes() {
   try {
@@ -11399,7 +11573,7 @@ function openQuoteBuilderUI() {
   toggleQbPayBank(); toggleQbPayLink();
   // dropdowns rebuilt from caches/products
   qbPopulateProductPicker();
-  renderQbItems(); renderQbSchedule(); renderQbTerms();
+  renderQbItems(); renderQbSchedule(); renderQbTermsView();
   recalcQuoteTotals();
   updateQuoteButtons();
   qbRenderStepper();
@@ -11437,6 +11611,7 @@ function qbGoStep(i) {
   if (prev) prev.style.visibility = _qbStep === 0 ? 'hidden' : 'visible';
   if (next) next.style.display = _qbStep === QB_STEPS.length - 1 ? 'none' : '';
   if (_qbStep === QB_STEPS.length - 1) qbRenderReview();
+  if (_qbStep === 5) renderQbTermsView();   // terms reflect current products
   // keep totals fresh when landing on Products/Review
   try { recalcQuoteTotals(); } catch (_) {}
   const sc = document.querySelector('#view-quotes .content') || window;
@@ -11878,6 +12053,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
+  q.terms = resolveQuoteTermsFlat(q);   // v21.9 — terms are fixed per product Type
   return q;
 }
 function saveQuote() {
@@ -12013,8 +12189,10 @@ function buildQuotePreviewHTML(q) {
     (q.sender.email ? `<div class="qp-muted">${escapeHtml(q.sender.email)}</div>` : '') +
     (q.sender.phone ? `<div class="qp-muted">${escapeHtml(q.sender.phone)}</div>` : '');
   const schedRows = q.schedule.map(s => `<div class="qp-srow"><span>${escapeHtml(s.when||'—')}</span><span>${s.pct}%</span></div>`).join('');
-  const termsRows = q.terms.filter(t => t.label || t.detail).map(t =>
-    `<div class="qp-terms-row"><b>${escapeHtml(t.label || '')}:</b> ${escapeHtml(t.detail || '')}</div>`).join('');
+  const termsRows = (q.terms || []).filter(t => t.label || t.detail).map(t =>
+    t.isHeader
+      ? `<div class="qp-terms-head">${escapeHtml(t.label)}</div>`
+      : `<div class="qp-terms-row"><b>${escapeHtml(t.label || '')}${t.label ? ':' : ''}</b> ${escapeHtml(t.detail || '')}</div>`).join('');
   let payBlock = '';
   if (q.payBank && q.bank) {
     payBlock += `<div class="qp-bank-grid"><b>Bank Transfer</b><br>` +
@@ -14771,6 +14949,7 @@ loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
+loadTermTemplates(); // v21.9 — per-Type purchase terms library
 hsLoadTokens();
 
 /* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
