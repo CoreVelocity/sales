@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.1</title>
+<title>CoreV | OxeFit Sales Tracker v21.2</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3422,7 +3422,7 @@
   }
   .prod-export-btn:hover { border-color: var(--teal); color: var(--teal2); }
   .prod-form { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
-  .prod-form-row { display: grid; grid-template-columns: 140px 1fr 150px 160px auto; gap: 12px; align-items: end; }
+  .prod-form-row { display: grid; grid-template-columns: 120px minmax(160px,1fr) 120px 140px 150px auto; gap: 12px; align-items: end; }
   .prod-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
   .prod-field label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); }
   .prod-field input, .prod-field select {
@@ -3446,6 +3446,7 @@
   .prod-type-Services      { background: rgba(13,148,136,0.15); color: var(--teal2); }
   .prod-type-Inventory     { background: rgba(37,99,235,0.15); color: var(--accent2); }
   .prod-type-Non-inventory { background: rgba(245,158,11,0.16); color: var(--warn); }
+  .prod-linetype-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.3px; background: rgba(37,99,235,0.10); color: var(--accent2); border: 1px solid var(--border); white-space: nowrap; }
   .prod-actions-col { width: 120px; text-align: right; }
   .prod-row-btn { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 5px 9px; font-size: 12px; cursor: pointer; color: var(--text-muted); margin-left: 4px; }
   .prod-row-btn:hover { border-color: var(--accent2); color: var(--accent2); }
@@ -3624,7 +3625,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.1 · Quote approval workflow · fixed 5% VAT · A4 PDF template with logo · SKU line items
+      v21.2 · Product Type (OXEFIT line) for per-type T&C lock · Quote approval workflow
     </div>
   </div>
 </div>
@@ -3697,7 +3698,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.1</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.2</strong></p>
     </div>
   </div>
 </div>
@@ -3766,7 +3767,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.1</div>
+      <div class="sidebar-version">v21.2</div>
     </div>
   </aside>
 
@@ -4569,10 +4570,24 @@
           <h3 class="prod-panel-title">Product Catalog</h3>
           <div class="prod-panel-tools">
             <select id="prodTypeFilter" class="prod-filter" onchange="renderProductsTable()">
-              <option value="all">All types</option>
+              <option value="all">All categories</option>
               <option value="Services">Services</option>
               <option value="Inventory">Inventory</option>
               <option value="Non-inventory">Non-inventory</option>
+            </select>
+            <select id="prodLineTypeFilter" class="prod-filter" onchange="renderProductsTable()">
+              <option value="all">All types</option>
+              <option value="XFIT-FLOW">XFIT-FLOW</option>
+              <option value="XFIT-FLOW+">XFIT-FLOW+</option>
+              <option value="XFIT-PEAK">XFIT-PEAK</option>
+              <option value="XFIT-PEAK+">XFIT-PEAK+</option>
+              <option value="XP1-XFIT-3YR">XP1-XFIT-3YR</option>
+              <option value="APEX-FLOW+">APEX-FLOW+</option>
+              <option value="APEX-PEAK+">APEX-PEAK+</option>
+              <option value="XP1-APEX+">XP1-APEX+</option>
+              <option value="OXLEAD">OXLEAD</option>
+              <option value="Services">Services</option>
+              <option value="Shipping">Shipping</option>
             </select>
             <button class="prod-export-btn" onclick="exportProductsCSV()" title="Export to CSV">⤓ CSV</button>
           </div>
@@ -4594,11 +4609,28 @@
               <input type="number" id="prodPrice" min="0" step="0.01" placeholder="0.00">
             </div>
             <div class="prod-field prod-field-type">
-              <label>Product Type</label>
+              <label>Category</label>
               <select id="prodType">
                 <option value="Inventory">Inventory</option>
                 <option value="Non-inventory">Non-inventory</option>
                 <option value="Services">Services</option>
+              </select>
+            </div>
+            <div class="prod-field prod-field-linetype">
+              <label>Type</label>
+              <select id="prodLineType">
+                <option value="">— Select type —</option>
+                <option value="XFIT-FLOW">XFIT-FLOW</option>
+                <option value="XFIT-FLOW+">XFIT-FLOW+</option>
+                <option value="XFIT-PEAK">XFIT-PEAK</option>
+                <option value="XFIT-PEAK+">XFIT-PEAK+</option>
+                <option value="XP1-XFIT-3YR">XP1-XFIT-3YR</option>
+                <option value="APEX-FLOW+">APEX-FLOW+</option>
+                <option value="APEX-PEAK+">APEX-PEAK+</option>
+                <option value="XP1-APEX+">XP1-APEX+</option>
+                <option value="OXLEAD">OXLEAD</option>
+                <option value="Services">Services</option>
+                <option value="Shipping">Shipping</option>
               </select>
             </div>
             <div class="prod-field prod-field-actions">
@@ -4616,6 +4648,7 @@
               <tr>
                 <th>SKU</th>
                 <th>Product Description</th>
+                <th>Category</th>
                 <th>Type</th>
                 <th class="prod-num">Unit Price (AED)</th>
                 <th class="prod-actions-col">Actions</th>
@@ -10914,8 +10947,10 @@ function renderProductsTable() {
   const empty = document.getElementById('prodEmpty');
   if (!body) return;
   const filter = (document.getElementById('prodTypeFilter') || {}).value || 'all';
+  const ltFilter = (document.getElementById('prodLineTypeFilter') || {}).value || 'all';
   let rows = productEntries.slice();
   if (filter !== 'all') rows = rows.filter(p => p.type === filter);
+  if (ltFilter !== 'all') rows = rows.filter(p => (p.lineType || '') === ltFilter);
   rows.sort((a, b) => (a.sku || '').localeCompare(b.sku || ''));
 
   body.innerHTML = '';
@@ -10930,6 +10965,7 @@ function renderProductsTable() {
       `<td class="prod-sku">${escapeHtml(p.sku || '—')}</td>` +
       `<td>${escapeHtml(p.desc || '—')}</td>` +
       `<td><span class="prod-type-badge ${typeClass}">${escapeHtml(p.type || '—')}</span></td>` +
+      `<td>${p.lineType ? `<span class="prod-linetype-badge">${escapeHtml(p.lineType)}</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>` +
       `<td class="prod-num">${fmtMoney(p.unitPrice)}</td>` +
       `<td class="prod-actions-col">${editable
         ? `<button class="prod-row-btn" onclick="editProduct('${p.id}')">Edit</button>` +
@@ -10950,6 +10986,7 @@ function saveProductFromForm() {
   const desc  = (document.getElementById('prodDesc').value || '').trim();
   const price = parseFloat(document.getElementById('prodPrice').value);
   const type  = document.getElementById('prodType').value;
+  const lineType = document.getElementById('prodLineType').value;
 
   if (!sku)  { _prodHint('SKU is required.'); return; }
   if (!desc) { _prodHint('Product description is required.'); return; }
@@ -10963,13 +11000,13 @@ function saveProductFromForm() {
   if (_prodEditId) {
     const idx = productEntries.findIndex(p => p.id === _prodEditId);
     if (idx >= 0) {
-      productEntries[idx] = { ...productEntries[idx], sku, desc, unitPrice: price, type, updatedAt: now };
+      productEntries[idx] = { ...productEntries[idx], sku, desc, unitPrice: price, type, lineType, updatedAt: now };
     }
     _prodEditId = null;
   } else {
     productEntries.push({
       id: 'prod_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      sku, desc, unitPrice: price, type, createdAt: now, updatedAt: now
+      sku, desc, unitPrice: price, type, lineType, createdAt: now, updatedAt: now
     });
   }
   saveProducts();
@@ -10987,6 +11024,7 @@ function editProduct(id) {
   document.getElementById('prodDesc').value  = p.desc || '';
   document.getElementById('prodPrice').value = p.unitPrice != null ? p.unitPrice : '';
   document.getElementById('prodType').value  = p.type || 'Inventory';
+  document.getElementById('prodLineType').value = p.lineType || '';
   document.getElementById('prodAddBtn').textContent = 'Save Changes';
   document.getElementById('prodCancelBtn').style.display = '';
   _prodHint('');
@@ -10999,6 +11037,7 @@ function _resetProductForm() {
   _prodEditId = null;
   ['prodSku', 'prodDesc', 'prodPrice'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const t = document.getElementById('prodType'); if (t) t.value = 'Inventory';
+  const lt = document.getElementById('prodLineType'); if (lt) lt.value = '';
   const add = document.getElementById('prodAddBtn'); if (add) add.textContent = '+ Add Product';
   const cancel = document.getElementById('prodCancelBtn'); if (cancel) cancel.style.display = 'none';
   _prodHint('');
@@ -11017,10 +11056,10 @@ function deleteProduct(id) {
 }
 
 function exportProductsCSV() {
-  const headers = ['SKU', 'Product Description', 'Type', 'Unit Price (AED)'];
+  const headers = ['SKU', 'Product Description', 'Category', 'Type', 'Unit Price (AED)'];
   const lines = [headers.join(',')];
   productEntries.slice().sort((a, b) => (a.sku || '').localeCompare(b.sku || '')).forEach(p => {
-    const row = [p.sku || '', p.desc || '', p.type || '', (Number(p.unitPrice) || 0).toFixed(2)]
+    const row = [p.sku || '', p.desc || '', p.type || '', p.lineType || '', (Number(p.unitPrice) || 0).toFixed(2)]
       .map(v => '"' + String(v).replace(/"/g, '""') + '"');
     lines.push(row.join(','));
   });
@@ -11421,7 +11460,7 @@ function qbHideProductResults() {
 function qbAddLineItemById(id) {
   const p = productEntries.find(x => x.id === id);
   if (!p) return;
-  _currentQuote.lineItems.push({ productId: p.id, sku: p.sku, desc: p.desc, qty: 1, unitPrice: Number(p.unitPrice) || 0 });
+  _currentQuote.lineItems.push({ productId: p.id, sku: p.sku, desc: p.desc, lineType: p.lineType || '', qty: 1, unitPrice: Number(p.unitPrice) || 0 });
   const inp = document.getElementById('qbProductSearch');
   if (inp) inp.value = '';
   const res = document.getElementById('qbProductResults');
