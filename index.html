@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.6</title>
+<title>CoreV | OxeFit Sales Tracker v20.7</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3394,6 +3394,69 @@
     letter-spacing: 0.08em;
   }
 #view-deal-rules footer strong { color: var(--dor-gold); }
+  /* ════════ QUOTES & PRODUCTS (v20.7) ════════ */
+  .quotes-hero {
+    display: flex; gap: 16px; align-items: center;
+    background: linear-gradient(135deg, rgba(13,148,136,0.12), rgba(37,99,235,0.08));
+    border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; margin-bottom: 16px;
+  }
+  .quotes-hero-icon { font-size: 34px; flex-shrink: 0; }
+  .quotes-hero-title { margin: 0 0 4px; font-size: 22px; font-weight: 800; color: var(--text); }
+  .quotes-hero-sub { margin: 0; font-size: 13px; color: var(--text-muted); max-width: 760px; line-height: 1.5; }
+  .quotes-subtabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .quotes-subtab {
+    background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer;
+    padding: 9px 16px; font: 700 13px 'Inter', system-ui, sans-serif; color: var(--text-muted);
+  }
+  .quotes-subtab:hover { color: var(--text); }
+  .quotes-subtab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+  .quotes-subview { display: none; }
+  .quotes-subview.active { display: block; }
+  .prod-panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  .prod-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+  .prod-panel-title { margin: 0; font-size: 16px; font-weight: 800; color: var(--text); }
+  .prod-panel-tools { display: flex; gap: 8px; align-items: center; }
+  .prod-filter, .prod-export-btn {
+    padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--bg-card); color: var(--text); font: 600 12.5px 'Inter', system-ui, sans-serif; cursor: pointer;
+  }
+  .prod-export-btn:hover { border-color: var(--teal); color: var(--teal2); }
+  .prod-form { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+  .prod-form-row { display: grid; grid-template-columns: 140px 1fr 150px 160px auto; gap: 12px; align-items: end; }
+  .prod-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .prod-field label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); }
+  .prod-field input, .prod-field select {
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--bg-card); color: var(--text); font: 400 13px 'Inter', system-ui, sans-serif; outline: none; width: 100%; box-sizing: border-box;
+  }
+  .prod-field input:focus, .prod-field select:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .prod-field-actions { display: flex; gap: 6px; }
+  .prod-add-btn { background: var(--brand-grad); color: #fff; border: none; border-radius: 9px; padding: 9px 14px; font: 700 12.5px 'Inter', system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+  .prod-add-btn:hover { filter: brightness(1.07); }
+  .prod-cancel-btn { background: var(--card); color: var(--text-muted); border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; font: 600 12.5px 'Inter', system-ui, sans-serif; cursor: pointer; }
+  .prod-form-hint { font-size: 12px; color: var(--danger); margin-top: 8px; min-height: 0; }
+  .prod-table-wrap { overflow-x: auto; }
+  .prod-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .prod-table th { text-align: left; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); padding: 8px 10px; border-bottom: 2px solid var(--border); }
+  .prod-table th.prod-num, .prod-table td.prod-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .prod-table td { padding: 10px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .prod-table tr:hover td { background: var(--row-hover); }
+  .prod-sku { font-weight: 700; font-family: 'Inter', monospace; color: var(--accent2); }
+  .prod-type-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.4px; }
+  .prod-type-Services      { background: rgba(13,148,136,0.15); color: var(--teal2); }
+  .prod-type-Inventory     { background: rgba(37,99,235,0.15); color: var(--accent2); }
+  .prod-type-Non-inventory { background: rgba(245,158,11,0.16); color: var(--warn); }
+  .prod-actions-col { width: 120px; text-align: right; }
+  .prod-row-btn { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 5px 9px; font-size: 12px; cursor: pointer; color: var(--text-muted); margin-left: 4px; }
+  .prod-row-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .prod-row-btn.del:hover { border-color: var(--danger); color: var(--danger); }
+  .prod-empty { padding: 28px; text-align: center; color: var(--text-muted); font-size: 13px; }
+  .quotes-placeholder { padding: 10px 2px; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+  .quotes-placeholder-sub { font-size: 12.5px; margin-top: 8px; }
+  @media (max-width: 900px) {
+    .prod-form-row { grid-template-columns: 1fr 1fr; }
+    .prod-field-desc { grid-column: 1 / -1; }
+  }
 </style>
 </head>
 <body>
@@ -3428,7 +3491,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.6 · Sort deal picker by value/name/stage · Full HubSpot pipeline · Access Control
+      v20.7 · Quotes tab with Product catalog · Sort deal picker · Access Control
     </div>
   </div>
 </div>
@@ -3501,7 +3564,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.6</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.7</strong></p>
     </div>
   </div>
 </div>
@@ -3547,6 +3610,9 @@
       <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
         <span class="nav-ico">📈</span><span class="nav-label">Marketing</span>
       </button>
+      <button class="nav-item" data-tab="quotes" onclick="switchTab('quotes')" title="Quotes &amp; Products">
+        <span class="nav-ico">🧾</span><span class="nav-label">Quotes</span>
+      </button>
 
       <div class="nav-group-rule"></div>
       <div class="nav-group-label">Reference</div>
@@ -3567,7 +3633,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.6</div>
+      <div class="sidebar-version">v20.7</div>
     </div>
   </aside>
 
@@ -4345,6 +4411,103 @@
       </div>
     </div>
   </div><!-- /#view-marketing -->
+
+  <!-- ░░░ QUOTES & PRODUCTS (v20.7) ░░░ -->
+  <div class="tab-view" id="view-quotes">
+  <div class="content">
+    <section class="quotes-hero">
+      <div class="quotes-hero-icon">🧾</div>
+      <div>
+        <h2 class="quotes-hero-title">Quotes &amp; Products</h2>
+        <p class="quotes-hero-sub">Build a product catalog, then generate quotes from it. Start by adding the products and services you sell — SKU, description, unit price and type.</p>
+      </div>
+    </section>
+
+    <!-- Sub-tabs: Products | Quotes -->
+    <div class="quotes-subtabs">
+      <button class="quotes-subtab active" data-qsub="products" onclick="quotesSwitchSub('products')">Products</button>
+      <button class="quotes-subtab" data-qsub="quotes" onclick="quotesSwitchSub('quotes')">Quotes</button>
+    </div>
+
+    <!-- ── PRODUCTS ── -->
+    <div class="quotes-subview active" id="qsub-products">
+      <div class="prod-panel">
+        <div class="prod-panel-head">
+          <h3 class="prod-panel-title">Product Catalog</h3>
+          <div class="prod-panel-tools">
+            <select id="prodTypeFilter" class="prod-filter" onchange="renderProductsTable()">
+              <option value="all">All types</option>
+              <option value="Services">Services</option>
+              <option value="Inventory">Inventory</option>
+              <option value="Non-inventory">Non-inventory</option>
+            </select>
+            <button class="prod-export-btn" onclick="exportProductsCSV()" title="Export to CSV">⤓ CSV</button>
+          </div>
+        </div>
+
+        <!-- Add / edit form (admins only) -->
+        <div class="prod-form" id="prodForm">
+          <div class="prod-form-row">
+            <div class="prod-field prod-field-sku">
+              <label>SKU</label>
+              <input type="text" id="prodSku" placeholder="e.g. OXE-XS1">
+            </div>
+            <div class="prod-field prod-field-desc">
+              <label>Product Description</label>
+              <input type="text" id="prodDesc" placeholder="e.g. OxeFit XS1 Smart Home Gym">
+            </div>
+            <div class="prod-field prod-field-price">
+              <label>Unit Price (AED)</label>
+              <input type="number" id="prodPrice" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div class="prod-field prod-field-type">
+              <label>Product Type</label>
+              <select id="prodType">
+                <option value="Inventory">Inventory</option>
+                <option value="Non-inventory">Non-inventory</option>
+                <option value="Services">Services</option>
+              </select>
+            </div>
+            <div class="prod-field prod-field-actions">
+              <label>&nbsp;</label>
+              <button class="prod-add-btn" id="prodAddBtn" onclick="saveProductFromForm()">+ Add Product</button>
+              <button class="prod-cancel-btn" id="prodCancelBtn" style="display:none;" onclick="cancelProductEdit()">Cancel</button>
+            </div>
+          </div>
+          <div class="prod-form-hint" id="prodFormHint"></div>
+        </div>
+
+        <div class="prod-table-wrap">
+          <table class="prod-table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Product Description</th>
+                <th>Type</th>
+                <th class="prod-num">Unit Price (AED)</th>
+                <th class="prod-actions-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="prodTableBody"></tbody>
+          </table>
+          <div class="prod-empty" id="prodEmpty" style="display:none;">No products yet. Add your first product above.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── QUOTES (builder comes next) ── -->
+    <div class="quotes-subview" id="qsub-quotes">
+      <div class="prod-panel">
+        <div class="prod-panel-head"><h3 class="prod-panel-title">Quotes</h3></div>
+        <div class="quotes-placeholder">
+          <p>The quote builder will be set up next. It will let you create a quote by picking products from the catalog, setting quantities, discounts and totals.</p>
+          <p class="quotes-placeholder-sub">First, add your products under the <strong>Products</strong> tab. Then tell me the fields you want on a quote (e.g. customer, quote number, validity date, line items, tax, terms) and I'll build the flow.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div><!-- /#view-quotes -->
 
   <!-- ░░░ DEAL OWNERSHIP & CRM RULES (merged v19.2) ░░░ -->
   <div class="tab-view" id="view-deal-rules">
@@ -6103,6 +6266,7 @@ async function downloadFromOneDrive() {
     // owner map) so this rep can open the deal-picker for their own row.
     if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
+    if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -6307,6 +6471,10 @@ function buildEnvelope() {
   // v20.3 — Ahmed is authoritative for access rules; everyone else preserves the synced map
   if (isPrimaryAdmin()) { const am = getAccessMap(); if (am && Object.keys(am).length) env.access = am; }
   else if (_lastRemoteAccess) env.access = _lastRemoteAccess;
+  // v20.7 — product catalog (admin-managed). Attach the local list; reps who
+  // don't manage products preserve whatever the admin last synced.
+  if (typeof productEntries !== 'undefined' && Array.isArray(productEntries) && productEntries.length) env.products = productEntries;
+  else if (_lastRemoteProducts) env.products = _lastRemoteProducts;
   return env;
 }
 
@@ -6339,6 +6507,7 @@ async function uploadToOneDrive() {
         // re-emits the admin's block instead of dropping it.
         if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
+    if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -8587,6 +8756,7 @@ let hubspotState = {
 // shared connection out of the envelope.
 let _lastRemoteHubspot = null;
 let _lastRemoteAccess = null;   // v20.3 — last access map received from sync
+let _lastRemoteProducts = null; // v20.7 — last product catalog received from sync
 
 function hsLoadTokens() {
   try {
@@ -10253,6 +10423,7 @@ const TAB_HEADINGS = {
   demos:       'Demo Tracker',
   requests:    'Event & On-site Demo Requests',
   marketing:   'Marketing Consumer Performance',
+  quotes:      'Quotes & Products',
   'deal-rules':'Deal Ownership & CRM Rules',
   guidelines:  'Guidelines'
 };
@@ -10283,6 +10454,9 @@ function switchTab(tabName) {
   if (tabName === 'exec') {
     renderExecDashboard();
   }
+  if (tabName === 'quotes') {
+    renderQuotesTab();
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════
@@ -10299,6 +10473,177 @@ function switchTab(tabName) {
 ════════════════════════════════════════════════════════════════════ */
 const REQUESTS_KEY = 'oxefit_requests_v1';
 let requestEntries = [];
+
+/* ════════════════════════════════════════════════════════════════════
+   QUOTES & PRODUCTS (v20.7)
+   Storage: localStorage 'oxefit_products_v1', mirrored into the shared
+   OneDrive envelope (products[]). Product catalog is managed by admins;
+   everyone else sees it read-only. Each product:
+     { id, sku, desc, unitPrice, type ('Services'|'Inventory'|'Non-inventory'),
+       createdAt, updatedAt }
+   The quote builder is added in a later step.
+════════════════════════════════════════════════════════════════════ */
+const PRODUCTS_KEY = 'oxefit_products_v1';
+let productEntries = [];
+let _prodEditId = null;
+
+function loadProducts() {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    productEntries = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(productEntries)) productEntries = [];
+  } catch (e) { productEntries = []; }
+}
+function saveProductsLocal() {
+  try { localStorage.setItem(PRODUCTS_KEY, JSON.stringify(productEntries)); } catch (e) {}
+}
+function saveProducts() {
+  saveProductsLocal();
+  if (typeof msalAccount !== 'undefined' && msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
+}
+// Only admins manage the catalog
+function canEditProducts() { return currentRole === 'admin'; }
+
+function renderQuotesTab() {
+  quotesSwitchSub(document.querySelector('.quotes-subtab.active')?.dataset.qsub || 'products');
+  // form is admin-only
+  const form = document.getElementById('prodForm');
+  if (form) form.style.display = canEditProducts() ? '' : 'none';
+  renderProductsTable();
+}
+
+function quotesSwitchSub(sub) {
+  document.querySelectorAll('.quotes-subtab').forEach(b => b.classList.toggle('active', b.dataset.qsub === sub));
+  document.querySelectorAll('.quotes-subview').forEach(v => v.classList.toggle('active', v.id === 'qsub-' + sub));
+}
+
+function fmtMoney(n) {
+  const v = Number(n) || 0;
+  return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function renderProductsTable() {
+  const body = document.getElementById('prodTableBody');
+  const empty = document.getElementById('prodEmpty');
+  if (!body) return;
+  const filter = (document.getElementById('prodTypeFilter') || {}).value || 'all';
+  let rows = productEntries.slice();
+  if (filter !== 'all') rows = rows.filter(p => p.type === filter);
+  rows.sort((a, b) => (a.sku || '').localeCompare(b.sku || ''));
+
+  body.innerHTML = '';
+  if (!rows.length) { if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+
+  const editable = canEditProducts();
+  rows.forEach(p => {
+    const tr = document.createElement('tr');
+    const typeClass = 'prod-type-' + (p.type || 'Inventory');
+    tr.innerHTML =
+      `<td class="prod-sku">${escapeHtml(p.sku || '—')}</td>` +
+      `<td>${escapeHtml(p.desc || '—')}</td>` +
+      `<td><span class="prod-type-badge ${typeClass}">${escapeHtml(p.type || '—')}</span></td>` +
+      `<td class="prod-num">${fmtMoney(p.unitPrice)}</td>` +
+      `<td class="prod-actions-col">${editable
+        ? `<button class="prod-row-btn" onclick="editProduct('${p.id}')">Edit</button>` +
+          `<button class="prod-row-btn del" onclick="deleteProduct('${p.id}')">Delete</button>`
+        : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+function _prodHint(msg) {
+  const h = document.getElementById('prodFormHint');
+  if (h) h.textContent = msg || '';
+}
+
+function saveProductFromForm() {
+  if (!canEditProducts()) { showToast('Only admins can manage products', 'error'); return; }
+  const sku   = (document.getElementById('prodSku').value || '').trim();
+  const desc  = (document.getElementById('prodDesc').value || '').trim();
+  const price = parseFloat(document.getElementById('prodPrice').value);
+  const type  = document.getElementById('prodType').value;
+
+  if (!sku)  { _prodHint('SKU is required.'); return; }
+  if (!desc) { _prodHint('Product description is required.'); return; }
+  if (isNaN(price) || price < 0) { _prodHint('Enter a valid unit price.'); return; }
+
+  // unique SKU (case-insensitive), excluding the row being edited
+  const dup = productEntries.find(p => (p.sku || '').toLowerCase() === sku.toLowerCase() && p.id !== _prodEditId);
+  if (dup) { _prodHint('A product with this SKU already exists.'); return; }
+
+  const now = new Date().toISOString();
+  if (_prodEditId) {
+    const idx = productEntries.findIndex(p => p.id === _prodEditId);
+    if (idx >= 0) {
+      productEntries[idx] = { ...productEntries[idx], sku, desc, unitPrice: price, type, updatedAt: now };
+    }
+    _prodEditId = null;
+  } else {
+    productEntries.push({
+      id: 'prod_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      sku, desc, unitPrice: price, type, createdAt: now, updatedAt: now
+    });
+  }
+  saveProducts();
+  _resetProductForm();
+  renderProductsTable();
+  showToast(_prodEditId ? 'Product updated' : 'Product saved', 'success');
+}
+
+function editProduct(id) {
+  if (!canEditProducts()) return;
+  const p = productEntries.find(x => x.id === id);
+  if (!p) return;
+  _prodEditId = id;
+  document.getElementById('prodSku').value   = p.sku || '';
+  document.getElementById('prodDesc').value  = p.desc || '';
+  document.getElementById('prodPrice').value = p.unitPrice != null ? p.unitPrice : '';
+  document.getElementById('prodType').value  = p.type || 'Inventory';
+  document.getElementById('prodAddBtn').textContent = 'Save Changes';
+  document.getElementById('prodCancelBtn').style.display = '';
+  _prodHint('');
+  document.getElementById('prodSku').focus();
+}
+
+function cancelProductEdit() { _prodEditId = null; _resetProductForm(); }
+
+function _resetProductForm() {
+  _prodEditId = null;
+  ['prodSku', 'prodDesc', 'prodPrice'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const t = document.getElementById('prodType'); if (t) t.value = 'Inventory';
+  const add = document.getElementById('prodAddBtn'); if (add) add.textContent = '+ Add Product';
+  const cancel = document.getElementById('prodCancelBtn'); if (cancel) cancel.style.display = 'none';
+  _prodHint('');
+}
+
+function deleteProduct(id) {
+  if (!canEditProducts()) return;
+  const p = productEntries.find(x => x.id === id);
+  if (!p) return;
+  if (!confirm('Delete product "' + (p.sku || p.desc) + '"?')) return;
+  productEntries = productEntries.filter(x => x.id !== id);
+  if (_prodEditId === id) _resetProductForm();
+  saveProducts();
+  renderProductsTable();
+  showToast('Product deleted', 'success');
+}
+
+function exportProductsCSV() {
+  const headers = ['SKU', 'Product Description', 'Type', 'Unit Price (AED)'];
+  const lines = [headers.join(',')];
+  productEntries.slice().sort((a, b) => (a.sku || '').localeCompare(b.sku || '')).forEach(p => {
+    const row = [p.sku || '', p.desc || '', p.type || '', (Number(p.unitPrice) || 0).toFixed(2)]
+      .map(v => '"' + String(v).replace(/"/g, '""') + '"');
+    lines.push(row.join(','));
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'products.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
 
 function loadRequests() {
   try {
@@ -12997,6 +13342,7 @@ function saveThresh() {
 loadLocal();
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
+loadProducts(); // v20.7 — product catalog for Quotes
 hsLoadTokens();
 
 /* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
