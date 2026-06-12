@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.3</title>
+<title>CoreV | OxeFit Sales Tracker v21.4</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3497,6 +3497,7 @@
   }
   .qb-field input:focus, .qb-field select:focus, .qb-textarea:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
   .qb-field-btn { justify-content: flex-end; }
+  .qb-mini-search { margin-bottom: 6px; font-size: 12px !important; }
   .qb-fetch-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--teal2); cursor: pointer; white-space: nowrap; }
   .qb-fetch-btn:hover { border-color: var(--teal); }
   .qb-inline-note { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.5; }
@@ -3646,7 +3647,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.3 · Step-by-step quote wizard · A4 template fit · removed signature
+      v21.4 · Open-deals-only + deal/contact filters · Ship date · Save returns to list
     </div>
   </div>
 </div>
@@ -3719,7 +3720,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.3</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.4</strong></p>
     </div>
   </div>
 </div>
@@ -3788,7 +3789,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.3</div>
+      <div class="sidebar-version">v21.4</div>
     </div>
   </aside>
 
@@ -4737,12 +4738,26 @@
                 <div class="qb-field"><label>Quote Name</label><input type="text" id="qbName" placeholder="e.g. FevaFit"></div>
                 <div class="qb-field"><label>Expiration Date <span class="qb-hint-inline">(default 14 days)</span></label><input type="date" id="qbExpires"></div>
               </div>
+              <div class="qb-row2">
+                <div class="qb-field">
+                  <label>Ship Date</label>
+                  <select id="qbShipDate">
+                    <option value="">— Select ship window —</option>
+                    <option value="1-2 days">1-2 days</option>
+                    <option value="1-2 weeks">1-2 weeks</option>
+                    <option value="4-6 weeks">4-6 weeks</option>
+                    <option value="6-8 weeks">6-8 weeks</option>
+                  </select>
+                </div>
+                <div class="qb-field"></div>
+              </div>
             </section>
             <section class="qb-card">
-              <h4 class="qb-card-title">Associated Deal <span class="qb-sub">— from your HubSpot deals</span></h4>
+              <h4 class="qb-card-title">Associated Deal <span class="qb-sub">— open deals only (excludes closed won / lost)</span></h4>
               <div class="qb-row2">
                 <div class="qb-field">
                   <label>Deal</label>
+                  <input type="text" id="qbDealFilter" class="qb-mini-search" placeholder="🔍 Filter your deals by name…" oninput="qbRebuildDealSelect()">
                   <select id="qbDealSelect" onchange="onQuoteDealSelect()"><option value="">— Select a deal —</option></select>
                 </div>
                 <div class="qb-field qb-field-btn">
@@ -4761,6 +4776,7 @@
               <div class="qb-row2">
                 <div class="qb-field">
                   <label>Contact</label>
+                  <input type="text" id="qbContactFilter" class="qb-mini-search" placeholder="🔍 Filter your contacts by name…" oninput="qbRebuildContactSelect()">
                   <select id="qbContactSelect" onchange="onQuoteContactSelect()"><option value="">— Select a contact —</option></select>
                 </div>
                 <div class="qb-field qb-field-btn">
@@ -4780,6 +4796,7 @@
               <div class="qb-row2">
                 <div class="qb-field">
                   <label>Company <span class="qb-hint-inline">(optional)</span></label>
+                  <input type="text" id="qbCompanyFilter" class="qb-mini-search" placeholder="🔍 Filter your companies by name…" oninput="qbRebuildCompanySelect()">
                   <select id="qbCompanySelect" onchange="onQuoteCompanySelect()"><option value="">— None —</option></select>
                 </div>
                 <div class="qb-field qb-field-btn">
@@ -11290,7 +11307,8 @@ function startNewQuote() {
     status: 'Draft',
     ownerUser: currentUser,
     createdAt: now.toISOString(),
-    expiresAt: exp.toISOString().slice(0, 10)
+    expiresAt: exp.toISOString().slice(0, 10),
+    shipDate: ''
   };
   openQuoteBuilderUI();
 }
@@ -11316,6 +11334,9 @@ function openQuoteBuilderUI() {
   document.getElementById('qbRefLabel').textContent = 'Ref: ' + q.reference;
   document.getElementById('qbName').value = q.name || '';
   document.getElementById('qbExpires').value = q.expiresAt || '';
+  document.getElementById('qbShipDate').value = q.shipDate || '';
+  // reset filter inputs
+  ['qbDealFilter','qbContactFilter','qbCompanyFilter'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById('qbBuyerName').value = q.buyer.name || '';
   document.getElementById('qbBuyerEmail').value = q.buyer.email || '';
   document.getElementById('qbBuyerPhone').value = q.buyer.phone || '';
@@ -11402,6 +11423,7 @@ function qbRenderReview() {
     row('Quote name', escapeHtml(q.name)) +
     row('Reference', escapeHtml(q.reference)) +
     row('Expires', quoteFmtDate(q.expiresAt)) +
+    row('Ship date', escapeHtml(q.shipDate)) +
     row('Deal', escapeHtml(q.dealName)) +
     row('Buyer', escapeHtml((q.buyer && q.buyer.name) || '') + (q.company && q.company.name ? ' — ' + escapeHtml(q.company.name) : '')) +
     row('Prepared by', escapeHtml((q.sender && q.sender.name) || '')) +
@@ -11418,9 +11440,13 @@ async function qbFetchDeals() {
   const btn = document.getElementById('qbFetchDealsBtn');
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
-    _qbDealsCache = await hubspotFetchDealsForRep(currentUser);
+    const all = await hubspotFetchDealsForRep(currentUser);
+    // only OPEN deals — exclude closed won and closed lost
+    _qbDealsCache = (all || []).filter(d => !d.isClosed);
     qbRebuildDealSelect();
-    document.getElementById('qbDealNote').textContent = `${_qbDealsCache.length} deal(s) loaded from your HubSpot.`;
+    const closed = (all || []).length - _qbDealsCache.length;
+    document.getElementById('qbDealNote').textContent =
+      `${_qbDealsCache.length} open deal(s) loaded` + (closed > 0 ? ` · ${closed} closed deal(s) hidden` : '') + '.';
   } catch (e) {
     document.getElementById('qbDealNote').textContent = 'Could not load deals: ' + (e.message || e);
   } finally { btn.textContent = '⟳ Load my deals'; btn.disabled = false; }
@@ -11428,10 +11454,13 @@ async function qbFetchDeals() {
 function qbRebuildDealSelect() {
   const sel = document.getElementById('qbDealSelect');
   const cur = _currentQuote ? _currentQuote.dealId : '';
+  const q = ((document.getElementById('qbDealFilter') || {}).value || '').trim().toLowerCase();
+  let list = (_qbDealsCache || []);
+  if (q) list = list.filter(d => (d.name || '').toLowerCase().includes(q));
   let html = '<option value="">— Select a deal —</option>';
-  (_qbDealsCache || []).forEach(d => { html += `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)} — AED ${fmtNum(d.amount||0)}</option>`; });
-  // keep previously-saved deal visible even if list not loaded
-  if (cur && !(_qbDealsCache || []).some(d => d.id === cur)) {
+  list.forEach(d => { html += `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)} — AED ${fmtNum(d.amount||0)}</option>`; });
+  // keep previously-saved deal visible even if list not loaded / filtered out
+  if (cur && !list.some(d => d.id === cur)) {
     html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.dealName || cur)}</option>`;
   }
   sel.innerHTML = html; sel.value = cur || '';
@@ -11459,9 +11488,12 @@ async function qbFetchContacts() {
 function qbRebuildContactSelect() {
   const sel = document.getElementById('qbContactSelect');
   const cur = _currentQuote ? _currentQuote.buyer.contactId : '';
+  const q = ((document.getElementById('qbContactFilter') || {}).value || '').trim().toLowerCase();
+  let list = (_qbContactsCache || []);
+  if (q) list = list.filter(c => (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q));
   let html = '<option value="">— Select a contact —</option>';
-  (_qbContactsCache || []).forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}${c.email ? ' · ' + escapeHtml(c.email) : ''}</option>`; });
-  if (cur && !(_qbContactsCache || []).some(c => c.id === cur)) {
+  list.forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}${c.email ? ' · ' + escapeHtml(c.email) : ''}</option>`; });
+  if (cur && !list.some(c => c.id === cur)) {
     html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.buyer.name || cur)}</option>`;
   }
   sel.innerHTML = html; sel.value = cur || '';
@@ -11489,9 +11521,12 @@ async function qbFetchCompanies() {
 function qbRebuildCompanySelect() {
   const sel = document.getElementById('qbCompanySelect');
   const cur = _currentQuote ? _currentQuote.company.id : '';
+  const q = ((document.getElementById('qbCompanyFilter') || {}).value || '').trim().toLowerCase();
+  let list = (_qbCompaniesCache || []);
+  if (q) list = list.filter(c => (c.name || '').toLowerCase().includes(q));
   let html = '<option value="">— None —</option>';
-  (_qbCompaniesCache || []).forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`; });
-  if (cur && !(_qbCompaniesCache || []).some(c => c.id === cur)) {
+  list.forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`; });
+  if (cur && !list.some(c => c.id === cur)) {
     html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.company.name || cur)}</option>`;
   }
   sel.innerHTML = html; sel.value = cur || '';
@@ -11705,6 +11740,7 @@ function qbCollect() {
   const q = _currentQuote;
   q.name = document.getElementById('qbName').value.trim();
   q.expiresAt = document.getElementById('qbExpires').value;
+  q.shipDate = document.getElementById('qbShipDate').value;
   q.buyer.name = document.getElementById('qbBuyerName').value.trim();
   q.buyer.email = document.getElementById('qbBuyerEmail').value.trim();
   q.buyer.phone = document.getElementById('qbBuyerPhone').value.trim();
@@ -11735,7 +11771,7 @@ function saveQuote() {
   if (!_currentQuote.status) _currentQuote.status = 'Draft';
   _persistCurrentQuote();
   showToast('Quote saved', 'success');
-  updateQuoteButtons();
+  closeQuoteBuilder();   // v21.4 — return to the quote list after saving
 }
 function _persistCurrentQuote() {
   const idx = quoteEntries.findIndex(x => x.id === _currentQuote.id);
@@ -11850,7 +11886,8 @@ function buildQuotePreviewHTML(q) {
     (q.buyer.address ? `<div class="qp-muted">${escapeHtml(q.buyer.address)}</div>` : '') +
     `<div class="qp-muted" style="margin-top:12px;">Reference: ${escapeHtml(q.reference)}</div>` +
     `<div class="qp-muted">Quote created: ${quoteFmtDate(q.createdAt)}</div>` +
-    `<div class="qp-muted">Quote expires: ${quoteFmtDate(q.expiresAt)}</div>`;
+    `<div class="qp-muted">Quote expires: ${quoteFmtDate(q.expiresAt)}</div>` +
+    (q.shipDate ? `<div class="qp-muted">Ship date: ${escapeHtml(q.shipDate)}</div>` : '');
   const sellerBlock =
     `<h5>${escapeHtml(QUOTE_SELLER.name)}</h5>` +
     QUOTE_SELLER.addrLines.map(l => `<div class="qp-muted">${escapeHtml(l)}</div>`).join('') +
