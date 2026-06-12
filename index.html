@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.5</title>
+<title>CoreV | OxeFit Sales Tracker v20.6</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -795,6 +794,7 @@
 
   .deal-picker-menu {
     position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30;
+    min-width: 320px;
     background: var(--card); border: 1px solid #cbd5e1; border-radius: 6px;
     box-shadow: 0 8px 24px rgba(15,23,42,.14);
     max-height: 280px; overflow-y: auto;
@@ -858,15 +858,23 @@
     position: sticky; top: 36px; z-index: 2;
     padding: 6px 8px; background: var(--card);
     border-bottom: 1px solid #e2e8f0;
+    display: flex; gap: 6px; align-items: center;
   }
   .deal-picker-menu .dp-search {
-    width: 100%; box-sizing: border-box;
+    flex: 1; min-width: 0; box-sizing: border-box;
     padding: 6px 10px 6px 28px;
     border: 1px solid #cbd5e1; border-radius: 5px;
     font: 400 12px 'Inter', system-ui, sans-serif; color: var(--text);
     background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 8px center;
     outline: none; transition: border-color .12s ease, background-color .12s ease;
   }
+  .deal-picker-menu .dp-sort {
+    flex: 0 0 auto; box-sizing: border-box;
+    padding: 6px 6px; border: 1px solid #cbd5e1; border-radius: 5px;
+    font: 600 11px 'Inter', system-ui, sans-serif; color: var(--text);
+    background: #f8fafc; cursor: pointer; outline: none; max-width: 130px;
+  }
+  .deal-picker-menu .dp-sort:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
   .deal-picker-menu .dp-search:focus {
     border-color: var(--accent2); background-color: var(--card);
     box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
@@ -3420,7 +3428,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.5 · Full HubSpot pipeline (all deals, paginated) · Access Control visible to admins · Rep-scoped visibility
+      v20.6 · Sort deal picker by value/name/stage · Full HubSpot pipeline · Access Control
     </div>
   </div>
 </div>
@@ -3493,7 +3501,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.5</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.6</strong></p>
     </div>
   </div>
 </div>
@@ -3559,7 +3567,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.5</div>
+      <div class="sidebar-version">v20.6</div>
     </div>
   </aside>
 
@@ -7589,6 +7597,20 @@ function makeDealPickerCell(ri, slot, row, editable) {
       return;
     }
 
+    // v20.6 — sort the deal list to make selection easier. Default is highest
+    // deal value first; the rep can switch order from the dropdown in the header.
+    const DP_SORTS = {
+      amount_desc: { label: 'Value: high → low', fn: (a,b) => (Number(b.amount)||0) - (Number(a.amount)||0) },
+      amount_asc:  { label: 'Value: low → high', fn: (a,b) => (Number(a.amount)||0) - (Number(b.amount)||0) },
+      name_asc:    { label: 'Name: A → Z',       fn: (a,b) => (a.name||'').localeCompare(b.name||'') },
+      stage_desc:  { label: 'Stage: latest first', fn: (a,b) => {
+                       const rank = { Negotiation:3, Proposal:2, Discovery:1, Qualified:0 };
+                       return (rank[b.stage]||0) - (rank[a.stage]||0) || (Number(b.amount)||0)-(Number(a.amount)||0);
+                     } }
+    };
+    const sortKey = (menu._dpSort && DP_SORTS[menu._dpSort]) ? menu._dpSort : 'amount_desc';
+    deals.sort(DP_SORTS[sortKey].fn);
+
     // ── v18.1 MULTI-SELECT ────────────────────────────────────
     // Pull current selections from the row (array form). Migrate legacy
     // single-id rows on the fly so older saved data still works.
@@ -7625,7 +7647,7 @@ function makeDealPickerCell(ri, slot, row, editable) {
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.className = 'dp-search';
-    searchInput.placeholder = 'Search deals…';
+    searchInput.placeholder = 'Search…';
     searchInput.value = menu._dpQuery || '';
     searchInput.addEventListener('input', (ev) => {
       ev.stopPropagation();
@@ -7634,6 +7656,23 @@ function makeDealPickerCell(ri, slot, row, editable) {
     });
     searchInput.addEventListener('click', (ev) => ev.stopPropagation());
     searchWrap.appendChild(searchInput);
+    // v20.6 — sort dropdown (default: highest deal value first)
+    const sortSel = document.createElement('select');
+    sortSel.className = 'dp-sort';
+    Object.entries(DP_SORTS).forEach(([key, def]) => {
+      const opt = document.createElement('option');
+      opt.value = key; opt.textContent = def.label;
+      if (key === sortKey) opt.selected = true;
+      sortSel.appendChild(opt);
+    });
+    sortSel.title = 'Sort deals';
+    sortSel.addEventListener('click', (ev) => ev.stopPropagation());
+    sortSel.addEventListener('change', (ev) => {
+      ev.stopPropagation();
+      menu._dpSort = ev.target.value;
+      renderMenu(state);   // re-sort & redraw (selection state is re-read from the row)
+    });
+    searchWrap.appendChild(sortSel);
     menu.appendChild(searchWrap);
 
     // applyFilter scans rendered .dp-item rows and hides ones that
