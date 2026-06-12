@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.5</title>
+<title>CoreV | OxeFit Sales Tracker v21.6</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3498,6 +3498,18 @@
   .qb-field input:focus, .qb-field select:focus, .qb-textarea:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
   .qb-field-btn { justify-content: flex-end; }
   .qb-mini-search { margin-bottom: 6px; font-size: 12px !important; }
+  /* v21.6 — searchable combobox (search within the listing) */
+  .qb-combo-wrap { position: relative; }
+  .qb-combo-input { width: 100%; box-sizing: border-box; padding: 8px 28px 8px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-card); color: var(--text); font: 400 13px 'Inter', system-ui, sans-serif; outline: none; }
+  .qb-combo-input:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .qb-combo-caret { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 11px; pointer-events: none; }
+  .qb-combo-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50; display: none; background: var(--card); border: 1px solid var(--border); border-radius: 10px; max-height: 260px; overflow-y: auto; box-shadow: 0 10px 28px rgba(15,23,42,0.16); }
+  .qb-combo-list.open { display: block; }
+  .qb-combo-opt { padding: 9px 12px; cursor: pointer; font-size: 12.5px; color: var(--text); border-bottom: 1px solid var(--border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qb-combo-opt:last-child { border-bottom: none; }
+  .qb-combo-opt:hover { background: var(--row-hover); }
+  .qb-combo-none { color: var(--text-muted); font-style: italic; }
+  .qb-combo-empty { padding: 11px 13px; color: var(--text-muted); font-size: 12.5px; }
   .qb-fetch-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--teal2); cursor: pointer; white-space: nowrap; }
   .qb-fetch-btn:hover { border-color: var(--teal); }
   .qb-inline-note { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.5; }
@@ -3600,17 +3612,22 @@
   .qp-sign-img { max-height: 90px; max-width: 280px; display: block; margin-top: 6px; }
   .qp-sign-name { font-family: 'Georgia', serif; font-size: 22px; color: #1e293b; border-bottom: 1px solid #94a3b8; display: inline-block; padding: 4px 20px 2px; margin-top: 6px; }
   .qp-bank-grid { font-size: 12.5px; line-height: 1.8; }
-  @page { margin: 0; }
+  @page { size: A4; margin: 0; }
   @media print {
+    html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
     body * { visibility: hidden !important; }
     #quotePreviewOverlay, #quotePreviewOverlay * { visibility: visible !important; }
-    #quotePreviewOverlay { position: absolute; inset: 0; background: #fff; padding: 0; }
-    .qp-modal { box-shadow: none; max-width: none; border-radius: 0; }
+    #quotePreviewOverlay { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: auto !important; height: auto !important; overflow: visible !important; background: #fff; padding: 0; }
+    .qp-overlay { overflow: visible !important; }
+    .qp-modal { position: static !important; box-shadow: none; max-width: none !important; width: 100% !important; border-radius: 0; overflow: visible !important; margin: 0; }
     .qp-modal-bar { display: none !important; }
-    .qp-scroll { max-height: none; overflow: visible; background: #fff; padding: 0; }
-    .qp-doc { max-width: none; padding: 14mm 14mm; }
+    .qp-scroll { max-height: none !important; height: auto !important; overflow: visible !important; background: #fff; padding: 0; }
+    .qp-doc { max-width: none; width: 100%; padding: 14mm; box-sizing: border-box; }
     /* v21.5 — keep Purchase Terms out of the downloaded/printed PDF */
     .qp-terms-block { display: none !important; }
+    /* avoid awkward splits */
+    table.qp-table tr, .qp-srow, .qp-cols { break-inside: avoid; }
+    .qp-section-h { break-after: avoid; }
   }
   @media (max-width: 900px) {
     .prod-form-row { grid-template-columns: 1fr 1fr; }
@@ -3650,7 +3667,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.5 · Clean PDF (no browser header/footer, terms hidden in print)
+      v21.6 · Search-in-dropdown deal/contact/company · multi-page PDF
     </div>
   </div>
 </div>
@@ -3723,7 +3740,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.5</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.6</strong></p>
     </div>
   </div>
 </div>
@@ -3792,7 +3809,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.5</div>
+      <div class="sidebar-version">v21.6</div>
     </div>
   </aside>
 
@@ -4760,8 +4777,12 @@
               <div class="qb-row2">
                 <div class="qb-field">
                   <label>Deal</label>
-                  <input type="text" id="qbDealFilter" class="qb-mini-search" placeholder="🔍 Filter your deals by name…" oninput="qbRebuildDealSelect()">
-                  <select id="qbDealSelect" onchange="onQuoteDealSelect()"><option value="">— Select a deal —</option></select>
+                  <div class="qb-combo-wrap">
+                    <input type="text" id="qbDealInput" class="qb-combo-input" autocomplete="off" placeholder="Select or search your open deals…"
+                           oninput="qbComboFilter('deal')" onfocus="qbComboFilter('deal')" onblur="qbComboHide('deal')">
+                    <span class="qb-combo-caret">▾</span>
+                    <div class="qb-combo-list" id="qbDealList"></div>
+                  </div>
                 </div>
                 <div class="qb-field qb-field-btn">
                   <label>&nbsp;</label>
@@ -4779,8 +4800,12 @@
               <div class="qb-row2">
                 <div class="qb-field">
                   <label>Contact</label>
-                  <input type="text" id="qbContactFilter" class="qb-mini-search" placeholder="🔍 Filter your contacts by name…" oninput="qbRebuildContactSelect()">
-                  <select id="qbContactSelect" onchange="onQuoteContactSelect()"><option value="">— Select a contact —</option></select>
+                  <div class="qb-combo-wrap">
+                    <input type="text" id="qbContactInput" class="qb-combo-input" autocomplete="off" placeholder="Select or search your contacts…"
+                           oninput="qbComboFilter('contact')" onfocus="qbComboFilter('contact')" onblur="qbComboHide('contact')">
+                    <span class="qb-combo-caret">▾</span>
+                    <div class="qb-combo-list" id="qbContactList"></div>
+                  </div>
                 </div>
                 <div class="qb-field qb-field-btn">
                   <label>&nbsp;</label>
@@ -4799,8 +4824,12 @@
               <div class="qb-row2">
                 <div class="qb-field">
                   <label>Company <span class="qb-hint-inline">(optional)</span></label>
-                  <input type="text" id="qbCompanyFilter" class="qb-mini-search" placeholder="🔍 Filter your companies by name…" oninput="qbRebuildCompanySelect()">
-                  <select id="qbCompanySelect" onchange="onQuoteCompanySelect()"><option value="">— None —</option></select>
+                  <div class="qb-combo-wrap">
+                    <input type="text" id="qbCompanyInput" class="qb-combo-input" autocomplete="off" placeholder="Select or search your companies…"
+                           oninput="qbComboFilter('company')" onfocus="qbComboFilter('company')" onblur="qbComboHide('company')">
+                    <span class="qb-combo-caret">▾</span>
+                    <div class="qb-combo-list" id="qbCompanyList"></div>
+                  </div>
                 </div>
                 <div class="qb-field qb-field-btn">
                   <label>&nbsp;</label>
@@ -11338,8 +11367,8 @@ function openQuoteBuilderUI() {
   document.getElementById('qbName').value = q.name || '';
   document.getElementById('qbExpires').value = q.expiresAt || '';
   document.getElementById('qbShipDate').value = q.shipDate || '';
-  // reset filter inputs
-  ['qbDealFilter','qbContactFilter','qbCompanyFilter'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  // combobox display values reflect current selection
+  qbComboSetValue('deal'); qbComboSetValue('contact'); qbComboSetValue('company');
   document.getElementById('qbBuyerName').value = q.buyer.name || '';
   document.getElementById('qbBuyerEmail').value = q.buyer.email || '';
   document.getElementById('qbBuyerPhone').value = q.buyer.phone || '';
@@ -11369,7 +11398,6 @@ function openQuoteBuilderUI() {
   toggleQbPayBank(); toggleQbPayLink();
   // dropdowns rebuilt from caches/products
   qbPopulateProductPicker();
-  qbRebuildDealSelect(); qbRebuildContactSelect(); qbRebuildCompanySelect();
   renderQbItems(); renderQbSchedule(); renderQbTerms();
   recalcQuoteTotals();
   updateQuoteButtons();
@@ -11438,106 +11466,124 @@ function qbRenderReview() {
     row('Payment schedule', escapeHtml(schedTxt));
 }
 
-/* ── Deal / contact / company selectors ───────────────────────────── */
+/* ── Deal / contact / company comboboxes (v21.6 — search within list) ── */
+const QB_COMBO = {
+  deal: {
+    inputId: 'qbDealInput', listId: 'qbDealList',
+    cache: () => _qbDealsCache,
+    emptyMsg: 'Click “Load my deals” to fetch your open deals.',
+    noneLabel: '— No deal —',
+    label: d => `${d.name} — AED ${fmtNum(d.amount || 0)}`,
+    match: (d, q) => (d.name || '').toLowerCase().includes(q),
+    selLabel: () => (_currentQuote && _currentQuote.dealName) || '',
+    onPick: d => {
+      _currentQuote.dealId = d ? d.id : '';
+      _currentQuote.dealName = d ? d.name : '';
+      if (d && !document.getElementById('qbName').value) document.getElementById('qbName').value = d.name;
+      document.getElementById('qbDealNote').textContent = d ? `Deal name pulled from HubSpot: “${d.name}”.` : '';
+    }
+  },
+  contact: {
+    inputId: 'qbContactInput', listId: 'qbContactList',
+    cache: () => _qbContactsCache,
+    emptyMsg: 'Click “Load my contacts” to fetch your HubSpot contacts.',
+    noneLabel: '— Clear contact —',
+    label: c => `${c.name}${c.email ? ' · ' + c.email : ''}`,
+    match: (c, q) => (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q),
+    selLabel: () => (_currentQuote && _currentQuote.buyer && _currentQuote.buyer.contactId) ? _currentQuote.buyer.name : '',
+    onPick: c => {
+      if (!c) { _currentQuote.buyer = { contactId: '', name: '', email: '', phone: '', address: '' }; }
+      else { _currentQuote.buyer = { contactId: c.id, name: c.name, email: c.email, phone: c.phone, address: c.address }; }
+      document.getElementById('qbBuyerName').value = c ? (c.name || '') : '';
+      document.getElementById('qbBuyerEmail').value = c ? (c.email || '') : '';
+      document.getElementById('qbBuyerPhone').value = c ? (c.phone || '') : '';
+      document.getElementById('qbBuyerAddress').value = c ? (c.address || '') : '';
+    }
+  },
+  company: {
+    inputId: 'qbCompanyInput', listId: 'qbCompanyList',
+    cache: () => _qbCompaniesCache,
+    emptyMsg: 'Click “Load my companies” to fetch your HubSpot companies.',
+    noneLabel: '— No company —',
+    label: c => c.name,
+    match: (c, q) => (c.name || '').toLowerCase().includes(q),
+    selLabel: () => (_currentQuote && _currentQuote.company) ? _currentQuote.company.name : '',
+    onPick: c => { _currentQuote.company = c ? { id: c.id, name: c.name } : { id: '', name: '' }; }
+  }
+};
+function qbComboFilter(kind) {
+  const cfg = QB_COMBO[kind];
+  const input = document.getElementById(cfg.inputId);
+  const listEl = document.getElementById(cfg.listId);
+  if (!input || !listEl) return;
+  const cache = cfg.cache() || [];
+  const q = (input.value || '').trim().toLowerCase();
+  let list = q ? cache.filter(x => cfg.match(x, q)) : cache.slice();
+  let html = `<div class="qb-combo-opt qb-combo-none" onmousedown="event.preventDefault()" onclick="qbComboPick('${kind}','')">${cfg.noneLabel}</div>`;
+  if (!cache.length) {
+    html += `<div class="qb-combo-empty">${cfg.emptyMsg}</div>`;
+  } else if (!list.length) {
+    html += `<div class="qb-combo-empty">No matches for “${escapeHtml(input.value)}”.</div>`;
+  } else {
+    html += list.slice(0, 50).map(x =>
+      `<div class="qb-combo-opt" onmousedown="event.preventDefault()" onclick="qbComboPick('${kind}','${escapeHtml(x.id)}')">${escapeHtml(cfg.label(x))}</div>`
+    ).join('');
+  }
+  listEl.innerHTML = html;
+  listEl.classList.add('open');
+}
+function qbComboPick(kind, id) {
+  const cfg = QB_COMBO[kind];
+  const cache = cfg.cache() || [];
+  const x = id ? cache.find(o => o.id === id) : null;
+  cfg.onPick(x);
+  const input = document.getElementById(cfg.inputId);
+  if (input) input.value = x ? cfg.label(x) : '';
+  const listEl = document.getElementById(cfg.listId);
+  if (listEl) { listEl.classList.remove('open'); listEl.innerHTML = ''; }
+}
+function qbComboHide(kind) {
+  setTimeout(() => { const el = document.getElementById(QB_COMBO[kind].listId); if (el) el.classList.remove('open'); }, 160);
+}
+function qbComboSetValue(kind) {
+  const cfg = QB_COMBO[kind];
+  const input = document.getElementById(cfg.inputId);
+  if (input) input.value = cfg.selLabel() || '';
+}
+
 async function qbFetchDeals() {
   const btn = document.getElementById('qbFetchDealsBtn');
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
     const all = await hubspotFetchDealsForRep(currentUser);
-    // only OPEN deals — exclude closed won and closed lost
-    _qbDealsCache = (all || []).filter(d => !d.isClosed);
-    qbRebuildDealSelect();
+    _qbDealsCache = (all || []).filter(d => !d.isClosed);   // open deals only
     const closed = (all || []).length - _qbDealsCache.length;
     document.getElementById('qbDealNote').textContent =
-      `${_qbDealsCache.length} open deal(s) loaded` + (closed > 0 ? ` · ${closed} closed deal(s) hidden` : '') + '.';
+      `${_qbDealsCache.length} open deal(s) loaded` + (closed > 0 ? ` · ${closed} closed deal(s) hidden` : '') + '. Click the field to pick one.';
+    const inp = document.getElementById('qbDealInput'); if (inp) { inp.focus(); qbComboFilter('deal'); }
   } catch (e) {
     document.getElementById('qbDealNote').textContent = 'Could not load deals: ' + (e.message || e);
   } finally { btn.textContent = '⟳ Load my deals'; btn.disabled = false; }
-}
-function qbRebuildDealSelect() {
-  const sel = document.getElementById('qbDealSelect');
-  const cur = _currentQuote ? _currentQuote.dealId : '';
-  const q = ((document.getElementById('qbDealFilter') || {}).value || '').trim().toLowerCase();
-  let list = (_qbDealsCache || []);
-  if (q) list = list.filter(d => (d.name || '').toLowerCase().includes(q));
-  let html = '<option value="">— Select a deal —</option>';
-  list.forEach(d => { html += `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)} — AED ${fmtNum(d.amount||0)}</option>`; });
-  // keep previously-saved deal visible even if list not loaded / filtered out
-  if (cur && !list.some(d => d.id === cur)) {
-    html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.dealName || cur)}</option>`;
-  }
-  sel.innerHTML = html; sel.value = cur || '';
-}
-function onQuoteDealSelect() {
-  const sel = document.getElementById('qbDealSelect');
-  const d = (_qbDealsCache || []).find(x => x.id === sel.value);
-  _currentQuote.dealId = sel.value;
-  _currentQuote.dealName = d ? d.name : (sel.value ? _currentQuote.dealName : '');
-  if (d && !document.getElementById('qbName').value) {
-    document.getElementById('qbName').value = d.name; // seed quote name from deal name
-  }
-  document.getElementById('qbDealNote').textContent = d ? `Deal name pulled from HubSpot: “${d.name}”.` : '';
 }
 async function qbFetchContacts() {
   const btn = document.getElementById('qbFetchContactsBtn');
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
     _qbContactsCache = await hubspotFetchContactsForRep(currentUser);
-    qbRebuildContactSelect();
     showToast(`${_qbContactsCache.length} contact(s) loaded`, 'success');
+    const inp = document.getElementById('qbContactInput'); if (inp) { inp.focus(); qbComboFilter('contact'); }
   } catch (e) { showToast('Contacts: ' + (e.message || e), 'error'); }
   finally { btn.textContent = '⟳ Load my contacts'; btn.disabled = false; }
-}
-function qbRebuildContactSelect() {
-  const sel = document.getElementById('qbContactSelect');
-  const cur = _currentQuote ? _currentQuote.buyer.contactId : '';
-  const q = ((document.getElementById('qbContactFilter') || {}).value || '').trim().toLowerCase();
-  let list = (_qbContactsCache || []);
-  if (q) list = list.filter(c => (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q));
-  let html = '<option value="">— Select a contact —</option>';
-  list.forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}${c.email ? ' · ' + escapeHtml(c.email) : ''}</option>`; });
-  if (cur && !list.some(c => c.id === cur)) {
-    html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.buyer.name || cur)}</option>`;
-  }
-  sel.innerHTML = html; sel.value = cur || '';
-}
-function onQuoteContactSelect() {
-  const sel = document.getElementById('qbContactSelect');
-  const c = (_qbContactsCache || []).find(x => x.id === sel.value);
-  if (!c) { _currentQuote.buyer.contactId = ''; return; }
-  _currentQuote.buyer = { contactId: c.id, name: c.name, email: c.email, phone: c.phone, address: c.address };
-  document.getElementById('qbBuyerName').value = c.name || '';
-  document.getElementById('qbBuyerEmail').value = c.email || '';
-  document.getElementById('qbBuyerPhone').value = c.phone || '';
-  document.getElementById('qbBuyerAddress').value = c.address || '';
 }
 async function qbFetchCompanies() {
   const btn = document.getElementById('qbFetchCompaniesBtn');
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
     _qbCompaniesCache = await hubspotFetchCompaniesForRep(currentUser);
-    qbRebuildCompanySelect();
     showToast(`${_qbCompaniesCache.length} compan(ies) loaded`, 'success');
+    const inp = document.getElementById('qbCompanyInput'); if (inp) { inp.focus(); qbComboFilter('company'); }
   } catch (e) { showToast('Companies: ' + (e.message || e), 'error'); }
   finally { btn.textContent = '⟳ Load my companies'; btn.disabled = false; }
-}
-function qbRebuildCompanySelect() {
-  const sel = document.getElementById('qbCompanySelect');
-  const cur = _currentQuote ? _currentQuote.company.id : '';
-  const q = ((document.getElementById('qbCompanyFilter') || {}).value || '').trim().toLowerCase();
-  let list = (_qbCompaniesCache || []);
-  if (q) list = list.filter(c => (c.name || '').toLowerCase().includes(q));
-  let html = '<option value="">— None —</option>';
-  list.forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`; });
-  if (cur && !list.some(c => c.id === cur)) {
-    html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.company.name || cur)}</option>`;
-  }
-  sel.innerHTML = html; sel.value = cur || '';
-}
-function onQuoteCompanySelect() {
-  const sel = document.getElementById('qbCompanySelect');
-  const c = (_qbCompaniesCache || []).find(x => x.id === sel.value);
-  _currentQuote.company = c ? { id: c.id, name: c.name } : { id: '', name: '' };
 }
 
 /* ── Line items ───────────────────────────────────────────────────── */
