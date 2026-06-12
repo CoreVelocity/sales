@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.6</title>
+<title>CoreV | OxeFit Sales Tracker v21.8</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3510,6 +3510,7 @@
   .qb-combo-opt:hover { background: var(--row-hover); }
   .qb-combo-none { color: var(--text-muted); font-style: italic; }
   .qb-combo-empty { padding: 11px 13px; color: var(--text-muted); font-size: 12.5px; }
+  .qb-invalid { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.16) !important; }
   .qb-fetch-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--teal2); cursor: pointer; white-space: nowrap; }
   .qb-fetch-btn:hover { border-color: var(--teal); }
   .qb-inline-note { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.5; }
@@ -3601,6 +3602,7 @@
   table.qp-table th { background: #dbeafe; color: #1e3a8a; text-align: left; font-size: 10px; font-weight: 800; padding: 8px 10px; letter-spacing: 0.3px; }
   table.qp-table th.qp-r, table.qp-table td.qp-r { text-align: right; }
   table.qp-table td { border-bottom: 1px solid #e2e8f0; padding: 9px 10px; font-size: 12px; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  table.qp-table tbody tr, table.qp-table tbody tr:nth-child(even), table.qp-table tbody tr:hover { background: #fff !important; }
   .qp-doc .qp-logo-img { height: 56px; width: auto; display: block; margin-bottom: 22px; }
   .qp-item-sku { font-size: 10px; font-weight: 800; color: #2563eb; letter-spacing: 0.4px; margin-bottom: 2px; }
   .qp-summary { max-width: 320px; margin-left: auto; }
@@ -3612,6 +3614,7 @@
   .qp-sign-img { max-height: 90px; max-width: 280px; display: block; margin-top: 6px; }
   .qp-sign-name { font-family: 'Georgia', serif; font-size: 22px; color: #1e293b; border-bottom: 1px solid #94a3b8; display: inline-block; padding: 4px 20px 2px; margin-top: 6px; }
   .qp-bank-grid { font-size: 12.5px; line-height: 1.8; }
+  .qp-accept { margin-top: 28px; padding-top: 14px; border-top: 1px solid #cbd5e1; font-size: 11.5px; line-height: 1.6; color: #334155; font-style: italic; }
   @page { size: A4; margin: 0; }
   @media print {
     html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
@@ -3623,8 +3626,6 @@
     .qp-modal-bar { display: none !important; }
     .qp-scroll { max-height: none !important; height: auto !important; overflow: visible !important; background: #fff; padding: 0; }
     .qp-doc { max-width: none; width: 100%; padding: 14mm; box-sizing: border-box; }
-    /* v21.5 — keep Purchase Terms out of the downloaded/printed PDF */
-    .qp-terms-block { display: none !important; }
     /* avoid awkward splits */
     table.qp-table tr, .qp-srow, .qp-cols { break-inside: avoid; }
     .qp-section-h { break-after: avoid; }
@@ -3667,7 +3668,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.6 · Search-in-dropdown deal/contact/company · multi-page PDF
+      v21.8 · Fixed acceptance clause at the bottom of every quote
     </div>
   </div>
 </div>
@@ -3740,7 +3741,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.6</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.8</strong></p>
     </div>
   </div>
 </div>
@@ -3809,7 +3810,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.6</div>
+      <div class="sidebar-version">v21.8</div>
     </div>
   </aside>
 
@@ -11415,7 +11416,7 @@ function qbRenderStepper() {
   const host = document.getElementById('qbStepper');
   if (!host) return;
   host.innerHTML = QB_STEPS.map((s, i) =>
-    `<div class="qb-step-pill" id="qbPill${i}" onclick="qbGoStep(${i})"><span class="qb-pill-num">${i + 1}</span><span class="qb-pill-label">${s.label}</span></div>`
+    `<div class="qb-step-pill" id="qbPill${i}" onclick="qbPillClick(${i})"><span class="qb-pill-num">${i + 1}</span><span class="qb-pill-label">${s.label}</span></div>`
   ).join('');
 }
 function qbGoStep(i) {
@@ -11441,8 +11442,73 @@ function qbGoStep(i) {
   const sc = document.querySelector('#view-quotes .content') || window;
   try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
 }
-function qbNextStep() { qbCollect(); qbGoStep(_qbStep + 1); }
+function qbNextStep() {
+  qbCollect();
+  if (!qbCheckStep(_qbStep)) return;   // block if current step incomplete
+  qbGoStep(_qbStep + 1);
+}
 function qbPrevStep() { qbCollect(); qbGoStep(_qbStep - 1); }
+function qbPillClick(i) {
+  qbCollect();
+  if (i > _qbStep) {
+    const bad = qbFirstIncomplete(i);   // validate every step before the target
+    if (bad >= 0) { qbGoStep(bad); qbCheckStep(bad); return; }
+  }
+  qbGoStep(i);
+}
+
+/* ── Mandatory-field validation (v21.7) ───────────────────────────── */
+function qbStepRequirements(step) {
+  const q = _currentQuote;
+  if (step === 0) return [
+    [!q.name, 'Quote Name', 'qbName'],
+    [!q.expiresAt, 'Expiration Date', 'qbExpires'],
+    [!q.shipDate, 'Ship Date', 'qbShipDate'],
+    [!q.dealId, 'Associated Deal', 'qbDealInput']
+  ];
+  if (step === 1) return [
+    [!q.buyer.name, 'Client Name', 'qbBuyerName'],
+    [!q.buyer.email, 'Email', 'qbBuyerEmail'],
+    [!q.buyer.phone, 'Phone', 'qbBuyerPhone']
+  ];
+  if (step === 2) return [
+    [!q.sender.name, 'Sender Full Name', 'qbSenderName'],
+    [!q.sender.email, 'Sender Email', 'qbSenderEmail'],
+    [!q.sender.phone, 'Sender Phone', 'qbSenderPhone'],
+    [!q.sender.title, 'Sender Title', 'qbSenderTitle']
+  ];
+  if (step === 3) return [
+    [!(q.lineItems && q.lineItems.length), 'At least one product', 'qbProductSearch']
+  ];
+  if (step === 4) {
+    const sum = (q.schedule || []).reduce((s, x) => s + (parseFloat(x.pct) || 0), 0);
+    const reqs = [[sum !== 100, 'Payment schedule must total 100%', 'qbSchedTotal']];
+    if (q.payBank) reqs.push([!q.bank.iban, 'Bank IBAN', 'qbBankIban']);
+    if (q.payLink) reqs.push([!q.paymentLink, 'Payment Link URL', 'qbPayLink']);
+    return reqs;
+  }
+  return []; // Terms (5) and Review (6) have no hard requirements
+}
+function qbCheckStep(step) {
+  qbCollect();
+  // clear previous markers
+  document.querySelectorAll('#quoteBuilder .qb-invalid').forEach(el => el.classList.remove('qb-invalid'));
+  const missing = qbStepRequirements(step).filter(r => r[0]);
+  if (!missing.length) return true;
+  missing.forEach(([, , id]) => { const el = document.getElementById(id); if (el && el.tagName !== 'DIV') el.classList.add('qb-invalid'); });
+  const first = missing[0];
+  const el = document.getElementById(first[2]);
+  if (el && typeof el.focus === 'function') { try { el.focus(); } catch (_) {} }
+  showToast('Please complete: ' + missing.map(m => m[1]).join(', '), 'error');
+  return false;
+}
+// first incomplete step at or before `target-1`; returns that index or -1 if all OK
+function qbFirstIncomplete(target) {
+  for (let s = 0; s < target; s++) {
+    if (qbStepRequirements(s).some(r => r[0])) return s;
+  }
+  return -1;
+}
 function qbRenderReview() {
   qbCollect();
   const q = _currentQuote;
@@ -11840,8 +11906,9 @@ function canApproveQuotes() { return currentRole === 'admin'; }   // managers/ad
 
 function submitQuoteForApproval() {
   qbCollect();
-  if (!_currentQuote.name) { showToast('Add a quote name first', 'error'); return; }
-  if (!_currentQuote.lineItems.length) { showToast('Add at least one product first', 'error'); return; }
+  // all steps must be complete before submission
+  const bad = qbFirstIncomplete(QB_STEPS.length);
+  if (bad >= 0) { qbGoStep(bad); qbCheckStep(bad); return; }
   _currentQuote.status = 'Pending Approval';
   _currentQuote.submittedBy = currentUser;
   _currentQuote.submittedAt = new Date().toISOString();
@@ -11986,6 +12053,7 @@ function buildQuotePreviewHTML(q) {
     ${termsRows ? `<div class="qp-terms-block"><div class="qp-section-h">Purchase Terms</div>${termsRows}</div>` : ''}
     ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
     ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
+    <div class="qp-accept">By issuing a PO, signing this quote or paying an invoice related to this quote, you are accepting the purchase terms &amp; conditions on behalf of your organization.</div>
   `;
 }
 function previewQuote() {
