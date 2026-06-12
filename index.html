@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.4</title>
+<title>CoreV | OxeFit Sales Tracker v21.5</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3600,6 +3600,7 @@
   .qp-sign-img { max-height: 90px; max-width: 280px; display: block; margin-top: 6px; }
   .qp-sign-name { font-family: 'Georgia', serif; font-size: 22px; color: #1e293b; border-bottom: 1px solid #94a3b8; display: inline-block; padding: 4px 20px 2px; margin-top: 6px; }
   .qp-bank-grid { font-size: 12.5px; line-height: 1.8; }
+  @page { margin: 0; }
   @media print {
     body * { visibility: hidden !important; }
     #quotePreviewOverlay, #quotePreviewOverlay * { visibility: visible !important; }
@@ -3607,7 +3608,9 @@
     .qp-modal { box-shadow: none; max-width: none; border-radius: 0; }
     .qp-modal-bar { display: none !important; }
     .qp-scroll { max-height: none; overflow: visible; background: #fff; padding: 0; }
-    .qp-doc { max-width: none; padding: 24px 32px; }
+    .qp-doc { max-width: none; padding: 14mm 14mm; }
+    /* v21.5 — keep Purchase Terms out of the downloaded/printed PDF */
+    .qp-terms-block { display: none !important; }
   }
   @media (max-width: 900px) {
     .prod-form-row { grid-template-columns: 1fr 1fr; }
@@ -3647,7 +3650,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.4 · Open-deals-only + deal/contact filters · Ship date · Save returns to list
+      v21.5 · Clean PDF (no browser header/footer, terms hidden in print)
     </div>
   </div>
 </div>
@@ -3720,7 +3723,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.4</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.5</strong></p>
     </div>
   </div>
 </div>
@@ -3789,7 +3792,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.4</div>
+      <div class="sidebar-version">v21.5</div>
     </div>
   </aside>
 
@@ -11934,7 +11937,7 @@ function buildQuotePreviewHTML(q) {
     </div>
     <div class="qp-section-h">Payment Schedule</div>
     <div class="qp-summary" style="margin-left:0;">${schedRows}</div>
-    ${termsRows ? `<div class="qp-section-h">Purchase Terms</div>${termsRows}` : ''}
+    ${termsRows ? `<div class="qp-terms-block"><div class="qp-section-h">Purchase Terms</div>${termsRows}</div>` : ''}
     ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
     ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
   `;
