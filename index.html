@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v20.7</title>
+<title>CoreV | OxeFit Sales Tracker v20.8</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3453,6 +3453,117 @@
   .prod-empty { padding: 28px; text-align: center; color: var(--text-muted); font-size: 13px; }
   .quotes-placeholder { padding: 10px 2px; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
   .quotes-placeholder-sub { font-size: 12.5px; margin-top: 8px; }
+
+  /* ════════ QUOTE BUILDER (v20.8) ════════ */
+  .qb-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .qb-back { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 8px 14px; font: 600 13px 'Inter', system-ui, sans-serif; color: var(--text); cursor: pointer; }
+  .qb-back:hover { border-color: var(--accent2); color: var(--accent2); }
+  .qb-toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .qb-ref { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-right: 6px; }
+  .qb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .qb-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+  .qb-card-wide { grid-column: 1 / -1; }
+  .qb-card-title { margin: 0 0 12px; font-size: 14px; font-weight: 800; color: var(--text); }
+  .qb-card-title .qb-sub { font-weight: 500; font-size: 11.5px; color: var(--text-muted); }
+  .qb-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .qb-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; min-width: 0; }
+  .qb-field label { font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-muted); }
+  .qb-hint-inline { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
+  .qb-field input, .qb-field select, .qb-textarea {
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--bg-card); color: var(--text); font: 400 13px 'Inter', system-ui, sans-serif; outline: none; width: 100%; box-sizing: border-box;
+  }
+  .qb-field input:focus, .qb-field select:focus, .qb-textarea:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .qb-field-btn { justify-content: flex-end; }
+  .qb-fetch-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--teal2); cursor: pointer; white-space: nowrap; }
+  .qb-fetch-btn:hover { border-color: var(--teal); }
+  .qb-inline-note { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.5; }
+  .qb-divider { height: 1px; background: var(--border); margin: 6px 0 12px; }
+  .qb-twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .qb-mini-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--accent2); margin-bottom: 8px; }
+  .qb-seller-box { font-size: 12.5px; line-height: 1.7; color: var(--text); background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .qb-seller-box strong { color: var(--text); }
+  .qb-additem { display: flex; gap: 8px; margin-bottom: 12px; }
+  .qb-additem select { flex: 1; padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-card); color: var(--text); font-size: 13px; }
+  .qb-table-wrap { overflow-x: auto; }
+  .qb-items { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .qb-items th { text-align: left; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); padding: 7px 8px; border-bottom: 2px solid var(--border); }
+  .qb-items th.qb-num, .qb-items td.qb-num { text-align: right; font-variant-numeric: tabular-nums; }
+  .qb-items td { padding: 7px 8px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .qb-items input { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 400 12.5px 'Inter', system-ui, sans-serif; }
+  .qb-items .qb-qty { width: 64px; text-align: right; }
+  .qb-items .qb-price { width: 110px; text-align: right; }
+  .qb-del-row { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 2px 6px; }
+  .qb-totals { margin-top: 14px; margin-left: auto; max-width: 360px; display: flex; flex-direction: column; gap: 6px; }
+  .qb-tot-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text); }
+  .qb-tot-row strong { font-variant-numeric: tabular-nums; }
+  .qb-disc-input input { width: 110px; text-align: right; padding: 5px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font-size: 12.5px; }
+  .qb-vat-input { width: 50px; padding: 2px 4px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text); font-size: 12px; text-align: right; }
+  .qb-tot-grand { border-top: 2px solid var(--border); padding-top: 8px; font-size: 16px; font-weight: 800; }
+  .qb-tot-grand strong { color: var(--accent2); }
+  .qb-sched-row { display: grid; grid-template-columns: 1fr 90px 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .qb-sched-row input { padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text); font-size: 12.5px; box-sizing: border-box; width: 100%; }
+  .qb-sched-total { font-size: 12px; font-weight: 700; margin-top: 6px; }
+  .qb-sched-total.bad { color: var(--danger); }
+  .qb-sched-total.ok { color: var(--success); }
+  .qb-check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text); margin: 6px 0; cursor: pointer; }
+  .qb-bank-box { padding: 10px 0 4px; }
+  .qb-terms td { vertical-align: top; }
+  .qb-textarea { min-height: 80px; resize: vertical; }
+  .qb-sign-tools { display: flex; gap: 8px; }
+  .qb-upload-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--text); cursor: pointer; display: inline-flex; align-items: center; }
+  .qb-sign-canvas { border: 1px dashed var(--border); border-radius: 10px; background: #fff; touch-action: none; width: 100%; max-width: 460px; margin-top: 8px; cursor: crosshair; }
+  .qb-status-sel { padding: 8px 12px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-card); color: var(--text); font: 600 13px 'Inter', system-ui, sans-serif; }
+  .quote-status-badge { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 20px; }
+  .qsb-Draft { background: rgba(100,116,139,0.18); color: var(--text-muted); }
+  .qsb-Sent { background: rgba(37,99,235,0.16); color: var(--accent2); }
+  .qsb-Accepted { background: rgba(13,148,136,0.16); color: var(--teal2); }
+  .qsb-Rejected { background: rgba(239,68,68,0.16); color: var(--danger); }
+  @media (max-width: 880px) {
+    .qb-grid, .qb-row2, .qb-twocol { grid-template-columns: 1fr; }
+  }
+
+  /* ── Quote preview / print document ── */
+  .qp-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 4000; padding: 24px; overflow: auto; }
+  .qp-overlay.open { display: block; }
+  .qp-modal { max-width: 880px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
+  .qp-modal-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: #0f172a; color: #fff; font-weight: 700; font-size: 14px; }
+  .qp-modal-bar > div { display: flex; gap: 8px; }
+  .qp-scroll { max-height: calc(100vh - 130px); overflow: auto; background: #e2e8f0; padding: 18px; }
+  .qp-doc { background: #fff; color: #1a202c; width: 100%; max-width: 794px; margin: 0 auto; padding: 48px 54px; font-family: 'Inter', Arial, sans-serif; font-size: 13px; line-height: 1.55; }
+  .qp-doc .qp-logo { font-size: 26px; font-weight: 900; letter-spacing: 1px; color: #1e293b; margin-bottom: 4px; }
+  .qp-doc .qp-logo span { color: #2563eb; }
+  .qp-doc .qp-byline { font-size: 10px; letter-spacing: 2px; color: #64748b; margin-bottom: 26px; }
+  .qp-doc .qp-title { text-align: center; font-size: 30px; font-weight: 800; color: #334155; margin: 10px 0 30px; }
+  .qp-cols { display: flex; justify-content: space-between; gap: 30px; margin-bottom: 26px; }
+  .qp-col { flex: 1; }
+  .qp-col h5 { margin: 0 0 6px; font-size: 13px; font-weight: 800; color: #0f172a; }
+  .qp-muted { color: #475569; }
+  .qp-total-line { display: flex; gap: 30px; align-items: baseline; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin: 18px 0; }
+  .qp-total-line .qp-tl-label { font-weight: 800; font-size: 15px; }
+  .qp-total-line .qp-tl-val { font-weight: 800; font-size: 15px; }
+  table.qp-table { width: 100%; border-collapse: collapse; margin: 6px 0 20px; }
+  table.qp-table th { background: #dbeafe; color: #1e3a8a; text-align: left; font-size: 11px; font-weight: 800; padding: 10px 12px; }
+  table.qp-table th.qp-r, table.qp-table td.qp-r { text-align: right; }
+  table.qp-table td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-size: 12.5px; vertical-align: top; }
+  .qp-summary { max-width: 320px; margin-left: auto; }
+  .qp-summary .qp-srow { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12.5px; }
+  .qp-summary .qp-sgrand { border-top: 2px solid #cbd5e1; margin-top: 6px; padding-top: 8px; font-weight: 800; font-size: 14px; }
+  .qp-section-h { font-size: 15px; font-weight: 800; color: #0f172a; margin: 26px 0 8px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+  .qp-terms-row { margin-bottom: 8px; }
+  .qp-terms-row b { color: #0f172a; }
+  .qp-sign-img { max-height: 90px; max-width: 280px; display: block; margin-top: 6px; }
+  .qp-sign-name { font-family: 'Georgia', serif; font-size: 22px; color: #1e293b; border-bottom: 1px solid #94a3b8; display: inline-block; padding: 4px 20px 2px; margin-top: 6px; }
+  .qp-bank-grid { font-size: 12.5px; line-height: 1.8; }
+  @media print {
+    body * { visibility: hidden !important; }
+    #quotePreviewOverlay, #quotePreviewOverlay * { visibility: visible !important; }
+    #quotePreviewOverlay { position: absolute; inset: 0; background: #fff; padding: 0; }
+    .qp-modal { box-shadow: none; max-width: none; border-radius: 0; }
+    .qp-modal-bar { display: none !important; }
+    .qp-scroll { max-height: none; overflow: visible; background: #fff; padding: 0; }
+    .qp-doc { max-width: none; padding: 24px 32px; }
+  }
   @media (max-width: 900px) {
     .prod-form-row { grid-template-columns: 1fr 1fr; }
     .prod-field-desc { grid-column: 1 / -1; }
@@ -3491,7 +3602,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v20.7 · Quotes tab with Product catalog · Sort deal picker · Access Control
+      v20.8 · Quote builder (HubSpot deal/contacts/companies, products, VAT, terms, signature, PDF) · Product catalog
     </div>
   </div>
 </div>
@@ -3564,7 +3675,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.7</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v20.8</strong></p>
     </div>
   </div>
 </div>
@@ -3633,7 +3744,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v20.7</div>
+      <div class="sidebar-version">v20.8</div>
     </div>
   </aside>
 
@@ -4495,19 +4606,245 @@
       </div>
     </div>
 
-    <!-- ── QUOTES (builder comes next) ── -->
+    <!-- ── QUOTES ── -->
     <div class="quotes-subview" id="qsub-quotes">
-      <div class="prod-panel">
-        <div class="prod-panel-head"><h3 class="prod-panel-title">Quotes</h3></div>
-        <div class="quotes-placeholder">
-          <p>The quote builder will be set up next. It will let you create a quote by picking products from the catalog, setting quantities, discounts and totals.</p>
-          <p class="quotes-placeholder-sub">First, add your products under the <strong>Products</strong> tab. Then tell me the fields you want on a quote (e.g. customer, quote number, validity date, line items, tax, terms) and I'll build the flow.</p>
+
+      <!-- LIST VIEW -->
+      <div class="prod-panel" id="quotesListPanel">
+        <div class="prod-panel-head">
+          <h3 class="prod-panel-title">Quotes</h3>
+          <div class="prod-panel-tools">
+            <select id="quoteStatusFilter" class="prod-filter" onchange="renderQuotesList()">
+              <option value="all">All statuses</option>
+              <option value="Draft">Draft</option>
+              <option value="Sent">Sent</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <button class="prod-add-btn" id="newQuoteBtn" onclick="startNewQuote()">+ New Quote</button>
+          </div>
+        </div>
+        <div class="prod-table-wrap">
+          <table class="prod-table">
+            <thead>
+              <tr><th>Quote</th><th>Reference</th><th>Buyer</th><th>Deal</th><th class="prod-num">Total (AED)</th><th>Status</th><th>Expires</th><th class="prod-actions-col">Actions</th></tr>
+            </thead>
+            <tbody id="quotesListBody"></tbody>
+          </table>
+          <div class="prod-empty" id="quotesEmpty" style="display:none;">No quotes yet. Click “New Quote” to create one.</div>
         </div>
       </div>
+
+      <!-- BUILDER VIEW -->
+      <div id="quoteBuilder" style="display:none;">
+        <div class="qb-toolbar">
+          <button class="qb-back" onclick="closeQuoteBuilder()">← Back to list</button>
+          <div class="qb-toolbar-right">
+            <span class="qb-ref" id="qbRefLabel"></span>
+            <button class="prod-row-btn" onclick="previewQuote()">👁 Preview</button>
+            <button class="prod-row-btn" onclick="exportQuotePDF()">⤓ Export PDF</button>
+            <button class="prod-add-btn" onclick="saveQuote()">💾 Save Quote</button>
+          </div>
+        </div>
+
+        <div class="qb-grid">
+          <!-- ░ Quote meta ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">1 · Quote Details</h4>
+            <div class="qb-row2">
+              <div class="qb-field"><label>Quote Name</label><input type="text" id="qbName" placeholder="e.g. FevaFit"></div>
+              <div class="qb-field"><label>Expiration Date <span class="qb-hint-inline">(default 14 days)</span></label><input type="date" id="qbExpires"></div>
+            </div>
+          </section>
+
+          <!-- ░ Associated deal ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">2 · Associated Deal <span class="qb-sub">— from your HubSpot deals</span></h4>
+            <div class="qb-row2">
+              <div class="qb-field">
+                <label>Deal</label>
+                <select id="qbDealSelect" onchange="onQuoteDealSelect()"><option value="">— Select a deal —</option></select>
+              </div>
+              <div class="qb-field qb-field-btn">
+                <label>&nbsp;</label>
+                <button class="qb-fetch-btn" id="qbFetchDealsBtn" onclick="qbFetchDeals()">⟳ Load my deals</button>
+              </div>
+            </div>
+            <div class="qb-inline-note" id="qbDealNote"></div>
+          </section>
+
+          <!-- ░ Buyer ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">3 · Buyer Information <span class="qb-sub">— existing HubSpot contacts only</span></h4>
+            <div class="qb-row2">
+              <div class="qb-field">
+                <label>Contact</label>
+                <select id="qbContactSelect" onchange="onQuoteContactSelect()"><option value="">— Select a contact —</option></select>
+              </div>
+              <div class="qb-field qb-field-btn">
+                <label>&nbsp;</label>
+                <button class="qb-fetch-btn" id="qbFetchContactsBtn" onclick="qbFetchContacts()">⟳ Load my contacts</button>
+              </div>
+            </div>
+            <div class="qb-row2">
+              <div class="qb-field"><label>Client Name</label><input type="text" id="qbBuyerName" placeholder="Contact name"></div>
+              <div class="qb-field"><label>Email</label><input type="email" id="qbBuyerEmail" placeholder="email@company.com"></div>
+            </div>
+            <div class="qb-row2">
+              <div class="qb-field"><label>Phone</label><input type="text" id="qbBuyerPhone" placeholder="+971…"></div>
+              <div class="qb-field"><label>Address</label><input type="text" id="qbBuyerAddress" placeholder="Address"></div>
+            </div>
+            <div class="qb-divider"></div>
+            <div class="qb-row2">
+              <div class="qb-field">
+                <label>Company <span class="qb-hint-inline">(optional)</span></label>
+                <select id="qbCompanySelect" onchange="onQuoteCompanySelect()"><option value="">— None —</option></select>
+              </div>
+              <div class="qb-field qb-field-btn">
+                <label>&nbsp;</label>
+                <button class="qb-fetch-btn" id="qbFetchCompaniesBtn" onclick="qbFetchCompanies()">⟳ Load my companies</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ░ Sender + Seller ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">4 · Quote Sender &amp; Seller</h4>
+            <div class="qb-twocol">
+              <div>
+                <div class="qb-mini-label">Prepared by (sender)</div>
+                <div class="qb-field"><label>Full Name</label><input type="text" id="qbSenderName"></div>
+                <div class="qb-field"><label>Email</label><input type="email" id="qbSenderEmail"></div>
+                <div class="qb-row2">
+                  <div class="qb-field"><label>Phone</label><input type="text" id="qbSenderPhone"></div>
+                  <div class="qb-field"><label>Title</label><input type="text" id="qbSenderTitle" placeholder="e.g. Sales Executive"></div>
+                </div>
+              </div>
+              <div>
+                <div class="qb-mini-label">Seller (fixed)</div>
+                <div class="qb-seller-box" id="qbSellerBox"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ░ Products / line items ░ -->
+          <section class="qb-card qb-card-wide">
+            <h4 class="qb-card-title">5 · Products &amp; Services</h4>
+            <div class="qb-additem">
+              <select id="qbProductPick"><option value="">— Select a product from catalog —</option></select>
+              <button class="qb-fetch-btn" onclick="qbAddLineItem()">+ Add line</button>
+            </div>
+            <div class="qb-table-wrap">
+              <table class="qb-items">
+                <thead><tr><th>Products &amp; Services</th><th class="qb-num">Qty</th><th class="qb-num">Unit Price</th><th class="qb-num">Line Total</th><th></th></tr></thead>
+                <tbody id="qbItemsBody"></tbody>
+              </table>
+            </div>
+            <div class="qb-totals">
+              <div class="qb-tot-row"><span>One-time subtotal</span><strong id="qbSubtotal">AED 0.00</strong></div>
+              <div class="qb-tot-row">
+                <span>One-time discount</span>
+                <span class="qb-disc-input">AED <input type="number" id="qbDiscount" min="0" step="0.01" value="0" oninput="recalcQuoteTotals()"></span>
+              </div>
+              <div class="qb-tot-row"><span>VAT (<input type="number" id="qbVatRate" min="0" step="0.1" value="5" oninput="recalcQuoteTotals()" class="qb-vat-input">%)</span><strong id="qbVatAmount">AED 0.00</strong></div>
+              <div class="qb-tot-row qb-tot-grand"><span>Total</span><strong id="qbGrandTotal">AED 0.00</strong></div>
+            </div>
+          </section>
+
+          <!-- ░ Payment schedule ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">6 · Payment Schedule</h4>
+            <div class="qb-inline-note">Default is 100% on order. Add installments with a percentage and a due milestone; percentages should total 100%.</div>
+            <div id="qbScheduleBody"></div>
+            <button class="qb-fetch-btn" onclick="qbAddInstallment()">+ Add installment</button>
+            <div class="qb-sched-total" id="qbSchedTotal"></div>
+          </section>
+
+          <!-- ░ Payment method ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">7 · Payment Method</h4>
+            <label class="qb-check"><input type="checkbox" id="qbPayBankChk" checked onchange="toggleQbPayBank()"> Bank transfer details</label>
+            <div id="qbBankBox" class="qb-bank-box">
+              <div class="qb-row2">
+                <div class="qb-field"><label>Customer Name</label><input type="text" id="qbBankCustomer"></div>
+                <div class="qb-field"><label>Bank Name</label><input type="text" id="qbBankName"></div>
+              </div>
+              <div class="qb-row2">
+                <div class="qb-field"><label>Account Number</label><input type="text" id="qbBankAccount"></div>
+                <div class="qb-field"><label>IBAN</label><input type="text" id="qbBankIban"></div>
+              </div>
+              <div class="qb-field"><label>Currency</label><input type="text" id="qbBankCurrency" value="AED"></div>
+            </div>
+            <label class="qb-check"><input type="checkbox" id="qbPayLinkChk" onchange="toggleQbPayLink()"> Payment link</label>
+            <div id="qbLinkBox" class="qb-bank-box" style="display:none;">
+              <div class="qb-field"><label>Payment Link URL</label><input type="url" id="qbPayLink" placeholder="https://…"></div>
+            </div>
+          </section>
+
+          <!-- ░ Purchase terms ░ -->
+          <section class="qb-card qb-card-wide">
+            <h4 class="qb-card-title">8 · Purchase Terms</h4>
+            <div class="qb-inline-note">Each row is a term (label + detail). A sensible default is pre-filled from the CoreV template.</div>
+            <table class="qb-items qb-terms">
+              <thead><tr><th style="width:30%;">Term</th><th>Detail</th><th></th></tr></thead>
+              <tbody id="qbTermsBody"></tbody>
+            </table>
+            <button class="qb-fetch-btn" onclick="qbAddTerm()">+ Add term</button>
+          </section>
+
+          <!-- ░ Comments ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">9 · Comments to Buyer</h4>
+            <textarea id="qbComments" class="qb-textarea" placeholder="Any notes for the buyer…"></textarea>
+          </section>
+
+          <!-- ░ Signature ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">10 · Signature</h4>
+            <div class="qb-row2">
+              <div class="qb-field"><label>Signed by (name)</label><input type="text" id="qbSignName" placeholder="Type name"></div>
+              <div class="qb-field"><label>&nbsp;</label>
+                <div class="qb-sign-tools">
+                  <button class="qb-fetch-btn" onclick="qbClearSignature()">Clear</button>
+                  <label class="qb-upload-btn">Upload image<input type="file" accept="image/*" id="qbSignUpload" style="display:none;" onchange="qbSignatureUpload(this)"></label>
+                </div>
+              </div>
+            </div>
+            <canvas id="qbSignCanvas" class="qb-sign-canvas" width="460" height="130"></canvas>
+            <div class="qb-inline-note">Draw with the mouse/finger, type a name, or upload an image.</div>
+          </section>
+
+          <!-- ░ Status ░ -->
+          <section class="qb-card">
+            <h4 class="qb-card-title">Status</h4>
+            <select id="qbStatus" class="qb-status-sel">
+              <option value="Draft">Draft</option>
+              <option value="Sent">Sent</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </section>
+        </div>
+      </div>
+
     </div>
 
   </div>
   </div><!-- /#view-quotes -->
+
+  <!-- Quote preview / print overlay -->
+  <div id="quotePreviewOverlay" class="qp-overlay" onclick="closeQuotePreview(event)">
+    <div class="qp-modal" onclick="event.stopPropagation()">
+      <div class="qp-modal-bar">
+        <span>Quote Preview</span>
+        <div>
+          <button class="prod-row-btn" onclick="printQuotePreview()">🖨 Print / Save PDF</button>
+          <button class="prod-row-btn" onclick="closeQuotePreview()">✕ Close</button>
+        </div>
+      </div>
+      <div class="qp-scroll"><div id="quotePreviewDoc" class="qp-doc"></div></div>
+    </div>
+  </div>
 
   <!-- ░░░ DEAL OWNERSHIP & CRM RULES (merged v19.2) ░░░ -->
   <div class="tab-view" id="view-deal-rules">
@@ -6267,6 +6604,7 @@ async function downloadFromOneDrive() {
     if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
+    if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -6475,6 +6813,9 @@ function buildEnvelope() {
   // don't manage products preserve whatever the admin last synced.
   if (typeof productEntries !== 'undefined' && Array.isArray(productEntries) && productEntries.length) env.products = productEntries;
   else if (_lastRemoteProducts) env.products = _lastRemoteProducts;
+  // v20.8 — quotes ride along too (merged by id, last-write-wins per quote)
+  if (typeof quoteEntries !== 'undefined' && Array.isArray(quoteEntries) && quoteEntries.length) env.quotes = quoteEntries;
+  else if (_lastRemoteQuotes) env.quotes = _lastRemoteQuotes;
   return env;
 }
 
@@ -6508,6 +6849,7 @@ async function uploadToOneDrive() {
         if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
+    if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -8757,6 +9099,7 @@ let hubspotState = {
 let _lastRemoteHubspot = null;
 let _lastRemoteAccess = null;   // v20.3 — last access map received from sync
 let _lastRemoteProducts = null; // v20.7 — last product catalog received from sync
+let _lastRemoteQuotes = null;   // v20.8 — last quotes list received from sync
 
 function hsLoadTokens() {
   try {
@@ -10510,6 +10853,13 @@ function renderQuotesTab() {
   const form = document.getElementById('prodForm');
   if (form) form.style.display = canEditProducts() ? '' : 'none';
   renderProductsTable();
+  // quotes: default to list view (hide builder)
+  const builder = document.getElementById('quoteBuilder');
+  const listPanel = document.getElementById('quotesListPanel');
+  if (builder && listPanel && builder.style.display !== 'none' && !_currentQuote) {
+    builder.style.display = 'none'; listPanel.style.display = '';
+  }
+  renderQuotesList();
 }
 
 function quotesSwitchSub(sub) {
@@ -10644,6 +10994,637 @@ function exportProductsCSV() {
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   QUOTES BUILDER (v20.8)
+   Storage: localStorage 'oxefit_quotes_v1', mirrored to the OneDrive
+   envelope (quotes[]). A quote is built by a sales rep from their own
+   HubSpot deal/contacts/companies + the product catalog.
+════════════════════════════════════════════════════════════════════ */
+const QUOTES_KEY = 'oxefit_quotes_v1';
+let quoteEntries = [];
+let _currentQuote = null;          // the quote object being edited
+let _qbDealsCache = null, _qbContactsCache = null, _qbCompaniesCache = null;
+
+// Fixed seller block (CoreV)
+const QUOTE_SELLER = {
+  name: 'Core Velocity Sport Machine Trading L.L.C',
+  vat: '104796789600003',
+  addrLines: ['Court Tower, Office 403', 'Business Bay', 'Dubai / UAE']
+};
+// Default bank block (from the CoreV template)
+const QUOTE_BANK_DEFAULT = {
+  customer: 'CORE VELOCITY SPORT MACHINE TRADING L.L.C',
+  bank: 'Emirates NBD',
+  account: '1015908678801',
+  iban: 'AE410260001015908678801',
+  currency: 'AED'
+};
+// Default purchase terms (from the CoreV template)
+function quoteDefaultTerms() {
+  return [
+    { label: 'Agreement', detail: 'Unless the parties have previously entered into a separate written agreement, this quotation is subject to the terms & conditions at https://www.core-velocity.com/corev-commercial-terms-and-policies' },
+    { label: 'Price Includes', detail: '3 YEAR APEX Annual Membership – Unlimited Usage, All Content, NO Profiles or Cloud Data Tracking' },
+    { label: 'XS1 Membership Renewal', detail: 'After the 3rd Year, annual renewal of OxeFit Membership is AED 4587.50 per XS1, subject to change' },
+    { label: 'Plus Warranty', detail: '36 months warranty on parts & labour. Details: https://www.oxefit.com/corev/terms-policies/plus-warranty' },
+    { label: 'Payment Terms', detail: '1. 100% on placing the order and prior to delivering the unit. 2. All payment via bank transfer. 3. Non-refundable and non-cancellable order.' },
+    { label: 'Delivery', detail: 'Delivery to customer address within 1-2 days.' }
+  ];
+}
+
+function loadQuotes() {
+  try {
+    const raw = localStorage.getItem(QUOTES_KEY);
+    quoteEntries = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(quoteEntries)) quoteEntries = [];
+  } catch (e) { quoteEntries = []; }
+}
+function saveQuotesLocal() { try { localStorage.setItem(QUOTES_KEY, JSON.stringify(quoteEntries)); } catch (e) {} }
+// Merge local + remote quote arrays by id, keeping the most recently updated copy
+function mergeQuotesById(localArr, remoteArr) {
+  const byId = {};
+  (localArr || []).forEach(q => { if (q && q.id) byId[q.id] = q; });
+  (remoteArr || []).forEach(q => {
+    if (!q || !q.id) return;
+    const ex = byId[q.id];
+    if (!ex) { byId[q.id] = q; return; }
+    const exT = ex.updatedAt || ex.createdAt || '';
+    const rT  = q.updatedAt || q.createdAt || '';
+    if (rT >= exT) byId[q.id] = q;
+  });
+  return Object.values(byId);
+}
+function saveQuotesAll() {
+  saveQuotesLocal();
+  if (typeof msalAccount !== 'undefined' && msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
+}
+// Reps see only their own quotes; full-view/write see all
+function quoteVisibleList() {
+  if (isOwnOnly()) return quoteEntries.filter(q => q.ownerUser === currentUser);
+  return quoteEntries.slice();
+}
+
+/* ── HubSpot fetchers for the rep's own contacts & companies ───────── */
+async function hubspotFetchContactsForRep(repName) {
+  let ownerId = hsGetOwnerIdForRep(repName);
+  if (!ownerId) throw new Error('No HubSpot owner mapped for ' + repName + ' — set it in Connect HubSpot → Owner Mapping.');
+  const all = [];
+  let after, guard = 0;
+  do {
+    const body = {
+      filterGroups: [{ filters: [{ propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId }] }],
+      properties: ['firstname','lastname','email','phone','address','city','country','company'],
+      limit: 100
+    };
+    if (after) body.after = after;
+    const data = await hubspotApi('/crm/v3/objects/contacts/search', { method: 'POST', body: JSON.stringify(body) });
+    (data.results || []).forEach(c => all.push(c));
+    after = data.paging && data.paging.next && data.paging.next.after; guard++;
+  } while (after && guard < 50);
+  return all.map(c => {
+    const p = c.properties || {};
+    const name = [p.firstname, p.lastname].filter(Boolean).join(' ').trim() || (p.email || '(no name)');
+    const addr = [p.address, p.city, p.country].filter(Boolean).join(', ');
+    return { id: c.id, name, email: p.email || '', phone: p.phone || '', address: addr, company: p.company || '' };
+  });
+}
+async function hubspotFetchCompaniesForRep(repName) {
+  let ownerId = hsGetOwnerIdForRep(repName);
+  if (!ownerId) throw new Error('No HubSpot owner mapped for ' + repName + ' — set it in Connect HubSpot → Owner Mapping.');
+  const all = [];
+  let after, guard = 0;
+  do {
+    const body = {
+      filterGroups: [{ filters: [{ propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId }] }],
+      properties: ['name','domain','phone','address','city','country'],
+      limit: 100
+    };
+    if (after) body.after = after;
+    const data = await hubspotApi('/crm/v3/objects/companies/search', { method: 'POST', body: JSON.stringify(body) });
+    (data.results || []).forEach(c => all.push(c));
+    after = data.paging && data.paging.next && data.paging.next.after; guard++;
+  } while (after && guard < 50);
+  return all.map(c => {
+    const p = c.properties || {};
+    const addr = [p.address, p.city, p.country].filter(Boolean).join(', ');
+    return { id: c.id, name: p.name || '(unnamed)', domain: p.domain || '', phone: p.phone || '', address: addr };
+  });
+}
+
+/* ── Sub-tab list rendering ───────────────────────────────────────── */
+function renderQuotesList() {
+  const body = document.getElementById('quotesListBody');
+  const empty = document.getElementById('quotesEmpty');
+  if (!body) return;
+  const filter = (document.getElementById('quoteStatusFilter') || {}).value || 'all';
+  let rows = quoteVisibleList();
+  if (filter !== 'all') rows = rows.filter(q => (q.status || 'Draft') === filter);
+  rows.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  body.innerHTML = '';
+  if (!rows.length) { if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+  rows.forEach(q => {
+    const tr = document.createElement('tr');
+    const st = q.status || 'Draft';
+    tr.innerHTML =
+      `<td><strong>${escapeHtml(q.name || 'Untitled')}</strong></td>` +
+      `<td style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.reference || '—')}</td>` +
+      `<td>${escapeHtml((q.buyer && q.buyer.name) || '—')}</td>` +
+      `<td style="font-size:11.5px;">${escapeHtml(q.dealName || '—')}</td>` +
+      `<td class="prod-num">${fmtMoney(q.total)}</td>` +
+      `<td><span class="quote-status-badge qsb-${st}">${st}</span></td>` +
+      `<td style="font-size:11.5px;">${q.expiresAt ? quoteFmtDate(q.expiresAt) : '—'}</td>` +
+      `<td class="prod-actions-col">` +
+        `<button class="prod-row-btn" onclick="openQuote('${q.id}')">Open</button>` +
+        `<button class="prod-row-btn del" onclick="deleteQuote('${q.id}')">Delete</button>` +
+      `</td>`;
+    body.appendChild(tr);
+  });
+}
+
+function quoteFmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function quoteGenReference() {
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}${String(d.getMilliseconds()).padStart(3,'0')}`;
+}
+
+/* ── New / open / close builder ───────────────────────────────────── */
+function startNewQuote() {
+  const now = new Date();
+  const exp = new Date(now.getTime() + 14 * 86400000);
+  // sender defaults to the initiating rep
+  const meEmail = (typeof REP_EMAILS !== 'undefined')
+    ? (Object.entries(REP_EMAILS).find(([e, n]) => n === currentUser) || [''])[0] : '';
+  _currentQuote = {
+    id: 'quote_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    reference: quoteGenReference(),
+    name: '', dealId: '', dealName: '',
+    buyer: { contactId: '', name: '', email: '', phone: '', address: '' },
+    company: { id: '', name: '' },
+    sender: { name: currentUser || '', email: meEmail || '', phone: '', title: 'Sales Executive' },
+    lineItems: [],
+    discount: 0, vatRate: 5,
+    schedule: [{ pct: 100, when: 'On placing the order' }],
+    payBank: true, bank: { ...QUOTE_BANK_DEFAULT },
+    payLink: false, paymentLink: '',
+    terms: quoteDefaultTerms(),
+    comments: '',
+    signName: '', signImg: '',
+    status: 'Draft',
+    ownerUser: currentUser,
+    createdAt: now.toISOString(),
+    expiresAt: exp.toISOString().slice(0, 10)
+  };
+  openQuoteBuilderUI();
+}
+function openQuote(id) {
+  const q = quoteEntries.find(x => x.id === id);
+  if (!q) return;
+  // deep clone so cancel doesn't mutate stored copy until save
+  _currentQuote = JSON.parse(JSON.stringify(q));
+  if (!_currentQuote.terms) _currentQuote.terms = quoteDefaultTerms();
+  if (!_currentQuote.schedule) _currentQuote.schedule = [{ pct: 100, when: 'On placing the order' }];
+  openQuoteBuilderUI();
+}
+function closeQuoteBuilder() {
+  document.getElementById('quoteBuilder').style.display = 'none';
+  document.getElementById('quotesListPanel').style.display = '';
+  _currentQuote = null;
+  renderQuotesList();
+}
+function openQuoteBuilderUI() {
+  document.getElementById('quotesListPanel').style.display = 'none';
+  document.getElementById('quoteBuilder').style.display = '';
+  const q = _currentQuote;
+  document.getElementById('qbRefLabel').textContent = 'Ref: ' + q.reference;
+  document.getElementById('qbName').value = q.name || '';
+  document.getElementById('qbExpires').value = q.expiresAt || '';
+  document.getElementById('qbBuyerName').value = q.buyer.name || '';
+  document.getElementById('qbBuyerEmail').value = q.buyer.email || '';
+  document.getElementById('qbBuyerPhone').value = q.buyer.phone || '';
+  document.getElementById('qbBuyerAddress').value = q.buyer.address || '';
+  document.getElementById('qbSenderName').value = q.sender.name || '';
+  document.getElementById('qbSenderEmail').value = q.sender.email || '';
+  document.getElementById('qbSenderPhone').value = q.sender.phone || '';
+  document.getElementById('qbSenderTitle').value = q.sender.title || '';
+  document.getElementById('qbDiscount').value = q.discount || 0;
+  document.getElementById('qbVatRate').value = q.vatRate != null ? q.vatRate : 5;
+  document.getElementById('qbComments').value = q.comments || '';
+  document.getElementById('qbSignName').value = q.signName || '';
+  document.getElementById('qbStatus').value = q.status || 'Draft';
+  // seller box
+  document.getElementById('qbSellerBox').innerHTML =
+    `<strong>${escapeHtml(QUOTE_SELLER.name)}</strong><br>` +
+    QUOTE_SELLER.addrLines.map(escapeHtml).join('<br>') +
+    `<br><span class="qp-muted">VAT ID: ${escapeHtml(QUOTE_SELLER.vat)}</span>`;
+  // bank
+  document.getElementById('qbPayBankChk').checked = !!q.payBank;
+  document.getElementById('qbBankCustomer').value = (q.bank && q.bank.customer) || '';
+  document.getElementById('qbBankName').value = (q.bank && q.bank.bank) || '';
+  document.getElementById('qbBankAccount').value = (q.bank && q.bank.account) || '';
+  document.getElementById('qbBankIban').value = (q.bank && q.bank.iban) || '';
+  document.getElementById('qbBankCurrency').value = (q.bank && q.bank.currency) || 'AED';
+  document.getElementById('qbPayLinkChk').checked = !!q.payLink;
+  document.getElementById('qbPayLink').value = q.paymentLink || '';
+  toggleQbPayBank(); toggleQbPayLink();
+  // dropdowns rebuilt from caches/products
+  qbPopulateProductPicker();
+  qbRebuildDealSelect(); qbRebuildContactSelect(); qbRebuildCompanySelect();
+  renderQbItems(); renderQbSchedule(); renderQbTerms();
+  // signature
+  _qbInitSignatureCanvas();
+  if (q.signImg) _qbDrawSignatureImg(q.signImg);
+  else _qbClearCanvasOnly();
+  recalcQuoteTotals();
+}
+
+/* ── Deal / contact / company selectors ───────────────────────────── */
+async function qbFetchDeals() {
+  const btn = document.getElementById('qbFetchDealsBtn');
+  try {
+    btn.textContent = 'Loading…'; btn.disabled = true;
+    _qbDealsCache = await hubspotFetchDealsForRep(currentUser);
+    qbRebuildDealSelect();
+    document.getElementById('qbDealNote').textContent = `${_qbDealsCache.length} deal(s) loaded from your HubSpot.`;
+  } catch (e) {
+    document.getElementById('qbDealNote').textContent = 'Could not load deals: ' + (e.message || e);
+  } finally { btn.textContent = '⟳ Load my deals'; btn.disabled = false; }
+}
+function qbRebuildDealSelect() {
+  const sel = document.getElementById('qbDealSelect');
+  const cur = _currentQuote ? _currentQuote.dealId : '';
+  let html = '<option value="">— Select a deal —</option>';
+  (_qbDealsCache || []).forEach(d => { html += `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)} — AED ${fmtNum(d.amount||0)}</option>`; });
+  // keep previously-saved deal visible even if list not loaded
+  if (cur && !(_qbDealsCache || []).some(d => d.id === cur)) {
+    html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.dealName || cur)}</option>`;
+  }
+  sel.innerHTML = html; sel.value = cur || '';
+}
+function onQuoteDealSelect() {
+  const sel = document.getElementById('qbDealSelect');
+  const d = (_qbDealsCache || []).find(x => x.id === sel.value);
+  _currentQuote.dealId = sel.value;
+  _currentQuote.dealName = d ? d.name : (sel.value ? _currentQuote.dealName : '');
+  if (d && !document.getElementById('qbName').value) {
+    document.getElementById('qbName').value = d.name; // seed quote name from deal name
+  }
+  document.getElementById('qbDealNote').textContent = d ? `Deal name pulled from HubSpot: “${d.name}”.` : '';
+}
+async function qbFetchContacts() {
+  const btn = document.getElementById('qbFetchContactsBtn');
+  try {
+    btn.textContent = 'Loading…'; btn.disabled = true;
+    _qbContactsCache = await hubspotFetchContactsForRep(currentUser);
+    qbRebuildContactSelect();
+    showToast(`${_qbContactsCache.length} contact(s) loaded`, 'success');
+  } catch (e) { showToast('Contacts: ' + (e.message || e), 'error'); }
+  finally { btn.textContent = '⟳ Load my contacts'; btn.disabled = false; }
+}
+function qbRebuildContactSelect() {
+  const sel = document.getElementById('qbContactSelect');
+  const cur = _currentQuote ? _currentQuote.buyer.contactId : '';
+  let html = '<option value="">— Select a contact —</option>';
+  (_qbContactsCache || []).forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}${c.email ? ' · ' + escapeHtml(c.email) : ''}</option>`; });
+  if (cur && !(_qbContactsCache || []).some(c => c.id === cur)) {
+    html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.buyer.name || cur)}</option>`;
+  }
+  sel.innerHTML = html; sel.value = cur || '';
+}
+function onQuoteContactSelect() {
+  const sel = document.getElementById('qbContactSelect');
+  const c = (_qbContactsCache || []).find(x => x.id === sel.value);
+  if (!c) { _currentQuote.buyer.contactId = ''; return; }
+  _currentQuote.buyer = { contactId: c.id, name: c.name, email: c.email, phone: c.phone, address: c.address };
+  document.getElementById('qbBuyerName').value = c.name || '';
+  document.getElementById('qbBuyerEmail').value = c.email || '';
+  document.getElementById('qbBuyerPhone').value = c.phone || '';
+  document.getElementById('qbBuyerAddress').value = c.address || '';
+}
+async function qbFetchCompanies() {
+  const btn = document.getElementById('qbFetchCompaniesBtn');
+  try {
+    btn.textContent = 'Loading…'; btn.disabled = true;
+    _qbCompaniesCache = await hubspotFetchCompaniesForRep(currentUser);
+    qbRebuildCompanySelect();
+    showToast(`${_qbCompaniesCache.length} compan(ies) loaded`, 'success');
+  } catch (e) { showToast('Companies: ' + (e.message || e), 'error'); }
+  finally { btn.textContent = '⟳ Load my companies'; btn.disabled = false; }
+}
+function qbRebuildCompanySelect() {
+  const sel = document.getElementById('qbCompanySelect');
+  const cur = _currentQuote ? _currentQuote.company.id : '';
+  let html = '<option value="">— None —</option>';
+  (_qbCompaniesCache || []).forEach(c => { html += `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`; });
+  if (cur && !(_qbCompaniesCache || []).some(c => c.id === cur)) {
+    html += `<option value="${escapeHtml(cur)}">${escapeHtml(_currentQuote.company.name || cur)}</option>`;
+  }
+  sel.innerHTML = html; sel.value = cur || '';
+}
+function onQuoteCompanySelect() {
+  const sel = document.getElementById('qbCompanySelect');
+  const c = (_qbCompaniesCache || []).find(x => x.id === sel.value);
+  _currentQuote.company = c ? { id: c.id, name: c.name } : { id: '', name: '' };
+}
+
+/* ── Line items ───────────────────────────────────────────────────── */
+function qbPopulateProductPicker() {
+  const sel = document.getElementById('qbProductPick');
+  let html = '<option value="">— Select a product from catalog —</option>';
+  productEntries.slice().sort((a,b)=>(a.sku||'').localeCompare(b.sku||'')).forEach(p => {
+    html += `<option value="${escapeHtml(p.id)}">${escapeHtml(p.sku)} · ${escapeHtml(p.desc)} — AED ${fmtMoney(p.unitPrice)}</option>`;
+  });
+  sel.innerHTML = html;
+}
+function qbAddLineItem() {
+  const sel = document.getElementById('qbProductPick');
+  const p = productEntries.find(x => x.id === sel.value);
+  if (!p) { showToast('Pick a product first', 'error'); return; }
+  _currentQuote.lineItems.push({ productId: p.id, sku: p.sku, desc: p.desc, qty: 1, unitPrice: Number(p.unitPrice) || 0 });
+  sel.value = '';
+  renderQbItems(); recalcQuoteTotals();
+}
+function qbRemoveLineItem(i) { _currentQuote.lineItems.splice(i, 1); renderQbItems(); recalcQuoteTotals(); }
+function qbItemChanged(i, field, val) {
+  if (!_currentQuote.lineItems[i]) return;
+  if (field === 'qty') _currentQuote.lineItems[i].qty = Math.max(0, parseFloat(val) || 0);
+  if (field === 'price') _currentQuote.lineItems[i].unitPrice = Math.max(0, parseFloat(val) || 0);
+  if (field === 'desc') _currentQuote.lineItems[i].desc = val;
+  recalcQuoteTotals();
+  // update just the line total cell
+  const cell = document.getElementById('qbLineTot' + i);
+  if (cell) cell.textContent = fmtMoney((_currentQuote.lineItems[i].qty||0) * (_currentQuote.lineItems[i].unitPrice||0));
+}
+function renderQbItems() {
+  const body = document.getElementById('qbItemsBody');
+  body.innerHTML = '';
+  _currentQuote.lineItems.forEach((it, i) => {
+    const tr = document.createElement('tr');
+    const lineTot = (it.qty || 0) * (it.unitPrice || 0);
+    tr.innerHTML =
+      `<td><input type="text" value="${escapeHtml(it.desc || '')}" oninput="qbItemChanged(${i},'desc',this.value)"></td>` +
+      `<td class="qb-num"><input class="qb-qty" type="number" min="0" step="1" value="${it.qty}" oninput="qbItemChanged(${i},'qty',this.value)"></td>` +
+      `<td class="qb-num"><input class="qb-price" type="number" min="0" step="0.01" value="${it.unitPrice}" oninput="qbItemChanged(${i},'price',this.value)"></td>` +
+      `<td class="qb-num" id="qbLineTot${i}">${fmtMoney(lineTot)}</td>` +
+      `<td><button class="qb-del-row" onclick="qbRemoveLineItem(${i})">✕</button></td>`;
+    body.appendChild(tr);
+  });
+}
+function recalcQuoteTotals() {
+  if (!_currentQuote) return;
+  const subtotal = _currentQuote.lineItems.reduce((s, it) => s + (it.qty || 0) * (it.unitPrice || 0), 0);
+  const discount = Math.max(0, parseFloat(document.getElementById('qbDiscount').value) || 0);
+  const vatRate = Math.max(0, parseFloat(document.getElementById('qbVatRate').value) || 0);
+  const taxable = Math.max(0, subtotal - discount);
+  const vatAmount = taxable * vatRate / 100;
+  const total = taxable + vatAmount;
+  _currentQuote.discount = discount; _currentQuote.vatRate = vatRate;
+  _currentQuote.subtotal = subtotal; _currentQuote.vatAmount = vatAmount; _currentQuote.total = total;
+  document.getElementById('qbSubtotal').textContent = 'AED ' + fmtMoney(subtotal);
+  document.getElementById('qbVatAmount').textContent = 'AED ' + fmtMoney(vatAmount);
+  document.getElementById('qbGrandTotal').textContent = 'AED ' + fmtMoney(total);
+}
+
+/* ── Payment schedule ─────────────────────────────────────────────── */
+function renderQbSchedule() {
+  const host = document.getElementById('qbScheduleBody');
+  host.innerHTML = '';
+  _currentQuote.schedule.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.className = 'qb-sched-row';
+    row.innerHTML =
+      `<input type="text" placeholder="Milestone (e.g. On order)" value="${escapeHtml(s.when || '')}" oninput="qbSchedChanged(${i},'when',this.value)">` +
+      `<input type="number" min="0" max="100" step="1" value="${s.pct}" oninput="qbSchedChanged(${i},'pct',this.value)"> ` +
+      `<span style="font-size:12px;color:var(--text-muted);">% of total</span>` +
+      `<button class="qb-del-row" onclick="qbRemoveInstallment(${i})">✕</button>`;
+    host.appendChild(row);
+  });
+  qbUpdateSchedTotal();
+}
+function qbSchedChanged(i, field, val) {
+  if (!_currentQuote.schedule[i]) return;
+  if (field === 'pct') _currentQuote.schedule[i].pct = Math.max(0, Math.min(100, parseFloat(val) || 0));
+  if (field === 'when') _currentQuote.schedule[i].when = val;
+  qbUpdateSchedTotal();
+}
+function qbAddInstallment() { _currentQuote.schedule.push({ pct: 0, when: '' }); renderQbSchedule(); }
+function qbRemoveInstallment(i) { _currentQuote.schedule.splice(i, 1); if (!_currentQuote.schedule.length) _currentQuote.schedule.push({ pct: 100, when: 'On placing the order' }); renderQbSchedule(); }
+function qbUpdateSchedTotal() {
+  const el = document.getElementById('qbSchedTotal');
+  const sum = _currentQuote.schedule.reduce((s, x) => s + (parseFloat(x.pct) || 0), 0);
+  el.textContent = `Total scheduled: ${sum}%` + (sum === 100 ? ' ✓' : ' — should equal 100%');
+  el.className = 'qb-sched-total ' + (sum === 100 ? 'ok' : 'bad');
+}
+
+/* ── Purchase terms ───────────────────────────────────────────────── */
+function renderQbTerms() {
+  const body = document.getElementById('qbTermsBody');
+  body.innerHTML = '';
+  _currentQuote.terms.forEach((t, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td><input type="text" value="${escapeHtml(t.label || '')}" oninput="qbTermChanged(${i},'label',this.value)"></td>` +
+      `<td><input type="text" value="${escapeHtml(t.detail || '')}" oninput="qbTermChanged(${i},'detail',this.value)"></td>` +
+      `<td><button class="qb-del-row" onclick="qbRemoveTerm(${i})">✕</button></td>`;
+    body.appendChild(tr);
+  });
+}
+function qbTermChanged(i, field, val) { if (_currentQuote.terms[i]) _currentQuote.terms[i][field] = val; }
+function qbAddTerm() { _currentQuote.terms.push({ label: '', detail: '' }); renderQbTerms(); }
+function qbRemoveTerm(i) { _currentQuote.terms.splice(i, 1); renderQbTerms(); }
+
+/* ── Payment method toggles ───────────────────────────────────────── */
+function toggleQbPayBank() {
+  const on = document.getElementById('qbPayBankChk').checked;
+  document.getElementById('qbBankBox').style.display = on ? '' : 'none';
+  if (_currentQuote) _currentQuote.payBank = on;
+}
+function toggleQbPayLink() {
+  const on = document.getElementById('qbPayLinkChk').checked;
+  document.getElementById('qbLinkBox').style.display = on ? '' : 'none';
+  if (_currentQuote) _currentQuote.payLink = on;
+}
+
+/* ── Signature canvas ─────────────────────────────────────────────── */
+let _qbSignCtx = null, _qbSignDrawing = false, _qbSignDirty = false;
+function _qbInitSignatureCanvas() {
+  const cv = document.getElementById('qbSignCanvas');
+  if (!cv) return;
+  _qbSignCtx = cv.getContext('2d');
+  _qbSignCtx.lineWidth = 2; _qbSignCtx.lineCap = 'round'; _qbSignCtx.strokeStyle = '#1e293b';
+  const pos = (e) => {
+    const r = cv.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: (t.clientX - r.left) * (cv.width / r.width), y: (t.clientY - r.top) * (cv.height / r.height) };
+  };
+  const start = (e) => { _qbSignDrawing = true; const p = pos(e); _qbSignCtx.beginPath(); _qbSignCtx.moveTo(p.x, p.y); e.preventDefault(); };
+  const move = (e) => { if (!_qbSignDrawing) return; const p = pos(e); _qbSignCtx.lineTo(p.x, p.y); _qbSignCtx.stroke(); _qbSignDirty = true; e.preventDefault(); };
+  const end = () => { if (_qbSignDrawing && _qbSignDirty && _currentQuote) { _currentQuote.signImg = cv.toDataURL('image/png'); } _qbSignDrawing = false; };
+  // avoid double-binding
+  cv.onmousedown = start; cv.onmousemove = move; cv.onmouseup = end; cv.onmouseleave = end;
+  cv.ontouchstart = start; cv.ontouchmove = move; cv.ontouchend = end;
+}
+function _qbClearCanvasOnly() {
+  const cv = document.getElementById('qbSignCanvas');
+  if (cv && _qbSignCtx) _qbSignCtx.clearRect(0, 0, cv.width, cv.height);
+  _qbSignDirty = false;
+}
+function _qbDrawSignatureImg(dataUrl) {
+  const cv = document.getElementById('qbSignCanvas');
+  if (!cv || !_qbSignCtx) return;
+  const img = new Image();
+  img.onload = () => { _qbSignCtx.clearRect(0, 0, cv.width, cv.height); _qbSignCtx.drawImage(img, 0, 0, cv.width, cv.height); };
+  img.src = dataUrl;
+}
+function qbClearSignature() { _qbClearCanvasOnly(); if (_currentQuote) _currentQuote.signImg = ''; }
+function qbSignatureUpload(input) {
+  const f = input.files && input.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => { if (_currentQuote) _currentQuote.signImg = rd.result; _qbDrawSignatureImg(rd.result); };
+  rd.readAsDataURL(f);
+}
+
+/* ── Collect form → quote object ──────────────────────────────────── */
+function qbCollect() {
+  const q = _currentQuote;
+  q.name = document.getElementById('qbName').value.trim();
+  q.expiresAt = document.getElementById('qbExpires').value;
+  q.buyer.name = document.getElementById('qbBuyerName').value.trim();
+  q.buyer.email = document.getElementById('qbBuyerEmail').value.trim();
+  q.buyer.phone = document.getElementById('qbBuyerPhone').value.trim();
+  q.buyer.address = document.getElementById('qbBuyerAddress').value.trim();
+  q.sender.name = document.getElementById('qbSenderName').value.trim();
+  q.sender.email = document.getElementById('qbSenderEmail').value.trim();
+  q.sender.phone = document.getElementById('qbSenderPhone').value.trim();
+  q.sender.title = document.getElementById('qbSenderTitle').value.trim();
+  q.comments = document.getElementById('qbComments').value;
+  q.signName = document.getElementById('qbSignName').value.trim();
+  q.status = document.getElementById('qbStatus').value;
+  q.payBank = document.getElementById('qbPayBankChk').checked;
+  q.payLink = document.getElementById('qbPayLinkChk').checked;
+  q.paymentLink = document.getElementById('qbPayLink').value.trim();
+  q.bank = {
+    customer: document.getElementById('qbBankCustomer').value.trim(),
+    bank: document.getElementById('qbBankName').value.trim(),
+    account: document.getElementById('qbBankAccount').value.trim(),
+    iban: document.getElementById('qbBankIban').value.trim(),
+    currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
+  };
+  recalcQuoteTotals();
+  return q;
+}
+function saveQuote() {
+  qbCollect();
+  if (!_currentQuote.name) { showToast('Add a quote name first', 'error'); return; }
+  const idx = quoteEntries.findIndex(x => x.id === _currentQuote.id);
+  _currentQuote.updatedAt = new Date().toISOString();
+  if (idx >= 0) quoteEntries[idx] = JSON.parse(JSON.stringify(_currentQuote));
+  else quoteEntries.push(JSON.parse(JSON.stringify(_currentQuote)));
+  saveQuotesAll();
+  showToast('Quote saved', 'success');
+}
+function deleteQuote(id) {
+  const q = quoteEntries.find(x => x.id === id);
+  if (!q) return;
+  if (!confirm('Delete quote "' + (q.name || q.reference) + '"?')) return;
+  quoteEntries = quoteEntries.filter(x => x.id !== id);
+  saveQuotesAll(); renderQuotesList();
+  showToast('Quote deleted', 'success');
+}
+
+/* ── Preview / print ──────────────────────────────────────────────── */
+function buildQuotePreviewHTML(q) {
+  const money = n => 'AED' + fmtMoney(n);
+  const itemsRows = q.lineItems.map(it =>
+    `<tr><td>${escapeHtml(it.desc || '')}</td><td class="qp-r">${it.qty}</td><td class="qp-r">${money((it.qty||0)*(it.unitPrice||0))}</td></tr>`
+  ).join('') || `<tr><td colspan="3" style="color:#94a3b8;">No line items</td></tr>`;
+  const buyerBlock =
+    `<h5>${escapeHtml(q.company.name || q.buyer.name || '—')}</h5>` +
+    (q.company.name && q.buyer.name ? `<div><strong>${escapeHtml(q.buyer.name)}</strong></div>` : (q.buyer.name && !q.company.name ? `<div><strong>${escapeHtml(q.buyer.name)}</strong></div>` : '')) +
+    (q.buyer.email ? `<div class="qp-muted">${escapeHtml(q.buyer.email)}</div>` : '') +
+    (q.buyer.phone ? `<div class="qp-muted">${escapeHtml(q.buyer.phone)}</div>` : '') +
+    (q.buyer.address ? `<div class="qp-muted">${escapeHtml(q.buyer.address)}</div>` : '') +
+    `<div class="qp-muted" style="margin-top:12px;">Reference: ${escapeHtml(q.reference)}</div>` +
+    `<div class="qp-muted">Quote created: ${quoteFmtDate(q.createdAt)}</div>` +
+    `<div class="qp-muted">Quote expires: ${quoteFmtDate(q.expiresAt)}</div>`;
+  const sellerBlock =
+    `<h5>${escapeHtml(QUOTE_SELLER.name)}</h5>` +
+    QUOTE_SELLER.addrLines.map(l => `<div class="qp-muted">${escapeHtml(l)}</div>`).join('') +
+    `<div class="qp-muted">VAT ID: ${escapeHtml(QUOTE_SELLER.vat)}</div>` +
+    `<div style="margin-top:12px;"><strong>Prepared by: ${escapeHtml(q.sender.name || '')}</strong></div>` +
+    (q.sender.title ? `<div class="qp-muted">${escapeHtml(q.sender.title)}</div>` : '') +
+    (q.sender.email ? `<div class="qp-muted">${escapeHtml(q.sender.email)}</div>` : '') +
+    (q.sender.phone ? `<div class="qp-muted">${escapeHtml(q.sender.phone)}</div>` : '');
+  const schedRows = q.schedule.map(s => `<div class="qp-srow"><span>${escapeHtml(s.when||'—')}</span><span>${s.pct}%</span></div>`).join('');
+  const termsRows = q.terms.filter(t => t.label || t.detail).map(t =>
+    `<div class="qp-terms-row"><b>${escapeHtml(t.label || '')}:</b> ${escapeHtml(t.detail || '')}</div>`).join('');
+  let payBlock = '';
+  if (q.payBank && q.bank) {
+    payBlock += `<div class="qp-bank-grid"><b>Bank Transfer</b><br>` +
+      `Customer Name: ${escapeHtml(q.bank.customer||'')}<br>` +
+      `Bank: ${escapeHtml(q.bank.bank||'')}<br>` +
+      `Account: ${escapeHtml(q.bank.account||'')}<br>` +
+      `IBAN: ${escapeHtml(q.bank.iban||'')}<br>` +
+      `Currency: ${escapeHtml(q.bank.currency||'AED')}</div>`;
+  }
+  if (q.payLink && q.paymentLink) {
+    payBlock += `<div style="margin-top:8px;"><b>Payment link:</b> <a href="${escapeHtml(q.paymentLink)}">${escapeHtml(q.paymentLink)}</a></div>`;
+  }
+  let signBlock = '';
+  if (q.signImg) signBlock = `<img class="qp-sign-img" src="${q.signImg}">`;
+  else if (q.signName) signBlock = `<div class="qp-sign-name">${escapeHtml(q.signName)}</div>`;
+  if (q.signName && q.signImg) signBlock += `<div class="qp-muted" style="margin-top:4px;">${escapeHtml(q.signName)}</div>`;
+
+  return `
+    <div class="qp-logo">O<span>≫</span>EFIT</div>
+    <div class="qp-byline">BY CORE</div>
+    <div class="qp-title">${escapeHtml(q.name || 'Quote')}</div>
+    <div class="qp-cols">
+      <div class="qp-col">${buyerBlock}</div>
+      <div class="qp-col">${sellerBlock}</div>
+    </div>
+    <div class="qp-total-line"><span class="qp-tl-label">Total</span><span class="qp-tl-val">${money(q.total||0)}</span></div>
+    ${q.dealName ? `<div class="qp-muted" style="margin-bottom:10px;">Associated deal: ${escapeHtml(q.dealName)}</div>` : ''}
+    <table class="qp-table">
+      <thead><tr><th>PRODUCTS &amp; SERVICES</th><th class="qp-r">QUANTITY</th><th class="qp-r">PRICE</th></tr></thead>
+      <tbody>${itemsRows}</tbody>
+    </table>
+    <div class="qp-section-h">Summary</div>
+    <div class="qp-summary">
+      <div class="qp-srow"><span>One-time subtotal</span><span>${money(q.subtotal||0)}</span></div>
+      <div class="qp-srow"><span>One-time discount</span><span>(${money(q.discount||0)})</span></div>
+      <div class="qp-srow"><span>VAT (${q.vatRate||0}%)</span><span>${money(q.vatAmount||0)}</span></div>
+      <div class="qp-srow qp-sgrand"><span>Total</span><span>${money(q.total||0)}</span></div>
+    </div>
+    <div class="qp-section-h">Payment Schedule</div>
+    <div class="qp-summary" style="margin-left:0;">${schedRows}</div>
+    ${termsRows ? `<div class="qp-section-h">Purchase Terms</div>${termsRows}` : ''}
+    ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
+    ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
+    ${signBlock ? `<div class="qp-section-h">Signature</div>${signBlock}` : ''}
+  `;
+}
+function previewQuote() {
+  qbCollect();
+  document.getElementById('quotePreviewDoc').innerHTML = buildQuotePreviewHTML(_currentQuote);
+  document.getElementById('quotePreviewOverlay').classList.add('open');
+}
+function closeQuotePreview(ev) {
+  if (ev && ev.target !== ev.currentTarget && ev.type === 'click') {
+    if (!ev.target.closest('.qp-overlay') || ev.target.closest('.qp-modal')) {
+      if (ev.target.closest('.qp-modal')) return;
+    }
+  }
+  document.getElementById('quotePreviewOverlay').classList.remove('open');
+}
+function printQuotePreview() { window.print(); }
+function exportQuotePDF() { previewQuote(); setTimeout(() => window.print(), 350); }
 
 function loadRequests() {
   try {
@@ -13343,6 +14324,7 @@ loadLocal();
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
+loadQuotes();   // v20.8 — saved quotes
 hsLoadTokens();
 
 /* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
