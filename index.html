@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.2</title>
+<title>CoreV | OxeFit Sales Tracker v21.3</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3462,6 +3462,27 @@
   .qb-toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .qb-ref { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-right: 6px; }
   .qb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  /* v21.3 — step wizard */
+  .qb-stepper { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .qb-step-pill { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); cursor: pointer; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--text-muted); flex: 1 1 auto; min-width: 0; }
+  .qb-step-pill .qb-pill-num { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-elev); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+  .qb-step-pill .qb-pill-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qb-step-pill.active { border-color: var(--accent2); color: var(--accent2); background: rgba(37,99,235,0.06); }
+  .qb-step-pill.active .qb-pill-num { background: var(--brand-grad); color: #fff; }
+  .qb-step-pill.done { color: var(--teal2); }
+  .qb-step-pill.done .qb-pill-num { background: var(--teal); color: #fff; }
+  .qb-steps { margin-bottom: 14px; }
+  .qb-step { display: none; }
+  .qb-step.active { display: grid; grid-template-columns: 1fr; gap: 14px; animation: qbFade .18s ease; }
+  @keyframes qbFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .qb-stepnav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 2px 4px; border-top: 1px solid var(--border); position: sticky; bottom: 0; background: var(--bg, transparent); }
+  .qb-step-indicator { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+  .qb-review { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .qb-review-line { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .qb-review-line .qb-rl-label { color: var(--text-muted); font-weight: 600; }
+  .qb-review-line .qb-rl-val { color: var(--text); font-weight: 700; text-align: right; }
+  .qb-review-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  @media (max-width: 700px) { .qb-step-pill .qb-pill-label { display: none; } }
   .qb-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
   .qb-card-wide { grid-column: 1 / -1; }
   .qb-card-title { margin: 0 0 12px; font-size: 14px; font-weight: 800; color: var(--text); }
@@ -3503,7 +3524,7 @@
   .qb-line-prod { display: flex; align-items: center; gap: 8px; }
   .qb-line-sku { font-weight: 800; color: var(--accent2); font-size: 11px; font-family: 'Inter', monospace; background: rgba(37,99,235,0.10); padding: 2px 7px; border-radius: 6px; white-space: nowrap; }
   .qb-table-wrap { overflow-x: auto; }
-  .qb-items { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .qb-items { width: 100%; min-width: 0; border-collapse: collapse; font-size: 13px; }
   .qb-items th { text-align: left; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); padding: 7px 8px; border-bottom: 2px solid var(--border); }
   .qb-items th.qb-num, .qb-items td.qb-num { text-align: right; font-variant-numeric: tabular-nums; }
   .qb-items td { padding: 7px 8px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
@@ -3551,7 +3572,7 @@
   .qp-modal-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: #0f172a; color: #fff; font-weight: 700; font-size: 14px; }
   .qp-modal-bar > div { display: flex; gap: 8px; }
   .qp-scroll { max-height: calc(100vh - 130px); overflow: auto; background: #e2e8f0; padding: 18px; }
-  .qp-doc { background: #fff; color: #1a202c; width: 100%; max-width: 794px; margin: 0 auto; padding: 48px 54px; font-family: 'Inter', Arial, sans-serif; font-size: 13px; line-height: 1.55; }
+  .qp-doc { background: #fff; color: #1a202c; width: 100%; max-width: 794px; margin: 0 auto; padding: 44px 46px; font-family: 'Inter', Arial, sans-serif; font-size: 12.5px; line-height: 1.5; box-sizing: border-box; }
   .qp-doc .qp-logo { font-size: 26px; font-weight: 900; letter-spacing: 1px; color: #1e293b; margin-bottom: 4px; }
   .qp-doc .qp-logo span { color: #2563eb; }
   .qp-doc .qp-byline { font-size: 10px; letter-spacing: 2px; color: #64748b; margin-bottom: 26px; }
@@ -3563,10 +3584,10 @@
   .qp-total-line { display: flex; gap: 30px; align-items: baseline; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; margin: 18px 0; }
   .qp-total-line .qp-tl-label { font-weight: 800; font-size: 15px; }
   .qp-total-line .qp-tl-val { font-weight: 800; font-size: 15px; }
-  table.qp-table { width: 100%; border-collapse: collapse; margin: 6px 0 20px; table-layout: fixed; }
-  table.qp-table th { background: #dbeafe; color: #1e3a8a; text-align: left; font-size: 11px; font-weight: 800; padding: 10px 12px; }
+  table.qp-table { width: 100%; min-width: 0; border-collapse: collapse; margin: 6px 0 20px; table-layout: fixed; }
+  table.qp-table th { background: #dbeafe; color: #1e3a8a; text-align: left; font-size: 10px; font-weight: 800; padding: 8px 10px; letter-spacing: 0.3px; }
   table.qp-table th.qp-r, table.qp-table td.qp-r { text-align: right; }
-  table.qp-table td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-size: 12.5px; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+  table.qp-table td { border-bottom: 1px solid #e2e8f0; padding: 9px 10px; font-size: 12px; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
   .qp-doc .qp-logo-img { height: 56px; width: auto; display: block; margin-bottom: 22px; }
   .qp-item-sku { font-size: 10px; font-weight: 800; color: #2563eb; letter-spacing: 0.4px; margin-bottom: 2px; }
   .qp-summary { max-width: 320px; margin-left: auto; }
@@ -3625,7 +3646,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.2 · Product Type (OXEFIT line) for per-type T&C lock · Quote approval workflow
+      v21.3 · Step-by-step quote wizard · A4 template fit · removed signature
     </div>
   </div>
 </div>
@@ -3698,7 +3719,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.2</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.3</strong></p>
     </div>
   </div>
 </div>
@@ -3767,7 +3788,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.2</div>
+      <div class="sidebar-version">v21.3</div>
     </div>
   </aside>
 
@@ -4697,185 +4718,197 @@
           <div class="qb-toolbar-right">
             <span class="qb-ref" id="qbRefLabel"></span>
             <span class="quote-status-badge" id="qbStatusBadge"></span>
-            <button class="prod-row-btn" onclick="previewQuote()">👁 Preview Quote</button>
-            <button class="prod-add-btn" id="qbSaveBtn" onclick="saveQuote()">💾 Save</button>
-            <button class="prod-add-btn" id="qbSubmitBtn" onclick="submitQuoteForApproval()">📤 Submit for Approval</button>
             <button class="prod-row-btn" id="qbApproveBtn" style="display:none;" onclick="approveQuote()">✓ Approve</button>
             <button class="prod-row-btn del" id="qbRejectBtn" style="display:none;" onclick="rejectQuote()">✕ Reject</button>
             <button class="prod-add-btn" id="qbDownloadBtn" style="display:none;" onclick="exportQuotePDF()">⤓ Download</button>
           </div>
         </div>
 
-        <div class="qb-grid">
-          <!-- ░ Quote meta ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">1 · Quote Details</h4>
-            <div class="qb-row2">
-              <div class="qb-field"><label>Quote Name</label><input type="text" id="qbName" placeholder="e.g. FevaFit"></div>
-              <div class="qb-field"><label>Expiration Date <span class="qb-hint-inline">(default 14 days)</span></label><input type="date" id="qbExpires"></div>
-            </div>
-          </section>
+        <!-- Wizard progress -->
+        <div class="qb-stepper" id="qbStepper"></div>
 
-          <!-- ░ Associated deal ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">2 · Associated Deal <span class="qb-sub">— from your HubSpot deals</span></h4>
-            <div class="qb-row2">
-              <div class="qb-field">
-                <label>Deal</label>
-                <select id="qbDealSelect" onchange="onQuoteDealSelect()"><option value="">— Select a deal —</option></select>
-              </div>
-              <div class="qb-field qb-field-btn">
-                <label>&nbsp;</label>
-                <button class="qb-fetch-btn" id="qbFetchDealsBtn" onclick="qbFetchDeals()">⟳ Load my deals</button>
-              </div>
-            </div>
-            <div class="qb-inline-note" id="qbDealNote"></div>
-          </section>
+        <div class="qb-steps">
 
-          <!-- ░ Buyer ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">3 · Buyer Information <span class="qb-sub">— existing HubSpot contacts only</span></h4>
-            <div class="qb-row2">
-              <div class="qb-field">
-                <label>Contact</label>
-                <select id="qbContactSelect" onchange="onQuoteContactSelect()"><option value="">— Select a contact —</option></select>
+          <!-- STEP 1 · Details -->
+          <div class="qb-step active" data-step="0">
+            <section class="qb-card">
+              <h4 class="qb-card-title">Quote Details</h4>
+              <div class="qb-row2">
+                <div class="qb-field"><label>Quote Name</label><input type="text" id="qbName" placeholder="e.g. FevaFit"></div>
+                <div class="qb-field"><label>Expiration Date <span class="qb-hint-inline">(default 14 days)</span></label><input type="date" id="qbExpires"></div>
               </div>
-              <div class="qb-field qb-field-btn">
-                <label>&nbsp;</label>
-                <button class="qb-fetch-btn" id="qbFetchContactsBtn" onclick="qbFetchContacts()">⟳ Load my contacts</button>
+            </section>
+            <section class="qb-card">
+              <h4 class="qb-card-title">Associated Deal <span class="qb-sub">— from your HubSpot deals</span></h4>
+              <div class="qb-row2">
+                <div class="qb-field">
+                  <label>Deal</label>
+                  <select id="qbDealSelect" onchange="onQuoteDealSelect()"><option value="">— Select a deal —</option></select>
+                </div>
+                <div class="qb-field qb-field-btn">
+                  <label>&nbsp;</label>
+                  <button class="qb-fetch-btn" id="qbFetchDealsBtn" onclick="qbFetchDeals()">⟳ Load my deals</button>
+                </div>
               </div>
-            </div>
-            <div class="qb-row2">
-              <div class="qb-field"><label>Client Name</label><input type="text" id="qbBuyerName" placeholder="Contact name"></div>
-              <div class="qb-field"><label>Email</label><input type="email" id="qbBuyerEmail" placeholder="email@company.com"></div>
-            </div>
-            <div class="qb-row2">
-              <div class="qb-field"><label>Phone</label><input type="text" id="qbBuyerPhone" placeholder="+971…"></div>
-              <div class="qb-field"><label>Address</label><input type="text" id="qbBuyerAddress" placeholder="Address"></div>
-            </div>
-            <div class="qb-divider"></div>
-            <div class="qb-row2">
-              <div class="qb-field">
-                <label>Company <span class="qb-hint-inline">(optional)</span></label>
-                <select id="qbCompanySelect" onchange="onQuoteCompanySelect()"><option value="">— None —</option></select>
-              </div>
-              <div class="qb-field qb-field-btn">
-                <label>&nbsp;</label>
-                <button class="qb-fetch-btn" id="qbFetchCompaniesBtn" onclick="qbFetchCompanies()">⟳ Load my companies</button>
-              </div>
-            </div>
-          </section>
+              <div class="qb-inline-note" id="qbDealNote"></div>
+            </section>
+          </div>
 
-          <!-- ░ Sender + Seller ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">4 · Quote Sender &amp; Seller</h4>
-            <div class="qb-twocol">
-              <div>
-                <div class="qb-mini-label">Prepared by (sender)</div>
-                <div class="qb-field"><label>Full Name</label><input type="text" id="qbSenderName"></div>
-                <div class="qb-field"><label>Email</label><input type="email" id="qbSenderEmail"></div>
+          <!-- STEP 2 · Buyer -->
+          <div class="qb-step" data-step="1">
+            <section class="qb-card">
+              <h4 class="qb-card-title">Buyer Information <span class="qb-sub">— existing HubSpot contacts only</span></h4>
+              <div class="qb-row2">
+                <div class="qb-field">
+                  <label>Contact</label>
+                  <select id="qbContactSelect" onchange="onQuoteContactSelect()"><option value="">— Select a contact —</option></select>
+                </div>
+                <div class="qb-field qb-field-btn">
+                  <label>&nbsp;</label>
+                  <button class="qb-fetch-btn" id="qbFetchContactsBtn" onclick="qbFetchContacts()">⟳ Load my contacts</button>
+                </div>
+              </div>
+              <div class="qb-row2">
+                <div class="qb-field"><label>Client Name</label><input type="text" id="qbBuyerName" placeholder="Contact name"></div>
+                <div class="qb-field"><label>Email</label><input type="email" id="qbBuyerEmail" placeholder="email@company.com"></div>
+              </div>
+              <div class="qb-row2">
+                <div class="qb-field"><label>Phone</label><input type="text" id="qbBuyerPhone" placeholder="+971…"></div>
+                <div class="qb-field"><label>Address</label><input type="text" id="qbBuyerAddress" placeholder="Address"></div>
+              </div>
+              <div class="qb-divider"></div>
+              <div class="qb-row2">
+                <div class="qb-field">
+                  <label>Company <span class="qb-hint-inline">(optional)</span></label>
+                  <select id="qbCompanySelect" onchange="onQuoteCompanySelect()"><option value="">— None —</option></select>
+                </div>
+                <div class="qb-field qb-field-btn">
+                  <label>&nbsp;</label>
+                  <button class="qb-fetch-btn" id="qbFetchCompaniesBtn" onclick="qbFetchCompanies()">⟳ Load my companies</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- STEP 3 · From -->
+          <div class="qb-step" data-step="2">
+            <section class="qb-card">
+              <h4 class="qb-card-title">Quote Sender &amp; Seller</h4>
+              <div class="qb-twocol">
+                <div>
+                  <div class="qb-mini-label">Prepared by (sender)</div>
+                  <div class="qb-field"><label>Full Name</label><input type="text" id="qbSenderName"></div>
+                  <div class="qb-field"><label>Email</label><input type="email" id="qbSenderEmail"></div>
+                  <div class="qb-row2">
+                    <div class="qb-field"><label>Phone</label><input type="text" id="qbSenderPhone"></div>
+                    <div class="qb-field"><label>Title</label><input type="text" id="qbSenderTitle" placeholder="e.g. Sales Executive"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="qb-mini-label">Seller (fixed)</div>
+                  <div class="qb-seller-box" id="qbSellerBox"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- STEP 4 · Products -->
+          <div class="qb-step" data-step="3">
+            <section class="qb-card qb-card-wide">
+              <h4 class="qb-card-title">Products &amp; Services</h4>
+              <div class="qb-additem">
+                <div class="qb-prod-search-wrap">
+                  <input id="qbProductSearch" class="qb-prod-search" type="text" autocomplete="off"
+                         placeholder="🔍 Search products by SKU…"
+                         oninput="qbFilterProductPicker()" onfocus="qbFilterProductPicker()" onblur="qbHideProductResults()">
+                  <div class="qb-prod-results" id="qbProductResults"></div>
+                </div>
+              </div>
+              <div class="qb-table-wrap">
+                <table class="qb-items">
+                  <thead><tr><th class="qb-col-sku">SKU</th><th>Product Description</th><th class="qb-num">Unit Price</th><th class="qb-num">Qty</th><th class="qb-num">Total</th><th></th></tr></thead>
+                  <tbody id="qbItemsBody"></tbody>
+                </table>
+              </div>
+              <div class="qb-totals">
+                <div class="qb-tot-row"><span>One-time subtotal</span><strong id="qbSubtotal">AED 0.00</strong></div>
+                <div class="qb-tot-row">
+                  <span>One-time discount</span>
+                  <span class="qb-disc-input">AED <input type="number" id="qbDiscount" min="0" step="0.01" value="0" oninput="recalcQuoteTotals()"></span>
+                </div>
+                <div class="qb-tot-row"><span>VAT (5%)</span><strong id="qbVatAmount">AED 0.00</strong></div>
+                <div class="qb-tot-row qb-tot-grand"><span>Total</span><strong id="qbGrandTotal">AED 0.00</strong></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- STEP 5 · Payment -->
+          <div class="qb-step" data-step="4">
+            <section class="qb-card">
+              <h4 class="qb-card-title">Payment Schedule</h4>
+              <div class="qb-inline-note">Default is 100% on order. Add installments with a percentage and a due milestone; percentages should total 100%.</div>
+              <div id="qbScheduleBody"></div>
+              <button class="qb-fetch-btn" onclick="qbAddInstallment()">+ Add installment</button>
+              <div class="qb-sched-total" id="qbSchedTotal"></div>
+            </section>
+            <section class="qb-card">
+              <h4 class="qb-card-title">Payment Method</h4>
+              <label class="qb-check"><input type="checkbox" id="qbPayBankChk" checked onchange="toggleQbPayBank()"> Bank transfer details</label>
+              <div id="qbBankBox" class="qb-bank-box">
                 <div class="qb-row2">
-                  <div class="qb-field"><label>Phone</label><input type="text" id="qbSenderPhone"></div>
-                  <div class="qb-field"><label>Title</label><input type="text" id="qbSenderTitle" placeholder="e.g. Sales Executive"></div>
+                  <div class="qb-field"><label>Customer Name</label><input type="text" id="qbBankCustomer"></div>
+                  <div class="qb-field"><label>Bank Name</label><input type="text" id="qbBankName"></div>
                 </div>
+                <div class="qb-row2">
+                  <div class="qb-field"><label>Account Number</label><input type="text" id="qbBankAccount"></div>
+                  <div class="qb-field"><label>IBAN</label><input type="text" id="qbBankIban"></div>
+                </div>
+                <div class="qb-field"><label>Currency</label><input type="text" id="qbBankCurrency" value="AED"></div>
               </div>
-              <div>
-                <div class="qb-mini-label">Seller (fixed)</div>
-                <div class="qb-seller-box" id="qbSellerBox"></div>
+              <label class="qb-check"><input type="checkbox" id="qbPayLinkChk" onchange="toggleQbPayLink()"> Payment link</label>
+              <div id="qbLinkBox" class="qb-bank-box" style="display:none;">
+                <div class="qb-field"><label>Payment Link URL</label><input type="url" id="qbPayLink" placeholder="https://…"></div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
 
-          <!-- ░ Products / line items ░ -->
-          <section class="qb-card qb-card-wide">
-            <h4 class="qb-card-title">5 · Products &amp; Services</h4>
-            <div class="qb-additem">
-              <div class="qb-prod-search-wrap">
-                <input id="qbProductSearch" class="qb-prod-search" type="text" autocomplete="off"
-                       placeholder="🔍 Search products by SKU…"
-                       oninput="qbFilterProductPicker()" onfocus="qbFilterProductPicker()" onblur="qbHideProductResults()">
-                <div class="qb-prod-results" id="qbProductResults"></div>
-              </div>
-            </div>
-            <div class="qb-table-wrap">
-              <table class="qb-items">
-                <thead><tr><th class="qb-col-sku">SKU</th><th>Product Description</th><th class="qb-num">Unit Price</th><th class="qb-num">Qty</th><th class="qb-num">Total</th><th></th></tr></thead>
-                <tbody id="qbItemsBody"></tbody>
+          <!-- STEP 6 · Terms -->
+          <div class="qb-step" data-step="5">
+            <section class="qb-card qb-card-wide">
+              <h4 class="qb-card-title">Purchase Terms</h4>
+              <div class="qb-inline-note">Each row is a term (label + detail). A sensible default is pre-filled from the CoreV template.</div>
+              <table class="qb-items qb-terms">
+                <thead><tr><th style="width:30%;">Term</th><th>Detail</th><th></th></tr></thead>
+                <tbody id="qbTermsBody"></tbody>
               </table>
-            </div>
-            <div class="qb-totals">
-              <div class="qb-tot-row"><span>One-time subtotal</span><strong id="qbSubtotal">AED 0.00</strong></div>
-              <div class="qb-tot-row">
-                <span>One-time discount</span>
-                <span class="qb-disc-input">AED <input type="number" id="qbDiscount" min="0" step="0.01" value="0" oninput="recalcQuoteTotals()"></span>
+              <button class="qb-fetch-btn" onclick="qbAddTerm()">+ Add term</button>
+            </section>
+            <section class="qb-card">
+              <h4 class="qb-card-title">Comments to Buyer</h4>
+              <textarea id="qbComments" class="qb-textarea" placeholder="Any notes for the buyer…"></textarea>
+            </section>
+          </div>
+
+          <!-- STEP 7 · Review -->
+          <div class="qb-step" data-step="6">
+            <section class="qb-card qb-card-wide">
+              <h4 class="qb-card-title">Review &amp; Submit</h4>
+              <div id="qbReviewSummary" class="qb-review"></div>
+              <div class="qb-review-actions">
+                <button class="prod-row-btn" onclick="previewQuote()">👁 Preview Quote</button>
+                <button class="prod-add-btn" id="qbSaveBtn" onclick="saveQuote()">💾 Save</button>
+                <button class="prod-add-btn" id="qbSubmitBtn" onclick="submitQuoteForApproval()">📤 Submit for Approval</button>
               </div>
-              <div class="qb-tot-row"><span>VAT (5%)</span><strong id="qbVatAmount">AED 0.00</strong></div>
-              <div class="qb-tot-row qb-tot-grand"><span>Total</span><strong id="qbGrandTotal">AED 0.00</strong></div>
-            </div>
-          </section>
+            </section>
+          </div>
 
-          <!-- ░ Payment schedule ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">6 · Payment Schedule</h4>
-            <div class="qb-inline-note">Default is 100% on order. Add installments with a percentage and a due milestone; percentages should total 100%.</div>
-            <div id="qbScheduleBody"></div>
-            <button class="qb-fetch-btn" onclick="qbAddInstallment()">+ Add installment</button>
-            <div class="qb-sched-total" id="qbSchedTotal"></div>
-          </section>
+        </div>
 
-          <!-- ░ Payment method ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">7 · Payment Method</h4>
-            <label class="qb-check"><input type="checkbox" id="qbPayBankChk" checked onchange="toggleQbPayBank()"> Bank transfer details</label>
-            <div id="qbBankBox" class="qb-bank-box">
-              <div class="qb-row2">
-                <div class="qb-field"><label>Customer Name</label><input type="text" id="qbBankCustomer"></div>
-                <div class="qb-field"><label>Bank Name</label><input type="text" id="qbBankName"></div>
-              </div>
-              <div class="qb-row2">
-                <div class="qb-field"><label>Account Number</label><input type="text" id="qbBankAccount"></div>
-                <div class="qb-field"><label>IBAN</label><input type="text" id="qbBankIban"></div>
-              </div>
-              <div class="qb-field"><label>Currency</label><input type="text" id="qbBankCurrency" value="AED"></div>
-            </div>
-            <label class="qb-check"><input type="checkbox" id="qbPayLinkChk" onchange="toggleQbPayLink()"> Payment link</label>
-            <div id="qbLinkBox" class="qb-bank-box" style="display:none;">
-              <div class="qb-field"><label>Payment Link URL</label><input type="url" id="qbPayLink" placeholder="https://…"></div>
-            </div>
-          </section>
-
-          <!-- ░ Purchase terms ░ -->
-          <section class="qb-card qb-card-wide">
-            <h4 class="qb-card-title">8 · Purchase Terms</h4>
-            <div class="qb-inline-note">Each row is a term (label + detail). A sensible default is pre-filled from the CoreV template.</div>
-            <table class="qb-items qb-terms">
-              <thead><tr><th style="width:30%;">Term</th><th>Detail</th><th></th></tr></thead>
-              <tbody id="qbTermsBody"></tbody>
-            </table>
-            <button class="qb-fetch-btn" onclick="qbAddTerm()">+ Add term</button>
-          </section>
-
-          <!-- ░ Comments ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">9 · Comments to Buyer</h4>
-            <textarea id="qbComments" class="qb-textarea" placeholder="Any notes for the buyer…"></textarea>
-          </section>
-
-          <!-- ░ Signature ░ -->
-          <section class="qb-card">
-            <h4 class="qb-card-title">10 · Signature</h4>
-            <div class="qb-row2">
-              <div class="qb-field"><label>Signed by (name)</label><input type="text" id="qbSignName" placeholder="Type name"></div>
-              <div class="qb-field"><label>&nbsp;</label>
-                <div class="qb-sign-tools">
-                  <button class="qb-fetch-btn" onclick="qbClearSignature()">Clear</button>
-                  <label class="qb-upload-btn">Upload image<input type="file" accept="image/*" id="qbSignUpload" style="display:none;" onchange="qbSignatureUpload(this)"></label>
-                </div>
-              </div>
-            </div>
-            <canvas id="qbSignCanvas" class="qb-sign-canvas" width="460" height="130"></canvas>
-            <div class="qb-inline-note">Draw with the mouse/finger, type a name, or upload an image.</div>
-          </section>
+        <!-- Wizard navigation -->
+        <div class="qb-stepnav">
+          <button class="qb-back" id="qbPrevBtn" onclick="qbPrevStep()">← Back</button>
+          <span class="qb-step-indicator" id="qbStepIndicator"></span>
+          <button class="prod-add-btn" id="qbNextBtn" onclick="qbNextStep()">Next →</button>
         </div>
       </div>
 
@@ -11294,7 +11327,7 @@ function openQuoteBuilderUI() {
   document.getElementById('qbDiscount').value = q.discount || 0;
 
   document.getElementById('qbComments').value = q.comments || '';
-  document.getElementById('qbSignName').value = q.signName || '';
+
   // seller box
   document.getElementById('qbSellerBox').innerHTML =
     `<strong>${escapeHtml(QUOTE_SELLER.name)}</strong><br>` +
@@ -11314,12 +11347,70 @@ function openQuoteBuilderUI() {
   qbPopulateProductPicker();
   qbRebuildDealSelect(); qbRebuildContactSelect(); qbRebuildCompanySelect();
   renderQbItems(); renderQbSchedule(); renderQbTerms();
-  // signature
-  _qbInitSignatureCanvas();
-  if (q.signImg) _qbDrawSignatureImg(q.signImg);
-  else _qbClearCanvasOnly();
   recalcQuoteTotals();
   updateQuoteButtons();
+  qbRenderStepper();
+  qbGoStep(0);
+}
+
+/* ── Step wizard (v21.3) ──────────────────────────────────────────── */
+const QB_STEPS = [
+  { label: 'Details' }, { label: 'Buyer' }, { label: 'From' },
+  { label: 'Products' }, { label: 'Payment' }, { label: 'Terms' }, { label: 'Review' }
+];
+let _qbStep = 0;
+function qbRenderStepper() {
+  const host = document.getElementById('qbStepper');
+  if (!host) return;
+  host.innerHTML = QB_STEPS.map((s, i) =>
+    `<div class="qb-step-pill" id="qbPill${i}" onclick="qbGoStep(${i})"><span class="qb-pill-num">${i + 1}</span><span class="qb-pill-label">${s.label}</span></div>`
+  ).join('');
+}
+function qbGoStep(i) {
+  _qbStep = Math.max(0, Math.min(QB_STEPS.length - 1, i));
+  document.querySelectorAll('#quoteBuilder .qb-step').forEach(el => {
+    el.classList.toggle('active', Number(el.dataset.step) === _qbStep);
+  });
+  QB_STEPS.forEach((s, idx) => {
+    const pill = document.getElementById('qbPill' + idx);
+    if (!pill) return;
+    pill.classList.toggle('active', idx === _qbStep);
+    pill.classList.toggle('done', idx < _qbStep);
+  });
+  const ind = document.getElementById('qbStepIndicator');
+  if (ind) ind.textContent = `Step ${_qbStep + 1} of ${QB_STEPS.length} · ${QB_STEPS[_qbStep].label}`;
+  const prev = document.getElementById('qbPrevBtn');
+  const next = document.getElementById('qbNextBtn');
+  if (prev) prev.style.visibility = _qbStep === 0 ? 'hidden' : 'visible';
+  if (next) next.style.display = _qbStep === QB_STEPS.length - 1 ? 'none' : '';
+  if (_qbStep === QB_STEPS.length - 1) qbRenderReview();
+  // keep totals fresh when landing on Products/Review
+  try { recalcQuoteTotals(); } catch (_) {}
+  const sc = document.querySelector('#view-quotes .content') || window;
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+}
+function qbNextStep() { qbCollect(); qbGoStep(_qbStep + 1); }
+function qbPrevStep() { qbCollect(); qbGoStep(_qbStep - 1); }
+function qbRenderReview() {
+  qbCollect();
+  const q = _currentQuote;
+  const host = document.getElementById('qbReviewSummary');
+  if (!host) return;
+  const row = (l, v) => `<div class="qb-review-line"><span class="qb-rl-label">${l}</span><span class="qb-rl-val">${v || '—'}</span></div>`;
+  const schedTxt = (q.schedule || []).map(s => `${s.pct}% ${s.when || ''}`.trim()).join(' · ');
+  host.innerHTML =
+    row('Quote name', escapeHtml(q.name)) +
+    row('Reference', escapeHtml(q.reference)) +
+    row('Expires', quoteFmtDate(q.expiresAt)) +
+    row('Deal', escapeHtml(q.dealName)) +
+    row('Buyer', escapeHtml((q.buyer && q.buyer.name) || '') + (q.company && q.company.name ? ' — ' + escapeHtml(q.company.name) : '')) +
+    row('Prepared by', escapeHtml((q.sender && q.sender.name) || '')) +
+    row('Line items', (q.lineItems || []).length + ' item(s)') +
+    row('Subtotal', 'AED ' + fmtMoney(q.subtotal || 0)) +
+    ((q.discount || 0) > 0 ? row('Discount', '(AED ' + fmtMoney(q.discount) + ')') : '') +
+    row('VAT (5%)', 'AED ' + fmtMoney(q.vatAmount || 0)) +
+    row('Total', 'AED ' + fmtMoney(q.total || 0)) +
+    row('Payment schedule', escapeHtml(schedTxt));
 }
 
 /* ── Deal / contact / company selectors ───────────────────────────── */
@@ -11623,7 +11714,7 @@ function qbCollect() {
   q.sender.phone = document.getElementById('qbSenderPhone').value.trim();
   q.sender.title = document.getElementById('qbSenderTitle').value.trim();
   q.comments = document.getElementById('qbComments').value;
-  q.signName = document.getElementById('qbSignName').value.trim();
+  // signature removed in v21.3
   // status is managed by the approval workflow (Draft → Pending Approval → Approved/Rejected)
   q.payBank = document.getElementById('qbPayBankChk').checked;
   q.payLink = document.getElementById('qbPayLinkChk').checked;
@@ -11783,10 +11874,6 @@ function buildQuotePreviewHTML(q) {
   if (q.payLink && q.paymentLink) {
     payBlock += `<div style="margin-top:8px;"><b>Payment link:</b> <a href="${escapeHtml(q.paymentLink)}">${escapeHtml(q.paymentLink)}</a></div>`;
   }
-  let signBlock = '';
-  if (q.signImg) signBlock = `<img class="qp-sign-img" src="${q.signImg}">`;
-  else if (q.signName) signBlock = `<div class="qp-sign-name">${escapeHtml(q.signName)}</div>`;
-  if (q.signName && q.signImg) signBlock += `<div class="qp-muted" style="margin-top:4px;">${escapeHtml(q.signName)}</div>`;
 
   return `
     <img class="qp-logo-img" src="${QUOTE_LOGO_URI}" alt="OXEFIT by CORE">
@@ -11797,7 +11884,7 @@ function buildQuotePreviewHTML(q) {
     </div>
     <div class="qp-total-line"><span class="qp-tl-label">Total</span><span class="qp-tl-val">${money(q.total||0)}</span></div>
     <table class="qp-table">
-      <colgroup><col style="width:50%"><col style="width:20%"><col style="width:10%"><col style="width:20%"></colgroup>
+      <colgroup><col style="width:54%"><col style="width:18%"><col style="width:10%"><col style="width:18%"></colgroup>
       <thead><tr><th>PRODUCTS &amp; SERVICES</th><th class="qp-r">UNIT PRICE</th><th class="qp-r">QTY</th><th class="qp-r">TOTAL</th></tr></thead>
       <tbody>${itemsRows}</tbody>
     </table>
@@ -11813,7 +11900,6 @@ function buildQuotePreviewHTML(q) {
     ${termsRows ? `<div class="qp-section-h">Purchase Terms</div>${termsRows}` : ''}
     ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
     ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
-    ${signBlock ? `<div class="qp-section-h">Signature</div>${signBlock}` : ''}
   `;
 }
 function previewQuote() {
