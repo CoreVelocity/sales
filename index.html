@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.25</title>
+<title>CoreV | OxeFit Sales Tracker v21.26</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -1970,7 +1970,7 @@
   /* ════════════ EXECUTIVE DASHBOARD (v19.2) ════════════ */
   .exec-hero {
     display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;
-    background: linear-gradient(135deg, var(--sidebar-bg) 0%, #14233f 100%);
+    background: linear-gradient(135deg, #233a5e 0%, #14233f 100%);
     border: 1px solid var(--border); border-radius: 18px; padding: 28px 32px; margin-bottom: 22px;
     color: #fff;
   }
@@ -3459,6 +3459,8 @@
     border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; margin-bottom: 16px;
   }
   .quotes-hero-icon { font-size: 34px; flex-shrink: 0; }
+  .quotes-hero-icon svg, .gd-hero-icon svg { width: 30px; height: 30px; stroke: var(--accent2); fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .exec-action svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
   .quotes-hero-title { margin: 0 0 4px; font-size: 22px; font-weight: 800; color: var(--text); }
   .quotes-hero-sub { margin: 0; font-size: 13px; color: var(--text-muted); max-width: 760px; line-height: 1.5; }
   .quotes-subtabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
@@ -3776,7 +3778,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.25 · Published Quotes on dashboard · icon top bar (no search) · clean SVG menu icons
+      v21.26 · SVG icons in page headers · readable exec hero · demo tracker excludes non-delivering staff
     </div>
   </div>
 </div>
@@ -3849,7 +3851,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.25</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.26</strong></p>
     </div>
   </div>
 </div>
@@ -3918,7 +3920,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.25</div>
+      <div class="sidebar-version">v21.26</div>
     </div>
   </aside>
 
@@ -4703,7 +4705,7 @@
   <div class="tab-view" id="view-quotes">
   <div class="content">
     <section class="quotes-hero">
-      <div class="quotes-hero-icon">🧾</div>
+      <div class="quotes-hero-icon"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v16l3-2 2 2 2-2 2 2 3-2V5a2 2 0 0 0-2-2z"/><line x1="8" y1="9" x2="14" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg></div>
       <div>
         <h2 class="quotes-hero-title">Quotes &amp; Products</h2>
         <p class="quotes-hero-sub">Build a product catalog, then generate quotes from it. Start by adding the products and services you sell — SKU, description, unit price and type.</p>
@@ -5398,7 +5400,7 @@
 
       <!-- HERO -->
       <section class="gd-hero">
-        <div class="gd-hero-icon">📖</div>
+        <div class="gd-hero-icon"><svg viewBox="0 0 24 24"><path d="M12 6S10 4 6 4a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2c4 0 6 2 6 2"/><path d="M12 6s2-2 6-2a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2c-4 0-6 2-6 2z"/></svg></div>
         <div>
           <h1>Guidelines &amp; Methodology</h1>
           <p>How every number on the <strong>Sales Rep Performance</strong> dashboard is calculated. Use this page as the single source of truth when reviewing a rep's scorecard, the leaderboard, or the team-level KPIs.</p>
@@ -6056,6 +6058,8 @@ const TEAMS = {
   'Abu Dhabi': ['Wafiq', 'Jawdat', 'Hussean', 'Connor']
 };
 const ALL_REPS = Object.values(TEAMS).flat();
+// Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
+const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
 /* ── M365 SSO IDENTITY MAP ────────────────────────────────────────
    Maps Microsoft 365 work email (core-velocity.com) → tracker rep name.
@@ -10984,10 +10988,10 @@ function renderExecDashboard() {
 
   // Quick actions
   document.getElementById('execActions').innerHTML = `
-    <button class="exec-action" onclick="switchTab('tracker')"><span>📊</span> Open Sales Tracker</button>
-    <button class="exec-action" onclick="switchTab('performance')"><span>🎯</span> Rep Performance</button>
-    <button class="exec-action" onclick="switchTab('requests')"><span>📝</span> Submit / Review Requests</button>
-    <button class="exec-action" onclick="switchTab('deal-rules')"><span>⚖️</span> Deal Ownership Rules</button>`;
+    <button class="exec-action" onclick="switchTab('tracker')"><svg viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg> Open Sales Tracker</button>
+    <button class="exec-action" onclick="switchTab('performance')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg> Rep Performance</button>
+    <button class="exec-action" onclick="switchTab('requests')"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg> Submit / Review Requests</button>
+    <button class="exec-action" onclick="switchTab('deal-rules')"><svg viewBox="0 0 24 24"><line x1="12" y1="4" x2="12" y2="21"/><line x1="7" y1="21" x2="17" y2="21"/><path d="M5 7h14"/><path d="M5 7l-2.5 5h5z"/><path d="M19 7l-2.5 5h5z"/></svg> Deal Ownership Rules</button>`;
 
   updateRequestsBadge();
   renderExecPublishedQuotes();
@@ -13312,9 +13316,9 @@ function demoExpandToCredits(rows) {
   const out = [];
   rows.forEach(e => {
     const seen = new Set();
-    if (e.rep) { out.push({ rep: e.rep, entry: e, role: 'primary' }); seen.add(e.rep); }
+    if (e.rep && !DEMO_EXCLUDE.has(e.rep)) { out.push({ rep: e.rep, entry: e, role: 'primary' }); seen.add(e.rep); }
     (Array.isArray(e.supportReps) ? e.supportReps : []).forEach(s => {
-      if (s && !seen.has(s)) { out.push({ rep: s, entry: e, role: 'support' }); seen.add(s); }
+      if (s && !seen.has(s) && !DEMO_EXCLUDE.has(s)) { out.push({ rep: s, entry: e, role: 'support' }); seen.add(s); }
     });
   });
   return out;
@@ -13341,8 +13345,8 @@ function renderDemoKpis(rows) {
   // v13.8 — uniqueReps includes supporting reps, not just primaries
   const repSet = new Set();
   rows.forEach(r => {
-    if (r.rep) repSet.add(r.rep);
-    (Array.isArray(r.supportReps) ? r.supportReps : []).forEach(s => s && repSet.add(s));
+    if (r.rep && !DEMO_EXCLUDE.has(r.rep)) repSet.add(r.rep);
+    (Array.isArray(r.supportReps) ? r.supportReps : []).forEach(s => { if (s && !DEMO_EXCLUDE.has(s)) repSet.add(s); });
   });
   const uniqueReps   = repSet.size;
   const uniqueClients= new Set(rows.map(r => (r.client||'').toLowerCase().trim()).filter(Boolean)).size;
