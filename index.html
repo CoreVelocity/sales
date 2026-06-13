@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.11</title>
+<title>CoreV | OxeFit Sales Tracker v21.12</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3524,6 +3524,10 @@
   .qb-combo-none { color: var(--text-muted); font-style: italic; }
   .qb-combo-empty { padding: 11px 13px; color: var(--text-muted); font-size: 12.5px; }
   .qb-invalid { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.16) !important; }
+  .quote-name-link { color: var(--accent2); font-weight: 700; cursor: pointer; text-decoration: none; }
+  .quote-name-link:hover { text-decoration: underline; }
+  .quote-del-x { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); cursor: pointer; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+  .quote-del-x:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
   .qb-fetch-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--teal2); cursor: pointer; white-space: nowrap; }
   .qb-fetch-btn:hover { border-color: var(--teal); }
   .qb-inline-note { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.5; }
@@ -3630,6 +3634,8 @@
   table.qp-table tbody tr.qp-terms-grouprow td { background: #eef2ff !important; color: #1e3a8a; font-weight: 800; font-size: 11px; letter-spacing: 0.5px; padding: 7px 10px; }
   .qp-page2 { margin-top: 10px; }
   @media print { .qp-page2 { break-before: page; } }
+  .qb-payterms-note { margin-top: 14px; }
+  .qb-payterms-head { font-size: 12px; font-weight: 800; color: var(--accent2); margin-bottom: 6px; letter-spacing: 0.3px; }
   .qb-terms textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 400 12.5px 'Inter', system-ui, sans-serif; resize: vertical; min-height: 42px; }
   .term-scope-sel { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 600 12px 'Inter', system-ui, sans-serif; }
   .qp-terms-row b { color: #0f172a; }
@@ -3763,7 +3769,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.11</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.12</strong></p>
     </div>
   </div>
 </div>
@@ -3832,7 +3838,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.11</div>
+      <div class="sidebar-version">v21.12</div>
     </div>
   </aside>
 
@@ -4923,6 +4929,7 @@
               <div id="qbScheduleBody"></div>
               <button class="qb-fetch-btn" onclick="qbAddInstallment()">+ Add installment</button>
               <div class="qb-sched-total" id="qbSchedTotal"></div>
+              <div class="qb-payterms-note" id="qbPayTermsNote"></div>
             </section>
             <section class="qb-card">
               <h4 class="qb-card-title">Payment Method</h4>
@@ -4997,7 +5004,7 @@
           <div class="qb-inline-note">These terms are <strong>fixed</strong> and applied automatically to any quote that contains a product of this Type. Reps cannot change them on a quote.<br>
           <strong>Scope</strong> controls multi-product quotes: <strong>Common</strong> terms (e.g. agreement, payment, warranty) are shown <strong>once</strong> even if several products share them; <strong>Unique</strong> terms (e.g. price includes, accessories) are listed <strong>per product Type</strong>.</div>
           <table class="qb-items qb-terms" id="termEditorTable">
-            <thead><tr><th style="width:24%;">Term Label</th><th>Detail</th><th style="width:120px;">Scope</th><th></th></tr></thead>
+            <thead><tr><th style="width:24%;">Term Label</th><th>Detail</th><th style="width:120px;" id="termScopeTh">Scope</th><th></th></tr></thead>
             <tbody id="termEditorBody"></tbody>
           </table>
           <div class="term-editor-actions">
@@ -6787,6 +6794,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
+    if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
     saveDemosLocalOnly();
     renderAll();
@@ -7001,6 +7009,8 @@ function buildEnvelope() {
   // v21.9 — per-Type terms library (admin-managed, last-write-wins)
   if (typeof termTemplates !== 'undefined' && termTemplates && Object.keys(termTemplates).length) env.termtemplates = termTemplates;
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
+  if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
+  else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
   return env;
 }
 
@@ -7036,6 +7046,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
+    if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
         saveDemosLocalOnly();
       }
@@ -11299,6 +11310,44 @@ function saveTermTemplates() {
   if (typeof msalAccount !== 'undefined' && msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
 }
 
+/* ── Payment Terms by schedule (v21.12) ───────────────────────────────
+   Two scenarios edited in the Terms Library and applied under the quote's
+   Payment Schedule: 'full' (single 100%-on-order milestone) vs 'installment'
+   (more than one milestone). Stored in 'oxefit_paymentterms_v1'. */
+const PAY_FULL_KEY = '__PAYFULL__', PAY_INST_KEY = '__PAYINST__';
+const PAYTERMS_KEY = 'oxefit_paymentterms_v1';
+let paymentTerms = { full: [], installment: [] };
+let _lastRemotePaymentTerms = null;
+const PAYTERMS_SEED = {
+  full: [
+    { label: 'PAYMENT TERMS', detail: '100% on placement of order. All payments via bank transfer. Order is non-refundable and non-cancellable.' }
+  ],
+  installment: [
+    { label: 'PAYMENT TERMS', detail: 'Payable by installments as per the Payment Schedule above. Each milestone is due on its stated date/event. All payments via bank transfer. Order is non-refundable and non-cancellable.' }
+  ]
+};
+function loadPaymentTerms() {
+  try { paymentTerms = JSON.parse(localStorage.getItem(PAYTERMS_KEY) || 'null') || null; }
+  catch (e) { paymentTerms = null; }
+  if (!paymentTerms || typeof paymentTerms !== 'object') paymentTerms = { full: [], installment: [] };
+  let seeded = false;
+  ['full', 'installment'].forEach(k => {
+    if (!Array.isArray(paymentTerms[k]) || !paymentTerms[k].length) { paymentTerms[k] = PAYTERMS_SEED[k].map(r => ({ ...r })); seeded = true; }
+  });
+  if (seeded) savePaymentTermsLocal();
+}
+function savePaymentTermsLocal() { try { localStorage.setItem(PAYTERMS_KEY, JSON.stringify(paymentTerms)); } catch (e) {} }
+function savePaymentTerms() {
+  savePaymentTermsLocal();
+  if (typeof msalAccount !== 'undefined' && msalAccount && typeof scheduleCloudSync === 'function') scheduleCloudSync();
+}
+// 'full' when the schedule is a single milestone, else 'installment'
+function quotePaymentMode(q) { return ((q && q.schedule) || []).length > 1 ? 'installment' : 'full'; }
+function resolveQuotePaymentTerms(q) {
+  const mode = quotePaymentMode(q);
+  return ((mode === 'installment' ? paymentTerms.installment : paymentTerms.full) || []).filter(r => r.label || r.detail);
+}
+
 // distinct product-line types present in the quote (in first-seen order)
 function quoteLineTypes(q) { return [...new Set(((q && q.lineItems) || []).map(it => it.lineType).filter(Boolean))]; }
 // groups of {type, rows} for the types present that have terms configured
@@ -11342,21 +11391,32 @@ function populateTermTypeSelect() {
   const sel = document.getElementById('termTypeSelect');
   if (!sel) return;
   const cur = sel.value;
-  sel.innerHTML = PRODUCT_LINE_TYPES.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  sel.innerHTML =
+    `<optgroup label="Payment Terms (by schedule)">` +
+      `<option value="${PAY_FULL_KEY}">💳 Payment Terms — Full payment (100%)</option>` +
+      `<option value="${PAY_INST_KEY}">💳 Payment Terms — Installments</option>` +
+    `</optgroup>` +
+    `<optgroup label="Product Type terms">` +
+      PRODUCT_LINE_TYPES.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('') +
+    `</optgroup>`;
   if (cur) sel.value = cur;
 }
+function _termEditorIsPay() { return _termEditorType === PAY_FULL_KEY || _termEditorType === PAY_INST_KEY; }
+function _payBucket(key) { return key === PAY_FULL_KEY ? 'full' : 'installment'; }
 function renderTermEditor() {
   const sel = document.getElementById('termTypeSelect');
   if (!sel) return;
   if (!sel.options.length) populateTermTypeSelect();
   const type = sel.value || PRODUCT_LINE_TYPES[0];
   _termEditorType = type;
-  _termEditorRows = JSON.parse(JSON.stringify(termTemplates[type] || []));
+  const isPay = _termEditorIsPay();
+  _termEditorRows = JSON.parse(JSON.stringify(isPay ? (paymentTerms[_payBucket(type)] || []) : (termTemplates[type] || [])));
   const admin = canEditProducts();
   const form = document.getElementById('termForm');
   const ro = document.getElementById('termsReadonly');
-  document.getElementById('termsIntro').innerHTML =
-    `Fixed Purchase Terms for Type <strong>${escapeHtml(type)}</strong>. These are applied automatically — and locked — on any quote that contains a ${escapeHtml(type)} product.`;
+  document.getElementById('termsIntro').innerHTML = isPay
+    ? `Payment Terms applied when a quote's Payment Schedule is <strong>${type === PAY_FULL_KEY ? 'a single 100% milestone (full payment)' : 'split into installments'}</strong>. These appear under the Payment Schedule on the quote.`
+    : `Fixed Purchase Terms for Type <strong>${escapeHtml(type)}</strong>. These are applied automatically — and locked — on any quote that contains a ${escapeHtml(type)} product.`;
   if (admin) {
     form.style.display = ''; ro.style.display = 'none';
     const body = document.getElementById('termEditorBody');
@@ -11364,32 +11424,45 @@ function renderTermEditor() {
       `<tr>` +
         `<td><input type="text" value="${escapeHtml(r.label || '')}" oninput="termRowChanged(${i},'label',this.value)"></td>` +
         `<td><textarea rows="2" oninput="termRowChanged(${i},'detail',this.value)">${escapeHtml(r.detail || '')}</textarea></td>` +
-        `<td><select class="term-scope-sel" onchange="termRowChanged(${i},'scope',this.value)">` +
-          `<option value="unique"${(r.scope || 'unique') === 'unique' ? ' selected' : ''}>Unique</option>` +
-          `<option value="common"${r.scope === 'common' ? ' selected' : ''}>Common</option>` +
-        `</select></td>` +
+        (isPay ? '' :
+          `<td><select class="term-scope-sel" onchange="termRowChanged(${i},'scope',this.value)">` +
+            `<option value="unique"${(r.scope || 'unique') === 'unique' ? ' selected' : ''}>Unique</option>` +
+            `<option value="common"${r.scope === 'common' ? ' selected' : ''}>Common</option>` +
+          `</select></td>`) +
         `<td><button class="qb-del-row" onclick="termDeleteRow(${i})">✕</button></td>` +
       `</tr>`
-    ).join('') || `<tr><td colspan="4" style="color:var(--text-muted);padding:10px;">No terms yet — add rows below.</td></tr>`;
+    ).join('') || `<tr><td colspan="${isPay ? 3 : 4}" style="color:var(--text-muted);padding:10px;">No terms yet — add rows below.</td></tr>`;
+    // hide the Scope column header for payment-terms mode
+    const scopeTh = document.getElementById('termScopeTh'); if (scopeTh) scopeTh.style.display = isPay ? 'none' : '';
     document.getElementById('termSavedNote').textContent = '';
   } else {
     form.style.display = 'none'; ro.style.display = '';
     ro.innerHTML = _termEditorRows.length
       ? `<div class="qb-terms-view">` + _termEditorRows.map(r => `<div class="qtv-row"><div class="qtv-label">${escapeHtml(r.label)}</div><div class="qtv-detail">${escapeHtml(r.detail)}</div></div>`).join('') + `</div>`
-      : 'No terms set for this Type yet.';
+      : 'No terms set yet.';
   }
 }
+function _termEditorPersist() {
+  if (_termEditorIsPay()) paymentTerms[_payBucket(_termEditorType)] = _termEditorRows;
+  else termTemplates[_termEditorType] = _termEditorRows;
+}
 function termRowChanged(i, field, val) { if (_termEditorRows[i]) _termEditorRows[i][field] = val; }
-function termAddRow() { _termEditorRows.push({ label: '', detail: '', scope: 'unique' }); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
-function termDeleteRow(i) { _termEditorRows.splice(i, 1); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
+function termAddRow() { _termEditorRows.push(_termEditorIsPay() ? { label: '', detail: '' } : { label: '', detail: '', scope: 'unique' }); _termEditorPersist(); renderTermEditor(); }
+function termDeleteRow(i) { _termEditorRows.splice(i, 1); _termEditorPersist(); renderTermEditor(); }
 function saveTermTemplate() {
   if (!canEditProducts()) { showToast('Only admins can edit terms', 'error'); return; }
   const rows = _termEditorRows.filter(r => (r.label || '').trim() || (r.detail || '').trim());
-  termTemplates[_termEditorType] = rows;
-  saveTermTemplates();
+  if (_termEditorIsPay()) {
+    paymentTerms[_payBucket(_termEditorType)] = rows;
+    savePaymentTerms();
+  } else {
+    termTemplates[_termEditorType] = rows;
+    saveTermTemplates();
+  }
+  const label = _termEditorIsPay() ? (_termEditorType === PAY_FULL_KEY ? 'Payment Terms — Full' : 'Payment Terms — Installments') : _termEditorType;
   const note = document.getElementById('termSavedNote');
-  if (note) { note.textContent = '✓ Saved for ' + _termEditorType; setTimeout(() => { note.textContent = ''; }, 2500); }
-  showToast('Terms saved for ' + _termEditorType, 'success');
+  if (note) { note.textContent = '✓ Saved'; setTimeout(() => { note.textContent = ''; }, 2500); }
+  showToast('Saved ' + label, 'success');
 }
 
 // read-only terms shown in the quote builder Terms step
@@ -11540,7 +11613,7 @@ function renderQuotesList() {
     const tr = document.createElement('tr');
     const st = q.status || 'Draft';
     tr.innerHTML =
-      `<td><strong>${escapeHtml(q.name || 'Untitled')}</strong></td>` +
+      `<td><a class="quote-name-link" onclick="openQuote('${q.id}')">${escapeHtml(q.name || 'Untitled')}</a></td>` +
       `<td style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.reference || '—')}</td>` +
       `<td>${escapeHtml((q.buyer && q.buyer.name) || '—')}</td>` +
       `<td style="font-size:11.5px;">${escapeHtml(q.dealName || '—')}</td>` +
@@ -11548,8 +11621,7 @@ function renderQuotesList() {
       `<td><span class="quote-status-badge ${quoteStatusClass(st)}">${st}</span></td>` +
       `<td style="font-size:11.5px;">${q.expiresAt ? quoteFmtDate(q.expiresAt) : '—'}</td>` +
       `<td class="prod-actions-col">` +
-        `<button class="prod-row-btn" onclick="openQuote('${q.id}')">Open</button>` +
-        `<button class="prod-row-btn del" onclick="deleteQuote('${q.id}')">Delete</button>` +
+        `<button class="quote-del-x" title="Delete quote" onclick="deleteQuote('${q.id}')">✕</button>` +
       `</td>`;
     body.appendChild(tr);
   });
@@ -12044,6 +12116,17 @@ function qbUpdateSchedTotal() {
   const sum = _currentQuote.schedule.reduce((s, x) => s + (parseFloat(x.pct) || 0), 0);
   el.textContent = `Total scheduled: ${sum}%` + (sum === 100 ? ' ✓' : ' — should equal 100%');
   el.className = 'qb-sched-total ' + (sum === 100 ? 'ok' : 'bad');
+  renderQbPayTermsNote();
+}
+function renderQbPayTermsNote() {
+  const host = document.getElementById('qbPayTermsNote');
+  if (!host || !_currentQuote) return;
+  const mode = quotePaymentMode(_currentQuote);
+  const rows = resolveQuotePaymentTerms(_currentQuote);
+  const modeLabel = mode === 'installment' ? 'Installments' : 'Full payment (100%)';
+  if (!rows.length) { host.innerHTML = `<div class="qb-payterms-head">Payment Terms · ${modeLabel}</div><div class="qb-terms-empty">No payment terms set for this scenario — an admin can add them under Quotes → Terms Library → Payment Terms.</div>`; return; }
+  host.innerHTML = `<div class="qb-payterms-head">Payment Terms · ${modeLabel} <span class="qb-sub">(auto, from Terms Library)</span></div>` +
+    `<div class="qb-terms-view">` + rows.map(r => `<div class="qtv-row"><div class="qtv-label">${escapeHtml(r.label)}</div><div class="qtv-detail">${escapeHtml(r.detail)}</div></div>`).join('') + `</div>`;
 }
 
 /* ── Purchase terms ───────────────────────────────────────────────── */
@@ -12282,6 +12365,13 @@ function buildQuotePreviewHTML(q) {
     `<thead><tr><th>PAYMENT MILESTONE</th><th class="qp-r">PERCENTAGE</th></tr></thead>` +
     `<tbody>${(q.schedule || []).map(s => `<tr><td>${escapeHtml(s.when || '—')}</td><td class="qp-r">${s.pct}%</td></tr>`).join('')}</tbody>` +
     `</table>`;
+  const payTermsRows = resolveQuotePaymentTerms(q);
+  const payTermsTable = payTermsRows.length
+    ? `<table class="qp-table qp-terms-table" style="margin-top:6px;"><colgroup><col style="width:26%"><col style="width:74%"></colgroup>` +
+      `<thead><tr><th>PAYMENT TERM</th><th>DETAIL</th></tr></thead><tbody>` +
+      payTermsRows.map(r => `<tr><td class="qp-term-label">${escapeHtml(r.label || '')}</td><td class="qp-term-detail">${escapeHtml(r.detail || '')}</td></tr>`).join('') +
+      `</tbody></table>`
+    : '';
   const termsBody = (q.terms || []).filter(t => t.label || t.detail).map(t =>
     t.isHeader
       ? `<tr class="qp-terms-grouprow"><td colspan="2">${escapeHtml(t.label)}</td></tr>`
@@ -12327,10 +12417,11 @@ function buildQuotePreviewHTML(q) {
     <div class="qp-page2">
       <div class="qp-section-h">Payment Schedule</div>
       ${schedTable}
+      ${payTermsTable}
       ${termsTable ? `<div class="qp-terms-block"><div class="qp-section-h">Purchase Terms</div>${termsTable}</div>` : ''}
+      <div class="qp-accept">By issuing a PO, signing this quote or paying an invoice related to this quote, you are accepting the purchase terms &amp; conditions on behalf of your organization.</div>
       ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
       ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
-      <div class="qp-accept">By issuing a PO, signing this quote or paying an invoice related to this quote, you are accepting the purchase terms &amp; conditions on behalf of your organization.</div>
     </div>
   `;
 }
@@ -15050,6 +15141,7 @@ loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
+loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
 
 /* ─── Bootstrap: restore session OR handle Microsoft redirect-return ─── */
