@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.9</title>
+<title>CoreV | OxeFit Sales Tracker v21.10</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3625,6 +3625,7 @@
   .qp-terms-row { margin-bottom: 8px; white-space: pre-line; }
   .qp-terms-head { font-size: 12px; font-weight: 800; color: #1e3a8a; margin: 12px 0 6px; letter-spacing: 0.4px; }
   .qb-terms textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 400 12.5px 'Inter', system-ui, sans-serif; resize: vertical; min-height: 42px; }
+  .term-scope-sel { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 600 12px 'Inter', system-ui, sans-serif; }
   .qp-terms-row b { color: #0f172a; }
   .qp-sign-img { max-height: 90px; max-width: 280px; display: block; margin-top: 6px; }
   .qp-sign-name { font-family: 'Georgia', serif; font-size: 22px; color: #1e293b; border-bottom: 1px solid #94a3b8; display: inline-block; padding: 4px 20px 2px; margin-top: 6px; }
@@ -3756,7 +3757,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.9</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.10</strong></p>
     </div>
   </div>
 </div>
@@ -3825,7 +3826,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.9</div>
+      <div class="sidebar-version">v21.10</div>
     </div>
   </aside>
 
@@ -4987,9 +4988,10 @@
         </div>
         <div class="terms-intro" id="termsIntro"></div>
         <div class="prod-form" id="termForm">
-          <div class="qb-inline-note">These terms are <strong>fixed</strong> and applied automatically to any quote that contains a product of this Type. Reps cannot change them on a quote.</div>
+          <div class="qb-inline-note">These terms are <strong>fixed</strong> and applied automatically to any quote that contains a product of this Type. Reps cannot change them on a quote.<br>
+          <strong>Scope</strong> controls multi-product quotes: <strong>Common</strong> terms (e.g. agreement, payment, warranty) are shown <strong>once</strong> even if several products share them; <strong>Unique</strong> terms (e.g. price includes, accessories) are listed <strong>per product Type</strong>.</div>
           <table class="qb-items qb-terms" id="termEditorTable">
-            <thead><tr><th style="width:28%;">Term Label</th><th>Detail</th><th></th></tr></thead>
+            <thead><tr><th style="width:24%;">Term Label</th><th>Detail</th><th style="width:120px;">Scope</th><th></th></tr></thead>
             <tbody id="termEditorBody"></tbody>
           </table>
           <div class="term-editor-actions">
@@ -11283,14 +11285,34 @@ function quoteLineTypes(q) { return [...new Set(((q && q.lineItems) || []).map(i
 function resolveQuoteTermGroups(q) {
   return quoteLineTypes(q).map(t => ({ type: t, rows: (termTemplates[t] || []) })).filter(g => g.rows.length);
 }
-// flat term list (with synthetic header rows when >1 type) — what gets stored & printed
+function _termIsCommon(r) { return (r && r.scope) === 'common'; }
+// flat term list — common terms appear once; unique terms are listed per Type.
+// (single-Type quotes just list all that Type's terms, no headers.)
 function resolveQuoteTermsFlat(q) {
   const groups = resolveQuoteTermGroups(q);
-  const multi = groups.length > 1;
+  if (!groups.length) return [];
+  if (groups.length === 1) {
+    return groups[0].rows.map(r => ({ label: r.label, detail: r.detail }));
+  }
   const out = [];
+  // 1) common terms — deduped by label (first occurrence wins)
+  const seen = new Set(); const common = [];
+  groups.forEach(g => g.rows.forEach(r => {
+    if (!_termIsCommon(r)) return;
+    const key = (r.label || '').trim().toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key); common.push({ label: r.label, detail: r.detail });
+  }));
+  if (common.length) {
+    out.push({ label: 'General Terms', detail: '', isHeader: true });
+    common.forEach(r => out.push(r));
+  }
+  // 2) unique terms — grouped under each Type
   groups.forEach(g => {
-    if (multi) out.push({ label: g.type, detail: '', isHeader: true });
-    g.rows.forEach(r => out.push({ label: r.label, detail: r.detail }));
+    const uniq = g.rows.filter(r => !_termIsCommon(r));
+    if (!uniq.length) return;
+    out.push({ label: g.type, detail: '', isHeader: true });
+    uniq.forEach(r => out.push({ label: r.label, detail: r.detail }));
   });
   return out;
 }
@@ -11322,9 +11344,13 @@ function renderTermEditor() {
       `<tr>` +
         `<td><input type="text" value="${escapeHtml(r.label || '')}" oninput="termRowChanged(${i},'label',this.value)"></td>` +
         `<td><textarea rows="2" oninput="termRowChanged(${i},'detail',this.value)">${escapeHtml(r.detail || '')}</textarea></td>` +
+        `<td><select class="term-scope-sel" onchange="termRowChanged(${i},'scope',this.value)">` +
+          `<option value="unique"${(r.scope || 'unique') === 'unique' ? ' selected' : ''}>Unique</option>` +
+          `<option value="common"${r.scope === 'common' ? ' selected' : ''}>Common</option>` +
+        `</select></td>` +
         `<td><button class="qb-del-row" onclick="termDeleteRow(${i})">✕</button></td>` +
       `</tr>`
-    ).join('') || `<tr><td colspan="3" style="color:var(--text-muted);padding:10px;">No terms yet — add rows below.</td></tr>`;
+    ).join('') || `<tr><td colspan="4" style="color:var(--text-muted);padding:10px;">No terms yet — add rows below.</td></tr>`;
     document.getElementById('termSavedNote').textContent = '';
   } else {
     form.style.display = 'none'; ro.style.display = '';
@@ -11334,7 +11360,7 @@ function renderTermEditor() {
   }
 }
 function termRowChanged(i, field, val) { if (_termEditorRows[i]) _termEditorRows[i][field] = val; }
-function termAddRow() { _termEditorRows.push({ label: '', detail: '' }); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
+function termAddRow() { _termEditorRows.push({ label: '', detail: '', scope: 'unique' }); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
 function termDeleteRow(i) { _termEditorRows.splice(i, 1); termTemplates[_termEditorType] = _termEditorRows; renderTermEditor(); }
 function saveTermTemplate() {
   if (!canEditProducts()) { showToast('Only admins can edit terms', 'error'); return; }
@@ -11350,8 +11376,8 @@ function saveTermTemplate() {
 function renderQbTermsView() {
   const host = document.getElementById('qbTermsView');
   if (!host || !_currentQuote) return;
-  const groups = resolveQuoteTermGroups(_currentQuote);
-  if (!groups.length) {
+  const flat = resolveQuoteTermsFlat(_currentQuote);
+  if (!flat.length) {
     const types = quoteLineTypes(_currentQuote);
     host.innerHTML = `<div class="qb-terms-empty">` +
       (types.length
@@ -11360,10 +11386,10 @@ function renderQbTermsView() {
       `</div>`;
     return;
   }
-  host.innerHTML = groups.map(g => {
-    const rows = g.rows.map(r => `<div class="qtv-row"><div class="qtv-label">${escapeHtml(r.label)}</div><div class="qtv-detail">${escapeHtml(r.detail)}</div></div>`).join('');
-    return `<div class="qtv-type">${escapeHtml(g.type)}</div>${rows}`;
-  }).join('');
+  host.innerHTML = flat.map(t => t.isHeader
+    ? `<div class="qtv-type">${escapeHtml(t.label)}</div>`
+    : `<div class="qtv-row"><div class="qtv-label">${escapeHtml(t.label)}</div><div class="qtv-detail">${escapeHtml(t.detail)}</div></div>`
+  ).join('');
 }
 
 
