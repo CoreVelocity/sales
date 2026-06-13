@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.19</title>
+<title>CoreV | OxeFit Sales Tracker v21.20</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3718,7 +3718,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.19 · Publish error shows HubSpot’s exact required scopes
+      v21.20 · Publish creates a native HubSpot Quote (line items) under the deal
     </div>
   </div>
 </div>
@@ -3791,7 +3791,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.19</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.20</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3860,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.19</div>
+      <div class="sidebar-version">v21.20</div>
     </div>
   </aside>
 
@@ -12456,33 +12456,59 @@ async function hubspotAttachFileToDeal(fileId, dealId, q) {
   };
   return hubspotApi('/crm/v3/objects/notes', { method: 'POST', body: JSON.stringify(body) });
 }
+/* Create a native HubSpot Quote object (with line items) under the deal.
+   HUBSPOT_DEFINED association type IDs:
+     quote→deal 64 · quote→contact 69 · quote→company 71 · line_item→quote 68 */
+async function hsCreateNativeQuote(q) {
+  const props = {
+    hs_title: q.name || ('Quote ' + q.reference),
+    hs_status: 'DRAFT',
+    hs_currency: (q.bank && q.bank.currency) || 'AED'
+  };
+  if (q.expiresAt) props.hs_expiration_date = q.expiresAt;           // 'YYYY-MM-DD'
+  const assoc = [];
+  if (q.dealId) assoc.push({ to: { id: String(q.dealId) }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 64 }] });
+  if (q.buyer && q.buyer.contactId) assoc.push({ to: { id: String(q.buyer.contactId) }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 69 }] });
+  if (q.company && q.company.id) assoc.push({ to: { id: String(q.company.id) }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 71 }] });
+  const created = await hubspotApi('/crm/v3/objects/quotes', {
+    method: 'POST', body: JSON.stringify({ properties: props, associations: assoc })
+  });
+  const quoteId = created.id;
+  // line items — custom (not tied to HubSpot products), associated to the quote
+  let liOk = 0, liErr = '';
+  for (const it of (q.lineItems || [])) {
+    const name = ((it.sku ? it.sku + ' — ' : '') + (it.desc || it.sku || 'Item')).slice(0, 250);
+    const liProps = { name, price: String(it.unitPrice || 0), quantity: String(it.qty || 1), hs_line_item_currency_code: props.hs_currency };
+    try {
+      await hubspotApi('/crm/v3/objects/line_items', {
+        method: 'POST',
+        body: JSON.stringify({ properties: liProps, associations: [{ to: { id: String(quoteId) }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 68 }] }] })
+      });
+      liOk++;
+    } catch (e) { liErr = e && e.message ? e.message : String(e); }
+  }
+  return { id: quoteId, lineItemsAdded: liOk, lineItemsTotal: (q.lineItems || []).length, lineItemError: liErr };
+}
 async function publishQuoteToHubspot(id) {
   const q = quoteEntries.find(x => x.id === id) || ((_currentQuote && _currentQuote.id === id) ? _currentQuote : null);
   if (!q) { showToast('Quote not found', 'error'); return; }
   if (q.status !== 'Approved') { showToast('Only approved quotes can be published', 'error'); return; }
   if (!hsIsConnected()) { showToast('Connect HubSpot first (top bar)', 'error'); return; }
   if (!q.dealId) { showToast('No associated HubSpot deal — add one before publishing', 'error'); return; }
-  showToast('Generating PDF and pushing to HubSpot…', 'info');
+  showToast('Creating the quote in HubSpot…', 'info');
   try {
-    const blob = await generateQuotePdfBlob(q);
-    const up = await hubspotUploadFile(blob, `Quote-${q.reference}.pdf`);
-    // Attaching to the deal's timeline is best-effort — it needs the notes scope.
-    // The PDF is already in HubSpot Files at this point, so we don't fail the publish.
-    let attached = true, attachErr = '';
-    try { await hubspotAttachFileToDeal(up.id, q.dealId, q); }
-    catch (ae) { attached = false; attachErr = ae && ae.message ? ae.message : String(ae); }
+    const res = await hsCreateNativeQuote(q);
     q.status = 'Published'; q.publishedAt = new Date().toISOString();
-    q.hsFileId = up.id; q.hsFileUrl = up.url || ''; q.hsAttachedToDeal = attached; q.updatedAt = q.publishedAt;
+    q.hsQuoteId = res.id; q.updatedAt = q.publishedAt;
     const idx = quoteEntries.findIndex(x => x.id === id);
     if (idx >= 0) quoteEntries[idx] = JSON.parse(JSON.stringify(q));
     saveQuotesAll();
-    if (_currentQuote && _currentQuote.id === id) { _currentQuote.status = 'Published'; _currentQuote.hsFileId = up.id; updateQuoteButtons(); updatePreviewPrintGate(); }
+    if (_currentQuote && _currentQuote.id === id) { _currentQuote.status = 'Published'; _currentQuote.hsQuoteId = res.id; updateQuoteButtons(); updatePreviewPrintGate(); }
     renderQuotesList();
-    if (attached) {
-      showToast('Published — PDF uploaded and attached to the HubSpot deal', 'success');
+    if (res.lineItemsAdded < res.lineItemsTotal) {
+      showToast(`Published — HubSpot quote created under the deal (DRAFT). ${res.lineItemsAdded}/${res.lineItemsTotal} line items added; check the line-items scope. ${res.lineItemError || ''}`, 'info');
     } else {
-      showToast('Published — PDF uploaded to HubSpot Files, but auto-attach to the deal needs the notes scope. You can attach it on the deal manually.', 'info');
-      console.warn('HubSpot deal attach skipped:', attachErr);
+      showToast('Published — a DRAFT quote was created in HubSpot under the deal, with all line items', 'success');
     }
   } catch (e) {
     showToast('Publish failed: ' + (e.message || e), 'error');
