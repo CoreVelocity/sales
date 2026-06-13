@@ -14763,19 +14763,27 @@ async function gdFetchSheetData(fileId, fileName, mimeType) {
     const aoa = XLSX.utils.sheet_to_json(wb.Sheets[wsName], { header: 1, raw: false, defval: '' });
     return { aoa, sheetUsed: wsName };
   };
+  // Drive content download — include Shared Drive support; retry 403 with acknowledgeAbuse
+  const dl = async () => {
+    const base = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`;
+    let r = await fetch(base, auth);
+    if (r.status === 403) { const r2 = await fetch(base + '&acknowledgeAbuse=true', auth); if (r2.ok) return r2; }
+    return r;
+  };
+  const denied = (code) => new Error('Google blocked reading this file (HTTP ' + code + '). It likely lives in a Shared Drive or only metadata access was granted — click Disconnect, then “Sign in with Google” again and approve full read access.');
   if (isExcel) {
-    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, auth);
-    if (!r.ok) throw new Error('Download failed (HTTP ' + r.status + ')');
+    const r = await dl();
+    if (!r.ok) throw (r.status === 403 ? denied(403) : new Error('Download failed (HTTP ' + r.status + ')'));
     return parseExcelBytes(await r.arrayBuffer());
   }
   if (isGoogleSheet || (!isCsv)) {
     // Try Google Sheets CSV export first (works for native Google Sheets, incl. odd mimeTypes/shortcuts)
-    const er = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/csv`, auth);
+    const er = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/csv&supportsAllDrives=true`, auth);
     if (er.ok) return { aoa: mktCsvToAOA(await er.text()), sheetUsed: '' };
   }
   // Otherwise download the raw bytes and sniff: PK zip header => xlsx, else treat as CSV text
-  const r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, auth);
-  if (!r.ok) throw new Error('Could not read this file (HTTP ' + r.status + ')');
+  const r = await dl();
+  if (!r.ok) throw (r.status === 403 ? denied(403) : new Error('Could not read this file (HTTP ' + r.status + ')'));
   const buf = await r.arrayBuffer();
   const b = new Uint8Array(buf);
   if (b[0] === 0x50 && b[1] === 0x4B) return parseExcelBytes(buf);   // 'PK' => xlsx
