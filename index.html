@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.23</title>
+<title>CoreV | OxeFit Sales Tracker v21.24</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -1920,6 +1920,34 @@
     .topbar-right .hubspot-chip span { display: none; }
   }
 
+  /* ════════════ MOBILE POLISH (v21.24) ════════════ */
+  @media (max-width: 760px) {
+    /* secondary table columns hide so the essential ones fit the screen */
+    .m-hide { display: none !important; }
+    /* quotes list compresses to fit (Quote · Buyer · Total · Status · Actions) */
+    #qsub-quotes table { min-width: 0 !important; }
+    #qsub-quotes th, #qsub-quotes td { padding-left: 8px; padding-right: 8px; }
+    /* smoother horizontal scrolling for the remaining wide tables */
+    .table-wrap, .prod-table-wrap, .gd-table-wrap, .demo-log-wrap,
+    .perf-leaderboard-wrap, .qb-table-wrap { -webkit-overflow-scrolling: touch; }
+    /* stop iOS auto-zoom when focusing inputs (needs >=16px) */
+    input, select, textarea,
+    .qb-field input, .qb-field select, .qb-textarea { font-size: 16px !important; }
+    /* preview / PDF dialog goes full-screen on phones */
+    .qp-overlay { padding: 0 !important; }
+    .qp-modal { max-width: none !important; min-height: 100vh; border-radius: 0 !important; }
+    .qp-modal-bar { position: sticky; top: 0; z-index: 5; }
+    .qp-cols { flex-direction: column; gap: 14px; }
+    /* tighten oversized hero text on small screens */
+    .exec-hero h1, .exec-hero-title { font-size: 26px !important; line-height: 1.1; }
+    /* wizard action buttons wrap instead of crowding */
+    .qb-wizard-nav, .qb-actions { flex-wrap: wrap; gap: 8px; }
+  }
+  @media (max-width: 480px) {
+    .content { padding: 12px; }
+    .card, .panel, .quotes-card, .prod-card { padding: 14px !important; }
+  }
+
   /* ════════════ EXECUTIVE DASHBOARD (v19.2) ════════════ */
   .exec-hero {
     display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;
@@ -3718,7 +3746,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.23 · Download matches HubSpot PDF exactly · filename = quote name + date
+      v21.24 · Mobile-friendly responsive design
     </div>
   </div>
 </div>
@@ -3791,7 +3819,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.23</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.24</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3888,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.23</div>
+      <div class="sidebar-version">v21.24</div>
     </div>
   </aside>
 
@@ -4777,7 +4805,7 @@
         <div class="prod-table-wrap">
           <table class="prod-table">
             <thead>
-              <tr><th>Quote</th><th>Reference</th><th>Buyer</th><th>Deal</th><th class="prod-num">Total (AED)</th><th>Status</th><th>Expires</th><th class="prod-actions-col">Actions</th></tr>
+              <tr><th>Quote</th><th class="m-hide">Reference</th><th class="m-hide">Buyer</th><th class="m-hide">Deal</th><th class="prod-num">Total (AED)</th><th>Status</th><th class="m-hide">Expires</th><th class="prod-actions-col">Actions</th></tr>
             </thead>
             <tbody id="quotesListBody"></tbody>
           </table>
@@ -11639,12 +11667,12 @@ function renderQuotesList() {
     const st = q.status || 'Draft';
     tr.innerHTML =
       `<td><a class="quote-name-link" onclick="openQuote('${q.id}')">${escapeHtml(q.name || 'Untitled')}</a></td>` +
-      `<td style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.reference || '—')}</td>` +
-      `<td>${escapeHtml((q.buyer && q.buyer.name) || '—')}</td>` +
-      `<td style="font-size:11.5px;">${escapeHtml(q.dealName || '—')}</td>` +
+      `<td class="m-hide" style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.reference || '—')}</td>` +
+      `<td class="m-hide">${escapeHtml((q.buyer && q.buyer.name) || '—')}</td>` +
+      `<td class="m-hide" style="font-size:11.5px;">${escapeHtml(q.dealName || '—')}</td>` +
       `<td class="prod-num">${fmtMoney(q.total)}</td>` +
       `<td><span class="quote-status-badge ${quoteStatusClass(st)}">${st}</span></td>` +
-      `<td style="font-size:11.5px;">${q.expiresAt ? quoteFmtDate(q.expiresAt) : '—'}</td>` +
+      `<td class="m-hide" style="font-size:11.5px;">${q.expiresAt ? quoteFmtDate(q.expiresAt) : '—'}</td>` +
       `<td class="prod-actions-col">` +
         ((canApproveQuotes() && st === 'Pending Approval')
           ? `<button class="quote-act-approve" title="Approve" onclick="approveQuoteById('${q.id}')">✓</button>` +
