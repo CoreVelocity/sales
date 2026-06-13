@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.14</title>
+<title>CoreV | OxeFit Sales Tracker v21.15</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3528,6 +3528,9 @@
   .quote-name-link:hover { text-decoration: underline; }
   .quote-del-x { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); cursor: pointer; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
   .quote-del-x:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .quote-act-approve, .quote-act-reject { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border); background: var(--card); cursor: pointer; font-size: 13px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
+  .quote-act-approve { color: var(--success); } .quote-act-approve:hover { background: var(--success); color: #fff; border-color: var(--success); }
+  .quote-act-reject { color: var(--danger); } .quote-act-reject:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
   .qb-fetch-btn { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 9px; padding: 8px 12px; font: 700 12px 'Inter', system-ui, sans-serif; color: var(--teal2); cursor: pointer; white-space: nowrap; }
   .qb-fetch-btn:hover { border-color: var(--teal); }
   .qb-inline-note { font-size: 11.5px; color: var(--text-muted); margin: 4px 0 10px; line-height: 1.5; }
@@ -3712,7 +3715,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.14 · PDF header simplified (reference only)
+      v21.15 · Email approval notifications · print after approval only · list approve/reject
     </div>
   </div>
 </div>
@@ -3785,7 +3788,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.14</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.15</strong></p>
     </div>
   </div>
 </div>
@@ -3854,7 +3857,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.14</div>
+      <div class="sidebar-version">v21.15</div>
     </div>
   </aside>
 
@@ -5042,7 +5045,8 @@
       <div class="qp-modal-bar">
         <span>Quote Preview</span>
         <div>
-          <button class="prod-row-btn" onclick="printQuotePreview()">🖨 Print / Save PDF</button>
+          <span class="qp-print-note" id="qpPrintNote" style="display:none;font-weight:600;font-size:11.5px;color:#fca5a5;align-self:center;">Download/print available after approval</span>
+          <button class="prod-row-btn" id="qpPrintBtn" onclick="printQuotePreview()">🖨 Print / Save PDF</button>
           <button class="prod-row-btn" onclick="closeQuotePreview()">✕ Close</button>
         </div>
       </div>
@@ -11637,7 +11641,11 @@ function renderQuotesList() {
       `<td><span class="quote-status-badge ${quoteStatusClass(st)}">${st}</span></td>` +
       `<td style="font-size:11.5px;">${q.expiresAt ? quoteFmtDate(q.expiresAt) : '—'}</td>` +
       `<td class="prod-actions-col">` +
-        `<button class="quote-del-x" title="Delete quote" onclick="deleteQuote('${q.id}')">✕</button>` +
+        ((canApproveQuotes() && st === 'Pending Approval')
+          ? `<button class="quote-act-approve" title="Approve" onclick="approveQuoteById('${q.id}')">✓</button>` +
+            `<button class="quote-act-reject" title="Reject" onclick="rejectQuoteById('${q.id}')">✕</button>`
+          : '') +
+        `<button class="quote-del-x" title="Delete quote" onclick="deleteQuote('${q.id}')">🗑</button>` +
       `</td>`;
     body.appendChild(tr);
   });
@@ -12261,64 +12269,102 @@ function _persistCurrentQuote() {
   saveQuotesAll();
 }
 // Manager who approves quotes = primary admin (Ahmed)
-function quoteManagerEmail() {
-  try {
-    const e = (Object.entries(REP_EMAILS).find(([em, n]) => n === PRIMARY_ADMIN) || [])[0];
-    return e || 'ahmed@core-velocity.com';
-  } catch (_) { return 'ahmed@core-velocity.com'; }
-}
+function quoteManagerEmail() { return 'ahmed@core-velocity.com'; }
 function canApproveQuotes() { return currentRole === 'admin'; }   // managers/admins approve
+function emailForRep(name) { try { return (Object.entries(REP_EMAILS).find(([e, n]) => n === name) || [])[0] || ''; } catch (_) { return ''; } }
 
-function submitQuoteForApproval() {
+/* ── Email notifications via Microsoft Graph (delegated Mail.Send) ──── */
+const MAIL_SEND_SCOPES = ['Mail.Send', 'User.Read'];
+async function getMailSendToken() {
+  if (!msalInstance || !msalAccount) throw new Error('Microsoft sign-in required');
+  const req = { scopes: MAIL_SEND_SCOPES, account: msalAccount };
+  try { return (await msalInstance.acquireTokenSilent(req)).accessToken; }
+  catch (e) { return (await msalInstance.acquireTokenPopup(req)).accessToken; }
+}
+// Send via Graph; on any failure fall back to opening the device mail client.
+async function notifyByEmail(to, subject, htmlBody, plainBody) {
+  try {
+    const token = await getMailSendToken();
+    const res = await fetch('https://graph.microsoft.com/v1.0/me/sendMail', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: { subject, body: { contentType: 'HTML', content: htmlBody }, toRecipients: [{ emailAddress: { address: to } }] },
+        saveToSentItems: true
+      })
+    });
+    if (!res.ok) throw new Error('Graph sendMail HTTP ' + res.status);
+    return true;
+  } catch (e) {
+    try {
+      const a = document.createElement('a');
+      a.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(plainBody || subject)}`;
+      a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove();
+    } catch (_) {}
+    return false;
+  }
+}
+function _quoteEmailHtml(q, intro) {
+  const row = (l, v) => `<tr><td style="padding:3px 10px 3px 0;color:#64748b;">${l}</td><td style="padding:3px 0;font-weight:600;">${escapeHtml(v || '-')}</td></tr>`;
+  return `<div style="font-family:Arial,sans-serif;font-size:14px;color:#0f172a;">` +
+    `<p>${intro}</p><table style="border-collapse:collapse;">` +
+    row('Quote', q.name) + row('Reference', q.reference) +
+    row('Buyer', ((q.buyer && q.buyer.name) || '') + (q.company && q.company.name ? ' — ' + q.company.name : '')) +
+    row('Prepared by', (q.sender && q.sender.name) || q.ownerUser) +
+    row('Total', 'AED ' + fmtMoney(q.total || 0)) + row('Expires', quoteFmtDate(q.expiresAt)) +
+    `</table><p style="color:#64748b;font-size:12px;">Open the CoreV Sales Tracker → Quotes to review.</p></div>`;
+}
+function _quoteEmailText(q, intro) {
+  return `${intro}\n\nQuote: ${q.name}\nReference: ${q.reference}\nBuyer: ${(q.buyer && q.buyer.name) || '-'}\nTotal: AED ${fmtMoney(q.total || 0)}\nExpires: ${quoteFmtDate(q.expiresAt)}\n\nOpen the CoreV Sales Tracker → Quotes to review.`;
+}
+
+async function submitQuoteForApproval() {
   qbCollect();
-  // all steps must be complete before submission
   const bad = qbFirstIncomplete(QB_STEPS.length);
   if (bad >= 0) { qbGoStep(bad); qbCheckStep(bad); return; }
   _currentQuote.status = 'Pending Approval';
   _currentQuote.submittedBy = currentUser;
+  _currentQuote.submittedByEmail = emailForRep(currentUser);
   _currentQuote.submittedAt = new Date().toISOString();
   _persistCurrentQuote();
   updateQuoteButtons();
-  // notify the manager by email (opens the rep's mail client pre-filled)
+  showToast('Submitted — flagged ready for approval', 'success');
   const q = _currentQuote;
-  const subject = `Quote approval needed: ${q.name} (${q.reference})`;
-  const bodyLines = [
-    `A quote has been submitted for your approval.`, '',
-    `Quote: ${q.name}`,
-    `Reference: ${q.reference}`,
-    `Buyer: ${(q.buyer && q.buyer.name) || '-'}${q.company && q.company.name ? ' — ' + q.company.name : ''}`,
-    `Prepared by: ${(q.sender && q.sender.name) || currentUser}`,
-    `Total: AED ${fmtMoney(q.total || 0)}`,
-    `Expires: ${quoteFmtDate(q.expiresAt)}`, '',
-    `Please open the CoreV Sales Tracker → Quotes to review and approve.`
-  ];
-  const mailto = `mailto:${encodeURIComponent(quoteManagerEmail())}` +
-    `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
-  try {
-    const a = document.createElement('a');
-    a.href = mailto; a.style.display = 'none';
-    document.body.appendChild(a); a.click(); a.remove();
-  } catch (_) {}
-  showToast('Submitted for approval — an email to the manager has been opened', 'success');
+  const intro = `${q.submittedBy || 'A sales rep'} submitted a quote for your approval.`;
+  const sent = await notifyByEmail(quoteManagerEmail(),
+    `Quote approval needed: ${q.name} (${q.reference})`,
+    _quoteEmailHtml(q, intro), _quoteEmailText(q, intro));
+  showToast(sent ? 'Approval request emailed to Ahmed' : 'Flagged for approval — mail client opened (Graph mail unavailable)', sent ? 'success' : 'info');
 }
-function approveQuote() {
-  if (!canApproveQuotes()) { showToast('Only a manager can approve', 'error'); return; }
-  _currentQuote.status = 'Approved';
-  _currentQuote.approvedBy = currentUser;
-  _currentQuote.approvedAt = new Date().toISOString();
-  _persistCurrentQuote();
-  updateQuoteButtons();
-  showToast('Quote approved — Download is now available', 'success');
+
+// Core decision applied to a quote object (works from builder or list)
+async function _decideQuote(id, decision) {
+  if (!canApproveQuotes()) { showToast('Only a manager can ' + (decision === 'Approved' ? 'approve' : 'reject'), 'error'); return; }
+  const q = quoteEntries.find(x => x.id === id);
+  if (!q) { showToast('Quote not found', 'error'); return; }
+  q.status = decision; q.approvedBy = currentUser; q.approvedAt = new Date().toISOString(); q.updatedAt = q.approvedAt;
+  saveQuotesAll();
+  if (_currentQuote && _currentQuote.id === id) {
+    _currentQuote.status = decision; _currentQuote.approvedBy = currentUser; _currentQuote.approvedAt = q.approvedAt;
+    updateQuoteButtons(); updatePreviewPrintGate();
+  }
+  renderQuotesList();
+  showToast(decision === 'Approved' ? 'Quote approved' : 'Quote rejected', decision === 'Approved' ? 'success' : 'info');
+  // notify the concerned sales rep
+  const repEmail = q.submittedByEmail || emailForRep(q.ownerUser);
+  if (repEmail) {
+    const word = decision === 'Approved' ? 'approved' : 'rejected';
+    const intro = `Your quote has been ${word} by ${currentUser}.` + (decision === 'Approved' ? ' You can now download/print the PDF from the Quotes tab.' : '');
+    const sent = await notifyByEmail(repEmail, `Your quote was ${word}: ${q.name} (${q.reference})`,
+      _quoteEmailHtml(q, intro), _quoteEmailText(q, intro));
+    showToast(sent ? 'Sales rep notified by email' : 'Decision saved — rep mail client opened', 'info');
+  }
 }
-function rejectQuote() {
-  if (!canApproveQuotes()) { showToast('Only a manager can reject', 'error'); return; }
-  _currentQuote.status = 'Rejected';
-  _currentQuote.approvedBy = currentUser;
-  _currentQuote.approvedAt = new Date().toISOString();
-  _persistCurrentQuote();
-  updateQuoteButtons();
-  showToast('Quote rejected', 'info');
-}
+function approveQuote() { if (_currentQuote) { _persistCurrentQuote(); _decideQuote(_currentQuote.id, 'Approved'); } }
+function rejectQuote() { if (_currentQuote) { _persistCurrentQuote(); _decideQuote(_currentQuote.id, 'Rejected'); } }
+function approveQuoteById(id) { _decideQuote(id, 'Approved'); }
+function rejectQuoteById(id) { _decideQuote(id, 'Rejected'); }
+
 function quoteStatusClass(status) {
   return 'qsb-' + ({ 'Draft': 'Draft', 'Pending Approval': 'Pending', 'Approved': 'Approved', 'Rejected': 'Rejected' }[status] || 'Draft');
 }
@@ -12331,12 +12377,9 @@ function updateQuoteButtons() {
   const isManager = canApproveQuotes();
   const pending = st === 'Pending Approval';
   const approved = st === 'Approved';
-  // Submit: available while Draft/Rejected (not once pending or approved)
   show('qbSubmitBtn', !pending && !approved);
-  // Approve / Reject: managers only, while pending
   show('qbApproveBtn', isManager && pending);
   show('qbRejectBtn', isManager && pending);
-  // Download: only once approved
   show('qbDownloadBtn', approved);
 }
 function deleteQuote(id) {
@@ -12454,6 +12497,16 @@ function previewQuote() {
   qbCollect();
   document.getElementById('quotePreviewDoc').innerHTML = buildQuotePreviewHTML(_currentQuote);
   document.getElementById('quotePreviewOverlay').classList.add('open');
+  updatePreviewPrintGate();
+}
+// Download/print only allowed once the quote is Approved
+function quotePrintAllowed() { return !!(_currentQuote && _currentQuote.status === 'Approved'); }
+function updatePreviewPrintGate() {
+  const allowed = quotePrintAllowed();
+  const btn = document.getElementById('qpPrintBtn');
+  const note = document.getElementById('qpPrintNote');
+  if (btn) btn.style.display = allowed ? '' : 'none';
+  if (note) note.style.display = allowed ? 'none' : '';
 }
 function closeQuotePreview(ev) {
   if (ev && ev.target !== ev.currentTarget && ev.type === 'click') {
@@ -12463,8 +12516,14 @@ function closeQuotePreview(ev) {
   }
   document.getElementById('quotePreviewOverlay').classList.remove('open');
 }
-function printQuotePreview() { window.print(); }
-function exportQuotePDF() { previewQuote(); setTimeout(() => window.print(), 350); }
+function printQuotePreview() {
+  if (!quotePrintAllowed()) { showToast('Download/print is available only after the quote is approved', 'error'); return; }
+  window.print();
+}
+function exportQuotePDF() {
+  if (!quotePrintAllowed()) { showToast('Download/print is available only after the quote is approved', 'error'); return; }
+  previewQuote(); setTimeout(() => window.print(), 350);
+}
 
 function loadRequests() {
   try {
