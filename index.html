@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.18</title>
+<title>CoreV | OxeFit Sales Tracker v21.19</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3718,7 +3718,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.18 · Publish works with files scope (deal auto-attach now best-effort)
+      v21.19 · Publish error shows HubSpot’s exact required scopes
     </div>
   </div>
 </div>
@@ -3791,7 +3791,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.18</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.19</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3860,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.18</div>
+      <div class="sidebar-version">v21.19</div>
     </div>
   </aside>
 
@@ -12438,7 +12438,8 @@ async function hubspotUploadFile(blob, filename) {
     if (r.status === 403 && /MISSING_SCOPES|required scopes|scope/i.test(raw)) {
       let scopes = [];
       try { const j = JSON.parse(raw); const ctx = (j.errors && j.errors[0] && j.errors[0].context) || j.context || {}; scopes = ctx.requiredGranularScopes || ctx.requiredScopes || []; } catch (_) {}
-      throw new Error('HubSpot blocked the upload (missing scopes). In your Private App add WRITE scopes — at minimum "files" and "crm.objects.notes.write" (your current token is read-only) — then reconnect. ' + (scopes.length ? 'HubSpot asked for: ' + scopes.join(', ') : ''));
+      const need = scopes.length ? scopes.join(', ') : 'files, files.ui_hidden.write';
+      throw new Error('HubSpot blocked the upload. Add these exact scopes to your Private App, then reconnect: ' + need + '. (To also auto-attach the PDF onto the deal timeline, add a notes/engagement write scope.)');
     }
     throw new Error('file upload failed (HTTP ' + r.status + ')' + (raw ? ' — ' + raw.slice(0, 240) : ''));
   }
