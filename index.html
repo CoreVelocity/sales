@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.31</title>
+<title>CoreV | OxeFit Sales Tracker v21.32</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.31</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.32</strong></p>
     </div>
   </div>
 </div>
@@ -3952,7 +3952,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.31</div>
+      <div class="sidebar-version">v21.32</div>
     </div>
   </aside>
 
@@ -14750,7 +14750,19 @@ function mktFromAOA(aoa) {
 async function gdFetchSheetData(fileId, fileName, mimeType) {
   if (!gdAccessToken) { gdSignIn(); throw new Error('Connecting to Google — click Load again once signed in.'); }
   const auth = { headers: { 'Authorization': 'Bearer ' + gdAccessToken } };
-  const mt = (mimeType || '').toLowerCase();
+  // Pre-flight: confirm the real mimeType and whether our access level is even allowed to download/export.
+  // (A view-only share with download disabled previews fine but returns 403 on content — detect it precisely.)
+  let mt = (mimeType || '').toLowerCase();
+  try {
+    const metaR = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=name,mimeType,capabilities(canDownload,canCopy)&supportsAllDrives=true`, auth);
+    if (metaR.ok) {
+      const meta = await metaR.json();
+      if (meta.mimeType) mt = String(meta.mimeType).toLowerCase();
+      if (meta.capabilities && meta.capabilities.canDownload === false) {
+        throw new Error('The file owner has turned OFF download/export for your access level, so its data can’t be pulled in (you can still preview it). Fix: ask them to give you Editor access or enable download for viewers — or in Google Drive open the file, choose File → “Make a copy”, and import your own copy.');
+      }
+    }
+  } catch (e) { if (/turned OFF download/.test(e.message || '')) throw e; /* metadata fetch failed — continue and let the download attempt report */ }
   const name = (fileName || '').toLowerCase();
   const isExcel = mt.includes('spreadsheetml') || mt.includes('ms-excel') || /\.xlsx?$/.test(name);
   const isCsv = mt.includes('text/csv') || /\.csv$/.test(name);
