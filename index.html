@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.24</title>
+<title>CoreV | OxeFit Sales Tracker v21.25</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -383,7 +383,10 @@
     width: 4px; border-radius: 0 4px 4px 0; background: var(--brand-grad);
     box-shadow: 0 0 12px var(--teal-glow);
   }
-  .nav-ico { font-size: 17px; width: 22px; text-align: center; opacity: 0.95; flex-shrink: 0; }
+  .nav-ico { font-size: 17px; width: 22px; text-align: center; opacity: 0.95; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; color: var(--nav-icon, #64748b); }
+  .nav-ico svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; display: block; }
+  .nav-item.active .nav-ico, .nav-item:hover .nav-ico,
+  .sidebar-foot-btn:hover .nav-ico { color: var(--accent2); }
   .nav-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .nav-group-label {
     font-size: 9.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
@@ -467,7 +470,23 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .topbar-logo { display: flex; align-items: center; }
-  .topbar-right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .tb-icon { position: relative; width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.15s; padding: 0; }
+  .tb-icon:hover { color: var(--accent2); border-color: var(--accent2); background: var(--row-hover); }
+  .tb-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  #hubspotChip.connected { color: var(--success); border-color: rgba(13,148,136,0.4); }
+  .tb-icon.tb-warn { color: #c2410c; border-color: rgba(234,88,12,0.3); }
+  .tb-hidden { display: none !important; }
+  #syncChip .sync-dot, #hubspotChip .hs-dot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); box-shadow: 0 0 0 2px var(--card); }
+  #syncChip .sync-dot.connected { background: var(--success); }
+  #syncChip .sync-dot.syncing { background: var(--warn); }
+  #syncChip .sync-dot.error { background: var(--danger); }
+  #hubspotChip.connected .hs-dot { background: var(--success); }
+  .tb-role { width: 36px; height: 36px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: var(--card); color: var(--text-muted); }
+  .tb-role svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .tb-role.admin { color: var(--accent2); border-color: rgba(37,99,235,0.35); }
+  .tb-role.office { color: var(--teal2); border-color: rgba(13,148,136,0.35); }
+  .user-chip { display: inline-flex; align-items: center; cursor: default; }
   .role-badge {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
@@ -2013,6 +2032,17 @@
   .exec-empty { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px; }
 
   .exec-ops-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .exec-pubq-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .exec-pubq-table { width: 100%; min-width: 0; border-collapse: collapse; font-size: 13px; }
+  .exec-pubq-table th { text-align: left; font-size: 10px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .exec-pubq-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .exec-pubq-table .prod-num { text-align: right; white-space: nowrap; }
+  .exec-link { color: var(--accent2); text-decoration: none; font-weight: 600; }
+  .exec-link:hover { text-decoration: underline; }
+  .region-pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .region-dubai { background: rgba(37,99,235,0.14); color: var(--accent2); }
+  .region-ad { background: rgba(13,148,136,0.16); color: var(--teal2); }
+  .region-none { background: var(--bg-elev); color: var(--text-muted); }
   .exec-ops { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
   .exec-ops-num { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
   .exec-ops-lbl { font-size: 11px; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.4px; }
@@ -3746,7 +3776,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.24 · Mobile-friendly responsive design
+      v21.25 · Published Quotes on dashboard · icon top bar (no search) · clean SVG menu icons
     </div>
   </div>
 </div>
@@ -3819,7 +3849,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.24</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.25</strong></p>
     </div>
   </div>
 </div>
@@ -3842,53 +3872,53 @@
     <nav class="sidebar-nav" id="primaryTabs">
       <div class="nav-group-label">Overview</div>
       <button class="nav-item active" data-tab="exec" onclick="switchTab('exec')" title="Executive Dashboard">
-        <span class="nav-ico">📌</span><span class="nav-label">Executive Dashboard</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span><span class="nav-label">Executive Dashboard</span>
       </button>
       <button class="nav-item" data-tab="tracker" onclick="switchTab('tracker')" title="Sales Tracker">
-        <span class="nav-ico">📊</span><span class="nav-label">Sales Tracker</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg></span><span class="nav-label">Sales Tracker</span>
       </button>
 
       <div class="nav-group-rule"></div>
       <div class="nav-group-label">Performance</div>
       <button class="nav-item" data-tab="performance" onclick="switchTab('performance')" title="Rep Performance">
-        <span class="nav-ico">🎯</span><span class="nav-label">Rep Performance</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></span><span class="nav-label">Rep Performance</span>
       </button>
       <button class="nav-item" data-tab="demos" onclick="switchTab('demos')" title="Demo Tracker">
-        <span class="nav-ico">🎬</span><span class="nav-label">Demo Tracker</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><polygon points="10 8.5 15 11 10 13.5"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span><span class="nav-label">Demo Tracker</span>
       </button>
 
       <div class="nav-group-rule"></div>
       <div class="nav-group-label">Operations</div>
       <button class="nav-item" data-tab="requests" onclick="switchTab('requests')" title="Event &amp; On-site Demo Requests">
-        <span class="nav-ico">📝</span><span class="nav-label">Requests</span><span class="nav-badge" id="requestsBadge" style="display:none;">0</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg></span><span class="nav-label">Requests</span><span class="nav-badge" id="requestsBadge" style="display:none;">0</span>
       </button>
       <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
-        <span class="nav-ico">📈</span><span class="nav-label">Marketing</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span class="nav-label">Marketing</span>
       </button>
       <button class="nav-item" data-tab="quotes" onclick="switchTab('quotes')" title="Quotes &amp; Products">
-        <span class="nav-ico">🧾</span><span class="nav-label">Quotes</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v16l3-2 2 2 2-2 2 2 3-2V5a2 2 0 0 0-2-2z"/><line x1="8" y1="9" x2="14" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg></span><span class="nav-label">Quotes</span>
       </button>
 
       <div class="nav-group-rule"></div>
       <div class="nav-group-label">Reference</div>
       <button class="nav-item" data-tab="deal-rules" onclick="switchTab('deal-rules')" title="Deal Ownership &amp; CRM Rules">
-        <span class="nav-ico">⚖️</span><span class="nav-label">Deal Rules</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="4" x2="12" y2="21"/><line x1="7" y1="21" x2="17" y2="21"/><path d="M5 7h14"/><path d="M5 7l-2.5 5h5z"/><path d="M19 7l-2.5 5h5z"/></svg></span><span class="nav-label">Deal Rules</span>
       </button>
       <button class="nav-item" data-tab="guidelines" onclick="switchTab('guidelines')" title="Guidelines">
-        <span class="nav-ico">📖</span><span class="nav-label">Guidelines</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 6S10 4 6 4a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2c4 0 6 2 6 2"/><path d="M12 6s2-2 6-2a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2c-4 0-6 2-6 2z"/></svg></span><span class="nav-label">Guidelines</span>
       </button>
     </nav>
 
     <div class="sidebar-footer">
       <button class="sidebar-foot-btn" id="settingsBtn" onclick="openSettings()" title="Settings">
-        <span class="nav-ico">⚙️</span><span class="nav-label">Settings</span>
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.2A1.6 1.6 0 0 0 7 19.7a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.2A1.6 1.6 0 0 0 4.3 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9 2.6V2a2 2 0 0 1 4 0v.2A1.6 1.6 0 0 0 17 4.3a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.1 1.7H23a2 2 0 0 1 0 4h-.2a1.6 1.6 0 0 0-1.4 1.3z"/></svg></span><span class="nav-label">Settings</span>
       </button>
       <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light / dark mode" aria-label="Toggle theme">
         <span class="theme-toggle-ico sun">☀</span>
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.24</div>
+      <div class="sidebar-version">v21.25</div>
     </div>
   </aside>
 
@@ -3908,34 +3938,31 @@
       <span></span><span></span><span></span>
     </button>
     <div class="topbar-heading" id="topbarHeading">Executive Dashboard</div>
-    <div class="cmdbar" id="cmdbar">
-      <span class="cmdbar-ico">🔍</span>
-      <input type="text" id="cmdInput" class="cmdbar-input" placeholder="Search tabs, reps, requests…  ( / )"
-             autocomplete="off"
-             oninput="runGlobalSearch(this.value)"
-             onkeydown="cmdKey(event)"
-             onfocus="runGlobalSearch(this.value)">
-      <div class="cmd-results" id="cmdResults"></div>
-    </div>
     <div class="topbar-right">
-      <div class="sync-chip" id="syncChip" onclick="manualSync()" title="OneDrive sync status">
-        <div class="sync-dot" id="syncDot"></div>
-        <span id="syncText">Offline</span>
-      </div>
-      <div class="hubspot-chip" id="hubspotChip" onclick="hubspotConnectOrSync()" title="HubSpot CRM">
-        <div class="hs-dot"></div>
-        <span id="hubspotText">Connect HubSpot</span>
-      </div>
-      <div class="hubspot-chip" id="hubspotSyncAllChip" onclick="hubspotSyncAllReps()" title="Pull Closed Won + Open Pipeline for every mapped rep" style="display:none;background:rgba(234,88,12,0.07);border-color:rgba(234,88,12,0.25);color:#c2410c;">
-        <div class="hs-dot" style="background:#fb923c;box-shadow:0 0 6px #fb923c;"></div>
-        <span id="hubspotSyncAllText">Sync All Reps</span>
-      </div>
-      <div class="role-badge" id="roleBadge"></div>
-      <div class="user-chip">
+      <button class="tb-icon" id="syncChip" onclick="manualSync()" title="OneDrive sync">
+        <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+        <span class="sync-dot" id="syncDot"></span>
+        <span class="tb-hidden" id="syncText">Offline</span>
+      </button>
+      <button class="tb-icon" id="hubspotChip" onclick="hubspotConnectOrSync()" title="HubSpot">
+        <svg viewBox="0 0 24 24"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span class="hs-dot"></span>
+        <span class="tb-hidden" id="hubspotText">Connect HubSpot</span>
+      </button>
+      <button class="tb-icon tb-warn" id="hubspotSyncAllChip" onclick="hubspotSyncAllReps()" title="Sync all reps" style="display:none;">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span class="tb-hidden" id="hubspotSyncAllText">Sync All Reps</span>
+      </button>
+      <span class="tb-role" id="roleBadge" title="Role">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </span>
+      <div class="user-chip" id="userChip" title="">
         <div class="user-avatar" id="userAvatar">?</div>
-        <div class="user-name" id="userNameDisplay">-</div>
+        <span class="tb-hidden" id="userNameDisplay">-</span>
       </div>
-      <button class="signout-btn" onclick="signOut()">Sign Out</button>
+      <button class="tb-icon" onclick="signOut()" title="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
   </div>
 
@@ -3998,6 +4025,11 @@
         <div class="exec-card-head"><h3>Quick Actions</h3></div>
         <div class="exec-actions" id="execActions"></div>
       </div>
+    </div>
+
+    <div class="exec-card" style="margin-top:20px;">
+      <div class="exec-card-head"><h3>Published Quotes</h3><span class="exec-card-hint">linked to deal · rep · region</span></div>
+      <div id="execPublishedQuotes"></div>
     </div>
   </div>
   </div><!-- /#view-exec -->
@@ -6490,6 +6522,8 @@ function setSyncStatus(status, text) {
   txt.textContent = text || (status === 'connected' ? 'Synced'
                             : status === 'syncing'  ? 'Syncing…'
                             : status === 'error'    ? 'Sync error' : 'Offline');
+  const chip = document.getElementById('syncChip');
+  if (chip) chip.title = 'OneDrive — ' + txt.textContent;
 }
 
 async function initOneDrive(opts) {
@@ -7369,12 +7403,14 @@ async function launchApp(alreadyAuthed) {
   document.body.setAttribute('data-role', currentRole || 'viewer');
 
   const badge = document.getElementById('roleBadge');
-  badge.textContent = currentRole === 'admin'  ? 'Admin'
-                    : currentRole === 'office' ? 'Office Admin'
-                    : 'Sales Rep';
-  badge.className = 'role-badge ' + currentRole;
+  const roleName = currentRole === 'admin'  ? 'Admin'
+                 : currentRole === 'office' ? 'Office Admin'
+                 : 'Sales Rep';
+  badge.title = 'Role: ' + roleName;
+  badge.className = 'tb-role ' + currentRole;
   document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
   document.getElementById('userNameDisplay').textContent = currentUser;
+  const uc = document.getElementById('userChip'); if (uc) uc.title = currentUser;
 
   document.getElementById('repBanner').style.display  = isOwnOnly() ? 'flex' : 'none';
   if (isOwnOnly()) {
@@ -9339,6 +9375,7 @@ function hsBuildUrl(path) {
 
 let hubspotState = {
   accessToken : null,
+  portalId    : null,
   fetchedDeals: [],
   selected    : new Set()
 };
@@ -9400,6 +9437,7 @@ function renderHubspotChip() {
     }
   }
   // version12.1: Sync All chip visible only to admin while connected
+  if (chip && !chip.title) chip.title = txt.textContent;
   const allChip = document.getElementById('hubspotSyncAllChip');
   if (allChip) {
     const showAll = hsIsConnected() && currentRole === 'admin';
@@ -10952,6 +10990,46 @@ function renderExecDashboard() {
     <button class="exec-action" onclick="switchTab('deal-rules')"><span>⚖️</span> Deal Ownership Rules</button>`;
 
   updateRequestsBadge();
+  renderExecPublishedQuotes();
+}
+
+// Region for a rep, derived from team membership
+function regionForRep(name) {
+  for (const [region, reps] of Object.entries(TEAMS)) { if (reps.includes(name)) return region; }
+  return '—';
+}
+function renderExecPublishedQuotes() {
+  const host = document.getElementById('execPublishedQuotes');
+  if (!host) return;
+  let pub = (typeof quoteEntries !== 'undefined' ? quoteEntries : []).filter(q => q.status === 'Published');
+  if (isOwnOnly()) pub = pub.filter(q => q.ownerUser === currentUser);
+  pub.sort((a, b) => new Date(b.publishedAt || b.updatedAt || 0) - new Date(a.publishedAt || a.updatedAt || 0));
+  if (!pub.length) {
+    host.innerHTML = `<div class="exec-empty">No published quotes yet. Approve a quote and Publish it to HubSpot to see it here.</div>`;
+    return;
+  }
+  const portal = (typeof hubspotState !== 'undefined' && hubspotState && hubspotState.portalId) || '';
+  const dealCell = (q) => {
+    if (!q.dealName && !q.dealId) return '—';
+    if (q.dealId && portal) return `<a href="https://app.hubspot.com/contacts/${portal}/record/0-3/${encodeURIComponent(q.dealId)}" target="_blank" rel="noopener" class="exec-link">${escapeHtml(q.dealName || q.dealId)}</a>`;
+    return escapeHtml(q.dealName || q.dealId);
+  };
+  const rows = pub.map(q => {
+    const rep = q.ownerUser || q.submittedBy || '—';
+    const region = regionForRep(rep);
+    const pill = region === 'Dubai' ? 'region-dubai' : (region === 'Abu Dhabi' ? 'region-ad' : 'region-none');
+    return `<tr>
+      <td><a class="quote-name-link" onclick="switchTab('quotes');setTimeout(function(){openQuote('${q.id}');},60)">${escapeHtml(q.name || 'Untitled')}</a></td>
+      <td>${dealCell(q)}</td>
+      <td>${escapeHtml(rep)}</td>
+      <td><span class="region-pill ${pill}">${escapeHtml(region)}</span></td>
+      <td class="prod-num">${fmtMoney(q.total || 0)}</td>
+      <td class="m-hide" style="font-size:11.5px;color:var(--text-muted);">${q.publishedAt ? quoteFmtDate(q.publishedAt) : '—'}</td>
+    </tr>`;
+  }).join('');
+  host.innerHTML = `<div class="exec-pubq-wrap"><table class="exec-pubq-table">
+    <thead><tr><th>Quote</th><th>Deal</th><th>Sales Rep</th><th>Region</th><th class="prod-num">Total (AED)</th><th class="m-hide">Published</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
 }
 
 /* ── Requests nav badge (v19.3) ── */
