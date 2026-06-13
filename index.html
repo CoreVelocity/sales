@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.28</title>
+<title>CoreV | OxeFit Sales Tracker v21.29</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3809,7 +3809,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.28 · Import Google Sheet data into a native customizable Marketing dashboard
+      v21.29 · Marketing dashboard now imports shared Excel (.xlsx) files too
     </div>
   </div>
 </div>
@@ -3882,7 +3882,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.28</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.29</strong></p>
     </div>
   </div>
 </div>
@@ -3951,7 +3951,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.28</div>
+      <div class="sidebar-version">v21.29</div>
     </div>
   </aside>
 
@@ -14630,9 +14630,9 @@ function gdFileCardHtml(f) {
   const onclick = isFolder
     ? `gdListFolder('${f.id}', true)`
     : `gdViewFile('${f.id}', ${JSON.stringify(f.name).replace(/"/g,'&quot;')}, '${f.mimeType}')`;
-  const isSheet = f.mimeType.includes('spreadsheet') || f.mimeType.includes('csv') || /\.csv$/i.test(f.name||'');
+  const isSheet = f.mimeType.includes('spreadsheet') || f.mimeType.includes('csv') || /\.csv$/i.test(f.name||'') || /\.xlsx?$/i.test(f.name||'') || f.mimeType.includes('ms-excel') || f.mimeType.includes('spreadsheetml');
   const importBtn = isSheet
-    ? `<button class="mkt-import-btn" onclick="event.stopPropagation();gdImportSheet('${f.id}', ${JSON.stringify(f.name).replace(/"/g,'&quot;')})">📥 Load into dashboard</button>`
+    ? `<button class="mkt-import-btn" onclick="event.stopPropagation();gdImportSheet('${f.id}', ${JSON.stringify(f.name).replace(/"/g,'&quot;')}, '${f.mimeType}')">📥 Load into dashboard</button>`
     : '';
   return `
     <div class="gdrive-file-card" onclick="${onclick}">
@@ -14699,31 +14699,64 @@ function mktIsNumericCol(col) {
 function mktNumericCols() { return marketingData ? marketingData.columns.filter(mktIsNumericCol) : []; }
 function mktCategoryCols() { return marketingData ? marketingData.columns.filter(c => !mktIsNumericCol(c)) : []; }
 
-async function gdFetchSheetCsv(fileId, mimeType) {
+// Lazy-load SheetJS for real Excel (.xlsx/.xls) parsing
+function ensureXLSX() {
+  return new Promise((resolve, reject) => {
+    if (window.XLSX) return resolve(window.XLSX);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => resolve(window.XLSX);
+    s.onerror = () => reject(new Error('Could not load the Excel reader (check your connection)'));
+    document.head.appendChild(s);
+  });
+}
+// Build {columns, rows} from a 2-D array of cells
+function mktFromAOA(aoa) {
+  const nonEmpty = (aoa || []).filter(r => r && r.some(v => String(v == null ? '' : v).trim() !== ''));
+  if (!nonEmpty.length) return { columns: [], rows: [] };
+  const header = nonEmpty[0].map((h, i) => (String(h == null ? '' : h).trim()) || ('Column ' + (i + 1)));
+  const data = nonEmpty.slice(1).map(r => { const o = {}; header.forEach((h, i) => { o[h] = String(r[i] == null ? '' : r[i]).trim(); }); return o; });
+  return { columns: header, rows: data };
+}
+// Returns { columns, rows } for any supported Drive file (Google Sheet, .xlsx/.xls, or .csv)
+async function gdFetchSheetData(fileId, fileName, mimeType) {
   if (!gdAccessToken) { gdSignIn(); throw new Error('Connecting to Google — click Load again once signed in.'); }
   const auth = { headers: { 'Authorization': 'Bearer ' + gdAccessToken } };
-  // Google Sheets must be exported; uploaded CSVs are downloaded with alt=media
-  const isGoogleSheet = !mimeType || mimeType.includes('vnd.google-apps');
+  const mt = (mimeType || '').toLowerCase();
+  const name = (fileName || '').toLowerCase();
+  const isGoogleSheet = mt.includes('vnd.google-apps.spreadsheet');
+  const isExcel = mt.includes('spreadsheetml') || mt.includes('ms-excel') || /\.xlsx?$/.test(name);
+  if (isExcel) {
+    // download the binary, parse with SheetJS
+    const XLSX = await ensureXLSX();
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, auth);
+    if (!r.ok) throw new Error('Download failed (HTTP ' + r.status + ')');
+    const buf = await r.arrayBuffer();
+    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+    const wsName = wb.SheetNames[0];
+    const ws = wb.Sheets[wsName];
+    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+    return Object.assign(mktFromAOA(aoa), { sheetNames: wb.SheetNames, sheetUsed: wsName });
+  }
+  // Google Sheet → export CSV; uploaded CSV → download raw text
   const url = isGoogleSheet
     ? `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/csv`
     : `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
   let r = await fetch(url, auth);
-  if (!r.ok && isGoogleSheet) { /* fallback */ r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, auth); }
+  if (!r.ok && isGoogleSheet) r = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, auth);
   if (!r.ok) throw new Error('Google export failed (HTTP ' + r.status + ')');
-  return r.text();
+  return mktParseCSV(await r.text());
 }
-async function gdImportSheet(fileId, fileName) {
+async function gdImportSheet(fileId, fileName, mimeType) {
   const host = document.getElementById('gdDashboard');
   if (host) { host.style.display = ''; host.innerHTML = `<div class="mkt-loading">⏳ Importing “${escapeHtml(fileName)}” from Google…</div>`; host.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   try {
-    let mimeType = '';
-    try { mimeType = (marketingData && marketingData.source && marketingData.source.fileId === fileId) ? '' : ''; } catch(_) {}
-    const csv = await gdFetchSheetCsv(fileId, mimeType || 'application/vnd.google-apps.spreadsheet');
-    const parsed = mktParseCSV(csv);
+    // re-import keeps the stored mimeType if not supplied
+    if (!mimeType && marketingData && marketingData.source && marketingData.source.fileId === fileId) mimeType = marketingData.source.mimeType || '';
+    const parsed = await gdFetchSheetData(fileId, fileName, mimeType);
     if (!parsed.columns.length) throw new Error('No tabular data found in this file.');
-    marketingData = { source: { fileId, fileName }, columns: parsed.columns, rows: parsed.rows, importedAt: new Date().toISOString() };
+    marketingData = { source: { fileId, fileName, mimeType: mimeType || '' }, columns: parsed.columns, rows: parsed.rows, importedAt: new Date().toISOString(), sheetUsed: parsed.sheetUsed || '' };
     try { localStorage.setItem(MKT_KEY, JSON.stringify(marketingData)); } catch(_) {}
-    // sensible default config
     const nums = mktNumericCols(), cats = mktCategoryCols();
     if (!marketingCfg.y || !nums.includes(marketingCfg.y)) marketingCfg.y = nums[0] || '';
     if (!marketingCfg.x || !marketingData.columns.includes(marketingCfg.x)) marketingCfg.x = cats[0] || marketingData.columns[0] || '';
@@ -14787,7 +14820,7 @@ function renderMarketingDashboard() {
     <div class="mkt-head">
       <div>
         <div class="mkt-title">📈 ${escapeHtml(marketingData.source.fileName)}</div>
-        <div class="mkt-sub">Imported ${new Date(marketingData.importedAt).toLocaleString()} · ${marketingData.rows.length} rows · ${cols.length} columns</div>
+        <div class="mkt-sub">Imported ${new Date(marketingData.importedAt).toLocaleString()} · ${marketingData.rows.length} rows · ${cols.length} columns${marketingData.sheetUsed ? ' · tab: ' + escapeHtml(marketingData.sheetUsed) : ''}</div>
       </div>
       <div class="mkt-head-actions">
         <button class="gdrive-btn ghost" onclick="gdImportSheet('${marketingData.source.fileId}', ${JSON.stringify(marketingData.source.fileName).replace(/"/g,'&quot;')})">↻ Re-import</button>
