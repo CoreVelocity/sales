@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.20</title>
+<title>CoreV | OxeFit Sales Tracker v21.21</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3718,7 +3718,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.20 · Publish creates a native HubSpot Quote (line items) under the deal
+      v21.21 · HubSpot Quote create includes hs_language (fixes DRAFT validation)
     </div>
   </div>
 </div>
@@ -3791,7 +3791,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.20</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.21</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3860,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.20</div>
+      <div class="sidebar-version">v21.21</div>
     </div>
   </aside>
 
@@ -12463,6 +12463,8 @@ async function hsCreateNativeQuote(q) {
   const props = {
     hs_title: q.name || ('Quote ' + q.reference),
     hs_status: 'DRAFT',
+    hs_language: 'en',
+    hs_locale: 'en-US',
     hs_currency: (q.bank && q.bank.currency) || 'AED'
   };
   if (q.expiresAt) props.hs_expiration_date = q.expiresAt;           // 'YYYY-MM-DD'
