@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.16</title>
+<title>CoreV | OxeFit Sales Tracker v21.17</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3718,7 +3718,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.16 · Default thank-you comment · Publish approved quote PDF to HubSpot deal
+      v21.17 · Clearer HubSpot publish errors (missing-scopes guidance)
     </div>
   </div>
 </div>
@@ -3791,7 +3791,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.16</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.17</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3860,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.16</div>
+      <div class="sidebar-version">v21.17</div>
     </div>
   </aside>
 
@@ -12433,7 +12433,15 @@ async function hubspotUploadFile(blob, filename) {
   fd.append('folderPath', '/quotes');
   // NB: no JSON Content-Type — the browser sets the multipart boundary
   const r = await fetch(url, { method: 'POST', headers: { 'Authorization': 'Bearer ' + hubspotState.accessToken }, body: fd });
-  if (!r.ok) throw new Error('file upload failed (HTTP ' + r.status + ')');
+  if (!r.ok) {
+    const raw = await r.text().catch(() => '');
+    if (r.status === 403 && /MISSING_SCOPES|required scopes|scope/i.test(raw)) {
+      let scopes = [];
+      try { const j = JSON.parse(raw); const ctx = (j.errors && j.errors[0] && j.errors[0].context) || j.context || {}; scopes = ctx.requiredGranularScopes || ctx.requiredScopes || []; } catch (_) {}
+      throw new Error('HubSpot blocked the upload (missing scopes). In your Private App add WRITE scopes — at minimum "files" and "crm.objects.notes.write" (your current token is read-only) — then reconnect. ' + (scopes.length ? 'HubSpot asked for: ' + scopes.join(', ') : ''));
+    }
+    throw new Error('file upload failed (HTTP ' + r.status + ')' + (raw ? ' — ' + raw.slice(0, 240) : ''));
+  }
   return r.json();
 }
 async function hubspotAttachFileToDeal(fileId, dealId, q) {
