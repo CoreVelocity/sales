@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.10</title>
+<title>CoreV | OxeFit Sales Tracker v21.11</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3624,6 +3624,12 @@
   .qp-section-h { font-size: 15px; font-weight: 800; color: #0f172a; margin: 26px 0 8px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
   .qp-terms-row { margin-bottom: 8px; white-space: pre-line; }
   .qp-terms-head { font-size: 12px; font-weight: 800; color: #1e3a8a; margin: 12px 0 6px; letter-spacing: 0.4px; }
+  /* v21.11 — elegant schedule/terms tables + page 2 break */
+  table.qp-terms-table td.qp-term-label { font-weight: 700; color: #0f172a; }
+  table.qp-terms-table td.qp-term-detail { white-space: pre-line; color: #334155; }
+  table.qp-table tbody tr.qp-terms-grouprow td { background: #eef2ff !important; color: #1e3a8a; font-weight: 800; font-size: 11px; letter-spacing: 0.5px; padding: 7px 10px; }
+  .qp-page2 { margin-top: 10px; }
+  @media print { .qp-page2 { break-before: page; } }
   .qb-terms textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 400 12.5px 'Inter', system-ui, sans-serif; resize: vertical; min-height: 42px; }
   .term-scope-sel { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 600 12px 'Inter', system-ui, sans-serif; }
   .qp-terms-row b { color: #0f172a; }
@@ -3757,7 +3763,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.10</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.11</strong></p>
     </div>
   </div>
 </div>
@@ -3826,7 +3832,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.10</div>
+      <div class="sidebar-version">v21.11</div>
     </div>
   </aside>
 
@@ -9912,32 +9918,46 @@ async function hubspotFetchDealsForRep(repName) {
     guard++;
   } while (after && guard < 50);
 
-  return allResults.map(d => {
-    const rawStage = (d.properties.dealstage || '').toLowerCase();
-    const isWon    = d.properties.hs_is_closed_won === 'true'
-                  || rawStage === 'closedwon'
-                  || rawStage.includes('closed won');
-    // v20.5 — trust HubSpot's computed hs_is_closed flag as authoritative for
-    // BOTH states: 'true' → closed (won or lost), 'false' → genuinely open.
-    // Only fall back to stage-name heuristics when the flag is missing, so an
-    // open deal is never wrongly dropped from the pipeline total.
-    const hsClosed = d.properties.hs_is_closed;
-    let isClosed;
-    if (hsClosed === 'true')       isClosed = true;
-    else if (hsClosed === 'false') isClosed = false;
-    else isClosed = isWon || rawStage === 'closedlost' || rawStage.includes('closed lost');
-    return {
-      id      : d.id,
-      name    : d.properties.dealname || '(untitled)',
-      amount  : Number(d.properties.amount || 0),
-      stage   : hsMapStage(d.properties.dealstage),
-      rawStage: d.properties.dealstage || '',
-      close   : d.properties.closedate || '',
-      prob    : Number(d.properties.hs_deal_stage_probability || 0),
-      isClosedWon: isWon,
-      isClosed: isClosed
+  return allResults.map(_mapHsDeal);
+}
+function _mapHsDeal(d) {
+  const rawStage = (d.properties.dealstage || '').toLowerCase();
+  const isWon    = d.properties.hs_is_closed_won === 'true'
+                || rawStage === 'closedwon'
+                || rawStage.includes('closed won');
+  const hsClosed = d.properties.hs_is_closed;
+  let isClosed;
+  if (hsClosed === 'true')       isClosed = true;
+  else if (hsClosed === 'false') isClosed = false;
+  else isClosed = isWon || rawStage === 'closedlost' || rawStage.includes('closed lost');
+  return {
+    id      : d.id,
+    name    : d.properties.dealname || '(untitled)',
+    amount  : Number(d.properties.amount || 0),
+    stage   : hsMapStage(d.properties.dealstage),
+    rawStage: d.properties.dealstage || '',
+    close   : d.properties.closedate || '',
+    prob    : Number(d.properties.hs_deal_stage_probability || 0),
+    isClosedWon: isWon,
+    isClosed: isClosed
+  };
+}
+// v21.11 — team-wide CRM fetch (admins/managers): no owner filter
+async function hubspotFetchAllDeals() {
+  const allResults = []; let after, guard = 0;
+  do {
+    const body = {
+      filterGroups: [{ filters: [{ propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }] }],
+      properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed'],
+      sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
+      limit: 100
     };
-  });
+    if (after) body.after = after;
+    const data = await hubspotApi('/crm/v3/objects/deals/search', { method: 'POST', body: JSON.stringify(body) });
+    (data.results || []).forEach(r => allResults.push(r));
+    after = data.paging && data.paging.next && data.paging.next.after; guard++;
+  } while (after && guard < 80);
+  return allResults.map(_mapHsDeal);
 }
 
 let hsCurrentRep = null;
@@ -11471,8 +11491,40 @@ async function hubspotFetchCompaniesForRep(repName) {
     return { id: c.id, name: p.name || '(unnamed)', domain: p.domain || '', phone: p.phone || '', address: addr };
   });
 }
-
-/* ── Sub-tab list rendering ───────────────────────────────────────── */
+// v21.11 — team-wide (no owner filter) variants for admins/managers
+async function hubspotFetchAllContacts() {
+  const all = []; let after, guard = 0;
+  do {
+    const body = { properties: ['firstname','lastname','email','phone','address','city','country','company'], limit: 100 };
+    if (after) body.after = after;
+    const data = await hubspotApi('/crm/v3/objects/contacts/search', { method: 'POST', body: JSON.stringify(body) });
+    (data.results || []).forEach(c => all.push(c));
+    after = data.paging && data.paging.next && data.paging.next.after; guard++;
+  } while (after && guard < 80);
+  return all.map(c => {
+    const p = c.properties || {};
+    const name = [p.firstname, p.lastname].filter(Boolean).join(' ').trim() || (p.email || '(no name)');
+    const addr = [p.address, p.city, p.country].filter(Boolean).join(', ');
+    return { id: c.id, name, email: p.email || '', phone: p.phone || '', address: addr, company: p.company || '' };
+  });
+}
+async function hubspotFetchAllCompanies() {
+  const all = []; let after, guard = 0;
+  do {
+    const body = { properties: ['name','domain','phone','address','city','country'], limit: 100 };
+    if (after) body.after = after;
+    const data = await hubspotApi('/crm/v3/objects/companies/search', { method: 'POST', body: JSON.stringify(body) });
+    (data.results || []).forEach(c => all.push(c));
+    after = data.paging && data.paging.next && data.paging.next.after; guard++;
+  } while (after && guard < 80);
+  return all.map(c => {
+    const p = c.properties || {};
+    const addr = [p.address, p.city, p.country].filter(Boolean).join(', ');
+    return { id: c.id, name: p.name || '(unnamed)', domain: p.domain || '', phone: p.phone || '', address: addr };
+  });
+}
+// Admins / managers (full-view, not own-only) see the whole team's CRM in quotes
+function quoteSeesAllCrm() { return typeof isOwnOnly === 'function' ? !isOwnOnly() : false; }
 function renderQuotesList() {
   const body = document.getElementById('quotesListBody');
   const empty = document.getElementById('quotesEmpty');
@@ -11541,7 +11593,7 @@ function startNewQuote() {
     ownerUser: currentUser,
     createdAt: now.toISOString(),
     expiresAt: exp.toISOString().slice(0, 10),
-    shipDate: ''
+    shipDate: '1-2 days'
   };
   openQuoteBuilderUI();
 }
@@ -11570,6 +11622,14 @@ function openQuoteBuilderUI() {
   document.getElementById('qbShipDate').value = q.shipDate || '';
   // combobox display values reflect current selection
   qbComboSetValue('deal'); qbComboSetValue('contact'); qbComboSetValue('company');
+  // v21.11 — label CRM buttons for team-wide (admins) vs own (reps)
+  (function () {
+    const team = quoteSeesAllCrm();
+    const lbl = (id, my, tm) => { const b = document.getElementById(id); if (b) b.textContent = team ? tm : my; };
+    lbl('qbFetchDealsBtn', '⟳ Load my deals', '⟳ Load team deals');
+    lbl('qbFetchContactsBtn', '⟳ Load my contacts', '⟳ Load team contacts');
+    lbl('qbFetchCompaniesBtn', '⟳ Load my companies', '⟳ Load team companies');
+  })();
   document.getElementById('qbBuyerName').value = q.buyer.name || '';
   document.getElementById('qbBuyerEmail').value = q.buyer.email || '';
   document.getElementById('qbBuyerPhone').value = q.buyer.phone || '';
@@ -11820,37 +11880,40 @@ function qbComboSetValue(kind) {
 
 async function qbFetchDeals() {
   const btn = document.getElementById('qbFetchDealsBtn');
+  const all_ = quoteSeesAllCrm();
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
-    const all = await hubspotFetchDealsForRep(currentUser);
+    const all = all_ ? await hubspotFetchAllDeals() : await hubspotFetchDealsForRep(currentUser);
     _qbDealsCache = (all || []).filter(d => !d.isClosed);   // open deals only
     const closed = (all || []).length - _qbDealsCache.length;
     document.getElementById('qbDealNote').textContent =
-      `${_qbDealsCache.length} open deal(s) loaded` + (closed > 0 ? ` · ${closed} closed deal(s) hidden` : '') + '. Click the field to pick one.';
+      `${_qbDealsCache.length} open ${all_ ? 'team ' : ''}deal(s) loaded` + (closed > 0 ? ` · ${closed} closed deal(s) hidden` : '') + '. Click the field to pick one.';
     const inp = document.getElementById('qbDealInput'); if (inp) { inp.focus(); qbComboFilter('deal'); }
   } catch (e) {
     document.getElementById('qbDealNote').textContent = 'Could not load deals: ' + (e.message || e);
-  } finally { btn.textContent = '⟳ Load my deals'; btn.disabled = false; }
+  } finally { btn.textContent = all_ ? '⟳ Load team deals' : '⟳ Load my deals'; btn.disabled = false; }
 }
 async function qbFetchContacts() {
   const btn = document.getElementById('qbFetchContactsBtn');
+  const all_ = quoteSeesAllCrm();
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
-    _qbContactsCache = await hubspotFetchContactsForRep(currentUser);
-    showToast(`${_qbContactsCache.length} contact(s) loaded`, 'success');
+    _qbContactsCache = all_ ? await hubspotFetchAllContacts() : await hubspotFetchContactsForRep(currentUser);
+    showToast(`${_qbContactsCache.length} ${all_ ? 'team ' : ''}contact(s) loaded`, 'success');
     const inp = document.getElementById('qbContactInput'); if (inp) { inp.focus(); qbComboFilter('contact'); }
   } catch (e) { showToast('Contacts: ' + (e.message || e), 'error'); }
-  finally { btn.textContent = '⟳ Load my contacts'; btn.disabled = false; }
+  finally { btn.textContent = all_ ? '⟳ Load team contacts' : '⟳ Load my contacts'; btn.disabled = false; }
 }
 async function qbFetchCompanies() {
   const btn = document.getElementById('qbFetchCompaniesBtn');
+  const all_ = quoteSeesAllCrm();
   try {
     btn.textContent = 'Loading…'; btn.disabled = true;
-    _qbCompaniesCache = await hubspotFetchCompaniesForRep(currentUser);
-    showToast(`${_qbCompaniesCache.length} compan(ies) loaded`, 'success');
+    _qbCompaniesCache = all_ ? await hubspotFetchAllCompanies() : await hubspotFetchCompaniesForRep(currentUser);
+    showToast(`${_qbCompaniesCache.length} ${all_ ? 'team ' : ''}compan(ies) loaded`, 'success');
     const inp = document.getElementById('qbCompanyInput'); if (inp) { inp.focus(); qbComboFilter('company'); }
   } catch (e) { showToast('Companies: ' + (e.message || e), 'error'); }
-  finally { btn.textContent = '⟳ Load my companies'; btn.disabled = false; }
+  finally { btn.textContent = all_ ? '⟳ Load team companies' : '⟳ Load my companies'; btn.disabled = false; }
 }
 
 /* ── Line items ───────────────────────────────────────────────────── */
@@ -12214,11 +12277,20 @@ function buildQuotePreviewHTML(q) {
     (q.sender.title ? `<div class="qp-muted">${escapeHtml(q.sender.title)}</div>` : '') +
     (q.sender.email ? `<div class="qp-muted">${escapeHtml(q.sender.email)}</div>` : '') +
     (q.sender.phone ? `<div class="qp-muted">${escapeHtml(q.sender.phone)}</div>` : '');
-  const schedRows = q.schedule.map(s => `<div class="qp-srow"><span>${escapeHtml(s.when||'—')}</span><span>${s.pct}%</span></div>`).join('');
-  const termsRows = (q.terms || []).filter(t => t.label || t.detail).map(t =>
+  const schedTable = `<table class="qp-table qp-sched-table">` +
+    `<colgroup><col style="width:74%"><col style="width:26%"></colgroup>` +
+    `<thead><tr><th>PAYMENT MILESTONE</th><th class="qp-r">PERCENTAGE</th></tr></thead>` +
+    `<tbody>${(q.schedule || []).map(s => `<tr><td>${escapeHtml(s.when || '—')}</td><td class="qp-r">${s.pct}%</td></tr>`).join('')}</tbody>` +
+    `</table>`;
+  const termsBody = (q.terms || []).filter(t => t.label || t.detail).map(t =>
     t.isHeader
-      ? `<div class="qp-terms-head">${escapeHtml(t.label)}</div>`
-      : `<div class="qp-terms-row"><b>${escapeHtml(t.label || '')}${t.label ? ':' : ''}</b> ${escapeHtml(t.detail || '')}</div>`).join('');
+      ? `<tr class="qp-terms-grouprow"><td colspan="2">${escapeHtml(t.label)}</td></tr>`
+      : `<tr><td class="qp-term-label">${escapeHtml(t.label || '')}</td><td class="qp-term-detail">${escapeHtml(t.detail || '')}</td></tr>`
+  ).join('');
+  const termsTable = termsBody
+    ? `<table class="qp-table qp-terms-table"><colgroup><col style="width:26%"><col style="width:74%"></colgroup>` +
+      `<thead><tr><th>TERM</th><th>DETAIL</th></tr></thead><tbody>${termsBody}</tbody></table>`
+    : '';
   let payBlock = '';
   if (q.payBank && q.bank) {
     payBlock += `<div class="qp-bank-grid"><b>Bank Transfer</b><br>` +
@@ -12252,12 +12324,14 @@ function buildQuotePreviewHTML(q) {
       <div class="qp-srow"><span>VAT (${q.vatRate||5}%)</span><span>${money(q.vatAmount||0)}</span></div>
       <div class="qp-srow qp-sgrand"><span>Total</span><span>${money(q.total||0)}</span></div>
     </div>
-    <div class="qp-section-h">Payment Schedule</div>
-    <div class="qp-summary" style="margin-left:0;">${schedRows}</div>
-    ${termsRows ? `<div class="qp-terms-block"><div class="qp-section-h">Purchase Terms</div>${termsRows}</div>` : ''}
-    ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
-    ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
-    <div class="qp-accept">By issuing a PO, signing this quote or paying an invoice related to this quote, you are accepting the purchase terms &amp; conditions on behalf of your organization.</div>
+    <div class="qp-page2">
+      <div class="qp-section-h">Payment Schedule</div>
+      ${schedTable}
+      ${termsTable ? `<div class="qp-terms-block"><div class="qp-section-h">Purchase Terms</div>${termsTable}</div>` : ''}
+      ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
+      ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
+      <div class="qp-accept">By issuing a PO, signing this quote or paying an invoice related to this quote, you are accepting the purchase terms &amp; conditions on behalf of your organization.</div>
+    </div>
   `;
 }
 function previewQuote() {
