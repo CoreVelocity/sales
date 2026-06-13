@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.26</title>
+<title>CoreV | OxeFit Sales Tracker v21.27</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2301,7 +2301,9 @@
   .demo-hero-title {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 32px; font-weight: 700;
     letter-spacing: 1px; margin: 0; color: var(--text);
+    display: inline-flex; align-items: center; gap: 12px;
   }
+  .demo-hero-svg { width: 30px; height: 30px; stroke: var(--accent2); fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
   .demo-hero-sub { margin: 6px 0 0; color: var(--text-muted); font-size: 14px; max-width: 640px; }
   .demo-hero-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .demo-select {
@@ -3778,7 +3780,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.26 · SVG icons in page headers · readable exec hero · demo tracker excludes non-delivering staff
+      v21.27 · Quotes-per-team in Monthly Commitments · demo header icon
     </div>
   </div>
 </div>
@@ -3851,7 +3853,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.26</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.27</strong></p>
     </div>
   </div>
 </div>
@@ -3920,7 +3922,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.26</div>
+      <div class="sidebar-version">v21.27</div>
     </div>
   </aside>
 
@@ -4261,7 +4263,7 @@
       <!-- Hero / header strip -->
       <div class="demo-hero">
         <div class="demo-hero-left">
-          <h1 class="demo-hero-title">🎬 Demo Tracker</h1>
+          <h1 class="demo-hero-title"><svg class="demo-hero-svg" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><polygon points="10 8.5 15 11 10 13.5"/><line x1="8" y1="21" x2="16" y2="21"/></svg> Demo Tracker</h1>
           <p class="demo-hero-sub">Weekly log of every product demo run by the sales team — owned by the Office Admin, with conversion tracking back into HubSpot deals.</p>
         </div>
         <div class="demo-hero-actions">
@@ -7594,6 +7596,16 @@ function renderAll() {
    when reps had entered data but not yet clicked Submit & Lock. Now any row
    with a non-zero commit / best case / closed-won / unit value is included,
    and a separate locked-vs-pending sub-count tells you how many are final. */
+function quotesCountForTeamMonth(teamName) {
+  if (typeof quoteEntries === 'undefined') return 0;
+  return quoteEntries.filter(q => {
+    const rep = q.ownerUser || q.submittedBy;
+    if (regionForRep(rep) !== teamName) return false;
+    const d = q.createdAt ? new Date(q.createdAt) : null;
+    if (!d || isNaN(d)) return false;
+    return d.getFullYear() === curYear && d.getMonth() === curMonth;
+  }).length;
+}
 function renderCommitPanel() {
   // v20.1 — the team commitment rollup is hidden for sales reps (it aggregates
   // other reps); reps see only their own row + KPIs scoped to themselves.
@@ -7601,7 +7613,7 @@ function renderCommitPanel() {
   if (isOwnOnly()) { if (panel) panel.style.display = 'none'; return; }
   if (panel) panel.style.display = '';
   const md = getCurMonthData();
-  const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, truePipeline:0, xs1:0, xp1:0, count:0, locked:0, pending:0, syncedReps:new Set() });
+  const blank = () => ({ commit:0, forecast:0, bestCase:0, closedWon:0, truePipeline:0, xs1:0, xp1:0, count:0, locked:0, pending:0, quotes:0, syncedReps:new Set() });
   const agg = { 'Dubai': blank(), 'Abu Dhabi': blank(), 'Direct Engagement': blank() };
   md.weeks.forEach((w, wi) => {
     if (!w) return;
@@ -7654,6 +7666,9 @@ function renderCommitPanel() {
     });
     agg[teamName].truePipeline = teamTP;
   });
+  // v21.27 — quotes generated this month, per team (by the owning rep's region)
+  agg['Dubai'].quotes     = quotesCountForTeamMonth('Dubai');
+  agg['Abu Dhabi'].quotes = quotesCountForTeamMonth('Abu Dhabi');
   const total = blank();
   ['commit','forecast','bestCase','closedWon','truePipeline','xs1','xp1','count','locked','pending'].forEach(k => {
     total[k] = agg['Dubai'][k] + agg['Abu Dhabi'][k];
@@ -7673,6 +7688,7 @@ function renderCommitPanel() {
         <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value">${d.truePipeline ? fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? '0' : '—')}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
+        <div title="Quotes generated this month"><div class="commit-metric-label">Quotes</div><div class="commit-metric-value accent">${d.quotes||0}</div></div>
       </div>
       <div class="commit-card-sub">
         <span class="commit-locked-pill">🔒 ${d.locked} locked</span>
