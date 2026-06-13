@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.17</title>
+<title>CoreV | OxeFit Sales Tracker v21.18</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3718,7 +3718,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.17 · Clearer HubSpot publish errors (missing-scopes guidance)
+      v21.18 · Publish works with files scope (deal auto-attach now best-effort)
     </div>
   </div>
 </div>
@@ -3791,7 +3791,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.17</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.18</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3860,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.17</div>
+      <div class="sidebar-version">v21.18</div>
     </div>
   </aside>
 
@@ -12465,15 +12465,24 @@ async function publishQuoteToHubspot(id) {
   try {
     const blob = await generateQuotePdfBlob(q);
     const up = await hubspotUploadFile(blob, `Quote-${q.reference}.pdf`);
-    await hubspotAttachFileToDeal(up.id, q.dealId, q);
+    // Attaching to the deal's timeline is best-effort — it needs the notes scope.
+    // The PDF is already in HubSpot Files at this point, so we don't fail the publish.
+    let attached = true, attachErr = '';
+    try { await hubspotAttachFileToDeal(up.id, q.dealId, q); }
+    catch (ae) { attached = false; attachErr = ae && ae.message ? ae.message : String(ae); }
     q.status = 'Published'; q.publishedAt = new Date().toISOString();
-    q.hsFileId = up.id; q.hsFileUrl = up.url || ''; q.updatedAt = q.publishedAt;
+    q.hsFileId = up.id; q.hsFileUrl = up.url || ''; q.hsAttachedToDeal = attached; q.updatedAt = q.publishedAt;
     const idx = quoteEntries.findIndex(x => x.id === id);
     if (idx >= 0) quoteEntries[idx] = JSON.parse(JSON.stringify(q));
     saveQuotesAll();
     if (_currentQuote && _currentQuote.id === id) { _currentQuote.status = 'Published'; _currentQuote.hsFileId = up.id; updateQuoteButtons(); updatePreviewPrintGate(); }
     renderQuotesList();
-    showToast('Published — PDF attached to the HubSpot deal', 'success');
+    if (attached) {
+      showToast('Published — PDF uploaded and attached to the HubSpot deal', 'success');
+    } else {
+      showToast('Published — PDF uploaded to HubSpot Files, but auto-attach to the deal needs the notes scope. You can attach it on the deal manually.', 'info');
+      console.warn('HubSpot deal attach skipped:', attachErr);
+    }
   } catch (e) {
     showToast('Publish failed: ' + (e.message || e), 'error');
   }
