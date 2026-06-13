@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.12</title>
+<title>CoreV | OxeFit Sales Tracker v21.13</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3634,6 +3634,22 @@
   table.qp-table tbody tr.qp-terms-grouprow td { background: #eef2ff !important; color: #1e3a8a; font-weight: 800; font-size: 11px; letter-spacing: 0.5px; padding: 7px 10px; }
   .qp-page2 { margin-top: 10px; }
   @media print { .qp-page2 { break-before: page; } }
+  /* v21.13 — repeating page header/footer for multi-page PDFs */
+  .qp-sheet { width: 100%; min-width: 0; border-collapse: collapse; }
+  .qp-sheet > tbody > tr, .qp-sheet > thead > tr, .qp-sheet > tfoot > tr { background: #fff !important; }
+  .qp-sheet > thead > tr > td, .qp-sheet > tfoot > tr > td, .qp-sheet > tbody > tr > td { padding: 0; border: none; background: #fff; }
+  .qp-runhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1.5px solid #1e3a8a; padding-bottom: 6px; }
+  .qp-runhead-logo { height: 22px; width: auto; }
+  .qp-runhead-meta { font-size: 9.5px; color: #64748b; font-weight: 700; letter-spacing: 0.3px; text-align: right; }
+  .qp-runfoot { border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8.5px; color: #94a3b8; text-align: center; }
+  /* on screen the big logo/title is enough — only show the running header/footer when printing */
+  .qp-sheet > thead, .qp-sheet > tfoot { display: none; }
+  @media print {
+    .qp-sheet > thead { display: table-header-group; }
+    .qp-sheet > tfoot { display: table-footer-group; }
+    .qp-runhead { padding-top: 9mm; }
+    .qp-runfoot { padding-bottom: 8mm; }
+  }
   .qb-payterms-note { margin-top: 14px; }
   .qb-payterms-head { font-size: 12px; font-weight: 800; color: var(--accent2); margin-bottom: 6px; letter-spacing: 0.3px; }
   .qb-terms textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-card); color: var(--text); font: 400 12.5px 'Inter', system-ui, sans-serif; resize: vertical; min-height: 42px; }
@@ -3653,7 +3669,7 @@
     .qp-modal { position: static !important; box-shadow: none; max-width: none !important; width: 100% !important; border-radius: 0; overflow: visible !important; margin: 0; }
     .qp-modal-bar { display: none !important; }
     .qp-scroll { max-height: none !important; height: auto !important; overflow: visible !important; background: #fff; padding: 0; }
-    .qp-doc { max-width: none; width: 100%; padding: 14mm; box-sizing: border-box; }
+    .qp-doc { max-width: none; width: 100%; padding: 0 12mm; box-sizing: border-box; }
     /* avoid awkward splits */
     table.qp-table tr, .qp-srow, .qp-cols { break-inside: avoid; }
     .qp-section-h { break-after: avoid; }
@@ -3696,7 +3712,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.9 · Admin Terms Library — fixed Purchase Terms auto-applied       v21.8 · Fixed acceptance clause at the bottom of every quote locked per product Type
+      v21.13 · Repeating PDF header · UAE +971 phone · Quotes-first landing
     </div>
   </div>
 </div>
@@ -3769,7 +3785,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.12</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.13</strong></p>
     </div>
   </div>
 </div>
@@ -3838,7 +3854,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.12</div>
+      <div class="sidebar-version">v21.13</div>
     </div>
   </aside>
 
@@ -4630,13 +4646,13 @@
 
     <!-- Sub-tabs: Products | Quotes | Terms -->
     <div class="quotes-subtabs">
-      <button class="quotes-subtab active" data-qsub="products" onclick="quotesSwitchSub('products')">Products</button>
-      <button class="quotes-subtab" data-qsub="quotes" onclick="quotesSwitchSub('quotes')">Quotes</button>
+      <button class="quotes-subtab active" data-qsub="quotes" onclick="quotesSwitchSub('quotes')">Quotes</button>
+      <button class="quotes-subtab" data-qsub="products" onclick="quotesSwitchSub('products')">Products</button>
       <button class="quotes-subtab" data-qsub="terms" onclick="quotesSwitchSub('terms')">Terms Library</button>
     </div>
 
     <!-- ── PRODUCTS ── -->
-    <div class="quotes-subview active" id="qsub-products">
+    <div class="quotes-subview" id="qsub-products">
       <div class="prod-panel">
         <div class="prod-panel-head">
           <h3 class="prod-panel-title">Product Catalog</h3>
@@ -4734,7 +4750,7 @@
     </div>
 
     <!-- ── QUOTES ── -->
-    <div class="quotes-subview" id="qsub-quotes">
+    <div class="quotes-subview active" id="qsub-quotes">
 
       <!-- LIST VIEW -->
       <div class="prod-panel" id="quotesListPanel">
@@ -4847,7 +4863,7 @@
                 <div class="qb-field"><label>Email</label><input type="email" id="qbBuyerEmail" placeholder="email@company.com"></div>
               </div>
               <div class="qb-row2">
-                <div class="qb-field"><label>Phone</label><input type="text" id="qbBuyerPhone" placeholder="+971…"></div>
+                <div class="qb-field"><label>Phone <span class="qb-hint-inline">(UAE · +971)</span></label><input type="text" id="qbBuyerPhone" placeholder="+971…"></div>
                 <div class="qb-field"><label>Address</label><input type="text" id="qbBuyerAddress" placeholder="Address"></div>
               </div>
               <div class="qb-divider"></div>
@@ -4879,7 +4895,7 @@
                   <div class="qb-field"><label>Full Name</label><input type="text" id="qbSenderName"></div>
                   <div class="qb-field"><label>Email</label><input type="email" id="qbSenderEmail"></div>
                   <div class="qb-row2">
-                    <div class="qb-field"><label>Phone</label><input type="text" id="qbSenderPhone"></div>
+                    <div class="qb-field"><label>Phone <span class="qb-hint-inline">(UAE · +971)</span></label><input type="text" id="qbSenderPhone" placeholder="+971…"></div>
                     <div class="qb-field"><label>Title</label><input type="text" id="qbSenderTitle" placeholder="e.g. Sales Executive"></div>
                   </div>
                 </div>
@@ -11077,7 +11093,7 @@ function saveProducts() {
 function canEditProducts() { return currentRole === 'admin'; }
 
 function renderQuotesTab() {
-  quotesSwitchSub(document.querySelector('.quotes-subtab.active')?.dataset.qsub || 'products');
+  quotesSwitchSub(document.querySelector('.quotes-subtab.active')?.dataset.qsub || 'quotes');
   // form is admin-only
   const form = document.getElementById('prodForm');
   if (form) form.style.display = canEditProducts() ? '' : 'none';
@@ -11652,7 +11668,7 @@ function startNewQuote() {
     name: '', dealId: '', dealName: '',
     buyer: { contactId: '', name: '', email: '', phone: '', address: '' },
     company: { id: '', name: '' },
-    sender: { name: currentUser || '', email: meEmail || '', phone: '', title: 'Sales Executive' },
+    sender: { name: currentUser || '', email: meEmail || '', phone: '+971', title: 'Sales Executive' },
     lineItems: [],
     discount: 0, vatRate: 5,
     schedule: [{ pct: 100, when: 'On placing the order' }],
@@ -11791,6 +11807,7 @@ function qbPillClick(i) {
 }
 
 /* ── Mandatory-field validation (v21.7) ───────────────────────────── */
+function _isUaePhone(p) { return /^\+971/.test(String(p || '').replace(/[\s-]/g, '')); }
 function qbStepRequirements(step) {
   const q = _currentQuote;
   if (step === 0) return [
@@ -11802,12 +11819,12 @@ function qbStepRequirements(step) {
   if (step === 1) return [
     [!q.buyer.name, 'Client Name', 'qbBuyerName'],
     [!q.buyer.email, 'Email', 'qbBuyerEmail'],
-    [!q.buyer.phone, 'Phone', 'qbBuyerPhone']
+    [!_isUaePhone(q.buyer.phone), 'Phone (must start with +971)', 'qbBuyerPhone']
   ];
   if (step === 2) return [
     [!q.sender.name, 'Sender Full Name', 'qbSenderName'],
     [!q.sender.email, 'Sender Email', 'qbSenderEmail'],
-    [!q.sender.phone, 'Sender Phone', 'qbSenderPhone'],
+    [!_isUaePhone(q.sender.phone), 'Sender Phone (must start with +971)', 'qbSenderPhone'],
     [!q.sender.title, 'Sender Title', 'qbSenderTitle']
   ];
   if (step === 3) return [
@@ -11891,11 +11908,11 @@ const QB_COMBO = {
     match: (c, q) => (c.name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q),
     selLabel: () => (_currentQuote && _currentQuote.buyer && _currentQuote.buyer.contactId) ? _currentQuote.buyer.name : '',
     onPick: c => {
-      if (!c) { _currentQuote.buyer = { contactId: '', name: '', email: '', phone: '', address: '' }; }
-      else { _currentQuote.buyer = { contactId: c.id, name: c.name, email: c.email, phone: c.phone, address: c.address }; }
+      if (!c) { _currentQuote.buyer = { contactId: '', name: '', email: '', phone: '+971', address: '' }; }
+      else { _currentQuote.buyer = { contactId: c.id, name: c.name, email: c.email, phone: (_isUaePhone(c.phone) ? c.phone : (c.phone ? c.phone : '+971')), address: c.address }; }
       document.getElementById('qbBuyerName').value = c ? (c.name || '') : '';
       document.getElementById('qbBuyerEmail').value = c ? (c.email || '') : '';
-      document.getElementById('qbBuyerPhone').value = c ? (c.phone || '') : '';
+      document.getElementById('qbBuyerPhone').value = _currentQuote.buyer.phone || '+971';
       document.getElementById('qbBuyerAddress').value = c ? (c.address || '') : '';
     }
   },
@@ -12395,6 +12412,13 @@ function buildQuotePreviewHTML(q) {
   }
 
   return `
+    <table class="qp-sheet">
+      <thead><tr><td><div class="qp-runhead">
+        <img class="qp-runhead-logo" src="${QUOTE_LOGO_URI}" alt="OXEFIT by CORE">
+        <span class="qp-runhead-meta">QUOTE · ${escapeHtml(q.reference || '')}${q.name ? ' · ' + escapeHtml(q.name) : ''}</span>
+      </div></td></tr></thead>
+      <tfoot><tr><td><div class="qp-runfoot">Core Velocity Sport Machine Trading L.L.C · VAT 104796789600003 · Court Tower, Office 403, Business Bay, Dubai / UAE</div></td></tr></tfoot>
+      <tbody><tr><td>
     <img class="qp-logo-img" src="${QUOTE_LOGO_URI}" alt="OXEFIT by CORE">
     <div class="qp-title">${escapeHtml(q.name || 'Quote')}</div>
     <div class="qp-cols">
@@ -12423,6 +12447,8 @@ function buildQuotePreviewHTML(q) {
       ${payBlock ? `<div class="qp-section-h">Payment Details</div>${payBlock}` : ''}
       ${q.comments ? `<div class="qp-section-h">Comments</div><div class="qp-muted">${escapeHtml(q.comments)}</div>` : ''}
     </div>
+      </td></tr></tbody>
+    </table>
   `;
 }
 function previewQuote() {
