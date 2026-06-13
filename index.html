@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.13</title>
+<title>CoreV | OxeFit Sales Tracker v21.14</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3638,7 +3638,7 @@
   .qp-sheet { width: 100%; min-width: 0; border-collapse: collapse; }
   .qp-sheet > tbody > tr, .qp-sheet > thead > tr, .qp-sheet > tfoot > tr { background: #fff !important; }
   .qp-sheet > thead > tr > td, .qp-sheet > tfoot > tr > td, .qp-sheet > tbody > tr > td { padding: 0; border: none; background: #fff; }
-  .qp-runhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1.5px solid #1e3a8a; padding-bottom: 6px; }
+  .qp-runhead { display: flex; align-items: center; justify-content: flex-end; gap: 12px; border-bottom: 1.5px solid #1e3a8a; padding-bottom: 6px; }
   .qp-runhead-logo { height: 22px; width: auto; }
   .qp-runhead-meta { font-size: 9.5px; color: #64748b; font-weight: 700; letter-spacing: 0.3px; text-align: right; }
   .qp-runfoot { border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8.5px; color: #94a3b8; text-align: center; }
@@ -3712,7 +3712,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.13 · Repeating PDF header · UAE +971 phone · Quotes-first landing
+      v21.14 · PDF header simplified (reference only)
     </div>
   </div>
 </div>
@@ -3785,7 +3785,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.13</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.14</strong></p>
     </div>
   </div>
 </div>
@@ -3854,7 +3854,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.13</div>
+      <div class="sidebar-version">v21.14</div>
     </div>
   </aside>
 
@@ -12414,8 +12414,7 @@ function buildQuotePreviewHTML(q) {
   return `
     <table class="qp-sheet">
       <thead><tr><td><div class="qp-runhead">
-        <img class="qp-runhead-logo" src="${QUOTE_LOGO_URI}" alt="OXEFIT by CORE">
-        <span class="qp-runhead-meta">QUOTE · ${escapeHtml(q.reference || '')}${q.name ? ' · ' + escapeHtml(q.name) : ''}</span>
+        <span class="qp-runhead-meta">QUOTE · ${escapeHtml(q.reference || '')}</span>
       </div></td></tr></thead>
       <tfoot><tr><td><div class="qp-runfoot">Core Velocity Sport Machine Trading L.L.C · VAT 104796789600003 · Court Tower, Office 403, Business Bay, Dubai / UAE</div></td></tr></tfoot>
       <tbody><tr><td>
