@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.22</title>
+<title>CoreV | OxeFit Sales Tracker v21.23</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3718,7 +3718,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.22 · Publish attaches the quote PDF to the HubSpot deal (instead of native quote)
+      v21.23 · Download matches HubSpot PDF exactly · filename = quote name + date
     </div>
   </div>
 </div>
@@ -3791,7 +3791,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.22</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.23</strong></p>
     </div>
   </div>
 </div>
@@ -3860,7 +3860,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.22</div>
+      <div class="sidebar-version">v21.23</div>
     </div>
   </aside>
 
@@ -5051,7 +5051,7 @@
         <span>Quote Preview</span>
         <div>
           <span class="qp-print-note" id="qpPrintNote" style="display:none;font-weight:600;font-size:11.5px;color:#fca5a5;align-self:center;">Download/print available after approval</span>
-          <button class="prod-row-btn" id="qpPrintBtn" onclick="printQuotePreview()">🖨 Print / Save PDF</button>
+          <button class="prod-row-btn" id="qpPrintBtn" onclick="printQuotePreview()">⤓ Download PDF</button>
           <button class="prod-row-btn" onclick="closeQuotePreview()">✕ Close</button>
         </div>
       </div>
@@ -12500,7 +12500,7 @@ async function publishQuoteToHubspot(id) {
   showToast('Generating PDF and attaching to the HubSpot deal…', 'info');
   try {
     const blob = await generateQuotePdfBlob(q);
-    const up = await hubspotUploadFile(blob, `Quote-${q.reference}.pdf`);
+    const up = await hubspotUploadFile(blob, quoteFileName(q));
     // attach the uploaded PDF onto the deal's timeline (best-effort — needs notes/engagement write scope)
     let attached = true, attachErr = '';
     try { await hubspotAttachFileToDeal(up.id, q.dealId, q); }
@@ -12658,13 +12658,49 @@ function closeQuotePreview(ev) {
   }
   document.getElementById('quotePreviewOverlay').classList.remove('open');
 }
-function printQuotePreview() {
-  if (!quotePrintAllowed()) { showToast('Download/print is available only after the quote is approved', 'error'); return; }
-  window.print();
+function quoteFileName(q) {
+  const d = (q && q.createdAt) ? new Date(q.createdAt) : new Date();
+  const ds = isNaN(d) ? new Date().toISOString().slice(0, 10) : d.toISOString().slice(0, 10);
+  const base = ((q && q.name) || ('Quote ' + (q && q.reference || ''))).replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return `${base} - ${ds}.pdf`;
 }
+// Download uses the SAME generator as the HubSpot upload, so both are identical
+async function downloadQuotePdf() {
+  if (!quotePrintAllowed()) { showToast('Download is available only after the quote is approved', 'error'); return; }
+  const q = _currentQuote;
+  const fname = quoteFileName(q);
+  try {
+    const html2pdf = await ensureHtml2Pdf();
+    const host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-1;';
+    const doc = document.createElement('div');
+    doc.className = 'qp-doc';
+    doc.style.cssText = 'width:794px;padding:14mm;box-sizing:border-box;background:#fff;color:#1a202c;';
+    doc.innerHTML = buildQuotePreviewHTML(q);
+    host.appendChild(doc); document.body.appendChild(host);
+    try {
+      await html2pdf().set({
+        margin: 0, filename: fname,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+      }).from(doc).save();
+    } finally { host.remove(); }
+  } catch (e) {
+    // fallback: browser print, but at least fix the suggested filename via the title
+    const orig = document.title;
+    document.title = fname.replace(/\.pdf$/i, '');
+    const restore = () => { document.title = orig; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore); setTimeout(restore, 5000);
+    window.print();
+  }
+}
+function printQuotePreview() { downloadQuotePdf(); }
 function exportQuotePDF() {
-  if (!quotePrintAllowed()) { showToast('Download/print is available only after the quote is approved', 'error'); return; }
-  previewQuote(); setTimeout(() => window.print(), 350);
+  if (!quotePrintAllowed()) { showToast('Download is available only after the quote is approved', 'error'); return; }
+  if (!document.getElementById('quotePreviewOverlay').classList.contains('open')) previewQuote();
+  downloadQuotePdf();
 }
 
 function loadRequests() {
