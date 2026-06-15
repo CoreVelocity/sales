@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.32</title>
+<title>CoreV | OxeFit Sales Tracker v21.33</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.31 · Marketing import detects multiple tables · works on any Drive sheet
+      v21.33 · Follow-up Engine + Google Drive multi-sheet import
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.32</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.33</strong></p>
     </div>
   </div>
 </div>
@@ -3926,6 +3926,9 @@
       <button class="nav-item" data-tab="requests" onclick="switchTab('requests')" title="Event &amp; On-site Demo Requests">
         <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg></span><span class="nav-label">Requests</span><span class="nav-badge" id="requestsBadge" style="display:none;">0</span>
       </button>
+      <button class="nav-item" data-tab="followup" onclick="switchTab('followup')" title="Follow-up Engine">
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span class="nav-label">Follow-up Engine</span>
+      </button>
       <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
         <span class="nav-ico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span class="nav-label">Marketing</span>
       </button>
@@ -3952,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.32</div>
+      <div class="sidebar-version">v21.33 · FE</div>
     </div>
   </aside>
 
@@ -5156,6 +5159,67 @@
   </div>
 
   <!-- ░░░ DEAL OWNERSHIP & CRM RULES (merged v19.2) ░░░ -->
+  <div class="tab-view" id="view-followup">
+    <style>
+      #view-followup .fe-wrap{max-width:920px;margin:0 auto;}
+      #view-followup .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+      #view-followup .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
+      #view-followup .fe-btn{background:var(--brand-grad);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;}
+      #view-followup .fe-btn:hover{filter:brightness(1.05);}
+      #view-followup .fe-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:8px 13px;font-size:14px;cursor:pointer;}
+      #view-followup .fe-ghost:hover{background:var(--card-hover);}
+      #view-followup .fe-sm{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
+      #view-followup .fe-sm:hover{background:var(--card-hover);}
+      #view-followup .fe-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+      @media(max-width:640px){#view-followup .fe-grid{grid-template-columns:repeat(2,1fr);}}
+      #view-followup .fe-metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+      #view-followup .fe-metric .l{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+      #view-followup .fe-metric .v{font-size:24px;font-weight:700;color:var(--text);}
+      #view-followup .fe-leadrow{width:100%;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;}
+      #view-followup .fe-leadrow:hover{background:var(--card-hover);}
+      #view-followup .fe-av{height:36px;width:36px;border-radius:50%;background:var(--navy-mid);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;}
+      #view-followup .fe-grow{flex:1;min-width:0;}
+      #view-followup .fe-name{font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text);}
+      #view-followup .fe-trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      #view-followup .fe-sub{font-size:12px;color:var(--text-muted);}
+      #view-followup .fe-chip{font-size:11px;border-radius:5px;padding:2px 6px;background:var(--navy-mid);color:var(--text-muted);}
+      #view-followup .fe-pill{font-size:11px;border-radius:999px;padding:3px 9px;background:var(--navy-mid);white-space:nowrap;}
+      #view-followup .fe-due{height:8px;width:8px;border-radius:50%;background:var(--warn);flex-shrink:0;}
+      #view-followup .fe-empty{background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text-muted);}
+      #view-followup .fe-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+      #view-followup .fe-touch{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+      #view-followup .fe-touch .hh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+      #view-followup .fe-purpose{font-size:12px;color:var(--text-muted);margin:0 0 8px;}
+      #view-followup .fe-msg{font-size:14px;color:var(--text);white-space:pre-wrap;background:var(--navy-mid);border-radius:9px;padding:12px;cursor:text;}
+      #view-followup .fe-msg:hover{background:var(--card-hover);}
+      #view-followup textarea.fe-ta,#view-followup input.fe-in,#view-followup select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
+      #view-followup .fe-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;}
+      #view-followup .fe-right{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
+      #view-followup .fe-back{background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;margin-bottom:14px;padding:0;}
+      #view-followup .fe-back:hover{color:var(--text);}
+      #view-followup .fe-stages{display:flex;flex-wrap:wrap;gap:6px;}
+      #view-followup .fe-stagebtn{font-size:12px;border-radius:999px;padding:6px 12px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
+      #view-followup .fe-stagebtn.on{border-color:transparent;box-shadow:0 0 0 1px var(--teal);color:var(--text);}
+      #view-followup .fe-meta{font-size:14px;color:var(--text-muted);margin-top:4px;}
+      #view-followup .fe-meta div{margin:1px 0;}
+      #view-followup .fe-err{color:var(--danger);font-size:12px;margin-top:8px;}
+      #fe-modal-root .fe-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
+      #fe-modal-root .fe-modal{background:var(--card);color:var(--text);width:100%;max-width:560px;border-radius:16px;padding:20px;max-height:92vh;overflow:auto;border:1px solid var(--border);}
+      #fe-modal-root .fe-field{margin-bottom:12px;}
+      #fe-modal-root .fe-lab{font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;}
+      #fe-modal-root .fe-seg{display:flex;gap:8px;}
+      #fe-modal-root .fe-seg button{flex:1;font-size:14px;border-radius:9px;padding:9px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
+      #fe-modal-root .fe-seg button.on{background:var(--brand-grad);color:#fff;border-color:transparent;}
+      #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+      #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
+      #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
+    </style>
+    <div class="fe-wrap">
+      <div id="fe-root"></div>
+    </div>
+    <div id="fe-modal-root"></div>
+  </div>
+
   <div class="tab-view" id="view-deal-rules">
 <div class="banner">
   <div class="banner-eyebrow">Internal Policy Document</div>
@@ -6849,12 +6913,13 @@ function parseEnvelope(remote) {
       data : (remote.data && typeof remote.data === 'object') ? remote.data : {},
       demos: Array.isArray(remote.demos) ? remote.demos : [],
       requests: Array.isArray(remote.requests) ? remote.requests : [],   // v19.1
+      followups: Array.isArray(remote.followups) ? remote.followups : [],   // Follow-up Engine
       hubspot: (remote.hubspot && typeof remote.hubspot === 'object') ? remote.hubspot : null, // v15.4
       meta : remote._meta || null
     };
   }
   // Legacy bare month-keyed object → treat as data, no demos.
-  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], hubspot: null, meta: null };
+  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], followups: [], hubspot: null, meta: null };
 }
 
 async function fetchRemoteEnvelope(tok) {
@@ -6918,6 +6983,7 @@ async function downloadFromOneDrive() {
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
+    if (r.env && Array.isArray(r.env.followups)) { _lastRemoteFollowups = r.env.followups; if (typeof followupLeads !== 'undefined') { followupLeads = mergeFollowupsById(followupLeads, r.env.followups); try { saveFollowupsLocal(); } catch(e){} try { var _fev=document.getElementById('view-followup'); if (_fev && _fev.classList.contains('active') && typeof renderFollowup==='function') renderFollowup(); } catch(e){} } }
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7131,6 +7197,9 @@ function buildEnvelope() {
   // v20.8 — quotes ride along too (merged by id, last-write-wins per quote)
   if (typeof quoteEntries !== 'undefined' && Array.isArray(quoteEntries) && quoteEntries.length) env.quotes = quoteEntries;
   else if (_lastRemoteQuotes) env.quotes = _lastRemoteQuotes;
+  // Follow-up Engine — leads ride along, merged by id (last-write-wins per lead)
+  if (typeof followupLeads !== 'undefined' && Array.isArray(followupLeads) && followupLeads.length) env.followups = followupLeads;
+  else if (_lastRemoteFollowups) env.followups = _lastRemoteFollowups;
   // v21.9 — per-Type terms library (admin-managed, last-write-wins)
   if (typeof termTemplates !== 'undefined' && termTemplates && Object.keys(termTemplates).length) env.termtemplates = termTemplates;
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
@@ -7170,6 +7239,7 @@ async function uploadToOneDrive() {
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
+    if (r.env && Array.isArray(r.env.followups)) { _lastRemoteFollowups = r.env.followups; if (typeof followupLeads !== 'undefined') { followupLeads = mergeFollowupsById(followupLeads, r.env.followups); try { saveFollowupsLocal(); } catch(e){} try { var _fev=document.getElementById('view-followup'); if (_fev && _fev.classList.contains('active') && typeof renderFollowup==='function') renderFollowup(); } catch(e){} } }
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11177,6 +11247,7 @@ const TAB_HEADINGS = {
   performance: 'Sales Rep Performance',
   demos:       'Demo Tracker',
   requests:    'Event & On-site Demo Requests',
+  followup:    'Follow-up Engine',
   marketing:   'Marketing Consumer Performance',
   quotes:      'Quotes & Products',
   'deal-rules':'Deal Ownership & CRM Rules',
@@ -11212,6 +11283,9 @@ function switchTab(tabName) {
   }
   if (tabName === 'quotes') {
     renderQuotesTab();
+  }
+  if (tabName === 'followup') {
+    renderFollowup();
   }
 }
 
@@ -15859,11 +15933,509 @@ function saveThresh() {
 /* ════════════════════════════════════════
    INIT
 ════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+   FOLLOW-UP ENGINE
+   Lead routing (B2B/B2C) → 12-day cadence → status tracking → AI tuning.
+   Storage: localStorage 'oxefit_followups_v1', mirrored into the shared
+   OneDrive envelope (followups[]) so the whole team shares one pipeline.
+════════════════════════════════════════════════════════════════════ */
+const FOLLOWUPS_KEY = 'oxefit_followups_v1';
+let followupLeads = [];
+let _lastRemoteFollowups = null;
+let feView = 'dashboard';
+let feSelectedId = null;
+let feEditKey = null;
+let feExpandKey = null;
+let feAiBusy = null;
+let feImportPreview = [];
+let feImportBusy = false;
+let feImportErr = '';
+
+const FE_STAGES = ["New","Contacted","Engaged","Demo booked","Won","Lost"];
+const FE_CADENCE = [
+  { key:"t1", dayLabel:"Day 0", when:"Within 5 min", channel:"WhatsApp", offsetMinutes:0,
+    purpose:"Instant reply and quick qualify (home vs business)",
+    msg:{ b2c:"Hi {name}, thanks for your interest in OxeFit! Quick question so I can help you best — is this for your home, or for a gym/business?",
+          b2b:"Hi {name}, thanks for reaching out to OxeFit! Quick one so I point you the right way — is this for your home, or for {company}?" } },
+  { key:"t2", dayLabel:"Day 0", when:"+2 hours", channel:"WhatsApp", offsetMinutes:120,
+    purpose:"Personal note from the rep with a soft demo offer",
+    msg:{ b2c:"Hi {name}, this is your OxeFit specialist. Most people are surprised how much one system replaces — strength, cardio, recovery and AI coaching in one. I'd love to show how it fits your space. Want me to send a quick 60-second clip?",
+          b2b:"Hi {name}, this is your OxeFit specialist. For {company}, OxeFit can lift member retention and add a premium draw without extra staff. Can I send a short overview built for facilities like yours?" } },
+  { key:"t3", dayLabel:"Day 1", when:"Next day", channel:"WhatsApp", offsetMinutes:1440,
+    purpose:"Send one short matched video",
+    msg:{ b2c:"Here's a quick look at OxeFit in a real home setup: [video link]. Watch how the resistance adjusts automatically as you move — that's the part people love.",
+          b2b:"Sharing how a studio worked OxeFit into their floor: [video link]. Members book it out — it's become a real differentiator for them." } },
+  { key:"t4", dayLabel:"Day 3", when:"3 days in", channel:"WhatsApp", offsetMinutes:4320,
+    purpose:"Social proof, handle the top objection, drop the booking link",
+    msg:{ b2c:"{name}, a customer here had the same thought about space — turned out it fit a corner they weren't using. Easiest way to judge is to feel it: 15 minutes, in person or over video. Here's my calendar: [booking link]. No pressure.",
+          b2b:"{name}, a gym we work with had members signing up specifically for the OxeFit sessions. Worth a 15-minute walkthrough to see if it fits {company}? Here's my calendar: [booking link]." } },
+  { key:"t5", dayLabel:"Day 5", when:"5 days in", channel:"Email", offsetMinutes:7200,
+    purpose:"Lower the money objection — financing (B2C) or ROI (B2B)",
+    subject:{ b2c:"Making OxeFit easy on the budget", b2b:"The numbers behind OxeFit for {company}" },
+    msg:{ b2c:"Hi {name},\n\nWanted to make the investment side simple. OxeFit comes with flexible payment plans and a full warranty, and over a year it usually costs less than a trainer or premium gym membership — while living in your home.\n\nHappy to walk through the options whenever suits. Want me to hold a demo slot this week?\n\nBest,\nYour OxeFit team",
+          b2b:"Hi {name},\n\nSharing a short ROI snapshot for {company}: how OxeFit tends to lift retention, add a premium tier you can charge for, and pay back over the first year. Multi-unit pricing is available.\n\nHappy to tailor the numbers to your floor. Shall I set up a 15-minute call?\n\nBest,\nYour OxeFit team" } },
+  { key:"t6", dayLabel:"Day 8", when:"8 days in", channel:"WhatsApp", offsetMinutes:11520,
+    purpose:"Re-engage quiet leads with a low-commitment option",
+    msg:{ b2c:"Totally understand it's a big decision, {name}. I've got a couple of demo slots this week — want me to hold one, or would a quick video tour be easier?",
+          b2b:"Totally understand these things take time, {name}. I can hold a walkthrough slot this week, or send a tailored video tour for {company} — whichever's easier?" } },
+  { key:"t7", dayLabel:"Day 12", when:"12 days in", channel:"WhatsApp", offsetMinutes:17280,
+    purpose:"Soft break-up that often re-opens the conversation",
+    msg:{ b2c:"{name}, I don't want to keep nudging if the timing's off — should I close your file for now, or keep your spot open? Either answer is completely fine.",
+          b2b:"{name}, I don't want to keep chasing if now isn't right — should I close this off, or keep {company} on the list for later? Either's completely fine." } }
+];
+
+function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } }
+function saveFollowupsLocal(){ try{ localStorage.setItem(FOLLOWUPS_KEY, JSON.stringify(followupLeads)); }catch(e){} }
+function feSave(){ saveFollowupsLocal(); if(typeof scheduleOneDriveSync==='function'){ try{ scheduleOneDriveSync(); }catch(e){} } }
+function mergeFollowupsById(localArr, remoteArr){
+  const byId={};
+  (localArr||[]).forEach(l=>{ if(l&&l.id) byId[l.id]=l; });
+  (remoteArr||[]).forEach(r=>{ if(!r||!r.id) return; const ex=byId[r.id];
+    if(!ex){ byId[r.id]=r; } else { const a=Date.parse(ex.updatedAt||0)||0, b=Date.parse(r.updatedAt||0)||0; byId[r.id]=(b>=a)?r:ex; } });
+  return Object.values(byId);
+}
+
+function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
+function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
+function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
+function feEsc(s){ return (typeof escapeHtml==='function') ? escapeHtml(s||'') : (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function feToast(m,t){ if(typeof showToast==='function') showToast(m, t||'info'); }
+function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead.type==='B2B'?'b2b':'b2c';
+  return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
+    scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
+    subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
+function feGet(id){ return followupLeads.find(l=>l.id===id); }
+function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
+
+function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)'})[s]||'var(--text-muted)'; }
+function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--accent)',replied:'var(--success)',skipped:'var(--text-muted)'})[s]||'var(--text-muted)'; }
+
+/* ---- AI key ---- */
+function feKey(){ return localStorage.getItem('oxefit_anthropic_key')||''; }
+function feModel(){ return localStorage.getItem('oxefit_anthropic_model')||'claude-sonnet-4-6'; }
+function feSetKey(){
+  const k=prompt('Paste your Anthropic API key (stored only in this browser, used for AI message tuning):', feKey());
+  if(k!==null){ localStorage.setItem('oxefit_anthropic_key', k.trim()); feToast(k.trim()?'AI key saved':'AI key cleared','success'); }
+}
+
+/* ---- mutations ---- */
+function feAddLead(){
+  const name=(document.getElementById('fe-name').value||'').trim();
+  if(!name){ document.getElementById('fe-name').focus(); return; }
+  const cf=document.getElementById('fe-company');
+  const lead={ id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New',
+    owner:(typeof currentUser!=='undefined'?currentUser:'')||'',
+    name, company:cf?cf.value.trim():'', type:window._feType||'B2C', language:window._feLang||'English',
+    phone:(document.getElementById('fe-phone').value||'').trim(),
+    email:(document.getElementById('fe-email').value||'').trim(),
+    source:(document.getElementById('fe-source').value||'').trim(),
+    note:(document.getElementById('fe-note').value||'').trim() };
+  lead.touches=feGenTouches(lead);
+  followupLeads.unshift(lead); feSave(); feCloseModal();
+  feSelectedId=lead.id; feView='lead'; renderFollowup();
+}
+function feSetStage(id,stage){ const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
+function feMark(id,key,status){ const l=feGet(id); if(!l) return; const tt=l.touches.find(x=>x.key===key); if(!tt) return;
+  if(status==='skipped'&&tt.status==='skipped') tt.status='pending'; else tt.status=status;
+  if(status==='sent'&&l.stage==='New') l.stage='Contacted';
+  if(status==='replied'&&(l.stage==='New'||l.stage==='Contacted')) l.stage='Engaged';
+  feStamp(l); feSave(); renderFollowup(); }
+function feStartEdit(id,key){ feEditKey=id+':'+key; renderFollowup(); setTimeout(()=>{const a=document.getElementById('fe-edit-area'); if(a){a.focus();a.setSelectionRange(a.value.length,a.value.length);} },0); }
+function feCancelEdit(){ feEditKey=null; renderFollowup(); }
+function feSaveEdit(id,key){ const l=feGet(id); const tt=l&&l.touches.find(x=>x.key===key); const a=document.getElementById('fe-edit-area'); if(tt&&a){ tt.message=a.value; feStamp(l); } feEditKey=null; feSave(); renderFollowup(); }
+function feCopy(id,key){ const l=feGet(id); const tt=l&&l.touches.find(x=>x.key===key); if(!tt) return;
+  const text=tt.subject?('Subject: '+tt.subject+'\n\n'+tt.message):tt.message;
+  navigator.clipboard.writeText(text).then(()=>feToast('Copied','success')).catch(()=>feToast('Copy failed','error')); }
+
+async function feTune(id,key){
+  const l=feGet(id); const tt=l&&l.touches.find(x=>x.key===key); if(!tt) return;
+  const apiKey=feKey(); if(!apiKey){ feSetKey(); return; }
+  feAiBusy=id+':'+key; renderFollowup();
+  const isEmail=tt.channel==='Email';
+  const prompt="You help a sales rep at OxeFit (premium connected home-gym equipment, sold worldwide outside the Americas, based in the UAE).\n"+
+    "Write a single "+tt.channel+" message for this lead. Return ONLY the message text — no preamble, no quotation marks, no notes.\n"+
+    "Write it in "+l.language+". Keep it warm, concise, human and professional.\n"+
+    (isEmail?'Start with one line "Subject: ..." then a blank line then the body.':"No subject line — this is a chat message.")+"\n\n"+
+    "Lead: name="+l.name+"; type="+l.type+"; company="+(l.company||'n/a')+"; source="+(l.source||'unknown')+"; notes="+(l.note||'none')+"; pipeline stage="+l.stage+".\n"+
+    "Goal of this message: "+tt.purpose+".\nCurrent draft: "+JSON.stringify(tt.message);
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
+      headers:{ 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+      body:JSON.stringify({ model:feModel(), max_tokens:1024, messages:[{role:'user',content:prompt}] }) });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message||'API error');
+    let text=(data.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
+    if(!text) throw new Error('Empty response');
+    if(isEmail && /^subject:/i.test(text)){ const nl=text.indexOf('\n'); tt.subject=text.slice(0,nl<0?undefined:nl).replace(/^subject:\s*/i,'').trim(); text=nl<0?'':text.slice(nl+1).trim(); }
+    tt.message=text; feStamp(l); feSave();
+  }catch(e){ feToast('AI: '+((e&&e.message)||'failed').slice(0,90),'error'); }
+  finally{ feAiBusy=null; renderFollowup(); }
+}
+
+/* ---- add / import modals ---- */
+function feCloseModal(){ document.getElementById('fe-modal-root').innerHTML=''; }
+function feOpenAdd(){
+  window._feType='B2C'; window._feLang='English';
+  document.getElementById('fe-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
+    '<div class="fe-rowb" style="margin-bottom:14px"><h3 class="fe-h">New lead</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
+    '<div class="fe-field"><label class="fe-lab">Name</label><input id="fe-name" class="fe-in" placeholder="e.g. Omar Al Mansoori"/></div>'+
+    '<div class="fe-field"><label class="fe-lab">Buyer type</label><div class="fe-seg" id="fe-seg-type">'+
+      '<button class="on" data-v="B2C" onclick="fePickType(\'B2C\')">Home (B2C)</button>'+
+      '<button data-v="B2B" onclick="fePickType(\'B2B\')">Business (B2B)</button></div></div>'+
+    '<div class="fe-field" id="fe-company-field" style="display:none"><label class="fe-lab">Company</label><input id="fe-company" class="fe-in" placeholder="Gym, hotel, studio…"/></div>'+
+    '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Phone</label><input id="fe-phone" class="fe-in" placeholder="+971…"/></div>'+
+      '<div class="fe-field"><label class="fe-lab">Email</label><input id="fe-email" class="fe-in" placeholder="name@…"/></div></div>'+
+    '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Source</label><input id="fe-source" class="fe-in" placeholder="Instagram, referral…"/></div>'+
+      '<div class="fe-field"><label class="fe-lab">Language</label><div class="fe-seg" id="fe-seg-lang">'+
+        '<button class="on" data-v="English" onclick="fePickLang(\'English\')">English</button>'+
+        '<button data-v="Arabic" onclick="fePickLang(\'Arabic\')">Arabic</button></div></div></div>'+
+    '<div class="fe-field"><label class="fe-lab">Notes (what they asked / their goal)</label><textarea id="fe-note" class="fe-ta" rows="2" placeholder="Wants strength + recovery, small villa gym…"></textarea></div>'+
+    '<button class="fe-btn" style="width:100%" onclick="feAddLead()">Add lead and build cadence</button>'+
+  '</div></div>';
+  setTimeout(()=>{ const n=document.getElementById('fe-name'); if(n)n.focus(); },0);
+}
+function fePickType(v){ window._feType=v; document.querySelectorAll('#fe-seg-type button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); const cf=document.getElementById('fe-company-field'); if(cf) cf.style.display=v==='B2B'?'block':'none'; }
+function fePickLang(v){ window._feLang=v; document.querySelectorAll('#fe-seg-lang button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
+
+function feOpenImport(){ feImportPreview=[]; feImportErr=''; feImportBusy=false; feRenderImportInput(); }
+function feRenderImportInput(){
+  const hasKey=!!feKey();
+  document.getElementById('fe-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
+    '<div class="fe-rowb" style="margin-bottom:10px"><h3 class="fe-h">Import leads</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
+    '<p class="fe-sub" style="line-height:1.55;margin:0 0 12px">Paste your list (from a Google Doc, OneDrive file, or spreadsheet). One lead per line is fine. '+
+      (hasKey?'Smart parse reads it and sorts each lead into B2B or B2C.':'Add an AI key (button below) for smart parsing, or paste columns: name, type, phone, email, company, source, note.')+'</p>'+
+    '<textarea id="fe-imp-raw" class="fe-ta" rows="9" placeholder="Omar Al Mansoori, +971 50 123 4567, omar@email.com — home setup, small villa gym&#10;FitZone Gym (Dubai), Sara Khalifa, sara@fitzone.ae — 3 locations, member retention&#10;..."></textarea>'+
+    (feImportErr?'<div class="fe-err">'+feEsc(feImportErr)+'</div>':'')+
+    '<div class="fe-actions" style="margin-top:14px">'+
+      '<button class="fe-btn" '+(feImportBusy?'disabled':'')+' onclick="feRunImportParse()">'+(feImportBusy?'Reading your list…':(hasKey?'Smart parse':'Parse list'))+'</button>'+
+      '<button class="fe-ghost" '+(feImportBusy?'disabled':'')+' onclick="feImportFromDrive()">Pick from Google Drive</button>'+
+      (hasKey?'':'<button class="fe-sm" onclick="feSetKey()">Add AI key</button>')+
+      '<button class="fe-sm" onclick="feCloseModal()">Cancel</button>'+
+    '</div></div></div>';
+}
+async function feRunImportParse(){
+  const raw=((document.getElementById('fe-imp-raw')||{}).value||'').trim();
+  if(!raw){ feImportErr='Paste your leads first.'; feRenderImportInput(); return; }
+  feImportErr='';
+  if(feKey()){ feImportBusy=true; feRenderImportInput();
+    try{ feImportPreview=await feParseSmart(raw); }
+    catch(e){ feImportErr=((e&&e.message)||'Smart parse failed')+' — using simple parse.'; feImportPreview=feParseSimple(raw); }
+    feImportBusy=false;
+  } else { feImportPreview=feParseSimple(raw); }
+  if(!feImportPreview.length){ feImportErr='Could not find any leads in that text.'; feRenderImportInput(); return; }
+  feRenderImportPreview();
+}
+async function feParseSmart(raw){
+  const prompt="You are parsing a sales lead list for OxeFit. Extract EVERY lead. Return ONLY a JSON array — no prose, no markdown, no code fences.\n"+
+    'Each item: {"name":string,"type":"B2C" or "B2B","company":string,"phone":string,"email":string,"source":string,"note":string,"language":"English" or "Arabic"}.\n'+
+    "Rules: individuals / home buyers = B2C. Gyms, hotels, studios, clinics, companies, corporate wellness, resellers = B2B (put the business in company). Missing field = empty string. Unsure = B2C. Default language English unless clearly Arabic. Keep notes short.\n\nLIST:\n"+raw;
+  const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
+    headers:{ 'Content-Type':'application/json','x-api-key':feKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+    body:JSON.stringify({ model:feModel(), max_tokens:8192, messages:[{role:'user',content:prompt}] }) });
+  const data=await res.json();
+  if(data.error) throw new Error(data.error.message||'API error');
+  let text=(data.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
+  text=text.replace(/^```(json)?/i,'').replace(/```$/,'').trim();
+  const arr=JSON.parse(text);
+  if(!Array.isArray(arr)) throw new Error('Unexpected response');
+  return arr.map(feNormalize).filter(l=>l.name);
+}
+function feParseSimple(raw){
+  const blocks=String(raw||'').split(/\n\s*\n/);   // sheets are separated by a blank line
+  const out=[];
+  blocks.forEach(function(block){
+    const lines=block.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(function(l){ return l && !/^#\s*sheet:/i.test(l); });
+    if(!lines.length) return;
+    const delim=lines[0].indexOf('\t')>=0?'\t':',';
+    let headers=null, start=0;
+    if(/name/i.test(lines[0]) && lines[0].split(delim).length>1){ headers=lines[0].split(delim).map(function(h){ return h.trim().toLowerCase(); }); start=1; }
+    for(let i=start;i<lines.length;i++){ const cells=lines[i].split(delim).map(function(c){ return c.trim(); }); let o;
+      if(headers){ o={}; headers.forEach(function(h,idx){ o[h]=cells[idx]||''; }); o={ name:o.name, type:o.type, company:o.company, phone:o.phone, email:o.email||o['e-mail'], source:o.source, note:o.note||o.notes }; }
+      else { o={ name:cells[0], type:cells[1], phone:cells[2], email:cells[3], company:cells[4], source:cells[5], note:cells.slice(6).join(' ') }; }
+      if(o.name) out.push(feNormalize(o)); }
+  });
+  return out;
+}
+function feNormalize(o){ o=o||{};
+  const txt=((o.type||'')+' '+(o.company||'')+' '+(o.note||'')+' '+(o.name||'')).toLowerCase();
+  let type=(o.type||'').toUpperCase();
+  if(type!=='B2B'&&type!=='B2C'){ type=/b2b|business|gym|hotel|studio|clinic|company|corporate|reseller|wellness|fitness center/.test(txt)?'B2B':'B2C'; }
+  return { name:(o.name||'').trim(), type, company:(o.company||'').trim(), phone:(o.phone||'').trim(), email:(o.email||'').trim(), source:(o.source||'').trim(), note:(o.note||'').trim(), language:(o.language==='Arabic'?'Arabic':'English') };
+}
+function feRenderImportPreview(){
+  const b2b=feImportPreview.filter(l=>l.type==='B2B').length, b2c=feImportPreview.length-b2b;
+  const rows=feImportPreview.map((l,i)=>
+    '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">'+
+      '<div class="fe-grow"><div class="fe-name fe-trunc" style="font-size:14px"><span class="fe-trunc">'+feEsc(l.name||'(no name)')+'</span>'+(l.company?'<span class="fe-chip">'+feEsc(l.company)+'</span>':'')+'</div>'+
+        '<div class="fe-sub fe-trunc">'+([l.phone,l.email,l.source].filter(Boolean).map(feEsc).join(' · ')||'&nbsp;')+'</div></div>'+
+      '<select class="fe-sel" style="width:auto" onchange="feImportPreview['+i+'].type=this.value">'+
+        '<option value="B2C"'+(l.type==='B2C'?' selected':'')+'>B2C</option><option value="B2B"'+(l.type==='B2B'?' selected':'')+'>B2B</option></select>'+
+      '<button class="fe-sm" onclick="feDropImport('+i+')">&times;</button>'+
+    '</div>').join('');
+  document.getElementById('fe-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
+    '<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Review '+feImportPreview.length+' lead'+(feImportPreview.length===1?'':'s')+'</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
+    '<p class="fe-sub" style="margin:0 0 12px">'+b2c+' home (B2C) · '+b2b+' business (B2B). Fix any type, then import — each lead gets the full 12-day cadence.</p>'+
+    '<div style="max-height:46vh;overflow:auto;margin-bottom:14px">'+rows+'</div>'+
+    '<div class="fe-actions"><button class="fe-btn" onclick="feConfirmImport()">Import '+feImportPreview.length+' lead'+(feImportPreview.length===1?'':'s')+'</button>'+
+      '<button class="fe-sm" onclick="feRenderImportInput()">Back</button></div>'+
+  '</div></div>';
+}
+function feDropImport(i){ feImportPreview.splice(i,1); if(!feImportPreview.length) feRenderImportInput(); else feRenderImportPreview(); }
+function feConfirmImport(){
+  const now=Date.now(), owner=(typeof currentUser!=='undefined'?currentUser:'')||'';
+  const made=feImportPreview.map((p,idx)=>{ const lead={ id:(now+idx).toString(36)+Math.random().toString(36).slice(2,6),
+    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New', owner:owner,
+    name:p.name, company:p.company, type:p.type, language:p.language, phone:p.phone, email:p.email, source:p.source, note:p.note };
+    lead.touches=feGenTouches(lead); return lead; });
+  followupLeads=made.concat(followupLeads); feSave();
+  const n=made.length; feImportPreview=[]; feCloseModal(); feView='dashboard'; renderFollowup(); feToast('Imported '+n+' lead'+(n===1?'':'s'),'success');
+}
+
+/* ---- render ---- */
+function renderFollowup(){ const root=document.getElementById('fe-root'); if(!root) return;
+  if(feView==='lead'){ const l=feGet(feSelectedId); if(l){ root.innerHTML=feRenderLead(l); return; } feView='dashboard'; }
+  root.innerHTML=feRenderDashboard();
+}
+function feNextAction(l,now){ if(['Won','Lost'].includes(l.stage)) return {label:l.stage,when:''};
+  const p=l.touches.filter(t=>t.status==='pending').sort((a,b)=>Date.parse(a.scheduledAt)-Date.parse(b.scheduledAt));
+  if(!p.length) return {label:'Cadence complete',when:''};
+  return {label:p[0].dayLabel+' · '+p[0].channel, when:feFmt(p[0].scheduledAt), due:Date.parse(p[0].scheduledAt)<=now}; }
+function feRenderDashboard(){
+  const now=Date.now();
+  const due=followupLeads.filter(l=>!['Won','Lost'].includes(l.stage)&&l.touches.some(t=>t.status==='pending'&&Date.parse(t.scheduledAt)<=now)).length;
+  const booked=followupLeads.filter(l=>l.stage==='Demo booked').length;
+  const won=followupLeads.filter(l=>l.stage==='Won').length;
+  let rows;
+  if(!followupLeads.length){
+    rows='<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No leads yet.</p>'+
+      '<p class="fe-sub" style="margin:4px 0 16px">Add a lead, or import your whole list — the cadence builds itself.</p>'+
+      '<div style="display:flex;gap:8px;justify-content:center"><button class="fe-btn" onclick="feOpenAdd()">+ Add a lead</button>'+
+      '<button class="fe-ghost" onclick="feImportFromDrive()">From Google Drive</button>'+
+      '<button class="fe-ghost" onclick="feOpenImport()">Import a list</button></div></div>';
+  } else {
+    rows=followupLeads.map(l=>{ const na=feNextAction(l,now);
+      return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
+        '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
+        '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span></div>'+
+          '<div class="fe-sub fe-trunc">'+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+'</div></div>'+
+        '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
+        (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
+      '</button>'; }).join('');
+  }
+  return '<div class="fe-rowb"><h3 class="fe-h">Pipeline</h3><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="fe-sm" onclick="feSetKey()" title="Set Anthropic API key for AI tuning">AI key</button>'+
+    '<button class="fe-ghost" onclick="feImportFromDrive()">Google Drive</button>'+
+    '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
+    '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div></div>'+
+    '<div class="fe-grid">'+
+      '<div class="fe-metric"><div class="l">Total leads</div><div class="v">'+followupLeads.length+'</div></div>'+
+      '<div class="fe-metric"><div class="l">Action due now</div><div class="v">'+due+'</div></div>'+
+      '<div class="fe-metric"><div class="l">Demos booked</div><div class="v">'+booked+'</div></div>'+
+      '<div class="fe-metric"><div class="l">Won</div><div class="v">'+won+'</div></div>'+
+    '</div>'+rows;
+}
+function feRenderLead(l){
+  const head='<button class="fe-back" onclick="feGoDash()">← Pipeline</button>'+
+    '<div class="fe-card"><div style="display:flex;gap:12px;align-items:flex-start">'+
+      '<div class="fe-av" style="height:44px;width:44px;font-size:15px">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
+      '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span></div>'+
+        '<div class="fe-meta">'+(l.company?'<div>'+feEsc(l.company)+'</div>':'')+(l.phone?'<div>'+feEsc(l.phone)+'</div>':'')+(l.email?'<div>'+feEsc(l.email)+'</div>':'')+
+          (l.source?'<div style="font-size:12px">Source: '+feEsc(l.source)+'</div>':'')+(l.owner?'<div style="font-size:12px">Owner: '+feEsc(l.owner)+'</div>':'')+
+          (l.note?'<div style="font-size:12px"><em>"'+feEsc(l.note)+'"</em></div>':'')+'</div></div></div>'+
+      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Pipeline stage</div>'+
+        '<div class="fe-stages">'+FE_STAGES.map(s=>'<button class="fe-stagebtn '+(l.stage===s?'on':'')+'" style="'+(l.stage===s?'color:'+feStageColor(s):'')+'" onclick="feSetStage(\''+l.id+'\',\''+s+'\')">'+s+'</button>').join('')+'</div></div>'+
+    '</div>'+
+    '<div class="fe-rowb"><h3 class="fe-h">Follow-up cadence</h3><span class="fe-sub">7 touches over 12 days</span></div>';
+  const touches=l.touches.map(t=>feRenderTouch(l,t)).join('');
+  const foot='<div class="fe-sub" style="padding:4px 2px">↻ Still silent after Day 12 → move to monthly nurture. Never delete the lead.</div>';
+  return head+touches+foot;
+}
+function feRenderTouch(l,t){
+  const k=l.id+':'+t.key, editing=feEditKey===k, busy=feAiBusy===k;
+  const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
+  const body=editing
+    ? '<textarea id="fe-edit-area" class="fe-ta" rows="5">'+feEsc(t.message)+'</textarea>'+
+      '<div class="fe-actions" style="margin-top:8px"><button class="fe-btn" onclick="feSaveEdit(\''+l.id+'\',\''+t.key+'\')">Save</button>'+
+      '<button class="fe-sm" onclick="feCancelEdit()">Cancel</button></div>'
+    : '<div class="fe-msg" onclick="feStartEdit(\''+l.id+'\',\''+t.key+'\')">'+feEsc(t.message)+'</div>';
+  return '<div class="fe-touch">'+
+    '<div class="hh"><span style="font-size:14px;font-weight:600">'+t.dayLabel+'</span><span class="fe-sub">'+t.when+'</span>'+
+      '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
+      '<span class="fe-pill" style="color:'+feStatusColor(t.status)+(t.status==='skipped'?';text-decoration:line-through':'')+'">'+t.status+'</span>'+
+      '<span class="fe-sub" style="margin-left:auto">'+feFmt(t.scheduledAt)+'</span></div>'+
+    '<p class="fe-purpose">'+feEsc(t.purpose)+'</p>'+
+    (t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
+    body+
+    '<div class="fe-actions"><button class="fe-sm" '+(busy?'disabled':'')+' onclick="feTune(\''+l.id+'\',\''+t.key+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(busy?'Tuning…':'Tune with AI')+'</button>'+
+      '<button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button>'+
+      '<div class="fe-right"><button class="fe-sm" style="color:var(--accent)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'sent\')">Mark sent</button>'+
+        '<button class="fe-sm" style="color:var(--success)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'replied\')">Replied</button>'+
+        '<button class="fe-sm" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'skipped\')">Skip</button></div></div>'+
+  '</div>';
+}
+function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
+function feGoDash(){ feView='dashboard'; renderFollowup(); }
+
+/* ---- Google Drive import — reuses the Marketing tab's authorized connection ---- */
+async function feFetchDriveRows(fileId, fileName, mimeType){
+  if (typeof gdAccessToken==='undefined' || !gdAccessToken){ if(typeof gdSignIn==='function') gdSignIn(); throw new Error('Connecting to Google — pick the file again once signed in.'); }
+  const auth={ headers:{ 'Authorization':'Bearer '+gdAccessToken } };
+  const mt=(mimeType||'').toLowerCase();
+  const fid=encodeURIComponent(fileId);
+  if (mt.includes('vnd.google-apps.document')){
+    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'/export?mimeType=text/plain&supportsAllDrives=true', auth);
+    if(!r.ok) throw new Error('Could not read the Google Doc (HTTP '+r.status+'). Make sure download is allowed for your access.');
+    return [{ name:'', aoa:(await r.text()).split(/\r?\n/).map(function(l){ return [l]; }) }];
+  }
+  let buf=null;
+  if (mt.includes('vnd.google-apps.spreadsheet')){
+    // Export the ENTIRE Google Sheet as .xlsx so every tab comes through (CSV export = first tab only)
+    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&supportsAllDrives=true', auth);
+    if(r.ok){ buf=await r.arrayBuffer(); }
+    else {
+      const er=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'/export?mimeType=text/csv&supportsAllDrives=true', auth);
+      if(er.ok){ const txt=await er.text(); const aoa=(typeof mktCsvToAOA==='function')?mktCsvToAOA(txt):txt.split(/\r?\n/).map(function(l){ return l.split(','); }); return [{ name:'', aoa:aoa }]; }
+      throw new Error('Could not export this Google Sheet (HTTP '+r.status+').');
+    }
+  }
+  if(!buf){
+    let r=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'?alt=media&supportsAllDrives=true', auth);
+    if(r.status===403){ const r2=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'?alt=media&supportsAllDrives=true&acknowledgeAbuse=true', auth); if(r2.ok) r=r2; }
+    if(!r.ok) throw new Error('Could not read the file (HTTP '+r.status+'). Make sure download/export is allowed for your access.');
+    buf=await r.arrayBuffer();
+  }
+  const bytes=new Uint8Array(buf);
+  const isZip = bytes[0]===0x50 && bytes[1]===0x4B;   // PK => xlsx workbook
+  if(!isZip){
+    const text=new TextDecoder('utf-8').decode(bytes);
+    const aoa=(typeof mktCsvToAOA==='function')?mktCsvToAOA(text):text.split(/\r?\n/).map(function(l){ return l.split(','); });
+    return [{ name:'', aoa:aoa }];
+  }
+  const XLSX=await ensureXLSX();
+  const wb=XLSX.read(bytes,{ type:'array' });
+  return wb.SheetNames.map(function(sn){
+    return { name:sn, aoa:XLSX.utils.sheet_to_json(wb.Sheets[sn], { header:1, raw:false, defval:'' }) };
+  }).filter(function(s){ return s.aoa && s.aoa.length; });
+}
+async function feFetchDriveText(fileId, fileName, mimeType){
+  const sheets=await feFetchDriveRows(fileId, fileName, mimeType);
+  const parts=[];
+  sheets.forEach(function(s){
+    if(s.name) parts.push('# Sheet: '+s.name);
+    parts.push((s.aoa||[]).map(function(row){ return (row||[]).map(function(c){ return c==null?'':String(c); }).join('\t'); }).join('\n'));
+  });
+  return parts.join('\n\n');
+}
+async function feDriveParseAndPreview(fileId, fileName, mimeType){
+  feImportErr=''; feImportBusy=true; feRenderImportInput();
+  try{
+    const sheets=await feFetchDriveRows(fileId, fileName, mimeType);
+    const tabular = sheets.some(function(s){ return (s.aoa||[]).some(function(r){ return (r||[]).length>1; }); });
+    let leads=[];
+    if(tabular){ sheets.forEach(function(s){ leads=leads.concat(feSheetToLeads(s.aoa)); }); }
+    if(!leads.length && feKey()){ try{ leads=await feParseSmart(feSheetsToText(sheets)); }catch(e){} }
+    if(!leads.length && !tabular){ leads=feParseSimple(feSheetsToText(sheets)); }
+    feImportBusy=false;
+    if(!leads.length){
+      const cols=feFirstHeaders(sheets);
+      feImportErr='Read '+sheets.length+' sheet'+(sheets.length===1?'':'s')+" but couldn't identify lead columns"+(cols?' (columns found: '+cols+')':'')+'. Add an AI key below for smarter parsing, or tell me your column names.';
+      feRenderImportInput(); return;
+    }
+    feImportPreview=leads; feRenderImportPreview();
+  }catch(e){ feImportBusy=false; feImportErr=(e&&e.message)||'Could not import from Google Drive.'; feRenderImportInput(); }
+}
+function feSheetsToText(sheets){ const parts=[]; (sheets||[]).forEach(function(s){ if(s.name) parts.push('# Sheet: '+s.name); parts.push((s.aoa||[]).map(function(row){ return (row||[]).map(function(c){ return c==null?'':String(c); }).join('\t'); }).join('\n')); }); return parts.join('\n\n'); }
+function feFirstHeaders(sheets){ for(var i=0;i<(sheets||[]).length;i++){ var aoa=sheets[i].aoa||[]; for(var j=0;j<Math.min(aoa.length,8);j++){ var r=(aoa[j]||[]).map(function(c){ return c==null?'':String(c).trim(); }); if(r.filter(Boolean).length>1) return r.filter(Boolean).slice(0,12).join(', '); } } return ''; }
+function feHeaderIndex(H, keys, used){
+  used=used||{};
+  for(var k=0;k<keys.length;k++){ for(var i=0;i<H.length;i++){ if(!used[i] && H[i]===keys[k]) return i; } }
+  for(var k2=0;k2<keys.length;k2++){ for(var i2=0;i2<H.length;i2++){ if(!used[i2] && H[i2].indexOf(keys[k2])>=0) return i2; } }
+  return -1;
+}
+function feSheetToLeads(aoa){
+  var rows=(aoa||[]).map(function(r){ return (r||[]).map(function(c){ return c==null?'':String(c).trim(); }); }).filter(function(r){ return r.some(function(c){ return c!==''; }); });
+  if(!rows.length) return [];
+  var hi=-1;
+  for(var i=0;i<Math.min(rows.length,8);i++){ var low=rows[i].map(function(c){ return c.toLowerCase(); }).join('|'); if(/name|email|e-mail|phone|mobile|whatsapp|company/.test(low)){ hi=i; break; } }
+  var leads=[];
+  if(hi>=0){
+    var H=rows[hi].map(function(c){ return c.toLowerCase(); });
+    var used={};
+    var pick=function(keys){ var ix=feHeaderIndex(H,keys,used); if(ix>=0) used[ix]=1; return ix; };
+    var iCompany=pick(['company','business','organisation','organization','account','gym','hotel','studio','org']);
+    var iEmail=pick(['email','e-mail','mail']);
+    var iPhone=pick(['whatsapp','mobile','phone','tel','contact number','number']);
+    var iName=pick(['full name','lead name','contact name','name','client','lead','contact']);
+    var iType=pick(['type','segment','category','b2b','b2c']);
+    var iSource=pick(['source','channel','origin','campaign','lead source']);
+    var iNote=pick(['note','comment','remark','detail','requirement','interest','message']);
+    for(var r2=hi+1;r2<rows.length;r2++){ var row=rows[r2];
+      var g=function(ix){ return ix>=0?(row[ix]||''):''; };
+      var name=g(iName);
+      if(!name && iName<0){ for(var c2=0;c2<row.length;c2++){ if(row[c2]){ name=row[c2]; break; } } }
+      if(!name) continue;
+      leads.push(feNormalize({ name:name, email:g(iEmail), phone:g(iPhone), company:g(iCompany), type:g(iType), source:g(iSource), note:g(iNote) }));
+    }
+  } else {
+    rows.forEach(function(row){ if(row[0]) leads.push(feNormalize({ name:row[0], phone:row[1], email:row[2], company:row[3], source:row[4], note:row.slice(5).join(' ') })); });
+  }
+  return leads;
+}
+function feImportFromDrive(){
+  if (typeof gdEnsureInit==='function'){ try{ gdEnsureInit(); }catch(e){} }
+  if (typeof gdAccessToken==='undefined' || !gdAccessToken){
+    if(typeof gdSignIn==='function'){ gdSignIn(); feToast('Sign in to Google, then click Google Drive again','info'); }
+    else { feToast('Google Drive is not configured','error'); }
+    return;
+  }
+  feOpenDriveBrowser();
+}
+function feOpenDriveBrowser(){
+  document.getElementById('fe-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
+    '<div class="fe-rowb" style="margin-bottom:10px"><h3 class="fe-h">Pick a file from Google Drive</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
+    '<p class="fe-sub" style="margin:0 0 10px">Choose your leads document (Google Doc, Sheet, CSV or Excel) — it reads and routes every lead into a cadence.</p>'+
+    '<input id="fe-drive-q" class="fe-in" placeholder="Search by file name…" oninput="feDriveSearchDebounced(this.value)" style="margin-bottom:10px"/>'+
+    '<div id="fe-drive-results" style="max-height:50vh;overflow:auto"><div class="fe-sub" style="padding:12px 0">Loading recent files…</div></div>'+
+  '</div></div>';
+  feDriveSearch('');
+}
+let _feDriveT=null;
+function feDriveSearchDebounced(term){ clearTimeout(_feDriveT); _feDriveT=setTimeout(function(){ feDriveSearch(term); }, 350); }
+async function feDriveSearch(term){
+  const box=document.getElementById('fe-drive-results'); if(!box) return;
+  if (typeof gdAccessToken==='undefined' || !gdAccessToken){ box.innerHTML='<div class="fe-err">Not signed in to Google.</div>'; return; }
+  const types="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='text/csv' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or mimeType='application/vnd.ms-excel')";
+  let q=types+" and trashed=false";
+  const t=(term||'').trim().replace(/'/g,"\\'");
+  if(t) q+=" and name contains '"+t+"'";
+  const params=new URLSearchParams({ q:q, orderBy:'modifiedTime desc', pageSize:'30', fields:'files(id,name,mimeType,modifiedTime)', supportsAllDrives:'true', includeItemsFromAllDrives:'true' });
+  try{
+    const r=await fetch('https://www.googleapis.com/drive/v3/files?'+params.toString(), { headers:{ 'Authorization':'Bearer '+gdAccessToken } });
+    if(!r.ok){ box.innerHTML='<div class="fe-err">Drive search failed (HTTP '+r.status+'). Try Disconnect → Sign in with Google again from the Marketing tab.</div>'; return; }
+    const data=await r.json(); const files=(data.files)||[];
+    if(!files.length){ box.innerHTML='<div class="fe-sub" style="padding:12px 0">No matching files.</div>'; return; }
+    box.innerHTML=files.map(function(f){
+      const icon=f.mimeType.indexOf('spreadsheet')>=0?'▦':(f.mimeType.indexOf('document')>=0?'▤':'▢');
+      const when=f.modifiedTime?new Date(f.modifiedTime).toLocaleDateString():'';
+      const nm=JSON.stringify(f.name).replace(/"/g,'&quot;');
+      return '<div class="fe-leadrow" style="margin-bottom:6px" onclick="feDriveParseAndPreview(\''+f.id+'\','+nm+',\''+f.mimeType+'\')">'+
+        '<div class="fe-av">'+icon+'</div><div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(f.name)+'</span></div>'+
+        '<div class="fe-sub">'+when+'</div></div></div>';
+    }).join('');
+  }catch(e){ box.innerHTML='<div class="fe-err">'+feEsc((e&&e.message)||'Search error')+'</div>'; }
+}
+
 loadLocal();
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
+loadFollowups(); // Follow-up Engine
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
