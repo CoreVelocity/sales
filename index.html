@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.39</title>
+<title>CoreV | OxeFit Sales Tracker v21.40</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.39 · Summary + All-leads tabs with filters
+      v21.40 · Lost reasons
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.39</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.40</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.39 · FE</div>
+      <div class="sidebar-version">v21.40 · FE</div>
     </div>
   </aside>
 
@@ -15955,6 +15955,7 @@ let feFilterStage = '';
 let feDashTab = 'summary';
 
 const FE_STAGES = ["New","Contacted","Engaged","Demo booked","Won","Lost","Referral"];
+const FE_LOST_REASONS = ["Above Budget","Went with Competitor","No Show","Not Interested","Asked to Drop it"];
 const FE_CADENCE = [
   { key:"t1", dayLabel:"Day 0", when:"Within 5 min", channel:"WhatsApp", offsetMinutes:0,
     purpose:"Instant reply and quick qualify (home vs business)",
@@ -16039,7 +16040,18 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-function feSetStage(id,stage){ const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
+function feSetStage(id,stage){ if(stage==='Lost'){ feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
+function feOpenLostModal(id){
+  const l=feGet(id); if(!l) return;
+  const btns=FE_LOST_REASONS.map(function(r){ return '<button class="fe-ghost" style="width:100%;text-align:left;margin-bottom:8px'+(l.lostReason===r?';box-shadow:0 0 0 1px var(--danger)':'')+'" onclick="feSetLost(\''+id+'\','+JSON.stringify(r).replace(/"/g,'&quot;')+')">'+feEsc(r)+'</button>'; }).join('');
+  document.getElementById('fe-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal" style="max-width:420px">'+
+    '<div class="fe-rowb" style="margin-bottom:12px"><h3 class="fe-h">Why was this lead lost?</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
+    btns+
+    '<div style="display:flex;gap:8px;margin-top:6px"><button class="fe-sm" onclick="feSetLost(\''+id+'\',\'\')">No specific reason</button><button class="fe-sm" onclick="feCloseModal()">Cancel</button></div>'+
+  '</div></div>';
+}
+function feSetLost(id, reason){ const l=feGet(id); if(l){ l.stage='Lost'; l.lostReason=reason||''; feStamp(l); feSave(); } feCloseModal(); renderFollowup(); }
 function feMark(id,key,status){ const l=feGet(id); if(!l) return; const tt=l.touches.find(x=>x.key===key); if(!tt) return;
   if(status==='skipped'&&tt.status==='skipped') tt.status='pending'; else tt.status=status;
   if(status==='sent'&&l.stage==='New') l.stage='Contacted';
@@ -16287,7 +16299,7 @@ function feLeadsTab(now){
         return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
           '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
           '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span></div>'+
-            '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+'</div></div>'+
+            '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
           '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
           (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
         '</button>'; }).join('')
@@ -16347,7 +16359,10 @@ function feRenderLead(l){
 }
 function feClosureBanner(l){
   if(l.stage==='Won') return '<div class="fe-card" style="text-align:center;border-color:var(--success)"><div style="font-size:18px;font-weight:700;color:var(--success)">Won 🎉</div><div class="fe-sub">Deal closed — the follow-up workflow is complete.</div></div>';
-  return '<div class="fe-card" style="text-align:center;border-color:var(--danger)"><div style="font-size:18px;font-weight:700;color:var(--danger)">Closed — Lost</div><div class="fe-sub">Workflow stopped. Reopen anytime by changing the stage above.</div></div>';
+  return '<div class="fe-card" style="text-align:center;border-color:var(--danger)"><div style="font-size:18px;font-weight:700;color:var(--danger)">Closed — Lost</div>'+
+    '<div class="fe-sub" style="margin-top:4px">'+(l.lostReason?('Reason: <strong style="color:var(--text)">'+feEsc(l.lostReason)+'</strong>'):'No reason recorded')+'</div>'+
+    '<div style="margin-top:10px"><button class="fe-sm" onclick="feOpenLostModal(\''+l.id+'\')">'+(l.lostReason?'Change reason':'Add a reason')+'</button></div>'+
+    '<div class="fe-sub" style="margin-top:8px">Reopen anytime by changing the stage above.</div></div>';
 }
 function feRenderActiveStep(l,t){
   const k=l.id+':'+t.key, editing=feEditKey===k, busy=feAiBusy===k;
