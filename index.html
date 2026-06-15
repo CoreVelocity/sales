@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.37</title>
+<title>CoreV | OxeFit Sales Tracker v21.38</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.37 · Lead assignment + per-rep summary
+      v21.38 · AI lead heads-up + profile-tuned messages
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.37</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.38</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.37 · FE</div>
+      <div class="sidebar-version">v21.38 · FE</div>
     </div>
   </aside>
 
@@ -16060,6 +16060,7 @@ async function feTune(id,key){
     "Write it in "+l.language+". Keep it warm, concise, human and professional.\n"+
     (isEmail?'Start with one line "Subject: ..." then a blank line then the body.':"No subject line — this is a chat message.")+"\n\n"+
     "Lead: name="+l.name+"; type="+l.type+"; company="+(l.company||'n/a')+"; source="+(l.source||'unknown')+"; notes="+(l.note||'none')+"; pipeline stage="+l.stage+".\n"+
+    (l.brief?("Rep brief on this lead — tailor the tone and angle to it, do not contradict it: "+l.brief+"\n"):"")+
     "Goal of this message: "+tt.purpose+".\nCurrent draft: "+JSON.stringify(tt.message);
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
@@ -16305,7 +16306,17 @@ function feRenderLead(l){
     });
     if(activeIndex<0){ wf+='<div class="fe-card" style="text-align:center;margin-top:4px"><div style="font-weight:600;margin-bottom:4px">Cadence complete</div><div class="fe-sub">No conversion after the full sequence — move them to monthly nurture, or set Won / Lost above. Never delete the lead.</div></div>'; }
   }
-  return head+wf;
+  const bb=feAiBusy==='brief:'+l.id;
+  const briefCard='<div class="fe-card">'+
+    '<div class="fe-rowb" style="margin-bottom:'+(l.brief?'8px':'0')+'"><h3 class="fe-h">Lead heads-up</h3><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<button class="fe-sm" onclick="feLinkedIn(\''+l.id+'\')">🔎 LinkedIn</button>'+
+      '<button class="fe-sm" '+(bb?'disabled':'')+' onclick="feBrief(\''+l.id+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(bb?'Researching…':(l.brief?'Refresh':'AI heads-up'))+'</button>'+
+    '</div></div>'+
+    (l.brief
+      ? '<div class="fe-msg" style="cursor:default">'+feEsc(l.brief)+'</div><div class="fe-sub" style="margin-top:6px;font-size:11px">AI-assisted from public info — verify on LinkedIn before relying on specifics.</div>'
+      : '<div class="fe-sub">Get an AI heads-up on this lead’s likely interests and the best angle, then tune the messages to match. Uses web search; needs your AI key.</div>')+
+  '</div>';
+  return head+briefCard+wf;
 }
 function feClosureBanner(l){
   if(l.stage==='Won') return '<div class="fe-card" style="text-align:center;border-color:var(--success)"><div style="font-size:18px;font-weight:700;color:var(--success)">Won 🎉</div><div class="fe-sub">Deal closed — the follow-up workflow is complete.</div></div>';
@@ -16401,6 +16412,27 @@ function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderF
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(l){ l.assignee=rep||''; feStamp(l); feSave(); renderFollowup(); } }
 function feSetRepFilter(rep){ feFilterRep=(feFilterRep===rep)?'':rep; renderFollowup(); }
+function feLinkedIn(id){ const l=feGet(id); if(!l) return; const q=encodeURIComponent([l.name,l.company].filter(Boolean).join(' ')); window.open('https://www.linkedin.com/search/results/people/?keywords='+q,'_blank','noopener'); }
+async function feBrief(id){
+  const l=feGet(id); if(!l) return;
+  const apiKey=feKey(); if(!apiKey){ feSetKey(); return; }
+  feAiBusy='brief:'+id; renderFollowup();
+  const prompt="You are briefing a sales rep before they contact a lead for OxeFit (premium connected home-gym equipment; UAE-based, sells worldwide outside the Americas).\n"+
+    "Use web search to find PUBLIC, professional information — focus on the company/organisation, and the person only if clearly and unambiguously identifiable in a professional context. Do NOT invent facts about the individual; if you cannot verify something, say so and give persona-based guidance instead.\n"+
+    "Lead: name="+l.name+"; type="+l.type+"; company="+(l.company||'n/a')+"; source="+(l.source||'unknown')+"; notes="+(l.note||'none')+".\n"+
+    "Write a short heads-up (under 140 words, plain text, no markdown headings) covering: who they likely are / context, their likely interests and priorities, the best angle for OxeFit, and the most likely objection. Be concrete and honest about uncertainty.";
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
+      headers:{ 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
+      body:JSON.stringify({ model:feModel(), max_tokens:1024, messages:[{role:'user',content:prompt}], tools:[{ type:'web_search_20250305', name:'web_search' }] }) });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message||'API error');
+    const text=(data.content||[]).map(function(b){ return b.type==='text'?b.text:''; }).join('').trim();
+    if(!text) throw new Error('No brief returned');
+    l.brief=text; l.briefAt=new Date().toISOString(); feStamp(l); feSave();
+  }catch(e){ feToast('Brief: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); }
+  finally{ feAiBusy=null; renderFollowup(); }
+}
 
 /* ---- Google Drive import — reuses the Marketing tab's authorized connection ---- */
 async function feFetchDriveRows(fileId, fileName, mimeType){
