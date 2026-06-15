@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.33</title>
+<title>CoreV | OxeFit Sales Tracker v21.34</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.33 · Follow-up Engine + Google Drive multi-sheet import
+      v21.34 · Follow-up workflow (guided step-by-step)
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.33</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.34</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.33 · FE</div>
+      <div class="sidebar-version">v21.34 · FE</div>
     </div>
   </aside>
 
@@ -16250,11 +16250,31 @@ function feRenderLead(l){
         '<div class="fe-stages">'+FE_STAGES.map(s=>'<button class="fe-stagebtn '+(l.stage===s?'on':'')+'" style="'+(l.stage===s?'color:'+feStageColor(s):'')+'" onclick="feSetStage(\''+l.id+'\',\''+s+'\')">'+s+'</button>').join('')+'</div></div>'+
     '</div>'+
     '<div class="fe-rowb"><h3 class="fe-h">Follow-up cadence</h3><span class="fe-sub">7 touches over 12 days</span></div>';
-  const touches=l.touches.map(t=>feRenderTouch(l,t)).join('');
-  const foot='<div class="fe-sub" style="padding:4px 2px">↻ Still silent after Day 12 → move to monthly nurture. Never delete the lead.</div>';
-  return head+touches+foot;
+  const steps=l.touches||[];
+  const closed=(l.stage==='Won'||l.stage==='Lost');
+  let activeIndex=-1; for(let i=0;i<steps.length;i++){ if(steps[i].status==='pending'){ activeIndex=i; break; } }
+  const doneCount=steps.filter(function(t){ return t.status!=='pending'; }).length;
+  let wf='';
+  if(closed){
+    wf=feClosureBanner(l)+'<div class="fe-sub" style="margin:14px 0 8px">Workflow history</div>'+steps.map(function(t){ return feRenderDoneStep(l,t,true); }).join('');
+  } else {
+    const pct=steps.length?Math.round(doneCount/steps.length*100):0;
+    wf+='<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Follow-up workflow</h3><span class="fe-sub">'+(activeIndex>=0?('Step '+(activeIndex+1)+' of '+steps.length):'All steps done')+'</span></div>';
+    wf+='<div style="height:6px;background:var(--navy-mid);border-radius:999px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+pct+'%;background:var(--teal);transition:width .25s"></div></div>';
+    steps.forEach(function(t,idx){
+      if(activeIndex<0 || idx<activeIndex) wf+=feRenderDoneStep(l,t,false);
+      else if(idx===activeIndex) wf+=feRenderActiveStep(l,t);
+      else wf+=(t.status!=='pending'? feRenderDoneStep(l,t,false) : feRenderLockedStep(l,t));
+    });
+    if(activeIndex<0){ wf+='<div class="fe-card" style="text-align:center;margin-top:4px"><div style="font-weight:600;margin-bottom:4px">Cadence complete</div><div class="fe-sub">No conversion after the full sequence — move them to monthly nurture, or set Won / Lost above. Never delete the lead.</div></div>'; }
+  }
+  return head+wf;
 }
-function feRenderTouch(l,t){
+function feClosureBanner(l){
+  if(l.stage==='Won') return '<div class="fe-card" style="text-align:center;border-color:var(--success)"><div style="font-size:18px;font-weight:700;color:var(--success)">Won 🎉</div><div class="fe-sub">Deal closed — the follow-up workflow is complete.</div></div>';
+  return '<div class="fe-card" style="text-align:center;border-color:var(--danger)"><div style="font-size:18px;font-weight:700;color:var(--danger)">Closed — Lost</div><div class="fe-sub">Workflow stopped. Reopen anytime by changing the stage above.</div></div>';
+}
+function feRenderActiveStep(l,t){
   const k=l.id+':'+t.key, editing=feEditKey===k, busy=feAiBusy===k;
   const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
   const body=editing
@@ -16262,21 +16282,51 @@ function feRenderTouch(l,t){
       '<div class="fe-actions" style="margin-top:8px"><button class="fe-btn" onclick="feSaveEdit(\''+l.id+'\',\''+t.key+'\')">Save</button>'+
       '<button class="fe-sm" onclick="feCancelEdit()">Cancel</button></div>'
     : '<div class="fe-msg" onclick="feStartEdit(\''+l.id+'\',\''+t.key+'\')">'+feEsc(t.message)+'</div>';
-  return '<div class="fe-touch">'+
-    '<div class="hh"><span style="font-size:14px;font-weight:600">'+t.dayLabel+'</span><span class="fe-sub">'+t.when+'</span>'+
+  return '<div class="fe-touch" style="border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)">'+
+    '<div class="hh"><span class="fe-pill" style="color:var(--teal);background:transparent;border:1px solid var(--teal)">▶ Do this now</span>'+
+      '<span style="font-size:14px;font-weight:600">'+t.dayLabel+'</span><span class="fe-sub">'+t.when+'</span>'+
       '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
-      '<span class="fe-pill" style="color:'+feStatusColor(t.status)+(t.status==='skipped'?';text-decoration:line-through':'')+'">'+t.status+'</span>'+
       '<span class="fe-sub" style="margin-left:auto">'+feFmt(t.scheduledAt)+'</span></div>'+
     '<p class="fe-purpose">'+feEsc(t.purpose)+'</p>'+
     (t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
     body+
     '<div class="fe-actions"><button class="fe-sm" '+(busy?'disabled':'')+' onclick="feTune(\''+l.id+'\',\''+t.key+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(busy?'Tuning…':'Tune with AI')+'</button>'+
       '<button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button>'+
-      '<div class="fe-right"><button class="fe-sm" style="color:var(--accent)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'sent\')">Mark sent</button>'+
-        '<button class="fe-sm" style="color:var(--success)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'replied\')">Replied</button>'+
+      '<div class="fe-right"><button class="fe-sm" style="color:var(--accent)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'sent\')">Sent → next</button>'+
+        '<button class="fe-sm" style="color:var(--success)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'replied\')">Replied → next</button>'+
         '<button class="fe-sm" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'skipped\')">Skip</button></div></div>'+
   '</div>';
 }
+function feRenderDoneStep(l,t,history){
+  const k=l.id+':'+t.key, expanded=feExpandKey===k;
+  const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
+  const stxt=t.status==='skipped'?'skipped':(t.status==='replied'?'replied':(t.status==='sent'?'sent':t.status));
+  let h='<div class="fe-touch" style="padding:12px 14px">'+
+    '<div class="hh" style="margin-bottom:'+(expanded?'8px':'0')+';cursor:pointer" onclick="feToggleExpand(\''+l.id+'\',\''+t.key+'\')">'+
+      '<span style="color:var(--success)">✓</span>'+
+      '<span style="font-size:13px;font-weight:600">'+t.dayLabel+'</span>'+
+      '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
+      '<span class="fe-pill" style="color:'+feStatusColor(t.status)+(t.status==='skipped'?';text-decoration:line-through':'')+'">'+stxt+'</span>'+
+      '<span class="fe-sub" style="margin-left:auto">'+(expanded?'▲':'▼')+'</span></div>';
+  if(expanded){
+    h+=(t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
+       '<div class="fe-msg" style="cursor:default">'+feEsc(t.message)+'</div>'+
+       (history?'':'<div class="fe-actions"><button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button><div class="fe-right"><button class="fe-sm" onclick="feUndoStep(\''+l.id+'\',\''+t.key+'\')">Undo this step</button></div></div>');
+  }
+  return h+'</div>';
+}
+function feRenderLockedStep(l,t){
+  const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
+  return '<div class="fe-touch" style="padding:12px 14px;opacity:.5">'+
+    '<div class="hh" style="margin-bottom:0">'+
+      '<span>🔒</span>'+
+      '<span style="font-size:13px;font-weight:600">'+t.dayLabel+'</span>'+
+      '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
+      '<span class="fe-sub fe-trunc" style="flex:1;min-width:0">'+feEsc(t.purpose)+'</span>'+
+      '<span class="fe-sub">locked</span></div></div>';
+}
+function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===k)?null:k; renderFollowup(); }
+function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 
