@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.34</title>
+<title>CoreV | OxeFit Sales Tracker v21.35</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.34 · Follow-up workflow (guided step-by-step)
+      v21.35 · Lost metric · Referral source · 3 PM reminders
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.34</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.35</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.34 · FE</div>
+      <div class="sidebar-version">v21.35 · FE</div>
     </div>
   </aside>
 
@@ -5170,7 +5170,7 @@
       #view-followup .fe-ghost:hover{background:var(--card-hover);}
       #view-followup .fe-sm{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
       #view-followup .fe-sm:hover{background:var(--card-hover);}
-      #view-followup .fe-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+      #view-followup .fe-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
       @media(max-width:640px){#view-followup .fe-grid{grid-template-columns:repeat(2,1fr);}}
       #view-followup .fe-metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
       #view-followup .fe-metric .l{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
@@ -16087,7 +16087,7 @@ function feOpenAdd(){
     '<div class="fe-field" id="fe-company-field" style="display:none"><label class="fe-lab">Company</label><input id="fe-company" class="fe-in" placeholder="Gym, hotel, studio…"/></div>'+
     '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Phone</label><input id="fe-phone" class="fe-in" placeholder="+971…"/></div>'+
       '<div class="fe-field"><label class="fe-lab">Email</label><input id="fe-email" class="fe-in" placeholder="name@…"/></div></div>'+
-    '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Source</label><input id="fe-source" class="fe-in" placeholder="Instagram, referral…"/></div>'+
+    '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Source</label><input id="fe-source" class="fe-in" list="fe-source-list" placeholder="e.g. Referral"/><datalist id="fe-source-list"><option value="Referral"></option><option value="Instagram"></option><option value="Facebook"></option><option value="Website"></option><option value="WhatsApp"></option><option value="Walk-in"></option><option value="Event"></option><option value="Google"></option><option value="Other"></option></datalist></div>'+
       '<div class="fe-field"><label class="fe-lab">Language</label><div class="fe-seg" id="fe-seg-lang">'+
         '<button class="on" data-v="English" onclick="fePickLang(\'English\')">English</button>'+
         '<button data-v="Arabic" onclick="fePickLang(\'Arabic\')">Arabic</button></div></div></div>'+
@@ -16209,6 +16209,7 @@ function feRenderDashboard(){
   const due=followupLeads.filter(l=>!['Won','Lost'].includes(l.stage)&&l.touches.some(t=>t.status==='pending'&&Date.parse(t.scheduledAt)<=now)).length;
   const booked=followupLeads.filter(l=>l.stage==='Demo booked').length;
   const won=followupLeads.filter(l=>l.stage==='Won').length;
+  const lost=followupLeads.filter(l=>l.stage==='Lost').length;
   let rows;
   if(!followupLeads.length){
     rows='<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No leads yet.</p>'+
@@ -16236,6 +16237,7 @@ function feRenderDashboard(){
       '<div class="fe-metric"><div class="l">Action due now</div><div class="v">'+due+'</div></div>'+
       '<div class="fe-metric"><div class="l">Demos booked</div><div class="v">'+booked+'</div></div>'+
       '<div class="fe-metric"><div class="l">Won</div><div class="v">'+won+'</div></div>'+
+      '<div class="fe-metric"><div class="l">Lost</div><div class="v">'+lost+'</div></div>'+
     '</div>'+rows;
 }
 function feRenderLead(l){
@@ -16259,7 +16261,7 @@ function feRenderLead(l){
     wf=feClosureBanner(l)+'<div class="fe-sub" style="margin:14px 0 8px">Workflow history</div>'+steps.map(function(t){ return feRenderDoneStep(l,t,true); }).join('');
   } else {
     const pct=steps.length?Math.round(doneCount/steps.length*100):0;
-    wf+='<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Follow-up workflow</h3><span class="fe-sub">'+(activeIndex>=0?('Step '+(activeIndex+1)+' of '+steps.length):'All steps done')+'</span></div>';
+    wf+='<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Follow-up workflow</h3><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="fe-sm" onclick="feSetReminders(\''+l.id+'\')" title="Create 3 PM Outlook reminders for the upcoming steps">🔔 3 PM reminders</button><span class="fe-sub">'+(activeIndex>=0?('Step '+(activeIndex+1)+' of '+steps.length):'All steps done')+'</span></div></div>';
     wf+='<div style="height:6px;background:var(--navy-mid);border-radius:999px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+pct+'%;background:var(--teal);transition:width .25s"></div></div>';
     steps.forEach(function(t,idx){
       if(activeIndex<0 || idx<activeIndex) wf+=feRenderDoneStep(l,t,false);
@@ -16327,6 +16329,39 @@ function feRenderLockedStep(l,t){
 }
 function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===k)?null:k; renderFollowup(); }
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
+
+/* ---- 3 PM Outlook reminders (reuses the app's Microsoft sign-in) ---- */
+function feLocalISOnoZ(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes())+':00'; }
+async function feGetCalToken(){
+  if(typeof msalInstance==='undefined' || !msalInstance || typeof msalAccount==='undefined' || !msalAccount) throw new Error('Sign in with your Microsoft account first (top-right of the app).');
+  const req={ scopes:['Calendars.ReadWrite','User.Read'], account:msalAccount };
+  try{ return (await msalInstance.acquireTokenSilent(req)).accessToken; }
+  catch(e){ try{ return (await msalInstance.acquireTokenPopup(req)).accessToken; } catch(pe){ try{ await msalInstance.acquireTokenRedirect(req); }catch(re){} throw pe; } }
+}
+async function feCreateReminderEvent(tok, lead, t){
+  const d=new Date(t.scheduledAt); d.setHours(15,0,0,0);   // 3:00 PM local on the step's date
+  const startISO=feLocalISOnoZ(d); const endISO=feLocalISOnoZ(new Date(d.getTime()+30*60000));
+  const tz=(typeof Intl!=='undefined' && Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions().timeZone)||'UTC';
+  const subject='Follow-up: '+lead.name+' — '+t.dayLabel+' ('+t.channel+')';
+  const bodyTxt=(t.subject?('Subject: '+t.subject+'\n\n'):'')+t.message+'\n\nLead: '+lead.name+(lead.company?(' · '+lead.company):'')+(lead.phone?(' · '+lead.phone):'')+(lead.email?(' · '+lead.email):'');
+  const ev={ subject:subject, body:{ contentType:'text', content:bodyTxt }, start:{ dateTime:startISO, timeZone:tz }, end:{ dateTime:endISO, timeZone:tz }, isReminderOn:true, reminderMinutesBeforeStart:0, categories:['OxeFit Follow-up'] };
+  const r=await fetch('https://graph.microsoft.com/v1.0/me/events', { method:'POST', headers:{ 'Authorization':'Bearer '+tok, 'Content-Type':'application/json' }, body:JSON.stringify(ev) });
+  if(!r.ok){ const tt=await r.text().catch(function(){ return ''; }); if(r.status===403) throw new Error('Calendar write not permitted yet — IT needs to add the Calendars.ReadWrite permission to the app and grant consent.'); throw new Error('Graph '+r.status+': '+tt.slice(0,160)); }
+  return true;
+}
+async function feSetReminders(id){
+  const l=feGet(id); if(!l) return;
+  const pending=(l.touches||[]).filter(function(t){ return t.status==='pending'; });
+  if(!pending.length){ feToast('No upcoming steps to set reminders for','info'); return; }
+  feToast('Adding '+pending.length+' reminder(s) at 3 PM…','info');
+  try{
+    const tok=await feGetCalToken();
+    let n=0;
+    for(let i=0;i<pending.length;i++){ await feCreateReminderEvent(tok, l, pending[i]); const tt=l.touches.find(function(x){ return x.key===pending[i].key; }); if(tt) tt.reminderSet=true; n++; }
+    feStamp(l); feSave(); renderFollowup();
+    feToast('Added '+n+' Outlook reminder(s) at 3 PM on each step date','success');
+  }catch(e){ feToast('Reminders: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); }
+}
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 
