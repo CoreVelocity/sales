@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.38</title>
+<title>CoreV | OxeFit Sales Tracker v21.39</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.38 · AI lead heads-up + profile-tuned messages
+      v21.39 · Summary + All-leads tabs with filters
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.38</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.39</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.38 · FE</div>
+      <div class="sidebar-version">v21.39 · FE</div>
     </div>
   </aside>
 
@@ -15951,6 +15951,8 @@ let feImportPreview = [];
 let feImportBusy = false;
 let feImportErr = '';
 let feFilterRep = '';
+let feFilterStage = '';
+let feDashTab = 'summary';
 
 const FE_STAGES = ["New","Contacted","Engaged","Demo booked","Won","Lost","Referral"];
 const FE_CADENCE = [
@@ -16215,62 +16217,87 @@ function feRenderDashboard(){
   const won=followupLeads.filter(l=>l.stage==='Won').length;
   const lost=followupLeads.filter(l=>l.stage==='Lost').length;
 
+  const actions='<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="fe-sm" onclick="feSetKey()" title="Set Anthropic API key for AI features">AI key</button>'+
+    '<button class="fe-ghost" onclick="feImportFromDrive()">Google Drive</button>'+
+    '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
+    '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div>';
+  const topbar='<div class="fe-rowb"><h3 class="fe-h">Follow-up Engine</h3>'+actions+'</div>';
+  const tabs='<div class="fe-stages" style="margin-bottom:16px">'+
+    '<button class="fe-stagebtn '+(feDashTab!=='leads'?'on':'')+'" onclick="feSetDashTab(\'summary\')">Summary</button>'+
+    '<button class="fe-stagebtn '+(feDashTab==='leads'?'on':'')+'" onclick="feSetDashTab(\'leads\')">All leads</button></div>';
+
+  if(!followupLeads.length){
+    const empty='<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No leads yet.</p>'+
+      '<p class="fe-sub" style="margin:4px 0 16px">Add a lead, or import your whole list — the cadence builds itself.</p>'+
+      '<div style="display:flex;gap:8px;justify-content:center"><button class="fe-btn" onclick="feOpenAdd()">+ Add a lead</button>'+
+      '<button class="fe-ghost" onclick="feImportFromDrive()">From Google Drive</button>'+
+      '<button class="fe-ghost" onclick="feOpenImport()">Import a list</button></div></div>';
+    return topbar+tabs+empty;
+  }
+
+  if(feDashTab==='leads') return topbar+tabs+feLeadsTab(now);
+
   const byRep={};
   followupLeads.forEach(function(l){ const r=l.assignee||'Unassigned'; if(!byRep[r]) byRep[r]={total:0,due:0,booked:0,won:0,lost:0};
     const s=byRep[r]; s.total++;
     if(!['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; })) s.due++;
     if(l.stage==='Demo booked') s.booked++; if(l.stage==='Won') s.won++; if(l.stage==='Lost') s.lost++;
   });
-  let repSummary='';
-  if(followupLeads.length){
-    const order=ALL_REPS.filter(function(r){ return byRep[r]; }).concat(byRep['Unassigned']?['Unassigned']:[]);
-    const hdr='<div style="display:flex;font-size:11px;color:var(--text-muted);padding:4px 12px;gap:8px"><div style="flex:1">Sales rep</div><div style="width:48px;text-align:center">Leads</div><div style="width:40px;text-align:center">Due</div><div style="width:48px;text-align:center">Demos</div><div style="width:40px;text-align:center">Won</div><div style="width:40px;text-align:center">Lost</div></div>';
-    const body=order.map(function(r){ const s=byRep[r]; const active=feFilterRep===r;
-      return '<div class="fe-leadrow" style="margin-bottom:6px;padding:9px 12px;gap:8px;'+(active?'box-shadow:0 0 0 1px var(--teal);':'')+'" onclick="feSetRepFilter(\''+r+'\')">'+
-        '<div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0"><span class="fe-av" style="height:26px;width:26px;font-size:11px">'+(r==='Unassigned'?'?':r.charAt(0).toUpperCase())+'</span><span class="fe-trunc" style="font-weight:600">'+feEsc(r)+'</span></div>'+
-        '<div style="width:48px;text-align:center;font-weight:600">'+s.total+'</div>'+
-        '<div style="width:40px;text-align:center;color:'+(s.due?'var(--warn)':'var(--text-muted)')+'">'+s.due+'</div>'+
-        '<div style="width:48px;text-align:center">'+s.booked+'</div>'+
-        '<div style="width:40px;text-align:center;color:'+(s.won?'var(--success)':'var(--text-muted)')+'">'+s.won+'</div>'+
-        '<div style="width:40px;text-align:center;color:'+(s.lost?'var(--danger)':'var(--text-muted)')+'">'+s.lost+'</div>'+
-      '</div>'; }).join('');
-    repSummary='<div class="fe-rowb" style="margin:4px 0 8px"><h3 class="fe-h">By sales rep</h3>'+(feFilterRep?'<button class="fe-sm" onclick="feSetRepFilter(\'\')">Clear filter</button>':'<span class="fe-sub">tap a rep to filter</span>')+'</div>'+hdr+body;
-  }
-
-  let rows;
-  if(!followupLeads.length){
-    rows='<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No leads yet.</p>'+
-      '<p class="fe-sub" style="margin:4px 0 16px">Add a lead, or import your whole list — the cadence builds itself.</p>'+
-      '<div style="display:flex;gap:8px;justify-content:center"><button class="fe-btn" onclick="feOpenAdd()">+ Add a lead</button>'+
-      '<button class="fe-ghost" onclick="feImportFromDrive()">From Google Drive</button>'+
-      '<button class="fe-ghost" onclick="feOpenImport()">Import a list</button></div></div>';
-  } else {
-    const list=feFilterRep?followupLeads.filter(function(l){ return (l.assignee||'Unassigned')===feFilterRep; }):followupLeads;
-    const chip=feFilterRep
-      ? '<div class="fe-sub" style="margin:14px 0 8px">Showing '+list.length+' lead'+(list.length===1?'':'s')+' for '+feEsc(feFilterRep)+' · <a onclick="feSetRepFilter(\'\')" style="color:var(--teal);cursor:pointer">show all</a></div>'
-      : '<div class="fe-sub" style="margin:14px 0 8px">All leads</div>';
-    rows=chip+list.map(function(l){ const na=feNextAction(l,now);
-      return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
-        '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-        '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span></div>'+
-          '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+'</div></div>'+
-        '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
-        (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
-      '</button>'; }).join('');
-  }
-  return '<div class="fe-rowb"><h3 class="fe-h">Pipeline</h3><div style="display:flex;gap:8px;flex-wrap:wrap">'+
-    '<button class="fe-sm" onclick="feSetKey()" title="Set Anthropic API key for AI tuning">AI key</button>'+
-    '<button class="fe-ghost" onclick="feImportFromDrive()">Google Drive</button>'+
-    '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
-    '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div></div>'+
-    '<div class="fe-grid">'+
+  const order=ALL_REPS.filter(function(r){ return byRep[r]; }).concat(byRep['Unassigned']?['Unassigned']:[]);
+  const hdr='<div style="display:flex;font-size:11px;color:var(--text-muted);padding:4px 12px;gap:8px"><div style="flex:1">Sales rep</div><div style="width:48px;text-align:center">Leads</div><div style="width:40px;text-align:center">Due</div><div style="width:48px;text-align:center">Demos</div><div style="width:40px;text-align:center">Won</div><div style="width:40px;text-align:center">Lost</div></div>';
+  const body=order.map(function(r){ const s=byRep[r];
+    return '<div class="fe-leadrow" style="margin-bottom:6px;padding:9px 12px;gap:8px" onclick="feSetRepFilter(\''+r+'\')">'+
+      '<div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0"><span class="fe-av" style="height:26px;width:26px;font-size:11px">'+(r==='Unassigned'?'?':r.charAt(0).toUpperCase())+'</span><span class="fe-trunc" style="font-weight:600">'+feEsc(r)+'</span></div>'+
+      '<div style="width:48px;text-align:center;font-weight:600">'+s.total+'</div>'+
+      '<div style="width:40px;text-align:center;color:'+(s.due?'var(--warn)':'var(--text-muted)')+'">'+s.due+'</div>'+
+      '<div style="width:48px;text-align:center">'+s.booked+'</div>'+
+      '<div style="width:40px;text-align:center;color:'+(s.won?'var(--success)':'var(--text-muted)')+'">'+s.won+'</div>'+
+      '<div style="width:40px;text-align:center;color:'+(s.lost?'var(--danger)':'var(--text-muted)')+'">'+s.lost+'</div>'+
+    '</div>'; }).join('');
+  const grid='<div class="fe-grid">'+
       '<div class="fe-metric"><div class="l">Total leads</div><div class="v">'+followupLeads.length+'</div></div>'+
       '<div class="fe-metric"><div class="l">Action due now</div><div class="v">'+due+'</div></div>'+
       '<div class="fe-metric"><div class="l">Demos booked</div><div class="v">'+booked+'</div></div>'+
       '<div class="fe-metric"><div class="l">Won</div><div class="v">'+won+'</div></div>'+
       '<div class="fe-metric"><div class="l">Lost</div><div class="v">'+lost+'</div></div>'+
-    '</div>'+repSummary+rows;
+    '</div>';
+  const repBlock='<div class="fe-rowb" style="margin:4px 0 8px"><h3 class="fe-h">By sales rep</h3><span class="fe-sub">tap a rep to see their leads</span></div>'+hdr+body;
+  return topbar+tabs+grid+repBlock;
 }
+function feLeadsTab(now){
+  const stageSel='<select class="fe-sel" style="max-width:180px" onchange="feSetStageFilter(this.value)">'+
+    '<option value=""'+(feFilterStage===''?' selected':'')+'>All statuses</option>'+
+    '<option value="__due"'+(feFilterStage==='__due'?' selected':'')+'>Action due now</option>'+
+    FE_STAGES.map(function(s){ return '<option value="'+s+'"'+(feFilterStage===s?' selected':'')+'>'+s+'</option>'; }).join('')+
+  '</select>';
+  const repSel='<select class="fe-sel" style="max-width:180px" onchange="feSetRepDirect(this.value)">'+
+    '<option value=""'+(feFilterRep===''?' selected':'')+'>All reps</option>'+
+    ALL_REPS.map(function(r){ return '<option value="'+feEsc(r)+'"'+(feFilterRep===r?' selected':'')+'>'+feEsc(r)+'</option>'; }).join('')+
+    '<option value="Unassigned"'+(feFilterRep==='Unassigned'?' selected':'')+'>Unassigned</option>'+
+  '</select>';
+  let list=followupLeads.slice();
+  if(feFilterRep) list=list.filter(function(l){ return (l.assignee||'Unassigned')===feFilterRep; });
+  if(feFilterStage==='__due') list=list.filter(function(l){ return !['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; }); });
+  else if(feFilterStage) list=list.filter(function(l){ return l.stage===feFilterStage; });
+  const clear=(feFilterRep||feFilterStage)?'<button class="fe-sm" onclick="feClearFilters()">Clear</button>':'';
+  const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'+stageSel+repSel+clear+'<span class="fe-sub" style="margin-left:auto">'+list.length+' lead'+(list.length===1?'':'s')+'</span></div>';
+  const rows=list.length
+    ? list.map(function(l){ const na=feNextAction(l,now);
+        return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
+          '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
+          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span></div>'+
+            '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+'</div></div>'+
+          '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
+          (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
+        '</button>'; }).join('')
+    : '<div class="fe-empty"><p class="fe-sub" style="margin:0">No leads match these filters.</p></div>';
+  return filters+rows;
+}
+function feSetDashTab(t){ feDashTab=t; renderFollowup(); }
+function feSetStageFilter(v){ feFilterStage=v||''; renderFollowup(); }
+function feSetRepDirect(v){ feFilterRep=v||''; renderFollowup(); }
+function feClearFilters(){ feFilterRep=''; feFilterStage=''; renderFollowup(); }
 function feRenderLead(l){
   const head='<button class="fe-back" onclick="feGoDash()">← Pipeline</button>'+
     '<div class="fe-card"><div style="display:flex;gap:12px;align-items:flex-start">'+
@@ -16411,7 +16438,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(l){ l.assignee=rep||''; feStamp(l); feSave(); renderFollowup(); } }
-function feSetRepFilter(rep){ feFilterRep=(feFilterRep===rep)?'':rep; renderFollowup(); }
+function feSetRepFilter(rep){ feFilterRep=(feFilterRep===rep)?'':rep; if(feFilterRep) feDashTab='leads'; renderFollowup(); }
 function feLinkedIn(id){ const l=feGet(id); if(!l) return; const q=encodeURIComponent([l.name,l.company].filter(Boolean).join(' ')); window.open('https://www.linkedin.com/search/results/people/?keywords='+q,'_blank','noopener'); }
 async function feBrief(id){
   const l=feGet(id); if(!l) return;
