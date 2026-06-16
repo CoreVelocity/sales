@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.40</title>
+<title>CoreV | OxeFit Sales Tracker v21.41</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.40 · Lost reasons
+      v21.41 · Lost-reason ratio on Summary
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.40</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.41</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.40 · FE</div>
+      <div class="sidebar-version">v21.41 · FE</div>
     </div>
   </aside>
 
@@ -16275,7 +16275,22 @@ function feRenderDashboard(){
       '<div class="fe-metric"><div class="l">Lost</div><div class="v">'+lost+'</div></div>'+
     '</div>';
   const repBlock='<div class="fe-rowb" style="margin:4px 0 8px"><h3 class="fe-h">By sales rep</h3><span class="fe-sub">tap a rep to see their leads</span></div>'+hdr+body;
-  return topbar+tabs+grid+repBlock;
+
+  const lostLeads=followupLeads.filter(function(l){ return l.stage==='Lost'; });
+  let lostBlock='';
+  if(lostLeads.length){
+    const counts={}; FE_LOST_REASONS.forEach(function(r){ counts[r]=0; }); counts['No reason']=0;
+    lostLeads.forEach(function(l){ const r=(l.lostReason&&FE_LOST_REASONS.indexOf(l.lostReason)>=0)?l.lostReason:'No reason'; counts[r]=(counts[r]||0)+1; });
+    const tot=lostLeads.length;
+    const labels=FE_LOST_REASONS.concat(counts['No reason']?['No reason']:[]);
+    const rowsHtml=labels.map(function(r){ const c=counts[r]||0; const pct=tot?Math.round(c/tot*100):0;
+      return '<div style="margin-bottom:12px">'+
+        '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>'+feEsc(r)+'</span><span class="fe-sub">'+c+' · '+pct+'%</span></div>'+
+        '<div style="height:8px;background:var(--navy-mid);border-radius:999px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(r==='No reason'?'var(--text-muted)':'var(--danger)')+';transition:width .25s"></div></div>'+
+      '</div>'; }).join('');
+    lostBlock='<div class="fe-rowb" style="margin:18px 0 8px"><h3 class="fe-h">Why we lose</h3><span class="fe-sub">'+tot+' lost lead'+(tot===1?'':'s')+'</span></div><div class="fe-card">'+rowsHtml+'</div>';
+  }
+  return topbar+tabs+grid+repBlock+lostBlock;
 }
 function feLeadsTab(now){
   const stageSel='<select class="fe-sel" style="max-width:180px" onchange="feSetStageFilter(this.value)">'+
