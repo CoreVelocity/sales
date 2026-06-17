@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.42</title>
+<title>CoreV | OxeFit Sales Tracker v21.43</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.42 · Referral column + Google Sheet auto-import
+      v21.43 · Duplicate cleanup tab
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.42</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.43</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.42 · FE</div>
+      <div class="sidebar-version">v21.43 · FE</div>
     </div>
   </aside>
 
@@ -16237,9 +16237,11 @@ function feRenderDashboard(){
     '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
     '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div>';
   const topbar='<div class="fe-rowb"><h3 class="fe-h">Follow-up Engine</h3>'+actions+'</div>';
+  let dupCount=0; try{ feDupGroups().forEach(function(g){ dupCount+=g.leads.length-1; }); }catch(e){}
   const tabs='<div class="fe-stages" style="margin-bottom:16px">'+
-    '<button class="fe-stagebtn '+(feDashTab!=='leads'?'on':'')+'" onclick="feSetDashTab(\'summary\')">Summary</button>'+
-    '<button class="fe-stagebtn '+(feDashTab==='leads'?'on':'')+'" onclick="feSetDashTab(\'leads\')">All leads</button></div>';
+    '<button class="fe-stagebtn '+(feDashTab!=='leads'&&feDashTab!=='dupes'?'on':'')+'" onclick="feSetDashTab(\'summary\')">Summary</button>'+
+    '<button class="fe-stagebtn '+(feDashTab==='leads'?'on':'')+'" onclick="feSetDashTab(\'leads\')">All leads</button>'+
+    '<button class="fe-stagebtn '+(feDashTab==='dupes'?'on':'')+'" onclick="feSetDashTab(\'dupes\')">Duplicates'+(dupCount?' ('+dupCount+')':'')+'</button></div>';
 
   if(!followupLeads.length){
     const empty='<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No leads yet.</p>'+
@@ -16251,6 +16253,7 @@ function feRenderDashboard(){
   }
 
   if(feDashTab==='leads') return topbar+tabs+feLeadsTab(now);
+  if(feDashTab==='dupes') return topbar+tabs+feDupesTab();
 
   const byRep={};
   followupLeads.forEach(function(l){ const r=l.assignee||'Unassigned'; if(!byRep[r]) byRep[r]={total:0,due:0,booked:0,won:0,lost:0,ref:0};
@@ -16342,6 +16345,62 @@ function feSetStageFilter(v){ feFilterStage=v||''; renderFollowup(); }
 function feSetRepDirect(v){ feFilterRep=v||''; renderFollowup(); }
 function feClearFilters(){ feFilterRep=''; feFilterStage=''; renderFollowup(); }
 
+/* ---- Duplicate detection & cleanup ---- */
+function feLeadScore(l){
+  const rank={'Won':6,'Referral':5,'Demo booked':4,'Engaged':3,'Contacted':2,'Lost':1,'New':0};
+  let s=(rank[l.stage]||0)*10;
+  s+=(l.touches?l.touches.filter(function(t){ return t.status!=='pending'; }).length:0);
+  if(l.assignee) s+=2; if(l.brief) s+=1;
+  return s;
+}
+function feDupGroups(){
+  const map={};
+  followupLeads.forEach(function(l){ const k=feLeadKey(l); if(!k) return; (map[k]=map[k]||[]).push(l); });
+  const groups=[];
+  Object.keys(map).forEach(function(k){ const arr=map[k]; if(arr.length<2) return;
+    const sorted=arr.slice().sort(function(a,b){ const d=feLeadScore(b)-feLeadScore(a); if(d) return d; return (Date.parse(a.createdAt)||0)-(Date.parse(b.createdAt)||0); });
+    const keep=sorted[0]; let label;
+    if(k.charAt(0)==='e') label='Same email: '+keep.email;
+    else if(k.charAt(0)==='p') label='Same phone: '+keep.phone;
+    else label='Same name'+(keep.company?' + company':'')+': '+keep.name+(keep.company?(' / '+keep.company):'');
+    groups.push({ key:k, label:label, leads:sorted, keepId:keep.id });
+  });
+  return groups;
+}
+function feDeleteLead(id){
+  const l=feGet(id); if(!l) return;
+  if(!confirm('Delete "'+(l.name||'this lead')+'"? This cannot be undone.')) return;
+  followupLeads=followupLeads.filter(function(x){ return x.id!==id; });
+  feSave(); if(feSelectedId===id) feView='dashboard'; renderFollowup(); feToast('Lead deleted','info');
+}
+function feDedupeAll(){
+  const groups=feDupGroups(); if(!groups.length){ feToast('No duplicates found','info'); return; }
+  const removable=groups.reduce(function(a,g){ return a+(g.leads.length-1); },0);
+  if(!confirm('Remove '+removable+' duplicate lead'+(removable===1?'':'s')+'? The most complete copy in each group is kept. This cannot be undone.')) return;
+  const drop={}; groups.forEach(function(g){ g.leads.forEach(function(l){ if(l.id!==g.keepId) drop[l.id]=true; }); });
+  followupLeads=followupLeads.filter(function(l){ return !drop[l.id]; });
+  feSave(); renderFollowup(); feToast('Removed '+removable+' duplicate'+(removable===1?'':'s'),'success');
+}
+function feDupesTab(){
+  const groups=feDupGroups();
+  if(!groups.length) return '<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No duplicates 🎉</p><p class="fe-sub" style="margin:4px 0 0">Every lead is unique by email, phone, or name + company.</p></div>';
+  const removable=groups.reduce(function(a,g){ return a+(g.leads.length-1); },0);
+  let html='<div class="fe-rowb" style="margin-bottom:12px"><span class="fe-sub">'+groups.length+' duplicate group'+(groups.length===1?'':'s')+' · '+removable+' removable</span><button class="fe-btn" onclick="feDedupeAll()">Remove all duplicates</button></div>';
+  html+=groups.map(function(g){
+    const rows=g.leads.map(function(l){ const keep=l.id===g.keepId;
+      return '<div class="fe-leadrow" style="cursor:default;margin-bottom:6px">'+
+        '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
+        '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.stage+'</span>'+(keep?'<span class="fe-chip" style="background:var(--success);color:#fff">Keep</span>':'')+'</div>'+
+          '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(l.email||l.phone||'')+' · added '+feFmt(l.createdAt)+'</div></div>'+
+        (keep
+          ? '<button class="fe-sm" onclick="feOpenLead(\''+l.id+'\')">Open</button>'
+          : '<button class="fe-sm" style="color:var(--danger);border-color:var(--danger)" onclick="feDeleteLead(\''+l.id+'\')">Delete</button>')+
+      '</div>'; }).join('');
+    return '<div class="fe-card" style="margin-bottom:12px"><div class="fe-sub" style="margin-bottom:8px">'+feEsc(g.label)+'</div>'+rows+'</div>';
+  }).join('');
+  return html;
+}
+
 /* ---- Google Sheet auto-import (pinned source, one-way Sheet → engine, deduped) ---- */
 const FE_SHEET_KEY='oxefit_followup_sheet';
 const FE_AUTO_KEY='oxefit_followup_autoimport';
@@ -16428,7 +16487,7 @@ function feRenderLead(l){
       ? '<div class="fe-msg" style="cursor:default">'+feEsc(l.brief)+'</div><div class="fe-sub" style="margin-top:6px;font-size:11px">AI-assisted from public info — verify on LinkedIn before relying on specifics.</div>'
       : '<div class="fe-sub">Get an AI heads-up on this lead’s likely interests and the best angle, then tune the messages to match. Uses web search; needs your AI key.</div>')+
   '</div>';
-  return head+briefCard+wf;
+  return head+briefCard+wf+'<div style="margin-top:16px;text-align:center"><button class="fe-sm" style="color:var(--danger)" onclick="feDeleteLead(\''+l.id+'\')">Delete this lead</button></div>';
 }
 function feClosureBanner(l){
   if(l.stage==='Won') return '<div class="fe-card" style="text-align:center;border-color:var(--success)"><div style="font-size:18px;font-weight:700;color:var(--success)">Won 🎉</div><div class="fe-sub">Deal closed — the follow-up workflow is complete.</div></div>';
