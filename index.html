@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.43</title>
+<title>CoreV | OxeFit Sales Tracker v21.44</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.43 · Duplicate cleanup tab
+      v21.44 · Deletion tombstones (fix duplicate re-add)
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.43</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.44</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.43 · FE</div>
+      <div class="sidebar-version">v21.44 · FE</div>
     </div>
   </aside>
 
@@ -6914,12 +6914,13 @@ function parseEnvelope(remote) {
       demos: Array.isArray(remote.demos) ? remote.demos : [],
       requests: Array.isArray(remote.requests) ? remote.requests : [],   // v19.1
       followups: Array.isArray(remote.followups) ? remote.followups : [],   // Follow-up Engine
+      followupsDeleted: (remote.followupsDeleted && typeof remote.followupsDeleted==='object') ? remote.followupsDeleted : {},
       hubspot: (remote.hubspot && typeof remote.hubspot === 'object') ? remote.hubspot : null, // v15.4
       meta : remote._meta || null
     };
   }
   // Legacy bare month-keyed object → treat as data, no demos.
-  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], followups: [], hubspot: null, meta: null };
+  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], followups: [], followupsDeleted: {}, hubspot: null, meta: null };
 }
 
 async function fetchRemoteEnvelope(tok) {
@@ -6983,7 +6984,7 @@ async function downloadFromOneDrive() {
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
-    if (r.env && Array.isArray(r.env.followups)) { _lastRemoteFollowups = r.env.followups; if (typeof followupLeads !== 'undefined') { followupLeads = mergeFollowupsById(followupLeads, r.env.followups); try { saveFollowupsLocal(); } catch(e){} try { var _fev=document.getElementById('view-followup'); if (_fev && _fev.classList.contains('active') && typeof renderFollowup==='function') renderFollowup(); } catch(e){} } }
+    if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7198,8 +7199,10 @@ function buildEnvelope() {
   if (typeof quoteEntries !== 'undefined' && Array.isArray(quoteEntries) && quoteEntries.length) env.quotes = quoteEntries;
   else if (_lastRemoteQuotes) env.quotes = _lastRemoteQuotes;
   // Follow-up Engine — leads ride along, merged by id (last-write-wins per lead)
-  if (typeof followupLeads !== 'undefined' && Array.isArray(followupLeads) && followupLeads.length) env.followups = followupLeads;
-  else if (_lastRemoteFollowups) env.followups = _lastRemoteFollowups;
+  var _fu = (typeof followupLeads !== 'undefined' && Array.isArray(followupLeads) && followupLeads.length) ? followupLeads : (_lastRemoteFollowups||[]);
+  if (typeof feTombstones==='object' && feTombstones) _fu = _fu.filter(function(l){ return l && !feTombstones[l.id]; });
+  if (typeof followupLeads !== 'undefined' || _lastRemoteFollowups) env.followups = _fu;
+  if (typeof feTombstones==='object' && feTombstones && Object.keys(feTombstones).length) env.followupsDeleted = feTombstones;
   // v21.9 — per-Type terms library (admin-managed, last-write-wins)
   if (typeof termTemplates !== 'undefined' && termTemplates && Object.keys(termTemplates).length) env.termtemplates = termTemplates;
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
@@ -7239,7 +7242,7 @@ async function uploadToOneDrive() {
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
-    if (r.env && Array.isArray(r.env.followups)) { _lastRemoteFollowups = r.env.followups; if (typeof followupLeads !== 'undefined') { followupLeads = mergeFollowupsById(followupLeads, r.env.followups); try { saveFollowupsLocal(); } catch(e){} try { var _fev=document.getElementById('view-followup'); if (_fev && _fev.classList.contains('active') && typeof renderFollowup==='function') renderFollowup(); } catch(e){} } }
+    if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -15988,15 +15991,15 @@ const FE_CADENCE = [
           b2b:"{name}, I don't want to keep chasing if now isn't right — should I close this off, or keep {company} on the list for later? Either's completely fine." } }
 ];
 
-function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } }
-function saveFollowupsLocal(){ try{ localStorage.setItem(FOLLOWUPS_KEY, JSON.stringify(followupLeads)); }catch(e){} }
+function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} }
+function saveFollowupsLocal(){ try{ localStorage.setItem(FOLLOWUPS_KEY, JSON.stringify(followupLeads)); }catch(e){} try{ feSaveTombstones(); }catch(e){} }
 function feSave(){ saveFollowupsLocal(); if(typeof scheduleOneDriveSync==='function'){ try{ scheduleOneDriveSync(); }catch(e){} } }
 function mergeFollowupsById(localArr, remoteArr){
   const byId={};
   (localArr||[]).forEach(l=>{ if(l&&l.id) byId[l.id]=l; });
   (remoteArr||[]).forEach(r=>{ if(!r||!r.id) return; const ex=byId[r.id];
     if(!ex){ byId[r.id]=r; } else { const a=Date.parse(ex.updatedAt||0)||0, b=Date.parse(r.updatedAt||0)||0; byId[r.id]=(b>=a)?r:ex; } });
-  return Object.values(byId);
+  return Object.values(byId).filter(function(l){ return !(feTombstones && feTombstones[l.id]); });
 }
 
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
@@ -16345,6 +16348,16 @@ function feSetStageFilter(v){ feFilterStage=v||''; renderFollowup(); }
 function feSetRepDirect(v){ feFilterRep=v||''; renderFollowup(); }
 function feClearFilters(){ feFilterRep=''; feFilterStage=''; renderFollowup(); }
 
+/* ---- deletion tombstones (so removed leads don't return via team sync or Sheet import) ---- */
+let feTombstones={};
+const FE_TOMB_KEY='oxefit_followup_deleted';
+function feLoadTombstones(){ try{ const r=localStorage.getItem(FE_TOMB_KEY); feTombstones=r?JSON.parse(r):{}; if(!feTombstones||typeof feTombstones!=='object') feTombstones={}; }catch(e){ feTombstones={}; } }
+function feSaveTombstones(){ try{ localStorage.setItem(FE_TOMB_KEY, JSON.stringify(feTombstones)); }catch(e){} }
+function feTombstone(l){ if(l&&l.id){ feTombstones[l.id]={ at:new Date().toISOString(), key:feLeadKey(l) }; } }
+function feTombKeys(){ const s={}; Object.keys(feTombstones).forEach(function(id){ const k=feTombstones[id]&&feTombstones[id].key; if(k) s[k]=true; }); return s; }
+function feAdoptTombstones(remote){ if(!remote||typeof remote!=='object') return; let changed=false; Object.keys(remote).forEach(function(id){ if(!feTombstones[id]){ feTombstones[id]=remote[id]; changed=true; } }); if(changed){ feSaveTombstones(); if(typeof followupLeads!=='undefined' && followupLeads.length){ const before=followupLeads.length; followupLeads=followupLeads.filter(function(l){ return !feTombstones[l.id]; }); if(followupLeads.length!==before){ try{ saveFollowupsLocal(); }catch(e){} } } } }
+function feAdoptRemoteFollowups(env){ if(!env) return; if(env.followupsDeleted) feAdoptTombstones(env.followupsDeleted); if(Array.isArray(env.followups)){ _lastRemoteFollowups=env.followups; if(typeof followupLeads!=='undefined'){ followupLeads=mergeFollowupsById(followupLeads, env.followups); try{ saveFollowupsLocal(); }catch(e){} try{ const fev=document.getElementById('view-followup'); if(fev&&fev.classList.contains('active')&&typeof renderFollowup==='function') renderFollowup(); }catch(e){} } } }
+
 /* ---- Duplicate detection & cleanup ---- */
 function feLeadScore(l){
   const rank={'Won':6,'Referral':5,'Demo booked':4,'Engaged':3,'Contacted':2,'Lost':1,'New':0};
@@ -16370,6 +16383,7 @@ function feDupGroups(){
 function feDeleteLead(id){
   const l=feGet(id); if(!l) return;
   if(!confirm('Delete "'+(l.name||'this lead')+'"? This cannot be undone.')) return;
+  feTombstone(l);
   followupLeads=followupLeads.filter(function(x){ return x.id!==id; });
   feSave(); if(feSelectedId===id) feView='dashboard'; renderFollowup(); feToast('Lead deleted','info');
 }
@@ -16377,7 +16391,7 @@ function feDedupeAll(){
   const groups=feDupGroups(); if(!groups.length){ feToast('No duplicates found','info'); return; }
   const removable=groups.reduce(function(a,g){ return a+(g.leads.length-1); },0);
   if(!confirm('Remove '+removable+' duplicate lead'+(removable===1?'':'s')+'? The most complete copy in each group is kept. This cannot be undone.')) return;
-  const drop={}; groups.forEach(function(g){ g.leads.forEach(function(l){ if(l.id!==g.keepId) drop[l.id]=true; }); });
+  const drop={}; groups.forEach(function(g){ g.leads.forEach(function(l){ if(l.id!==g.keepId){ drop[l.id]=true; feTombstone(l); } }); });
   followupLeads=followupLeads.filter(function(l){ return !drop[l.id]; });
   feSave(); renderFollowup(); feToast('Removed '+removable+' duplicate'+(removable===1?'':'s'),'success');
 }
@@ -16430,8 +16444,9 @@ async function feSyncSheet(silent){
     const sheets=await feFetchDriveRows(pin.id, pin.name, pin.mimeType);
     let parsed=[]; sheets.forEach(function(s){ parsed=parsed.concat(feSheetToLeads(s.aoa)); });
     const existing={}; followupLeads.forEach(function(l){ existing[feLeadKey(l)]=true; });
+    const tomb=feTombKeys();
     const seen={}; const fresh=[];
-    parsed.forEach(function(p){ const k=feLeadKey(p); if(!k||existing[k]||seen[k]) return; seen[k]=true; fresh.push(p); });
+    parsed.forEach(function(p){ const k=feLeadKey(p); if(!k||existing[k]||seen[k]||tomb[k]) return; seen[k]=true; fresh.push(p); });
     if(fresh.length){
       const now=Date.now(), owner=(typeof currentUser!=='undefined'?currentUser:'')||'';
       const made=fresh.map(function(p,idx){ const lead={ id:(now+idx).toString(36)+Math.random().toString(36).slice(2,6), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New', owner:owner, name:p.name, company:p.company, type:p.type, language:p.language, phone:p.phone, email:p.email, source:p.source||'Google Sheet', note:p.note, assignee:'' }; lead.touches=feGenTouches(lead); return lead; });
