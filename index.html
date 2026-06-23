@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.44</title>
+<title>CoreV | OxeFit Sales Tracker v21.33</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.44 · Deletion tombstones (fix duplicate re-add)
+      v21.31 · Marketing import detects multiple tables · works on any Drive sheet
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.44</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.33</strong></p>
     </div>
   </div>
 </div>
@@ -3926,9 +3926,6 @@
       <button class="nav-item" data-tab="requests" onclick="switchTab('requests')" title="Event &amp; On-site Demo Requests">
         <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg></span><span class="nav-label">Requests</span><span class="nav-badge" id="requestsBadge" style="display:none;">0</span>
       </button>
-      <button class="nav-item" data-tab="followup" onclick="switchTab('followup')" title="Follow-up Engine">
-        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span class="nav-label">Follow-up Engine</span>
-      </button>
       <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
         <span class="nav-ico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span class="nav-label">Marketing</span>
       </button>
@@ -3955,7 +3952,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.44 · FE</div>
+      <div class="sidebar-version">v21.33</div>
     </div>
   </aside>
 
@@ -5159,67 +5156,6 @@
   </div>
 
   <!-- ░░░ DEAL OWNERSHIP & CRM RULES (merged v19.2) ░░░ -->
-  <div class="tab-view" id="view-followup">
-    <style>
-      #view-followup .fe-wrap{max-width:920px;margin:0 auto;}
-      #view-followup .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-      #view-followup .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
-      #view-followup .fe-btn{background:var(--brand-grad);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;}
-      #view-followup .fe-btn:hover{filter:brightness(1.05);}
-      #view-followup .fe-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:8px 13px;font-size:14px;cursor:pointer;}
-      #view-followup .fe-ghost:hover{background:var(--card-hover);}
-      #view-followup .fe-sm{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
-      #view-followup .fe-sm:hover{background:var(--card-hover);}
-      #view-followup .fe-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
-      @media(max-width:640px){#view-followup .fe-grid{grid-template-columns:repeat(2,1fr);}}
-      #view-followup .fe-metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
-      #view-followup .fe-metric .l{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
-      #view-followup .fe-metric .v{font-size:24px;font-weight:700;color:var(--text);}
-      #view-followup .fe-leadrow{width:100%;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;}
-      #view-followup .fe-leadrow:hover{background:var(--card-hover);}
-      #view-followup .fe-av{height:36px;width:36px;border-radius:50%;background:var(--navy-mid);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;}
-      #view-followup .fe-grow{flex:1;min-width:0;}
-      #view-followup .fe-name{font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text);}
-      #view-followup .fe-trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      #view-followup .fe-sub{font-size:12px;color:var(--text-muted);}
-      #view-followup .fe-chip{font-size:11px;border-radius:5px;padding:2px 6px;background:var(--navy-mid);color:var(--text-muted);}
-      #view-followup .fe-pill{font-size:11px;border-radius:999px;padding:3px 9px;background:var(--navy-mid);white-space:nowrap;}
-      #view-followup .fe-due{height:8px;width:8px;border-radius:50%;background:var(--warn);flex-shrink:0;}
-      #view-followup .fe-empty{background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text-muted);}
-      #view-followup .fe-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
-      #view-followup .fe-touch{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
-      #view-followup .fe-touch .hh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
-      #view-followup .fe-purpose{font-size:12px;color:var(--text-muted);margin:0 0 8px;}
-      #view-followup .fe-msg{font-size:14px;color:var(--text);white-space:pre-wrap;background:var(--navy-mid);border-radius:9px;padding:12px;cursor:text;}
-      #view-followup .fe-msg:hover{background:var(--card-hover);}
-      #view-followup textarea.fe-ta,#view-followup input.fe-in,#view-followup select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
-      #view-followup .fe-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;}
-      #view-followup .fe-right{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
-      #view-followup .fe-back{background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;margin-bottom:14px;padding:0;}
-      #view-followup .fe-back:hover{color:var(--text);}
-      #view-followup .fe-stages{display:flex;flex-wrap:wrap;gap:6px;}
-      #view-followup .fe-stagebtn{font-size:12px;border-radius:999px;padding:6px 12px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
-      #view-followup .fe-stagebtn.on{border-color:transparent;box-shadow:0 0 0 1px var(--teal);color:var(--text);}
-      #view-followup .fe-meta{font-size:14px;color:var(--text-muted);margin-top:4px;}
-      #view-followup .fe-meta div{margin:1px 0;}
-      #view-followup .fe-err{color:var(--danger);font-size:12px;margin-top:8px;}
-      #fe-modal-root .fe-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
-      #fe-modal-root .fe-modal{background:var(--card);color:var(--text);width:100%;max-width:560px;border-radius:16px;padding:20px;max-height:92vh;overflow:auto;border:1px solid var(--border);}
-      #fe-modal-root .fe-field{margin-bottom:12px;}
-      #fe-modal-root .fe-lab{font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;}
-      #fe-modal-root .fe-seg{display:flex;gap:8px;}
-      #fe-modal-root .fe-seg button{flex:1;font-size:14px;border-radius:9px;padding:9px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
-      #fe-modal-root .fe-seg button.on{background:var(--brand-grad);color:#fff;border-color:transparent;}
-      #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-      #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
-      #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-    </style>
-    <div class="fe-wrap">
-      <div id="fe-root"></div>
-    </div>
-    <div id="fe-modal-root"></div>
-  </div>
-
   <div class="tab-view" id="view-deal-rules">
 <div class="banner">
   <div class="banner-eyebrow">Internal Policy Document</div>
@@ -6251,7 +6187,7 @@ function saveAccessMap(map) {
 }
 function defaultAccessFor(user) {
   if (user === PRIMARY_ADMIN) return 'write';   // Ahmed
-  if (isAdminUser(user))      return 'view';     // Sami, Kamal — full view by default
+  if (isAdminUser(user))      return 'write';    // Sami, Kamal — full edit rights (v21.33)
   if (user === OFFICE_ADMIN)  return 'view';     // Gladys — full view (demo editing preserved separately)
   return 'own';                                  // sales reps
 }
@@ -6913,14 +6849,12 @@ function parseEnvelope(remote) {
       data : (remote.data && typeof remote.data === 'object') ? remote.data : {},
       demos: Array.isArray(remote.demos) ? remote.demos : [],
       requests: Array.isArray(remote.requests) ? remote.requests : [],   // v19.1
-      followups: Array.isArray(remote.followups) ? remote.followups : [],   // Follow-up Engine
-      followupsDeleted: (remote.followupsDeleted && typeof remote.followupsDeleted==='object') ? remote.followupsDeleted : {},
       hubspot: (remote.hubspot && typeof remote.hubspot === 'object') ? remote.hubspot : null, // v15.4
       meta : remote._meta || null
     };
   }
   // Legacy bare month-keyed object → treat as data, no demos.
-  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], followups: [], followupsDeleted: {}, hubspot: null, meta: null };
+  return { data: (remote && typeof remote === 'object') ? remote : {}, demos: [], requests: [], hubspot: null, meta: null };
 }
 
 async function fetchRemoteEnvelope(tok) {
@@ -6982,9 +6916,8 @@ async function downloadFromOneDrive() {
     // owner map) so this rep can open the deal-picker for their own row.
     if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
-    if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
+    if (r.env && Array.isArray(r.env.products) && r.env.products.length) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
-    if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7194,15 +7127,10 @@ function buildEnvelope() {
   // v20.7 — product catalog (admin-managed). Attach the local list; reps who
   // don't manage products preserve whatever the admin last synced.
   if (typeof productEntries !== 'undefined' && Array.isArray(productEntries) && productEntries.length) env.products = productEntries;
-  else if (_lastRemoteProducts) env.products = _lastRemoteProducts;
+  else if (_lastRemoteProducts && _lastRemoteProducts.length) env.products = _lastRemoteProducts;
   // v20.8 — quotes ride along too (merged by id, last-write-wins per quote)
   if (typeof quoteEntries !== 'undefined' && Array.isArray(quoteEntries) && quoteEntries.length) env.quotes = quoteEntries;
   else if (_lastRemoteQuotes) env.quotes = _lastRemoteQuotes;
-  // Follow-up Engine — leads ride along, merged by id (last-write-wins per lead)
-  var _fu = (typeof followupLeads !== 'undefined' && Array.isArray(followupLeads) && followupLeads.length) ? followupLeads : (_lastRemoteFollowups||[]);
-  if (typeof feTombstones==='object' && feTombstones) _fu = _fu.filter(function(l){ return l && !feTombstones[l.id]; });
-  if (typeof followupLeads !== 'undefined' || _lastRemoteFollowups) env.followups = _fu;
-  if (typeof feTombstones==='object' && feTombstones && Object.keys(feTombstones).length) env.followupsDeleted = feTombstones;
   // v21.9 — per-Type terms library (admin-managed, last-write-wins)
   if (typeof termTemplates !== 'undefined' && termTemplates && Object.keys(termTemplates).length) env.termtemplates = termTemplates;
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
@@ -7240,9 +7168,8 @@ async function uploadToOneDrive() {
         // re-emits the admin's block instead of dropping it.
         if (r.env && r.env.hubspot) { _lastRemoteHubspot = r.env.hubspot; hsIngestSharedConfig(r.env.hubspot); }
     if (r.env && r.env.access && !isPrimaryAdmin()) { _lastRemoteAccess = r.env.access; try { saveAccessMap(r.env.access); } catch(e){} }
-    if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
+    if (r.env && Array.isArray(r.env.products) && r.env.products.length) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined') { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
-    if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11250,7 +11177,6 @@ const TAB_HEADINGS = {
   performance: 'Sales Rep Performance',
   demos:       'Demo Tracker',
   requests:    'Event & On-site Demo Requests',
-  followup:    'Follow-up Engine',
   marketing:   'Marketing Consumer Performance',
   quotes:      'Quotes & Products',
   'deal-rules':'Deal Ownership & CRM Rules',
@@ -11286,9 +11212,6 @@ function switchTab(tabName) {
   }
   if (tabName === 'quotes') {
     renderQuotesTab();
-  }
-  if (tabName === 'followup') {
-    renderFollowup();
   }
 }
 
@@ -15936,849 +15859,11 @@ function saveThresh() {
 /* ════════════════════════════════════════
    INIT
 ════════════════════════════════════════ */
-/* ════════════════════════════════════════════════════════════════════
-   FOLLOW-UP ENGINE
-   Lead routing (B2B/B2C) → 12-day cadence → status tracking → AI tuning.
-   Storage: localStorage 'oxefit_followups_v1', mirrored into the shared
-   OneDrive envelope (followups[]) so the whole team shares one pipeline.
-════════════════════════════════════════════════════════════════════ */
-const FOLLOWUPS_KEY = 'oxefit_followups_v1';
-let followupLeads = [];
-let _lastRemoteFollowups = null;
-let feView = 'dashboard';
-let feSelectedId = null;
-let feEditKey = null;
-let feExpandKey = null;
-let feAiBusy = null;
-let feImportPreview = [];
-let feImportBusy = false;
-let feImportErr = '';
-let feFilterRep = '';
-let feFilterStage = '';
-let feDashTab = 'summary';
-
-const FE_STAGES = ["New","Contacted","Engaged","Demo booked","Won","Lost","Referral"];
-const FE_LOST_REASONS = ["Above Budget","Went with Competitor","No Show","Not Interested","Asked to Drop it"];
-const FE_CADENCE = [
-  { key:"t1", dayLabel:"Day 0", when:"Within 5 min", channel:"WhatsApp", offsetMinutes:0,
-    purpose:"Instant reply and quick qualify (home vs business)",
-    msg:{ b2c:"Hi {name}, thanks for your interest in OxeFit! Quick question so I can help you best — is this for your home, or for a gym/business?",
-          b2b:"Hi {name}, thanks for reaching out to OxeFit! Quick one so I point you the right way — is this for your home, or for {company}?" } },
-  { key:"t2", dayLabel:"Day 0", when:"+2 hours", channel:"WhatsApp", offsetMinutes:120,
-    purpose:"Personal note from the rep with a soft demo offer",
-    msg:{ b2c:"Hi {name}, this is your OxeFit specialist. Most people are surprised how much one system replaces — strength, cardio, recovery and AI coaching in one. I'd love to show how it fits your space. Want me to send a quick 60-second clip?",
-          b2b:"Hi {name}, this is your OxeFit specialist. For {company}, OxeFit can lift member retention and add a premium draw without extra staff. Can I send a short overview built for facilities like yours?" } },
-  { key:"t3", dayLabel:"Day 1", when:"Next day", channel:"WhatsApp", offsetMinutes:1440,
-    purpose:"Send one short matched video",
-    msg:{ b2c:"Here's a quick look at OxeFit in a real home setup: [video link]. Watch how the resistance adjusts automatically as you move — that's the part people love.",
-          b2b:"Sharing how a studio worked OxeFit into their floor: [video link]. Members book it out — it's become a real differentiator for them." } },
-  { key:"t4", dayLabel:"Day 3", when:"3 days in", channel:"WhatsApp", offsetMinutes:4320,
-    purpose:"Social proof, handle the top objection, drop the booking link",
-    msg:{ b2c:"{name}, a customer here had the same thought about space — turned out it fit a corner they weren't using. Easiest way to judge is to feel it: 15 minutes, in person or over video. Here's my calendar: [booking link]. No pressure.",
-          b2b:"{name}, a gym we work with had members signing up specifically for the OxeFit sessions. Worth a 15-minute walkthrough to see if it fits {company}? Here's my calendar: [booking link]." } },
-  { key:"t5", dayLabel:"Day 5", when:"5 days in", channel:"Email", offsetMinutes:7200,
-    purpose:"Lower the money objection — financing (B2C) or ROI (B2B)",
-    subject:{ b2c:"Making OxeFit easy on the budget", b2b:"The numbers behind OxeFit for {company}" },
-    msg:{ b2c:"Hi {name},\n\nWanted to make the investment side simple. OxeFit comes with flexible payment plans and a full warranty, and over a year it usually costs less than a trainer or premium gym membership — while living in your home.\n\nHappy to walk through the options whenever suits. Want me to hold a demo slot this week?\n\nBest,\nYour OxeFit team",
-          b2b:"Hi {name},\n\nSharing a short ROI snapshot for {company}: how OxeFit tends to lift retention, add a premium tier you can charge for, and pay back over the first year. Multi-unit pricing is available.\n\nHappy to tailor the numbers to your floor. Shall I set up a 15-minute call?\n\nBest,\nYour OxeFit team" } },
-  { key:"t6", dayLabel:"Day 8", when:"8 days in", channel:"WhatsApp", offsetMinutes:11520,
-    purpose:"Re-engage quiet leads with a low-commitment option",
-    msg:{ b2c:"Totally understand it's a big decision, {name}. I've got a couple of demo slots this week — want me to hold one, or would a quick video tour be easier?",
-          b2b:"Totally understand these things take time, {name}. I can hold a walkthrough slot this week, or send a tailored video tour for {company} — whichever's easier?" } },
-  { key:"t7", dayLabel:"Day 12", when:"12 days in", channel:"WhatsApp", offsetMinutes:17280,
-    purpose:"Soft break-up that often re-opens the conversation",
-    msg:{ b2c:"{name}, I don't want to keep nudging if the timing's off — should I close your file for now, or keep your spot open? Either answer is completely fine.",
-          b2b:"{name}, I don't want to keep chasing if now isn't right — should I close this off, or keep {company} on the list for later? Either's completely fine." } }
-];
-
-function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} }
-function saveFollowupsLocal(){ try{ localStorage.setItem(FOLLOWUPS_KEY, JSON.stringify(followupLeads)); }catch(e){} try{ feSaveTombstones(); }catch(e){} }
-function feSave(){ saveFollowupsLocal(); if(typeof scheduleOneDriveSync==='function'){ try{ scheduleOneDriveSync(); }catch(e){} } }
-function mergeFollowupsById(localArr, remoteArr){
-  const byId={};
-  (localArr||[]).forEach(l=>{ if(l&&l.id) byId[l.id]=l; });
-  (remoteArr||[]).forEach(r=>{ if(!r||!r.id) return; const ex=byId[r.id];
-    if(!ex){ byId[r.id]=r; } else { const a=Date.parse(ex.updatedAt||0)||0, b=Date.parse(r.updatedAt||0)||0; byId[r.id]=(b>=a)?r:ex; } });
-  return Object.values(byId).filter(function(l){ return !(feTombstones && feTombstones[l.id]); });
-}
-
-function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
-function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
-function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-function feEsc(s){ return (typeof escapeHtml==='function') ? escapeHtml(s||'') : (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function feToast(m,t){ if(typeof showToast==='function') showToast(m, t||'info'); }
-function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead.type==='B2B'?'b2b':'b2c';
-  return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
-    scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
-    subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-function feGet(id){ return followupLeads.find(l=>l.id===id); }
-function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
-
-function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--accent)',replied:'var(--success)',skipped:'var(--text-muted)'})[s]||'var(--text-muted)'; }
-
-/* ---- AI key ---- */
-function feKey(){ return localStorage.getItem('oxefit_anthropic_key')||''; }
-function feModel(){ return localStorage.getItem('oxefit_anthropic_model')||'claude-sonnet-4-6'; }
-function feSetKey(){
-  const k=prompt('Paste your Anthropic API key (stored only in this browser, used for AI message tuning):', feKey());
-  if(k!==null){ localStorage.setItem('oxefit_anthropic_key', k.trim()); feToast(k.trim()?'AI key saved':'AI key cleared','success'); }
-}
-
-/* ---- mutations ---- */
-function feAddLead(){
-  const name=(document.getElementById('fe-name').value||'').trim();
-  if(!name){ document.getElementById('fe-name').focus(); return; }
-  const cf=document.getElementById('fe-company');
-  const lead={ id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New',
-    owner:(typeof currentUser!=='undefined'?currentUser:'')||'',
-    name, company:cf?cf.value.trim():'', type:window._feType||'B2C', language:window._feLang||'English',
-    phone:(document.getElementById('fe-phone').value||'').trim(),
-    email:(document.getElementById('fe-email').value||'').trim(),
-    source:(document.getElementById('fe-source').value||'').trim(),
-    note:(document.getElementById('fe-note').value||'').trim(),
-    assignee:(document.getElementById('fe-assignee')?document.getElementById('fe-assignee').value:'')||'' };
-  lead.touches=feGenTouches(lead);
-  followupLeads.unshift(lead); feSave(); feCloseModal();
-  feSelectedId=lead.id; feView='lead'; renderFollowup();
-}
-function feSetStage(id,stage){ if(stage==='Lost'){ feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
-function feOpenLostModal(id){
-  const l=feGet(id); if(!l) return;
-  const btns=FE_LOST_REASONS.map(function(r){ return '<button class="fe-ghost" style="width:100%;text-align:left;margin-bottom:8px'+(l.lostReason===r?';box-shadow:0 0 0 1px var(--danger)':'')+'" onclick="feSetLost(\''+id+'\','+JSON.stringify(r).replace(/"/g,'&quot;')+')">'+feEsc(r)+'</button>'; }).join('');
-  document.getElementById('fe-modal-root').innerHTML=
-  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal" style="max-width:420px">'+
-    '<div class="fe-rowb" style="margin-bottom:12px"><h3 class="fe-h">Why was this lead lost?</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
-    btns+
-    '<div style="display:flex;gap:8px;margin-top:6px"><button class="fe-sm" onclick="feSetLost(\''+id+'\',\'\')">No specific reason</button><button class="fe-sm" onclick="feCloseModal()">Cancel</button></div>'+
-  '</div></div>';
-}
-function feSetLost(id, reason){ const l=feGet(id); if(l){ l.stage='Lost'; l.lostReason=reason||''; feStamp(l); feSave(); } feCloseModal(); renderFollowup(); }
-function feMark(id,key,status){ const l=feGet(id); if(!l) return; const tt=l.touches.find(x=>x.key===key); if(!tt) return;
-  if(status==='skipped'&&tt.status==='skipped') tt.status='pending'; else tt.status=status;
-  if(status==='sent'&&l.stage==='New') l.stage='Contacted';
-  if(status==='replied'&&(l.stage==='New'||l.stage==='Contacted')) l.stage='Engaged';
-  feStamp(l); feSave(); renderFollowup(); }
-function feStartEdit(id,key){ feEditKey=id+':'+key; renderFollowup(); setTimeout(()=>{const a=document.getElementById('fe-edit-area'); if(a){a.focus();a.setSelectionRange(a.value.length,a.value.length);} },0); }
-function feCancelEdit(){ feEditKey=null; renderFollowup(); }
-function feSaveEdit(id,key){ const l=feGet(id); const tt=l&&l.touches.find(x=>x.key===key); const a=document.getElementById('fe-edit-area'); if(tt&&a){ tt.message=a.value; feStamp(l); } feEditKey=null; feSave(); renderFollowup(); }
-function feCopy(id,key){ const l=feGet(id); const tt=l&&l.touches.find(x=>x.key===key); if(!tt) return;
-  const text=tt.subject?('Subject: '+tt.subject+'\n\n'+tt.message):tt.message;
-  navigator.clipboard.writeText(text).then(()=>feToast('Copied','success')).catch(()=>feToast('Copy failed','error')); }
-
-async function feTune(id,key){
-  const l=feGet(id); const tt=l&&l.touches.find(x=>x.key===key); if(!tt) return;
-  const apiKey=feKey(); if(!apiKey){ feSetKey(); return; }
-  feAiBusy=id+':'+key; renderFollowup();
-  const isEmail=tt.channel==='Email';
-  const prompt="You help a sales rep at OxeFit (premium connected home-gym equipment, sold worldwide outside the Americas, based in the UAE).\n"+
-    "Write a single "+tt.channel+" message for this lead. Return ONLY the message text — no preamble, no quotation marks, no notes.\n"+
-    "Write it in "+l.language+". Keep it warm, concise, human and professional.\n"+
-    (isEmail?'Start with one line "Subject: ..." then a blank line then the body.':"No subject line — this is a chat message.")+"\n\n"+
-    "Lead: name="+l.name+"; type="+l.type+"; company="+(l.company||'n/a')+"; source="+(l.source||'unknown')+"; notes="+(l.note||'none')+"; pipeline stage="+l.stage+".\n"+
-    (l.brief?("Rep brief on this lead — tailor the tone and angle to it, do not contradict it: "+l.brief+"\n"):"")+
-    "Goal of this message: "+tt.purpose+".\nCurrent draft: "+JSON.stringify(tt.message);
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
-      headers:{ 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-      body:JSON.stringify({ model:feModel(), max_tokens:1024, messages:[{role:'user',content:prompt}] }) });
-    const data=await res.json();
-    if(data.error) throw new Error(data.error.message||'API error');
-    let text=(data.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
-    if(!text) throw new Error('Empty response');
-    if(isEmail && /^subject:/i.test(text)){ const nl=text.indexOf('\n'); tt.subject=text.slice(0,nl<0?undefined:nl).replace(/^subject:\s*/i,'').trim(); text=nl<0?'':text.slice(nl+1).trim(); }
-    tt.message=text; feStamp(l); feSave();
-  }catch(e){ feToast('AI: '+((e&&e.message)||'failed').slice(0,90),'error'); }
-  finally{ feAiBusy=null; renderFollowup(); }
-}
-
-/* ---- add / import modals ---- */
-function feCloseModal(){ document.getElementById('fe-modal-root').innerHTML=''; }
-function feOpenAdd(){
-  window._feType='B2C'; window._feLang='English';
-  document.getElementById('fe-modal-root').innerHTML=
-  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
-    '<div class="fe-rowb" style="margin-bottom:14px"><h3 class="fe-h">New lead</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
-    '<div class="fe-field"><label class="fe-lab">Name</label><input id="fe-name" class="fe-in" placeholder="e.g. Omar Al Mansoori"/></div>'+
-    '<div class="fe-field"><label class="fe-lab">Buyer type</label><div class="fe-seg" id="fe-seg-type">'+
-      '<button class="on" data-v="B2C" onclick="fePickType(\'B2C\')">Home (B2C)</button>'+
-      '<button data-v="B2B" onclick="fePickType(\'B2B\')">Business (B2B)</button></div></div>'+
-    '<div class="fe-field" id="fe-company-field" style="display:none"><label class="fe-lab">Company</label><input id="fe-company" class="fe-in" placeholder="Gym, hotel, studio…"/></div>'+
-    '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Phone</label><input id="fe-phone" class="fe-in" placeholder="+971…"/></div>'+
-      '<div class="fe-field"><label class="fe-lab">Email</label><input id="fe-email" class="fe-in" placeholder="name@…"/></div></div>'+
-    '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Source</label><input id="fe-source" class="fe-in" placeholder="Instagram, referral…"/></div>'+
-      '<div class="fe-field"><label class="fe-lab">Language</label><div class="fe-seg" id="fe-seg-lang">'+
-        '<button class="on" data-v="English" onclick="fePickLang(\'English\')">English</button>'+
-        '<button data-v="Arabic" onclick="fePickLang(\'Arabic\')">Arabic</button></div></div></div>'+
-    '<div class="fe-field"><label class="fe-lab">Assign to</label><select id="fe-assignee" class="fe-sel"><option value="">Unassigned</option>'+ALL_REPS.map(function(rp){ return '<option value="'+rp+'">'+rp+'</option>'; }).join('')+'</select></div>'+
-    '<div class="fe-field"><label class="fe-lab">Notes (what they asked / their goal)</label><textarea id="fe-note" class="fe-ta" rows="2" placeholder="Wants strength + recovery, small villa gym…"></textarea></div>'+
-    '<button class="fe-btn" style="width:100%" onclick="feAddLead()">Add lead and build cadence</button>'+
-  '</div></div>';
-  setTimeout(()=>{ const n=document.getElementById('fe-name'); if(n)n.focus(); },0);
-}
-function fePickType(v){ window._feType=v; document.querySelectorAll('#fe-seg-type button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); const cf=document.getElementById('fe-company-field'); if(cf) cf.style.display=v==='B2B'?'block':'none'; }
-function fePickLang(v){ window._feLang=v; document.querySelectorAll('#fe-seg-lang button').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
-
-function feOpenImport(){ feImportPreview=[]; feImportErr=''; feImportBusy=false; feRenderImportInput(); }
-function feRenderImportInput(){
-  const hasKey=!!feKey();
-  document.getElementById('fe-modal-root').innerHTML=
-  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
-    '<div class="fe-rowb" style="margin-bottom:10px"><h3 class="fe-h">Import leads</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
-    '<p class="fe-sub" style="line-height:1.55;margin:0 0 12px">Paste your list (from a Google Doc, OneDrive file, or spreadsheet). One lead per line is fine. '+
-      (hasKey?'Smart parse reads it and sorts each lead into B2B or B2C.':'Add an AI key (button below) for smart parsing, or paste columns: name, type, phone, email, company, source, note.')+'</p>'+
-    '<textarea id="fe-imp-raw" class="fe-ta" rows="9" placeholder="Omar Al Mansoori, +971 50 123 4567, omar@email.com — home setup, small villa gym&#10;FitZone Gym (Dubai), Sara Khalifa, sara@fitzone.ae — 3 locations, member retention&#10;..."></textarea>'+
-    (feImportErr?'<div class="fe-err">'+feEsc(feImportErr)+'</div>':'')+
-    '<div class="fe-actions" style="margin-top:14px">'+
-      '<button class="fe-btn" '+(feImportBusy?'disabled':'')+' onclick="feRunImportParse()">'+(feImportBusy?'Reading your list…':(hasKey?'Smart parse':'Parse list'))+'</button>'+
-      '<button class="fe-ghost" '+(feImportBusy?'disabled':'')+' onclick="feImportFromDrive()">Pick from Google Drive</button>'+
-      (hasKey?'':'<button class="fe-sm" onclick="feSetKey()">Add AI key</button>')+
-      '<button class="fe-sm" onclick="feCloseModal()">Cancel</button>'+
-    '</div></div></div>';
-}
-async function feRunImportParse(){
-  const raw=((document.getElementById('fe-imp-raw')||{}).value||'').trim();
-  if(!raw){ feImportErr='Paste your leads first.'; feRenderImportInput(); return; }
-  feImportErr='';
-  if(feKey()){ feImportBusy=true; feRenderImportInput();
-    try{ feImportPreview=await feParseSmart(raw); }
-    catch(e){ feImportErr=((e&&e.message)||'Smart parse failed')+' — using simple parse.'; feImportPreview=feParseSimple(raw); }
-    feImportBusy=false;
-  } else { feImportPreview=feParseSimple(raw); }
-  if(!feImportPreview.length){ feImportErr='Could not find any leads in that text.'; feRenderImportInput(); return; }
-  feRenderImportPreview();
-}
-async function feParseSmart(raw){
-  const prompt="You are parsing a sales lead list for OxeFit. Extract EVERY lead. Return ONLY a JSON array — no prose, no markdown, no code fences.\n"+
-    'Each item: {"name":string,"type":"B2C" or "B2B","company":string,"phone":string,"email":string,"source":string,"note":string,"language":"English" or "Arabic"}.\n'+
-    "Rules: individuals / home buyers = B2C. Gyms, hotels, studios, clinics, companies, corporate wellness, resellers = B2B (put the business in company). Missing field = empty string. Unsure = B2C. Default language English unless clearly Arabic. Keep notes short.\n\nLIST:\n"+raw;
-  const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
-    headers:{ 'Content-Type':'application/json','x-api-key':feKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-    body:JSON.stringify({ model:feModel(), max_tokens:8192, messages:[{role:'user',content:prompt}] }) });
-  const data=await res.json();
-  if(data.error) throw new Error(data.error.message||'API error');
-  let text=(data.content||[]).map(b=>b.type==='text'?b.text:'').join('').trim();
-  text=text.replace(/^```(json)?/i,'').replace(/```$/,'').trim();
-  const arr=JSON.parse(text);
-  if(!Array.isArray(arr)) throw new Error('Unexpected response');
-  return arr.map(feNormalize).filter(l=>l.name);
-}
-function feParseSimple(raw){
-  const blocks=String(raw||'').split(/\n\s*\n/);   // sheets are separated by a blank line
-  const out=[];
-  blocks.forEach(function(block){
-    const lines=block.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(function(l){ return l && !/^#\s*sheet:/i.test(l); });
-    if(!lines.length) return;
-    const delim=lines[0].indexOf('\t')>=0?'\t':',';
-    let headers=null, start=0;
-    if(/name/i.test(lines[0]) && lines[0].split(delim).length>1){ headers=lines[0].split(delim).map(function(h){ return h.trim().toLowerCase(); }); start=1; }
-    for(let i=start;i<lines.length;i++){ const cells=lines[i].split(delim).map(function(c){ return c.trim(); }); let o;
-      if(headers){ o={}; headers.forEach(function(h,idx){ o[h]=cells[idx]||''; }); o={ name:o.name, type:o.type, company:o.company, phone:o.phone, email:o.email||o['e-mail'], source:o.source, note:o.note||o.notes }; }
-      else { o={ name:cells[0], type:cells[1], phone:cells[2], email:cells[3], company:cells[4], source:cells[5], note:cells.slice(6).join(' ') }; }
-      if(o.name) out.push(feNormalize(o)); }
-  });
-  return out;
-}
-function feNormalize(o){ o=o||{};
-  const txt=((o.type||'')+' '+(o.company||'')+' '+(o.note||'')+' '+(o.name||'')).toLowerCase();
-  let type=(o.type||'').toUpperCase();
-  if(type!=='B2B'&&type!=='B2C'){ type=/b2b|business|gym|hotel|studio|clinic|company|corporate|reseller|wellness|fitness center/.test(txt)?'B2B':'B2C'; }
-  return { name:(o.name||'').trim(), type, company:(o.company||'').trim(), phone:(o.phone||'').trim(), email:(o.email||'').trim(), source:(o.source||'').trim(), note:(o.note||'').trim(), language:(o.language==='Arabic'?'Arabic':'English') };
-}
-function feRenderImportPreview(){
-  const b2b=feImportPreview.filter(l=>l.type==='B2B').length, b2c=feImportPreview.length-b2b;
-  const rows=feImportPreview.map((l,i)=>
-    '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">'+
-      '<div class="fe-grow"><div class="fe-name fe-trunc" style="font-size:14px"><span class="fe-trunc">'+feEsc(l.name||'(no name)')+'</span>'+(l.company?'<span class="fe-chip">'+feEsc(l.company)+'</span>':'')+'</div>'+
-        '<div class="fe-sub fe-trunc">'+([l.phone,l.email,l.source].filter(Boolean).map(feEsc).join(' · ')||'&nbsp;')+'</div></div>'+
-      '<select class="fe-sel" style="width:auto" onchange="feImportPreview['+i+'].type=this.value">'+
-        '<option value="B2C"'+(l.type==='B2C'?' selected':'')+'>B2C</option><option value="B2B"'+(l.type==='B2B'?' selected':'')+'>B2B</option></select>'+
-      '<button class="fe-sm" onclick="feDropImport('+i+')">&times;</button>'+
-    '</div>').join('');
-  document.getElementById('fe-modal-root').innerHTML=
-  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
-    '<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Review '+feImportPreview.length+' lead'+(feImportPreview.length===1?'':'s')+'</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
-    '<p class="fe-sub" style="margin:0 0 12px">'+b2c+' home (B2C) · '+b2b+' business (B2B). Fix any type, then import — each lead gets the full 12-day cadence.</p>'+
-    '<div style="max-height:46vh;overflow:auto;margin-bottom:14px">'+rows+'</div>'+
-    '<div class="fe-actions"><button class="fe-btn" onclick="feConfirmImport()">Import '+feImportPreview.length+' lead'+(feImportPreview.length===1?'':'s')+'</button>'+
-      '<button class="fe-sm" onclick="feRenderImportInput()">Back</button></div>'+
-  '</div></div>';
-}
-function feDropImport(i){ feImportPreview.splice(i,1); if(!feImportPreview.length) feRenderImportInput(); else feRenderImportPreview(); }
-function feConfirmImport(){
-  const now=Date.now(), owner=(typeof currentUser!=='undefined'?currentUser:'')||'';
-  const made=feImportPreview.map((p,idx)=>{ const lead={ id:(now+idx).toString(36)+Math.random().toString(36).slice(2,6),
-    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New', owner:owner,
-    name:p.name, company:p.company, type:p.type, language:p.language, phone:p.phone, email:p.email, source:p.source, note:p.note };
-    lead.touches=feGenTouches(lead); return lead; });
-  followupLeads=made.concat(followupLeads); feSave();
-  const n=made.length; feImportPreview=[]; feCloseModal(); feView='dashboard'; renderFollowup(); feToast('Imported '+n+' lead'+(n===1?'':'s'),'success');
-}
-
-/* ---- render ---- */
-function renderFollowup(){ const root=document.getElementById('fe-root'); if(!root) return;
-  if(feView==='lead'){ const l=feGet(feSelectedId); if(l){ root.innerHTML=feRenderLead(l); return; } feView='dashboard'; }
-  try{ if(fePinGet()&&feAutoGet()&&typeof gdAccessToken!=='undefined'&&gdAccessToken&&!feSyncing){ const last=Date.parse(feLastSyncGet()||0)||0; if(Date.now()-last>600000){ feSyncSheet(true); } } }catch(e){}
-  root.innerHTML=feRenderDashboard();
-}
-function feNextAction(l,now){ if(['Won','Lost'].includes(l.stage)) return {label:l.stage,when:''};
-  const p=l.touches.filter(t=>t.status==='pending').sort((a,b)=>Date.parse(a.scheduledAt)-Date.parse(b.scheduledAt));
-  if(!p.length) return {label:'Cadence complete',when:''};
-  return {label:p[0].dayLabel+' · '+p[0].channel, when:feFmt(p[0].scheduledAt), due:Date.parse(p[0].scheduledAt)<=now}; }
-function feRenderDashboard(){
-  const now=Date.now();
-  const due=followupLeads.filter(l=>!['Won','Lost'].includes(l.stage)&&l.touches.some(t=>t.status==='pending'&&Date.parse(t.scheduledAt)<=now)).length;
-  const booked=followupLeads.filter(l=>l.stage==='Demo booked').length;
-  const won=followupLeads.filter(l=>l.stage==='Won').length;
-  const lost=followupLeads.filter(l=>l.stage==='Lost').length;
-  const ref=followupLeads.filter(l=>l.stage==='Referral').length;
-
-  const actions='<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-    '<button class="fe-sm" onclick="feSetKey()" title="Set Anthropic API key for AI features">AI key</button>'+
-    '<button class="fe-ghost" onclick="feImportFromDrive()">Google Drive</button>'+
-    '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
-    '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div>';
-  const topbar='<div class="fe-rowb"><h3 class="fe-h">Follow-up Engine</h3>'+actions+'</div>';
-  let dupCount=0; try{ feDupGroups().forEach(function(g){ dupCount+=g.leads.length-1; }); }catch(e){}
-  const tabs='<div class="fe-stages" style="margin-bottom:16px">'+
-    '<button class="fe-stagebtn '+(feDashTab!=='leads'&&feDashTab!=='dupes'?'on':'')+'" onclick="feSetDashTab(\'summary\')">Summary</button>'+
-    '<button class="fe-stagebtn '+(feDashTab==='leads'?'on':'')+'" onclick="feSetDashTab(\'leads\')">All leads</button>'+
-    '<button class="fe-stagebtn '+(feDashTab==='dupes'?'on':'')+'" onclick="feSetDashTab(\'dupes\')">Duplicates'+(dupCount?' ('+dupCount+')':'')+'</button></div>';
-
-  if(!followupLeads.length){
-    const empty='<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No leads yet.</p>'+
-      '<p class="fe-sub" style="margin:4px 0 16px">Add a lead, or import your whole list — the cadence builds itself.</p>'+
-      '<div style="display:flex;gap:8px;justify-content:center"><button class="fe-btn" onclick="feOpenAdd()">+ Add a lead</button>'+
-      '<button class="fe-ghost" onclick="feImportFromDrive()">From Google Drive</button>'+
-      '<button class="fe-ghost" onclick="feOpenImport()">Import a list</button></div></div>';
-    return topbar+tabs+empty;
-  }
-
-  if(feDashTab==='leads') return topbar+tabs+feLeadsTab(now);
-  if(feDashTab==='dupes') return topbar+tabs+feDupesTab();
-
-  const byRep={};
-  followupLeads.forEach(function(l){ const r=l.assignee||'Unassigned'; if(!byRep[r]) byRep[r]={total:0,due:0,booked:0,won:0,lost:0,ref:0};
-    const s=byRep[r]; s.total++;
-    if(!['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; })) s.due++;
-    if(l.stage==='Demo booked') s.booked++; if(l.stage==='Won') s.won++; if(l.stage==='Lost') s.lost++; if(l.stage==='Referral') s.ref++;
-  });
-  const order=ALL_REPS.filter(function(r){ return byRep[r]; }).concat(byRep['Unassigned']?['Unassigned']:[]);
-  const hdr='<div style="display:flex;font-size:11px;color:var(--text-muted);padding:4px 12px;gap:8px"><div style="flex:1">Sales rep</div><div style="width:48px;text-align:center">Leads</div><div style="width:40px;text-align:center">Due</div><div style="width:48px;text-align:center">Demos</div><div style="width:40px;text-align:center">Won</div><div style="width:40px;text-align:center">Lost</div><div style="width:40px;text-align:center">Ref</div></div>';
-  const body=order.map(function(r){ const s=byRep[r];
-    return '<div class="fe-leadrow" style="margin-bottom:6px;padding:9px 12px;gap:8px" onclick="feSetRepFilter(\''+r+'\')">'+
-      '<div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0"><span class="fe-av" style="height:26px;width:26px;font-size:11px">'+(r==='Unassigned'?'?':r.charAt(0).toUpperCase())+'</span><span class="fe-trunc" style="font-weight:600">'+feEsc(r)+'</span></div>'+
-      '<div style="width:48px;text-align:center;font-weight:600">'+s.total+'</div>'+
-      '<div style="width:40px;text-align:center;color:'+(s.due?'var(--warn)':'var(--text-muted)')+'">'+s.due+'</div>'+
-      '<div style="width:48px;text-align:center">'+s.booked+'</div>'+
-      '<div style="width:40px;text-align:center;color:'+(s.won?'var(--success)':'var(--text-muted)')+'">'+s.won+'</div>'+
-      '<div style="width:40px;text-align:center;color:'+(s.lost?'var(--danger)':'var(--text-muted)')+'">'+s.lost+'</div>'+
-      '<div style="width:40px;text-align:center;color:'+(s.ref?'#06b6d4':'var(--text-muted)')+'">'+s.ref+'</div>'+
-    '</div>'; }).join('');
-  const grid='<div class="fe-grid">'+
-      '<div class="fe-metric"><div class="l">Total leads</div><div class="v">'+followupLeads.length+'</div></div>'+
-      '<div class="fe-metric"><div class="l">Action due now</div><div class="v">'+due+'</div></div>'+
-      '<div class="fe-metric"><div class="l">Demos booked</div><div class="v">'+booked+'</div></div>'+
-      '<div class="fe-metric"><div class="l">Won</div><div class="v">'+won+'</div></div>'+
-      '<div class="fe-metric"><div class="l">Lost</div><div class="v">'+lost+'</div></div>'+
-      '<div class="fe-metric"><div class="l">Referral</div><div class="v">'+ref+'</div></div>'+
-    '</div>';
-  const repBlock='<div class="fe-rowb" style="margin:4px 0 8px"><h3 class="fe-h">By sales rep</h3><span class="fe-sub">tap a rep to see their leads</span></div>'+hdr+body;
-
-  const lostLeads=followupLeads.filter(function(l){ return l.stage==='Lost'; });
-  let lostBlock='';
-  if(lostLeads.length){
-    const counts={}; FE_LOST_REASONS.forEach(function(r){ counts[r]=0; }); counts['No reason']=0;
-    lostLeads.forEach(function(l){ const r=(l.lostReason&&FE_LOST_REASONS.indexOf(l.lostReason)>=0)?l.lostReason:'No reason'; counts[r]=(counts[r]||0)+1; });
-    const tot=lostLeads.length;
-    const labels=FE_LOST_REASONS.concat(counts['No reason']?['No reason']:[]);
-    const rowsHtml=labels.map(function(r){ const c=counts[r]||0; const pct=tot?Math.round(c/tot*100):0;
-      return '<div style="margin-bottom:12px">'+
-        '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>'+feEsc(r)+'</span><span class="fe-sub">'+c+' · '+pct+'%</span></div>'+
-        '<div style="height:8px;background:var(--navy-mid);border-radius:999px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(r==='No reason'?'var(--text-muted)':'var(--danger)')+';transition:width .25s"></div></div>'+
-      '</div>'; }).join('');
-    lostBlock='<div class="fe-rowb" style="margin:18px 0 8px"><h3 class="fe-h">Why we lose</h3><span class="fe-sub">'+tot+' lost lead'+(tot===1?'':'s')+'</span></div><div class="fe-card">'+rowsHtml+'</div>';
-  }
-  const pin=fePinGet();
-  const sheetBar=pin
-    ? '<div class="fe-card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px">'+
-        '<span style="font-size:13px">📄 <strong>'+feEsc(pin.name)+'</strong></span>'+
-        '<span class="fe-sub">'+(feLastSyncGet()?('synced '+feFmt(feLastSyncGet())):'not synced yet')+'</span>'+
-        '<div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">'+
-          '<button class="fe-sm" onclick="feSyncSheet(false)">Sync now</button>'+
-          '<button class="fe-sm" onclick="feToggleAuto()" style="'+(feAutoGet()?'color:var(--success);border-color:var(--success)':'')+'">Auto-import: '+(feAutoGet()?'On':'Off')+'</button>'+
-          '<button class="fe-sm" onclick="fePinSheetPicker()">Change</button>'+
-          '<button class="fe-sm" onclick="fePinClear()">Unpin</button>'+
-        '</div></div>'
-    : '<div class="fe-card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px"><span class="fe-sub" style="flex:1;min-width:160px">Pin a Google Sheet and new rows import automatically.</span><button class="fe-sm" onclick="fePinSheetPicker()">Pin a Google Sheet</button></div>';
-  return topbar+tabs+sheetBar+grid+repBlock+lostBlock;
-}
-function feLeadsTab(now){
-  const stageSel='<select class="fe-sel" style="max-width:180px" onchange="feSetStageFilter(this.value)">'+
-    '<option value=""'+(feFilterStage===''?' selected':'')+'>All statuses</option>'+
-    '<option value="__due"'+(feFilterStage==='__due'?' selected':'')+'>Action due now</option>'+
-    FE_STAGES.map(function(s){ return '<option value="'+s+'"'+(feFilterStage===s?' selected':'')+'>'+s+'</option>'; }).join('')+
-  '</select>';
-  const repSel='<select class="fe-sel" style="max-width:180px" onchange="feSetRepDirect(this.value)">'+
-    '<option value=""'+(feFilterRep===''?' selected':'')+'>All reps</option>'+
-    ALL_REPS.map(function(r){ return '<option value="'+feEsc(r)+'"'+(feFilterRep===r?' selected':'')+'>'+feEsc(r)+'</option>'; }).join('')+
-    '<option value="Unassigned"'+(feFilterRep==='Unassigned'?' selected':'')+'>Unassigned</option>'+
-  '</select>';
-  let list=followupLeads.slice();
-  if(feFilterRep) list=list.filter(function(l){ return (l.assignee||'Unassigned')===feFilterRep; });
-  if(feFilterStage==='__due') list=list.filter(function(l){ return !['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; }); });
-  else if(feFilterStage) list=list.filter(function(l){ return l.stage===feFilterStage; });
-  const clear=(feFilterRep||feFilterStage)?'<button class="fe-sm" onclick="feClearFilters()">Clear</button>':'';
-  const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'+stageSel+repSel+clear+'<span class="fe-sub" style="margin-left:auto">'+list.length+' lead'+(list.length===1?'':'s')+'</span></div>';
-  const rows=list.length
-    ? list.map(function(l){ const na=feNextAction(l,now);
-        return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
-          '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span></div>'+
-            '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
-          '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
-          (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
-        '</button>'; }).join('')
-    : '<div class="fe-empty"><p class="fe-sub" style="margin:0">No leads match these filters.</p></div>';
-  return filters+rows;
-}
-function feSetDashTab(t){ feDashTab=t; renderFollowup(); }
-function feSetStageFilter(v){ feFilterStage=v||''; renderFollowup(); }
-function feSetRepDirect(v){ feFilterRep=v||''; renderFollowup(); }
-function feClearFilters(){ feFilterRep=''; feFilterStage=''; renderFollowup(); }
-
-/* ---- deletion tombstones (so removed leads don't return via team sync or Sheet import) ---- */
-let feTombstones={};
-const FE_TOMB_KEY='oxefit_followup_deleted';
-function feLoadTombstones(){ try{ const r=localStorage.getItem(FE_TOMB_KEY); feTombstones=r?JSON.parse(r):{}; if(!feTombstones||typeof feTombstones!=='object') feTombstones={}; }catch(e){ feTombstones={}; } }
-function feSaveTombstones(){ try{ localStorage.setItem(FE_TOMB_KEY, JSON.stringify(feTombstones)); }catch(e){} }
-function feTombstone(l){ if(l&&l.id){ feTombstones[l.id]={ at:new Date().toISOString(), key:feLeadKey(l) }; } }
-function feTombKeys(){ const s={}; Object.keys(feTombstones).forEach(function(id){ const k=feTombstones[id]&&feTombstones[id].key; if(k) s[k]=true; }); return s; }
-function feAdoptTombstones(remote){ if(!remote||typeof remote!=='object') return; let changed=false; Object.keys(remote).forEach(function(id){ if(!feTombstones[id]){ feTombstones[id]=remote[id]; changed=true; } }); if(changed){ feSaveTombstones(); if(typeof followupLeads!=='undefined' && followupLeads.length){ const before=followupLeads.length; followupLeads=followupLeads.filter(function(l){ return !feTombstones[l.id]; }); if(followupLeads.length!==before){ try{ saveFollowupsLocal(); }catch(e){} } } } }
-function feAdoptRemoteFollowups(env){ if(!env) return; if(env.followupsDeleted) feAdoptTombstones(env.followupsDeleted); if(Array.isArray(env.followups)){ _lastRemoteFollowups=env.followups; if(typeof followupLeads!=='undefined'){ followupLeads=mergeFollowupsById(followupLeads, env.followups); try{ saveFollowupsLocal(); }catch(e){} try{ const fev=document.getElementById('view-followup'); if(fev&&fev.classList.contains('active')&&typeof renderFollowup==='function') renderFollowup(); }catch(e){} } } }
-
-/* ---- Duplicate detection & cleanup ---- */
-function feLeadScore(l){
-  const rank={'Won':6,'Referral':5,'Demo booked':4,'Engaged':3,'Contacted':2,'Lost':1,'New':0};
-  let s=(rank[l.stage]||0)*10;
-  s+=(l.touches?l.touches.filter(function(t){ return t.status!=='pending'; }).length:0);
-  if(l.assignee) s+=2; if(l.brief) s+=1;
-  return s;
-}
-function feDupGroups(){
-  const map={};
-  followupLeads.forEach(function(l){ const k=feLeadKey(l); if(!k) return; (map[k]=map[k]||[]).push(l); });
-  const groups=[];
-  Object.keys(map).forEach(function(k){ const arr=map[k]; if(arr.length<2) return;
-    const sorted=arr.slice().sort(function(a,b){ const d=feLeadScore(b)-feLeadScore(a); if(d) return d; return (Date.parse(a.createdAt)||0)-(Date.parse(b.createdAt)||0); });
-    const keep=sorted[0]; let label;
-    if(k.charAt(0)==='e') label='Same email: '+keep.email;
-    else if(k.charAt(0)==='p') label='Same phone: '+keep.phone;
-    else label='Same name'+(keep.company?' + company':'')+': '+keep.name+(keep.company?(' / '+keep.company):'');
-    groups.push({ key:k, label:label, leads:sorted, keepId:keep.id });
-  });
-  return groups;
-}
-function feDeleteLead(id){
-  const l=feGet(id); if(!l) return;
-  if(!confirm('Delete "'+(l.name||'this lead')+'"? This cannot be undone.')) return;
-  feTombstone(l);
-  followupLeads=followupLeads.filter(function(x){ return x.id!==id; });
-  feSave(); if(feSelectedId===id) feView='dashboard'; renderFollowup(); feToast('Lead deleted','info');
-}
-function feDedupeAll(){
-  const groups=feDupGroups(); if(!groups.length){ feToast('No duplicates found','info'); return; }
-  const removable=groups.reduce(function(a,g){ return a+(g.leads.length-1); },0);
-  if(!confirm('Remove '+removable+' duplicate lead'+(removable===1?'':'s')+'? The most complete copy in each group is kept. This cannot be undone.')) return;
-  const drop={}; groups.forEach(function(g){ g.leads.forEach(function(l){ if(l.id!==g.keepId){ drop[l.id]=true; feTombstone(l); } }); });
-  followupLeads=followupLeads.filter(function(l){ return !drop[l.id]; });
-  feSave(); renderFollowup(); feToast('Removed '+removable+' duplicate'+(removable===1?'':'s'),'success');
-}
-function feDupesTab(){
-  const groups=feDupGroups();
-  if(!groups.length) return '<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No duplicates 🎉</p><p class="fe-sub" style="margin:4px 0 0">Every lead is unique by email, phone, or name + company.</p></div>';
-  const removable=groups.reduce(function(a,g){ return a+(g.leads.length-1); },0);
-  let html='<div class="fe-rowb" style="margin-bottom:12px"><span class="fe-sub">'+groups.length+' duplicate group'+(groups.length===1?'':'s')+' · '+removable+' removable</span><button class="fe-btn" onclick="feDedupeAll()">Remove all duplicates</button></div>';
-  html+=groups.map(function(g){
-    const rows=g.leads.map(function(l){ const keep=l.id===g.keepId;
-      return '<div class="fe-leadrow" style="cursor:default;margin-bottom:6px">'+
-        '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-        '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.stage+'</span>'+(keep?'<span class="fe-chip" style="background:var(--success);color:#fff">Keep</span>':'')+'</div>'+
-          '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(l.email||l.phone||'')+' · added '+feFmt(l.createdAt)+'</div></div>'+
-        (keep
-          ? '<button class="fe-sm" onclick="feOpenLead(\''+l.id+'\')">Open</button>'
-          : '<button class="fe-sm" style="color:var(--danger);border-color:var(--danger)" onclick="feDeleteLead(\''+l.id+'\')">Delete</button>')+
-      '</div>'; }).join('');
-    return '<div class="fe-card" style="margin-bottom:12px"><div class="fe-sub" style="margin-bottom:8px">'+feEsc(g.label)+'</div>'+rows+'</div>';
-  }).join('');
-  return html;
-}
-
-/* ---- Google Sheet auto-import (pinned source, one-way Sheet → engine, deduped) ---- */
-const FE_SHEET_KEY='oxefit_followup_sheet';
-const FE_AUTO_KEY='oxefit_followup_autoimport';
-const FE_LASTSYNC_KEY='oxefit_followup_lastsync';
-let feDriveMode='import';
-let feSyncing=false;
-function fePinGet(){ try{ const r=localStorage.getItem(FE_SHEET_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
-function fePinSet(o){ try{ localStorage.setItem(FE_SHEET_KEY, JSON.stringify(o)); }catch(e){} }
-function fePinClear(){ try{ localStorage.removeItem(FE_SHEET_KEY); }catch(e){} feToast('Sheet unpinned','info'); renderFollowup(); }
-function feAutoGet(){ return localStorage.getItem(FE_AUTO_KEY)==='1'; }
-function feToggleAuto(){ try{ localStorage.setItem(FE_AUTO_KEY, feAutoGet()?'0':'1'); }catch(e){} renderFollowup(); if(feAutoGet()) feSyncSheet(false); }
-function feLastSyncGet(){ return localStorage.getItem(FE_LASTSYNC_KEY)||''; }
-function feLastSyncSet(v){ try{ localStorage.setItem(FE_LASTSYNC_KEY, v); }catch(e){} }
-function feLeadKey(l){ const e=(l.email||'').toLowerCase().trim(); if(e) return 'e:'+e; const p=(l.phone||'').replace(/[^0-9]/g,''); if(p.length>=7) return 'p:'+p; return 'n:'+(l.name||'').toLowerCase().trim()+'|'+(l.company||'').toLowerCase().trim(); }
-function fePinSheetPicker(){
-  if(typeof gdEnsureInit==='function'){ try{ gdEnsureInit(); }catch(e){} }
-  if(typeof gdAccessToken==='undefined' || !gdAccessToken){ if(typeof gdSignIn==='function'){ gdSignIn(); feToast('Sign in to Google, then pick the sheet again','info'); } return; }
-  feDriveMode='pin'; feOpenDriveBrowser();
-}
-function feDrivePicked(id,name,mime){ if(feDriveMode==='pin'){ fePinSheet(id,name,mime); } else { feDriveParseAndPreview(id,name,mime); } }
-function fePinSheet(id,name,mime){ fePinSet({ id:id, name:name, mimeType:mime }); feCloseModal(); feToast('Pinned "'+name+'" for auto-import','success'); renderFollowup(); feSyncSheet(false); }
-async function feSyncSheet(silent){
-  const pin=fePinGet(); if(!pin){ if(!silent) feToast('Pin a Google Sheet first','info'); return; }
-  if(typeof gdAccessToken==='undefined' || !gdAccessToken){ if(!silent && typeof gdSignIn==='function'){ gdSignIn(); feToast('Sign in to Google, then Sync again','info'); } return; }
-  if(feSyncing) return; feSyncing=true; if(!silent) feToast('Syncing from "'+pin.name+'"…','info');
-  try{
-    const sheets=await feFetchDriveRows(pin.id, pin.name, pin.mimeType);
-    let parsed=[]; sheets.forEach(function(s){ parsed=parsed.concat(feSheetToLeads(s.aoa)); });
-    const existing={}; followupLeads.forEach(function(l){ existing[feLeadKey(l)]=true; });
-    const tomb=feTombKeys();
-    const seen={}; const fresh=[];
-    parsed.forEach(function(p){ const k=feLeadKey(p); if(!k||existing[k]||seen[k]||tomb[k]) return; seen[k]=true; fresh.push(p); });
-    if(fresh.length){
-      const now=Date.now(), owner=(typeof currentUser!=='undefined'?currentUser:'')||'';
-      const made=fresh.map(function(p,idx){ const lead={ id:(now+idx).toString(36)+Math.random().toString(36).slice(2,6), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New', owner:owner, name:p.name, company:p.company, type:p.type, language:p.language, phone:p.phone, email:p.email, source:p.source||'Google Sheet', note:p.note, assignee:'' }; lead.touches=feGenTouches(lead); return lead; });
-      followupLeads=made.concat(followupLeads); feSave();
-    }
-    feLastSyncSet(new Date().toISOString());
-    feSyncing=false; renderFollowup();
-    if(!silent || fresh.length) feToast(fresh.length?('Imported '+fresh.length+' new lead'+(fresh.length===1?'':'s')+' from the sheet'):'Up to date — no new leads','success');
-  }catch(e){ feSyncing=false; if(!silent) feToast('Sync: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); renderFollowup(); }
-}
-function feRenderLead(l){
-  const head='<button class="fe-back" onclick="feGoDash()">← Pipeline</button>'+
-    '<div class="fe-card"><div style="display:flex;gap:12px;align-items:flex-start">'+
-      '<div class="fe-av" style="height:44px;width:44px;font-size:15px">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-      '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span></div>'+
-        '<div class="fe-meta">'+(l.company?'<div>'+feEsc(l.company)+'</div>':'')+(l.phone?'<div>'+feEsc(l.phone)+'</div>':'')+(l.email?'<div>'+feEsc(l.email)+'</div>':'')+
-          (l.source?'<div style="font-size:12px">Source: '+feEsc(l.source)+'</div>':'')+(l.owner?'<div style="font-size:12px">Owner: '+feEsc(l.owner)+'</div>':'')+
-          (l.note?'<div style="font-size:12px"><em>"'+feEsc(l.note)+'"</em></div>':'')+'</div></div></div>'+
-      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Assigned to</div>'+
-        '<select class="fe-sel" style="max-width:240px" onchange="feAssign(\''+l.id+'\',this.value)">'+
-          '<option value=""'+(l.assignee?'':' selected')+'>Unassigned</option>'+
-          ALL_REPS.map(function(rp){ return '<option value="'+feEsc(rp)+'"'+(l.assignee===rp?' selected':'')+'>'+feEsc(rp)+'</option>'; }).join('')+
-        '</select></div>'+
-      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Pipeline stage</div>'+
-        '<div class="fe-stages">'+FE_STAGES.map(s=>'<button class="fe-stagebtn '+(l.stage===s?'on':'')+'" style="'+(l.stage===s?'color:'+feStageColor(s):'')+'" onclick="feSetStage(\''+l.id+'\',\''+s+'\')">'+s+'</button>').join('')+'</div></div>'+
-    '</div>'+
-    '<div class="fe-rowb"><h3 class="fe-h">Follow-up cadence</h3><span class="fe-sub">7 touches over 12 days</span></div>';
-  const steps=l.touches||[];
-  const closed=(l.stage==='Won'||l.stage==='Lost');
-  let activeIndex=-1; for(let i=0;i<steps.length;i++){ if(steps[i].status==='pending'){ activeIndex=i; break; } }
-  const doneCount=steps.filter(function(t){ return t.status!=='pending'; }).length;
-  let wf='';
-  if(closed){
-    wf=feClosureBanner(l)+'<div class="fe-sub" style="margin:14px 0 8px">Workflow history</div>'+steps.map(function(t){ return feRenderDoneStep(l,t,true); }).join('');
-  } else {
-    const pct=steps.length?Math.round(doneCount/steps.length*100):0;
-    wf+='<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Follow-up workflow</h3><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="fe-sm" onclick="feSetReminders(\''+l.id+'\')" title="Create 3 PM Outlook reminders for the upcoming steps">🔔 3 PM reminders</button><span class="fe-sub">'+(activeIndex>=0?('Step '+(activeIndex+1)+' of '+steps.length):'All steps done')+'</span></div></div>';
-    wf+='<div style="height:6px;background:var(--navy-mid);border-radius:999px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+pct+'%;background:var(--teal);transition:width .25s"></div></div>';
-    steps.forEach(function(t,idx){
-      if(activeIndex<0 || idx<activeIndex) wf+=feRenderDoneStep(l,t,false);
-      else if(idx===activeIndex) wf+=feRenderActiveStep(l,t);
-      else wf+=(t.status!=='pending'? feRenderDoneStep(l,t,false) : feRenderLockedStep(l,t));
-    });
-    if(activeIndex<0){ wf+='<div class="fe-card" style="text-align:center;margin-top:4px"><div style="font-weight:600;margin-bottom:4px">Cadence complete</div><div class="fe-sub">No conversion after the full sequence — move them to monthly nurture, or set Won / Lost above. Never delete the lead.</div></div>'; }
-  }
-  const bb=feAiBusy==='brief:'+l.id;
-  const briefCard='<div class="fe-card">'+
-    '<div class="fe-rowb" style="margin-bottom:'+(l.brief?'8px':'0')+'"><h3 class="fe-h">Lead heads-up</h3><div style="display:flex;gap:8px;flex-wrap:wrap">'+
-      '<button class="fe-sm" onclick="feLinkedIn(\''+l.id+'\')">🔎 LinkedIn</button>'+
-      '<button class="fe-sm" '+(bb?'disabled':'')+' onclick="feBrief(\''+l.id+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(bb?'Researching…':(l.brief?'Refresh':'AI heads-up'))+'</button>'+
-    '</div></div>'+
-    (l.brief
-      ? '<div class="fe-msg" style="cursor:default">'+feEsc(l.brief)+'</div><div class="fe-sub" style="margin-top:6px;font-size:11px">AI-assisted from public info — verify on LinkedIn before relying on specifics.</div>'
-      : '<div class="fe-sub">Get an AI heads-up on this lead’s likely interests and the best angle, then tune the messages to match. Uses web search; needs your AI key.</div>')+
-  '</div>';
-  return head+briefCard+wf+'<div style="margin-top:16px;text-align:center"><button class="fe-sm" style="color:var(--danger)" onclick="feDeleteLead(\''+l.id+'\')">Delete this lead</button></div>';
-}
-function feClosureBanner(l){
-  if(l.stage==='Won') return '<div class="fe-card" style="text-align:center;border-color:var(--success)"><div style="font-size:18px;font-weight:700;color:var(--success)">Won 🎉</div><div class="fe-sub">Deal closed — the follow-up workflow is complete.</div></div>';
-  return '<div class="fe-card" style="text-align:center;border-color:var(--danger)"><div style="font-size:18px;font-weight:700;color:var(--danger)">Closed — Lost</div>'+
-    '<div class="fe-sub" style="margin-top:4px">'+(l.lostReason?('Reason: <strong style="color:var(--text)">'+feEsc(l.lostReason)+'</strong>'):'No reason recorded')+'</div>'+
-    '<div style="margin-top:10px"><button class="fe-sm" onclick="feOpenLostModal(\''+l.id+'\')">'+(l.lostReason?'Change reason':'Add a reason')+'</button></div>'+
-    '<div class="fe-sub" style="margin-top:8px">Reopen anytime by changing the stage above.</div></div>';
-}
-function feRenderActiveStep(l,t){
-  const k=l.id+':'+t.key, editing=feEditKey===k, busy=feAiBusy===k;
-  const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
-  const body=editing
-    ? '<textarea id="fe-edit-area" class="fe-ta" rows="5">'+feEsc(t.message)+'</textarea>'+
-      '<div class="fe-actions" style="margin-top:8px"><button class="fe-btn" onclick="feSaveEdit(\''+l.id+'\',\''+t.key+'\')">Save</button>'+
-      '<button class="fe-sm" onclick="feCancelEdit()">Cancel</button></div>'
-    : '<div class="fe-msg" onclick="feStartEdit(\''+l.id+'\',\''+t.key+'\')">'+feEsc(t.message)+'</div>';
-  return '<div class="fe-touch" style="border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)">'+
-    '<div class="hh"><span class="fe-pill" style="color:var(--teal);background:transparent;border:1px solid var(--teal)">▶ Do this now</span>'+
-      '<span style="font-size:14px;font-weight:600">'+t.dayLabel+'</span><span class="fe-sub">'+t.when+'</span>'+
-      '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
-      '<span class="fe-sub" style="margin-left:auto">'+feFmt(t.scheduledAt)+'</span></div>'+
-    '<p class="fe-purpose">'+feEsc(t.purpose)+'</p>'+
-    (t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
-    body+
-    '<div class="fe-actions"><button class="fe-sm" '+(busy?'disabled':'')+' onclick="feTune(\''+l.id+'\',\''+t.key+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(busy?'Tuning…':'Tune with AI')+'</button>'+
-      '<button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button>'+
-      '<div class="fe-right"><button class="fe-sm" style="color:var(--accent)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'sent\')">Sent → next</button>'+
-        '<button class="fe-sm" style="color:var(--success)" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'replied\')">Replied → next</button>'+
-        '<button class="fe-sm" onclick="feMark(\''+l.id+'\',\''+t.key+'\',\'skipped\')">Skip</button></div></div>'+
-  '</div>';
-}
-function feRenderDoneStep(l,t,history){
-  const k=l.id+':'+t.key, expanded=feExpandKey===k;
-  const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
-  const stxt=t.status==='skipped'?'skipped':(t.status==='replied'?'replied':(t.status==='sent'?'sent':t.status));
-  let h='<div class="fe-touch" style="padding:12px 14px">'+
-    '<div class="hh" style="margin-bottom:'+(expanded?'8px':'0')+';cursor:pointer" onclick="feToggleExpand(\''+l.id+'\',\''+t.key+'\')">'+
-      '<span style="color:var(--success)">✓</span>'+
-      '<span style="font-size:13px;font-weight:600">'+t.dayLabel+'</span>'+
-      '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
-      '<span class="fe-pill" style="color:'+feStatusColor(t.status)+(t.status==='skipped'?';text-decoration:line-through':'')+'">'+stxt+'</span>'+
-      '<span class="fe-sub" style="margin-left:auto">'+(expanded?'▲':'▼')+'</span></div>';
-  if(expanded){
-    h+=(t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
-       '<div class="fe-msg" style="cursor:default">'+feEsc(t.message)+'</div>'+
-       (history?'':'<div class="fe-actions"><button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button><div class="fe-right"><button class="fe-sm" onclick="feUndoStep(\''+l.id+'\',\''+t.key+'\')">Undo this step</button></div></div>');
-  }
-  return h+'</div>';
-}
-function feRenderLockedStep(l,t){
-  const chanColor=t.channel==='WhatsApp'?'var(--teal)':'var(--accent)';
-  return '<div class="fe-touch" style="padding:12px 14px;opacity:.5">'+
-    '<div class="hh" style="margin-bottom:0">'+
-      '<span>🔒</span>'+
-      '<span style="font-size:13px;font-weight:600">'+t.dayLabel+'</span>'+
-      '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
-      '<span class="fe-sub fe-trunc" style="flex:1;min-width:0">'+feEsc(t.purpose)+'</span>'+
-      '<span class="fe-sub">locked</span></div></div>';
-}
-function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===k)?null:k; renderFollowup(); }
-function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
-
-/* ---- 3 PM Outlook reminders (reuses the app's Microsoft sign-in) ---- */
-function feLocalISOnoZ(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes())+':00'; }
-async function feGetCalToken(){
-  if(typeof msalInstance==='undefined' || !msalInstance || typeof msalAccount==='undefined' || !msalAccount) throw new Error('Sign in with your Microsoft account first (top-right of the app).');
-  const req={ scopes:['Calendars.ReadWrite','User.Read'], account:msalAccount };
-  try{ return (await msalInstance.acquireTokenSilent(req)).accessToken; }
-  catch(e){ try{ return (await msalInstance.acquireTokenPopup(req)).accessToken; } catch(pe){ try{ await msalInstance.acquireTokenRedirect(req); }catch(re){} throw pe; } }
-}
-async function feCreateReminderEvent(tok, lead, t){
-  const d=new Date(t.scheduledAt); d.setHours(15,0,0,0);   // 3:00 PM local on the step's date
-  const startISO=feLocalISOnoZ(d); const endISO=feLocalISOnoZ(new Date(d.getTime()+30*60000));
-  const tz=(typeof Intl!=='undefined' && Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions().timeZone)||'UTC';
-  const subject='Follow-up: '+lead.name+' — '+t.dayLabel+' ('+t.channel+')';
-  const bodyTxt=(t.subject?('Subject: '+t.subject+'\n\n'):'')+t.message+'\n\nLead: '+lead.name+(lead.company?(' · '+lead.company):'')+(lead.phone?(' · '+lead.phone):'')+(lead.email?(' · '+lead.email):'');
-  const ev={ subject:subject, body:{ contentType:'text', content:bodyTxt }, start:{ dateTime:startISO, timeZone:tz }, end:{ dateTime:endISO, timeZone:tz }, isReminderOn:true, reminderMinutesBeforeStart:0, categories:['OxeFit Follow-up'] };
-  const r=await fetch('https://graph.microsoft.com/v1.0/me/events', { method:'POST', headers:{ 'Authorization':'Bearer '+tok, 'Content-Type':'application/json' }, body:JSON.stringify(ev) });
-  if(!r.ok){ const tt=await r.text().catch(function(){ return ''; }); if(r.status===403) throw new Error('Calendar write not permitted yet — IT needs to add the Calendars.ReadWrite permission to the app and grant consent.'); throw new Error('Graph '+r.status+': '+tt.slice(0,160)); }
-  return true;
-}
-async function feSetReminders(id){
-  const l=feGet(id); if(!l) return;
-  const pending=(l.touches||[]).filter(function(t){ return t.status==='pending'; });
-  if(!pending.length){ feToast('No upcoming steps to set reminders for','info'); return; }
-  feToast('Adding '+pending.length+' reminder(s) at 3 PM…','info');
-  try{
-    const tok=await feGetCalToken();
-    let n=0;
-    for(let i=0;i<pending.length;i++){ await feCreateReminderEvent(tok, l, pending[i]); const tt=l.touches.find(function(x){ return x.key===pending[i].key; }); if(tt) tt.reminderSet=true; n++; }
-    feStamp(l); feSave(); renderFollowup();
-    feToast('Added '+n+' Outlook reminder(s) at 3 PM on each step date','success');
-  }catch(e){ feToast('Reminders: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); }
-}
-function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
-function feGoDash(){ feView='dashboard'; renderFollowup(); }
-function feAssign(id, rep){ const l=feGet(id); if(l){ l.assignee=rep||''; feStamp(l); feSave(); renderFollowup(); } }
-function feSetRepFilter(rep){ feFilterRep=(feFilterRep===rep)?'':rep; if(feFilterRep) feDashTab='leads'; renderFollowup(); }
-function feLinkedIn(id){ const l=feGet(id); if(!l) return; const q=encodeURIComponent([l.name,l.company].filter(Boolean).join(' ')); window.open('https://www.linkedin.com/search/results/people/?keywords='+q,'_blank','noopener'); }
-async function feBrief(id){
-  const l=feGet(id); if(!l) return;
-  const apiKey=feKey(); if(!apiKey){ feSetKey(); return; }
-  feAiBusy='brief:'+id; renderFollowup();
-  const prompt="You are briefing a sales rep before they contact a lead for OxeFit (premium connected home-gym equipment; UAE-based, sells worldwide outside the Americas).\n"+
-    "Use web search to find PUBLIC, professional information — focus on the company/organisation, and the person only if clearly and unambiguously identifiable in a professional context. Do NOT invent facts about the individual; if you cannot verify something, say so and give persona-based guidance instead.\n"+
-    "Lead: name="+l.name+"; type="+l.type+"; company="+(l.company||'n/a')+"; source="+(l.source||'unknown')+"; notes="+(l.note||'none')+".\n"+
-    "Write a short heads-up (under 140 words, plain text, no markdown headings) covering: who they likely are / context, their likely interests and priorities, the best angle for OxeFit, and the most likely objection. Be concrete and honest about uncertainty.";
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST',
-      headers:{ 'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true' },
-      body:JSON.stringify({ model:feModel(), max_tokens:1024, messages:[{role:'user',content:prompt}], tools:[{ type:'web_search_20250305', name:'web_search' }] }) });
-    const data=await res.json();
-    if(data.error) throw new Error(data.error.message||'API error');
-    const text=(data.content||[]).map(function(b){ return b.type==='text'?b.text:''; }).join('').trim();
-    if(!text) throw new Error('No brief returned');
-    l.brief=text; l.briefAt=new Date().toISOString(); feStamp(l); feSave();
-  }catch(e){ feToast('Brief: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); }
-  finally{ feAiBusy=null; renderFollowup(); }
-}
-
-/* ---- Google Drive import — reuses the Marketing tab's authorized connection ---- */
-async function feFetchDriveRows(fileId, fileName, mimeType){
-  if (typeof gdAccessToken==='undefined' || !gdAccessToken){ if(typeof gdSignIn==='function') gdSignIn(); throw new Error('Connecting to Google — pick the file again once signed in.'); }
-  const auth={ headers:{ 'Authorization':'Bearer '+gdAccessToken } };
-  const mt=(mimeType||'').toLowerCase();
-  const fid=encodeURIComponent(fileId);
-  if (mt.includes('vnd.google-apps.document')){
-    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'/export?mimeType=text/plain&supportsAllDrives=true', auth);
-    if(!r.ok) throw new Error('Could not read the Google Doc (HTTP '+r.status+'). Make sure download is allowed for your access.');
-    return [{ name:'', aoa:(await r.text()).split(/\r?\n/).map(function(l){ return [l]; }) }];
-  }
-  let buf=null;
-  if (mt.includes('vnd.google-apps.spreadsheet')){
-    // Export the ENTIRE Google Sheet as .xlsx so every tab comes through (CSV export = first tab only)
-    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'/export?mimeType=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&supportsAllDrives=true', auth);
-    if(r.ok){ buf=await r.arrayBuffer(); }
-    else {
-      const er=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'/export?mimeType=text/csv&supportsAllDrives=true', auth);
-      if(er.ok){ const txt=await er.text(); const aoa=(typeof mktCsvToAOA==='function')?mktCsvToAOA(txt):txt.split(/\r?\n/).map(function(l){ return l.split(','); }); return [{ name:'', aoa:aoa }]; }
-      throw new Error('Could not export this Google Sheet (HTTP '+r.status+').');
-    }
-  }
-  if(!buf){
-    let r=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'?alt=media&supportsAllDrives=true', auth);
-    if(r.status===403){ const r2=await fetch('https://www.googleapis.com/drive/v3/files/'+fid+'?alt=media&supportsAllDrives=true&acknowledgeAbuse=true', auth); if(r2.ok) r=r2; }
-    if(!r.ok) throw new Error('Could not read the file (HTTP '+r.status+'). Make sure download/export is allowed for your access.');
-    buf=await r.arrayBuffer();
-  }
-  const bytes=new Uint8Array(buf);
-  const isZip = bytes[0]===0x50 && bytes[1]===0x4B;   // PK => xlsx workbook
-  if(!isZip){
-    const text=new TextDecoder('utf-8').decode(bytes);
-    const aoa=(typeof mktCsvToAOA==='function')?mktCsvToAOA(text):text.split(/\r?\n/).map(function(l){ return l.split(','); });
-    return [{ name:'', aoa:aoa }];
-  }
-  const XLSX=await ensureXLSX();
-  const wb=XLSX.read(bytes,{ type:'array' });
-  return wb.SheetNames.map(function(sn){
-    return { name:sn, aoa:XLSX.utils.sheet_to_json(wb.Sheets[sn], { header:1, raw:false, defval:'' }) };
-  }).filter(function(s){ return s.aoa && s.aoa.length; });
-}
-async function feFetchDriveText(fileId, fileName, mimeType){
-  const sheets=await feFetchDriveRows(fileId, fileName, mimeType);
-  const parts=[];
-  sheets.forEach(function(s){
-    if(s.name) parts.push('# Sheet: '+s.name);
-    parts.push((s.aoa||[]).map(function(row){ return (row||[]).map(function(c){ return c==null?'':String(c); }).join('\t'); }).join('\n'));
-  });
-  return parts.join('\n\n');
-}
-async function feDriveParseAndPreview(fileId, fileName, mimeType){
-  feImportErr=''; feImportBusy=true; feRenderImportInput();
-  try{
-    const sheets=await feFetchDriveRows(fileId, fileName, mimeType);
-    const tabular = sheets.some(function(s){ return (s.aoa||[]).some(function(r){ return (r||[]).length>1; }); });
-    let leads=[];
-    if(tabular){ sheets.forEach(function(s){ leads=leads.concat(feSheetToLeads(s.aoa)); }); }
-    if(!leads.length && feKey()){ try{ leads=await feParseSmart(feSheetsToText(sheets)); }catch(e){} }
-    if(!leads.length && !tabular){ leads=feParseSimple(feSheetsToText(sheets)); }
-    feImportBusy=false;
-    if(!leads.length){
-      const cols=feFirstHeaders(sheets);
-      feImportErr='Read '+sheets.length+' sheet'+(sheets.length===1?'':'s')+" but couldn't identify lead columns"+(cols?' (columns found: '+cols+')':'')+'. Add an AI key below for smarter parsing, or tell me your column names.';
-      feRenderImportInput(); return;
-    }
-    feImportPreview=leads; feRenderImportPreview();
-  }catch(e){ feImportBusy=false; feImportErr=(e&&e.message)||'Could not import from Google Drive.'; feRenderImportInput(); }
-}
-function feSheetsToText(sheets){ const parts=[]; (sheets||[]).forEach(function(s){ if(s.name) parts.push('# Sheet: '+s.name); parts.push((s.aoa||[]).map(function(row){ return (row||[]).map(function(c){ return c==null?'':String(c); }).join('\t'); }).join('\n')); }); return parts.join('\n\n'); }
-function feFirstHeaders(sheets){ for(var i=0;i<(sheets||[]).length;i++){ var aoa=sheets[i].aoa||[]; for(var j=0;j<Math.min(aoa.length,8);j++){ var r=(aoa[j]||[]).map(function(c){ return c==null?'':String(c).trim(); }); if(r.filter(Boolean).length>1) return r.filter(Boolean).slice(0,12).join(', '); } } return ''; }
-function feHeaderIndex(H, keys, used){
-  used=used||{};
-  for(var k=0;k<keys.length;k++){ for(var i=0;i<H.length;i++){ if(!used[i] && H[i]===keys[k]) return i; } }
-  for(var k2=0;k2<keys.length;k2++){ for(var i2=0;i2<H.length;i2++){ if(!used[i2] && H[i2].indexOf(keys[k2])>=0) return i2; } }
-  return -1;
-}
-function feSheetToLeads(aoa){
-  var rows=(aoa||[]).map(function(r){ return (r||[]).map(function(c){ return c==null?'':String(c).trim(); }); }).filter(function(r){ return r.some(function(c){ return c!==''; }); });
-  if(!rows.length) return [];
-  var hi=-1;
-  for(var i=0;i<Math.min(rows.length,8);i++){ var low=rows[i].map(function(c){ return c.toLowerCase(); }).join('|'); if(/name|email|e-mail|phone|mobile|whatsapp|company/.test(low)){ hi=i; break; } }
-  var leads=[];
-  if(hi>=0){
-    var H=rows[hi].map(function(c){ return c.toLowerCase(); });
-    var used={};
-    var pick=function(keys){ var ix=feHeaderIndex(H,keys,used); if(ix>=0) used[ix]=1; return ix; };
-    var iCompany=pick(['company','business','organisation','organization','account','gym','hotel','studio','org']);
-    var iEmail=pick(['email','e-mail','mail']);
-    var iPhone=pick(['whatsapp','mobile','phone','tel','contact number','number']);
-    var iName=pick(['full name','lead name','contact name','name','client','lead','contact']);
-    var iType=pick(['type','segment','category','b2b','b2c']);
-    var iSource=pick(['source','channel','origin','campaign','lead source']);
-    var iNote=pick(['note','comment','remark','detail','requirement','interest','message']);
-    for(var r2=hi+1;r2<rows.length;r2++){ var row=rows[r2];
-      var g=function(ix){ return ix>=0?(row[ix]||''):''; };
-      var name=g(iName);
-      if(!name && iName<0){ for(var c2=0;c2<row.length;c2++){ if(row[c2]){ name=row[c2]; break; } } }
-      if(!name) continue;
-      leads.push(feNormalize({ name:name, email:g(iEmail), phone:g(iPhone), company:g(iCompany), type:g(iType), source:g(iSource), note:g(iNote) }));
-    }
-  } else {
-    rows.forEach(function(row){ if(row[0]) leads.push(feNormalize({ name:row[0], phone:row[1], email:row[2], company:row[3], source:row[4], note:row.slice(5).join(' ') })); });
-  }
-  return leads;
-}
-function feImportFromDrive(){
-  if (typeof gdEnsureInit==='function'){ try{ gdEnsureInit(); }catch(e){} }
-  if (typeof gdAccessToken==='undefined' || !gdAccessToken){
-    if(typeof gdSignIn==='function'){ gdSignIn(); feToast('Sign in to Google, then click Google Drive again','info'); }
-    else { feToast('Google Drive is not configured','error'); }
-    return;
-  }
-  feDriveMode='import'; feOpenDriveBrowser();
-}
-function feOpenDriveBrowser(){
-  document.getElementById('fe-modal-root').innerHTML=
-  '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
-    '<div class="fe-rowb" style="margin-bottom:10px"><h3 class="fe-h">Pick a file from Google Drive</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
-    '<p class="fe-sub" style="margin:0 0 10px">Choose your leads document (Google Doc, Sheet, CSV or Excel) — it reads and routes every lead into a cadence.</p>'+
-    '<input id="fe-drive-q" class="fe-in" placeholder="Search by file name…" oninput="feDriveSearchDebounced(this.value)" style="margin-bottom:10px"/>'+
-    '<div id="fe-drive-results" style="max-height:50vh;overflow:auto"><div class="fe-sub" style="padding:12px 0">Loading recent files…</div></div>'+
-  '</div></div>';
-  feDriveSearch('');
-}
-let _feDriveT=null;
-function feDriveSearchDebounced(term){ clearTimeout(_feDriveT); _feDriveT=setTimeout(function(){ feDriveSearch(term); }, 350); }
-async function feDriveSearch(term){
-  const box=document.getElementById('fe-drive-results'); if(!box) return;
-  if (typeof gdAccessToken==='undefined' || !gdAccessToken){ box.innerHTML='<div class="fe-err">Not signed in to Google.</div>'; return; }
-  const types="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='text/csv' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or mimeType='application/vnd.ms-excel')";
-  let q=types+" and trashed=false";
-  const t=(term||'').trim().replace(/'/g,"\\'");
-  if(t) q+=" and name contains '"+t+"'";
-  const params=new URLSearchParams({ q:q, orderBy:'modifiedTime desc', pageSize:'30', fields:'files(id,name,mimeType,modifiedTime)', supportsAllDrives:'true', includeItemsFromAllDrives:'true' });
-  try{
-    const r=await fetch('https://www.googleapis.com/drive/v3/files?'+params.toString(), { headers:{ 'Authorization':'Bearer '+gdAccessToken } });
-    if(!r.ok){ box.innerHTML='<div class="fe-err">Drive search failed (HTTP '+r.status+'). Try Disconnect → Sign in with Google again from the Marketing tab.</div>'; return; }
-    const data=await r.json(); const files=(data.files)||[];
-    if(!files.length){ box.innerHTML='<div class="fe-sub" style="padding:12px 0">No matching files.</div>'; return; }
-    box.innerHTML=files.map(function(f){
-      const icon=f.mimeType.indexOf('spreadsheet')>=0?'▦':(f.mimeType.indexOf('document')>=0?'▤':'▢');
-      const when=f.modifiedTime?new Date(f.modifiedTime).toLocaleDateString():'';
-      const nm=JSON.stringify(f.name).replace(/"/g,'&quot;');
-      return '<div class="fe-leadrow" style="margin-bottom:6px" onclick="feDrivePicked(\''+f.id+'\','+nm+',\''+f.mimeType+'\')">'+
-        '<div class="fe-av">'+icon+'</div><div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(f.name)+'</span></div>'+
-        '<div class="fe-sub">'+when+'</div></div></div>';
-    }).join('');
-  }catch(e){ box.innerHTML='<div class="fe-err">'+feEsc((e&&e.message)||'Search error')+'</div>'; }
-}
-
 loadLocal();
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
-loadFollowups(); // Follow-up Engine
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
