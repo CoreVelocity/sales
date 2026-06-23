@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.46</title>
+<title>CoreV | OxeFit Sales Tracker v21.47</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.46 · Fix: terms/products no longer revert on save
+      v21.47 · Auto sign-out (30 min) + version on dashboard
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.46</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.47</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.46 · FE</div>
+      <div class="sidebar-version">v21.47 · FE</div>
     </div>
   </aside>
 
@@ -4031,7 +4031,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales</div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.47</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -7504,11 +7504,33 @@ async function signOut() {
     } catch(_) {}
     msalAccount = null;
   }
+  try { if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; } } catch(_) {}
 }
+
+/* v21.47 — auto sign-out after 30 minutes of no activity */
+let _idleTimer = null;
+const IDLE_LIMIT_MS = 30 * 60 * 1000;   // 30 minutes
+function _resetIdleTimer() {
+  if (_idleTimer) { clearTimeout(_idleTimer); _idleTimer = null; }
+  if (!currentUser) return;             // only count down while signed in
+  _idleTimer = setTimeout(_onIdleTimeout, IDLE_LIMIT_MS);
+}
+function _onIdleTimeout() {
+  if (!currentUser) return;
+  try { showToast('Signed out after 30 minutes of inactivity', 'info'); } catch(_) {}
+  try { signOut(); } catch(_) {}
+}
+(function _initIdleWatch(){
+  ['mousemove','mousedown','keydown','touchstart','scroll','click','wheel'].forEach(function(ev){
+    try { window.addEventListener(ev, _resetIdleTimer, { passive: true }); } catch(_) {}
+  });
+  try { document.addEventListener('visibilitychange', function(){ if (!document.hidden) _resetIdleTimer(); }); } catch(_) {}
+})();
 
 async function launchApp(alreadyAuthed) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
+  _resetIdleTimer();   // v21.47 — start the inactivity countdown on sign-in
   restoreSidebarState();          // v19.1 — apply persisted collapsed/expanded menu
   applyStoredLogo();              // v19.2 — apply admin-uploaded logo if present
   renderRequests();               // v19.1 — populate Event / On-site Demo request tab
