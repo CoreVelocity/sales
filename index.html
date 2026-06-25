@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.48</title>
+<title>CoreV | OxeFit Sales Tracker v21.49</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.48 · Weekly commitments per displayed week (per region)
+      v21.49 · Pipeline-by-close-month bar chart (FY2026)
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.48</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.49</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.48 · FE</div>
+      <div class="sidebar-version">v21.49 · FE</div>
     </div>
   </aside>
 
@@ -4031,7 +4031,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.48</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.49</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4067,6 +4067,17 @@
     <div class="exec-card" style="margin-top:20px;">
       <div class="exec-card-head"><h3>Published Quotes</h3><span class="exec-card-hint">linked to deal · rep · region</span></div>
       <div id="execPublishedQuotes"></div>
+    </div>
+
+    <div class="exec-card" style="margin-top:20px;">
+      <div class="exec-card-head">
+        <h3>Total Pipeline by Close Month — FY2026</h3>
+        <span class="exec-card-hint" id="pbmStatus">open HubSpot deals · bucketed by close date</span>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <button class="btn-secondary" id="pbmRefreshBtn" onclick="refreshPipelineByMonth()" style="font-size:12px;">↻ Refresh from HubSpot</button>
+      </div>
+      <div id="pipelineByMonthChart"></div>
     </div>
   </div>
   </div><!-- /#view-exec -->
@@ -11147,6 +11158,70 @@ function renderExecDashboard() {
 
   updateRequestsBadge();
   renderExecPublishedQuotes();
+  renderPipelineByMonthChart();
+}
+
+/* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
+const PIPELINE_BY_MONTH_KEY = 'oxefit_pipeline_by_month_v1';
+const PBM_FY = 2026;
+function _pbmCompact(n){ n=Number(n)||0; const a=Math.abs(n); if(a>=1e9) return (n/1e9).toFixed(1)+'B'; if(a>=1e6) return (n/1e6).toFixed(1)+'M'; if(a>=1e3) return (n/1e3).toFixed(0)+'K'; return String(Math.round(n)); }
+function _pbmLoadCache(){ try{ const r=localStorage.getItem(PIPELINE_BY_MONTH_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function _pbmSaveCache(o){ try{ localStorage.setItem(PIPELINE_BY_MONTH_KEY, JSON.stringify(o)); }catch(e){} }
+function renderPipelineByMonthChart(){
+  const host=document.getElementById('pipelineByMonthChart'); if(!host) return;
+  const statusEl=document.getElementById('pbmStatus');
+  const cache=_pbmLoadCache();
+  if(!cache || !Array.isArray(cache.months)){
+    host.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No data yet — click “Refresh from HubSpot” to pull open deals and build the FY'+PBM_FY+' pipeline chart.</div>';
+    return;
+  }
+  const months=cache.months;
+  const max=Math.max.apply(null, months.concat([1]));
+  const total=months.reduce(function(a,b){ return a+(Number(b)||0); },0);
+  const labels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const W=720,H=300,padL=8,padR=8,padT=28,padB=42,gap=10;
+  const plotW=W-padL-padR, plotH=H-padT-padB, bw=(plotW-gap*11)/12;
+  let svg='';
+  for(let i=0;i<12;i++){
+    const v=Number(months[i])||0;
+    const h=max>0?(v/max)*plotH:0;
+    const x=padL+i*(bw+gap), y=padT+plotH-h;
+    svg+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(h,0).toFixed(1)+'" rx="3" fill="#fb923c" opacity="'+(v>0?'0.92':'0.16')+'"></rect>';
+    if(v>0) svg+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-6).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text)">'+_pbmCompact(v)+'</text>';
+    svg+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(padT+plotH+16).toFixed(1)+'" text-anchor="middle" font-size="11" fill="var(--text-muted)">'+labels[i]+'</text>';
+  }
+  svg+='<line x1="'+padL+'" y1="'+(padT+plotH).toFixed(1)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH).toFixed(1)+'" stroke="var(--border)" stroke-width="1"></line>';
+  host.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;flex-wrap:wrap;gap:8px;">'+
+      '<div style="font-size:13px;color:var(--text-muted);">Open pipeline by expected close month · FY'+PBM_FY+' (Jan–Dec)</div>'+
+      '<div style="font-size:13px;font-weight:700;color:#fb923c;">Total: AED '+fmtNum(total)+'</div>'+
+    '</div>'+
+    '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="max-width:100%;">'+svg+'</svg>';
+  if(statusEl) statusEl.textContent=(cache.dealCount!=null?(cache.dealCount+' open deals · '):'')+'updated '+(cache.at?new Date(cache.at).toLocaleString():'—');
+}
+async function refreshPipelineByMonth(){
+  const btn=document.getElementById('pbmRefreshBtn'), statusEl=document.getElementById('pbmStatus');
+  if(typeof hubspotState==='undefined' || !hubspotState || !hubspotState.accessToken){ try{ showToast('Connect HubSpot first (use the HubSpot chip), then refresh','info'); }catch(_){} return; }
+  if(btn){ btn.disabled=true; btn.textContent='Loading…'; }
+  if(statusEl) statusEl.textContent='Fetching open deals from HubSpot…';
+  try{
+    const deals=await hubspotFetchAllDeals();
+    const months=new Array(12).fill(0); let count=0;
+    (deals||[]).forEach(function(d){
+      if(d.isClosed) return;                  // open pipeline only (excludes won + lost)
+      const amt=Number(d.amount)||0; if(!amt) return;
+      if(!d.close) return;
+      const dt=new Date(d.close); if(isNaN(dt)) return;
+      if(dt.getFullYear()!==PBM_FY) return;   // FY2026 only
+      months[dt.getMonth()]+=amt; count++;
+    });
+    _pbmSaveCache({ months:months, at:new Date().toISOString(), dealCount:count, fy:PBM_FY });
+    renderPipelineByMonthChart();
+    try{ showToast('Pipeline chart updated — '+count+' open FY'+PBM_FY+' deals','success'); }catch(_){}
+  }catch(e){
+    if(statusEl) statusEl.textContent='Could not load: '+(((e&&e.message)||'error')+'').slice(0,90);
+    try{ showToast('Pipeline report: '+(((e&&e.message)||'failed')+'').slice(0,120),'error'); }catch(_){}
+  } finally { if(btn){ btn.disabled=false; btn.textContent='↻ Refresh from HubSpot'; } }
 }
 
 // Region for a rep, derived from team membership
