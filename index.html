@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.53</title>
+<title>CoreV | OxeFit Sales Tracker v21.54</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3811,7 +3811,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.53 · Closed-Won read live from HubSpot (by owner) across all ranges
+      v21.54 · Admin can add/remove sales reps (Settings → Manage Sales Reps)
     </div>
   </div>
 </div>
@@ -3877,6 +3877,27 @@
       <div id="accessSaveStatus" class="settings-note" style="text-align:right;margin-top:6px;"></div>
     </div>
 
+    <div class="settings-block" id="settingsRepsSection" style="display:none;">
+      <div class="settings-block-title">Manage Sales Reps</div>
+      <p class="settings-note">Add or remove sales reps. Changes are saved and synced to the whole team. Removing a rep keeps their historical entries but drops them from team rosters, region cards, and new-month seeding. The optional email lets a new rep sign in with Microsoft 365.</p>
+      <div id="manageRepsList"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:12px;">
+        <div style="flex:1;min-width:130px;">
+          <label class="settings-note" style="display:block;margin:0 0 4px;">Name</label>
+          <input id="repAddName" type="text" placeholder="e.g. Sara" style="width:100%;">
+        </div>
+        <div style="min-width:120px;">
+          <label class="settings-note" style="display:block;margin:0 0 4px;">Team</label>
+          <select id="repAddTeam" style="width:100%;"></select>
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <label class="settings-note" style="display:block;margin:0 0 4px;">M365 email (optional)</label>
+          <input id="repAddEmail" type="email" placeholder="name@core-velocity.com" style="width:100%;">
+        </div>
+        <button class="btn btn-primary" onclick="rosterAddFromUI()">Add Rep</button>
+      </div>
+    </div>
+
     <div class="settings-block">
       <div class="settings-block-title">Appearance</div>
       <p class="settings-note">Current theme: <strong id="settingsThemeLabel">Light</strong>. Use the toggle at the bottom of the side menu to switch between light and dark mode at any time.</p>
@@ -3884,7 +3905,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.53</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.54</strong></p>
     </div>
   </div>
 </div>
@@ -3956,7 +3977,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.53 · FE</div>
+      <div class="sidebar-version">v21.54 · FE</div>
     </div>
   </aside>
 
@@ -4032,7 +4053,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.53</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.54</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6165,11 +6186,180 @@ const GDRIVE_CONFIG = {
 ════════════════════════════════════════ */
 const TEAMS = {
   'Dubai':     ['Fatima', 'Marios', 'Hasan', 'Katy', 'Milena'],
-  'Abu Dhabi': ['Wafiq', 'Jawdat', 'Hussean', 'Connor']
+  'Abu Dhabi': ['Wafiq', 'Jawdat', 'Hussean']
 };
 const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
+
+/* ── v21.54 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+   TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
+   roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
+   every existing reference to TEAMS / ALL_REPS stays valid), persisted to
+   localStorage, and ridden along the shared envelope. Adoption is newest-wins
+   by `at`, so a rep re-sending an older roster never clobbers a fresh admin
+   edit. Removing a rep keeps their historical rows; they simply drop out of
+   team rosters, region cards and new-month seeding. */
+const ROSTER_KEY = 'oxefit_roster_v1';
+let _rosterAt = null;
+function recomputeAllReps(){ ALL_REPS.splice(0, ALL_REPS.length, ...Object.values(TEAMS).flat()); }
+function rosterEmailsForCurrentReps(){
+  const out = {};
+  Object.values(TEAMS).flat().forEach(name => { const e = REP_TO_EMAIL[name]; if (e) out[e] = name; });
+  return out;
+}
+function rosterCurrentObj(at){
+  return { teams: JSON.parse(JSON.stringify(TEAMS)), emails: rosterEmailsForCurrentReps(), at: at || _rosterAt || null };
+}
+function saveRosterLocal(at){
+  _rosterAt = at || new Date().toISOString();
+  const obj = rosterCurrentObj(_rosterAt);
+  try { localStorage.setItem(ROSTER_KEY, JSON.stringify(obj)); } catch(_){}
+  return obj;
+}
+function applyRosterObj(r){
+  if (!r || typeof r !== 'object' || !r.teams) return false;
+  Object.keys(TEAMS).forEach(tn => {
+    if (Array.isArray(r.teams[tn])) {
+      const seen = new Set(), clean = [];
+      r.teams[tn].forEach(n => { n = (n||'').trim(); if (n && !seen.has(n)) { seen.add(n); clean.push(n); } });
+      TEAMS[tn] = clean;
+    }
+  });
+  if (r.emails && typeof r.emails === 'object') {
+    Object.entries(r.emails).forEach(([email, name]) => {
+      email = (email||'').toLowerCase().trim(); name = (name||'').trim();
+      if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
+    });
+  }
+  recomputeAllReps();
+  return true;
+}
+function loadRosterLocal(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(ROSTER_KEY) || 'null');
+    if (raw && raw.teams) { applyRosterObj(raw); _rosterAt = raw.at || null; }
+  } catch(_){}
+}
+function adoptRemoteRoster(env){
+  if (!env || !env.roster || !env.roster.teams) return;
+  const localAt  = _rosterAt ? Date.parse(_rosterAt) : 0;
+  const remoteAt = env.roster.at ? Date.parse(env.roster.at) : 0;
+  if (remoteAt > localAt) {
+    applyRosterObj(env.roster);
+    _rosterAt = env.roster.at || new Date().toISOString();
+    try { localStorage.setItem(ROSTER_KEY, JSON.stringify(rosterCurrentObj(_rosterAt))); } catch(_){}
+  }
+}
+// Does a tracker row carry any real data (vs an empty seeded placeholder)?
+function _rowHasData(r){
+  if (!r) return false;
+  const nums = ['commitValue','bestCaseValue','closedWon','forecastXS1','forecastXP1','truePipeline'];
+  for (const k of nums) { if ((parseFloat(r[k])||0) !== 0) return true; }
+  const txts = ['commitText','bestCaseText','notes','note'];
+  for (const k of txts) { if (r[k] && String(r[k]).trim()) return true; }
+  if (Array.isArray(r.supportReps) && r.supportReps.length) return true;
+  return false;
+}
+function _rosterKnownReps(){ return new Set([].concat(Object.values(TEAMS).flat(), DE_OWNERS, Array.from(DEMO_EXCLUDE))); }
+// Remove EMPTY rows belonging to reps no longer on the roster (e.g. a removed
+// rep's leftover seeded placeholders). Rows with real data are preserved as
+// history. Safe for roster members too — ensureWeekSeeded re-creates their row.
+function pruneOrphanEmptyRows(){
+  const known = _rosterKnownReps(); let changed = false;
+  Object.keys(allData).forEach(k => {
+    const md = allData[k]; if (!md || !md.weeks) return;
+    md.weeks.forEach((w, wi) => {
+      if (!Array.isArray(w)) return;
+      const filtered = w.filter(r => !(r && r.rep && !known.has(r.rep) && !_rowHasData(r)));
+      if (filtered.length !== w.length) { md.weeks[wi] = filtered; changed = true; }
+    });
+  });
+  return changed;
+}
+// Reps who still have real entries but aren't on the current roster.
+function rosterOrphanRepsWithData(){
+  const known = _rosterKnownReps(); const orphans = new Set();
+  Object.keys(allData).forEach(k => {
+    const md = allData[k]; if (!md || !md.weeks) return;
+    md.weeks.forEach(w => { if (!Array.isArray(w)) return; w.forEach(r => { if (r && r.rep && !known.has(r.rep) && _rowHasData(r)) orphans.add(r.rep); }); });
+  });
+  return Array.from(orphans);
+}
+function rosterAddRep(team, name, email){
+  if (currentRole !== 'admin') { showToast('Only an admin can manage reps', 'error'); return false; }
+  name = (name||'').trim(); team = (team||'').trim(); email = (email||'').toLowerCase().trim();
+  if (!name) { showToast('Enter a rep name', 'error'); return false; }
+  if (!TEAMS[team]) { showToast('Pick a valid team', 'error'); return false; }
+  if (Object.values(TEAMS).flat().some(n => n.toLowerCase() === name.toLowerCase())) { showToast(name + ' is already on the roster', 'info'); return false; }
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showToast('That email looks invalid', 'error'); return false; }
+  TEAMS[team].push(name);
+  if (email) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
+  recomputeAllReps();
+  saveRosterLocal();
+  rosterPersistAndSync();
+  showToast(name + ' added to ' + team, 'success');
+  return true;
+}
+function rosterRemoveRep(name){
+  if (currentRole !== 'admin') { showToast('Only an admin can manage reps', 'error'); return false; }
+  name = (name||'').trim(); if (!name) return false;
+  let found = false;
+  Object.keys(TEAMS).forEach(tn => { const i = TEAMS[tn].indexOf(name); if (i >= 0) { TEAMS[tn].splice(i, 1); found = true; } });
+  if (!found) { showToast(name + ' is not on the roster', 'info'); return false; }
+  recomputeAllReps();
+  pruneOrphanEmptyRows();   // drop the removed rep's empty placeholder rows now
+  saveRosterLocal();
+  rosterPersistAndSync();
+  showToast(name + ' removed from the roster', 'success');
+  return true;
+}
+function rosterRemoveRepConfirm(name){
+  if (!confirm('Remove ' + name + ' from the sales roster?\n\nTheir past entries stay in history, but they will no longer appear in team rosters, region cards, or new-month seeding.')) return;
+  rosterRemoveRep(name);
+}
+function rosterPersistAndSync(){
+  try { if (typeof saveLocal === 'function') saveLocal(); } catch(_){}
+  try { if (typeof scheduleOneDriveSync === 'function') scheduleOneDriveSync(); } catch(_){}
+  try { renderManageRepsPanel(); } catch(_){}
+  try { if (typeof renderAll === 'function') renderAll(); } catch(_){}
+}
+function renderManageRepsPanel(){
+  const list = document.getElementById('manageRepsList');
+  if (!list) return;
+  list.innerHTML = Object.keys(TEAMS).map(tn => {
+    const reps = TEAMS[tn] || [];
+    const rows = reps.length
+      ? reps.map(r => `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid var(--border);border-radius:8px;margin:6px 0;background:var(--card);">
+            <span style="font-weight:600;color:var(--text);">${escapeHtml(r)}</span>
+            <button class="btn btn-ghost" data-rep="${escapeHtml(r)}" style="color:var(--danger);padding:2px 10px;">Remove</button>
+          </div>`).join('')
+      : `<div class="settings-note" style="margin:6px 0;">No reps in this team yet.</div>`;
+    return `<div style="margin-bottom:14px;"><div class="settings-note" style="font-weight:700;color:var(--text);margin:0 0 2px;">${escapeHtml(tn)} <span style="color:var(--text-muted);font-weight:500;">(${reps.length})</span></div>${rows}</div>`;
+  }).join('');
+  list.querySelectorAll('button[data-rep]').forEach(b => {
+    b.addEventListener('click', () => rosterRemoveRepConfirm(b.getAttribute('data-rep')));
+  });
+  const orphans = rosterOrphanRepsWithData();
+  if (orphans.length) {
+    const note = document.createElement('div');
+    note.style.marginTop = '6px';
+    note.innerHTML = `<div class="settings-note" style="font-weight:700;color:var(--warn);margin:0 0 2px;">Not on roster — historical data kept</div>`
+      + `<div class="settings-note" style="margin:0 0 6px;">${orphans.map(escapeHtml).join(', ')} no longer appear in team rosters or new months, but their past entries remain in history.</div>`;
+    list.appendChild(note);
+  }
+  const sel = document.getElementById('repAddTeam');
+  if (sel) sel.innerHTML = Object.keys(TEAMS).map(tn => `<option value="${escapeHtml(tn)}">${escapeHtml(tn)}</option>`).join('');
+}
+function rosterAddFromUI(){
+  const n = document.getElementById('repAddName');
+  const t = document.getElementById('repAddTeam');
+  const e = document.getElementById('repAddEmail');
+  if (rosterAddRep(t ? t.value : '', n ? n.value : '', e ? e.value : '')) {
+    if (n) n.value = '';
+    if (e) e.value = '';
+  }
+}
 
 /* ── M365 SSO IDENTITY MAP ────────────────────────────────────────
    Maps Microsoft 365 work email (core-velocity.com) → tracker rep name.
@@ -6197,7 +6387,6 @@ const REP_EMAILS = {
   'wafiq@core-velocity.com'   : 'Wafiq',
   'jawdat@core-velocity.com'  : 'Jawdat',
   'hussean@core-velocity.com' : 'Hussean',
-  'connor@core-velocity.com'  : 'Connor',
   // v15.3 — old-spelling UPN aliases. The reps were renamed (display name
   // Milene→Milena, Hussein→Hussean) but their Microsoft 365 sign-in address
   // (UPN) may still use the original spelling. These aliases ensure SSO
@@ -6586,10 +6775,13 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
+  try { loadRosterLocal(); } catch(_) {}   // v21.54 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
+  // v21.54 — drop empty placeholder rows for reps no longer on the roster.
+  try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
 function getMonthData(y,m) {
@@ -6933,6 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.54
       meta : remote._meta || null
     };
   }
@@ -7002,6 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.54
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7225,6 +7419,8 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
+  // v21.54 — editable roster rides along (newest-wins by `at` on adoption)
+  try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
 
@@ -7260,6 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.54
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -9355,7 +9552,7 @@ const HUBSPOT_CONFIG = {
   repEmails   : {
     'Ahmed'  : '',
     'Fatima' : '',  'Marios'  : '',  'Hasan'  : '',  'Katy'    : '',  'Milena' : '',
-    'Wafiq'  : '',  'Jawdat'  : '',  'Hussean': '',  'Connor'  : ''
+    'Wafiq'  : '',  'Jawdat'  : '',  'Hussean': ''
   }
 };
 const HUBSPOT_TOKEN_KEY  = 'oxefit_hubspot_pat_v1';
@@ -10801,6 +10998,9 @@ function openSettings() {
   const accSec = document.getElementById('settingsAccessSection');
   if (accSec) accSec.style.display = (currentRole === 'admin') ? 'block' : 'none';
   if (currentRole === 'admin') renderAccessMatrix();
+  const repsSec = document.getElementById('settingsRepsSection');
+  if (repsSec) repsSec.style.display = (currentRole === 'admin') ? 'block' : 'none';
+  if (currentRole === 'admin') renderManageRepsPanel();
   document.getElementById('settingsModal').classList.add('open');
 }
 
