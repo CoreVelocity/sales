@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.47</title>
+<title>CoreV | OxeFit Sales Tracker v21.48</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.47 · Auto sign-out (30 min) + version on dashboard
+      v21.48 · Weekly commitments per displayed week (per region)
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.47</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.48</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.47 · FE</div>
+      <div class="sidebar-version">v21.48 · FE</div>
     </div>
   </aside>
 
@@ -4031,7 +4031,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.47</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.48</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4132,7 +4132,7 @@
 
     <!-- Monthly Commitments dashboard (locked / submitted entries only) -->
     <div class="commit-panel" id="commitPanel">
-      <div class="commit-title">Monthly Commitments (AED) — All Entries (Locked + In Progress)</div>
+      <div class="commit-title" id="commitTitle">Weekly Commitments (AED) — All Entries (Locked + In Progress)</div>
       <div class="commit-grid" id="commitGrid"></div>
     </div>
 
@@ -7749,6 +7749,7 @@ function renderCommitPanel() {
   const agg = { 'Dubai': blank(), 'Abu Dhabi': blank(), 'Direct Engagement': blank() };
   md.weeks.forEach((w, wi) => {
     if (!w) return;
+    if (wi !== curWeek) return;   // v21.48 — weekly view: count only the displayed week
     w.forEach(r => {
       const t = agg[r.team] || (r.rep === 'Direct Engagement' ? agg['Direct Engagement'] : null); if (!t) return;
       const commit    = parseFloat(r.commitValue)   || 0;
@@ -7785,8 +7786,9 @@ function renderCommitPanel() {
     let teamTP = 0;
     TEAMS[teamName].forEach(repName => {
       let latestTP = 0;
-      md.weeks.forEach(w => {
+      md.weeks.forEach((w, wi) => {
         if (!w) return;
+        if (wi > curWeek) return;   // v21.48 — snapshot up to and including the displayed week
         w.forEach(r => {
           if (r.rep === repName && r.hubspotSynced) {
             const tp = parseFloat(r.truePipeline) || 0;
@@ -7826,12 +7828,14 @@ function renderCommitPanel() {
         <span class="commit-locked-pill">🔒 ${d.locked} locked</span>
         <span class="commit-pending-pill">✎ ${d.pending} in progress</span>
         ${totalCount?`<span class="commit-of-pill">of ${totalCount} possible</span>`:''}
-        · ${MONTHS[curMonth]} ${curYear}
+        · Week ${curWeek+1} · ${MONTHS[curMonth]} ${curYear}
       </div>
     </div>`;
+  const _ct = document.getElementById('commitTitle');
+  if (_ct) _ct.textContent = `Weekly Commitments (AED) — Week ${curWeek+1} of ${MONTHS[curMonth]} (Locked + In Progress)`;
   document.getElementById('commitGrid').innerHTML =
-    card('dubai',     'Dubai Team',     agg['Dubai'],     TEAMS['Dubai'].length     * 5) +
-    card('abu-dhabi', 'Abu Dhabi Team', agg['Abu Dhabi'], TEAMS['Abu Dhabi'].length * 5);
+    card('dubai',     'Dubai Team',     agg['Dubai'],     TEAMS['Dubai'].length) +
+    card('abu-dhabi', 'Abu Dhabi Team', agg['Abu Dhabi'], TEAMS['Abu Dhabi'].length);
 }
 function renderMonthLabel() {
   document.getElementById('monthLabelBtn').textContent = MONTHS[curMonth] + ' ' + curYear;
