@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.54</title>
+<title>CoreV | OxeFit Sales Tracker v21.55</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3811,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.54 · Admin can add/remove sales reps (Settings → Manage Sales Reps)
+      v21.55 · Demo Tracker: filter by Month and by Sales Rep
     </div>
   </div>
 </div>
@@ -3905,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.54</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.55</strong></p>
     </div>
   </div>
 </div>
@@ -3977,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.54 · FE</div>
+      <div class="sidebar-version">v21.55 · FE</div>
     </div>
   </aside>
 
@@ -4053,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.54</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.55</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4333,6 +4332,7 @@
           <p class="demo-hero-sub">Weekly log of every product demo run by the sales team — owned by the Office Admin, with conversion tracking back into HubSpot deals.</p>
         </div>
         <div class="demo-hero-actions">
+          <select id="demoMonthSel" class="demo-select" onchange="demoMonthChanged()"></select>
           <select id="demoWeekSel" class="demo-select" onchange="renderDemoDashboard()"></select>
           <select id="demoRepFilter" class="demo-select" onchange="renderDemoDashboard()">
             <option value="">All Sales Reps</option>
@@ -4354,7 +4354,7 @@
         <div class="demo-chart-card">
           <div class="demo-chart-head">
             <h3>Demos per Sales Rep</h3>
-            <span class="demo-chart-sub">This week · click bar to filter table</span>
+            <span class="demo-chart-sub" id="demoChartSub">This week · click bar to filter table</span>
           </div>
           <div class="demo-bar-chart" id="demoBarChart"></div>
         </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.54 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.55 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.54 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.55 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.54 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.55 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.54
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.55
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.54
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.55
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.54 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.55 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.54
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.55
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -13775,6 +13775,7 @@ function demoCanEditReason(entry) {
 function renderDemoTab() {
   document.body.setAttribute('data-role', currentRole || 'viewer');
   loadDemos();
+  demoPopulateMonthSelect();
   demoPopulateWeekSelect();
   demoPopulateRepSelects();
   demoRenderPermBanner();
@@ -13809,14 +13810,48 @@ function demoRenderPermBanner() {
 function demoPopulateWeekSelect() {
   const sel = document.getElementById('demoWeekSel');
   if (!sel) return;
-  // Build a set of all weeks that exist in the log + the current week
-  const weekSet = new Set(demoEntries.map(e => e.weekKey).filter(Boolean));
-  weekSet.add(demoCurrentWeekKey());
+  const mo = document.getElementById('demoMonthSel')?.value || '';
+  // When a month is chosen, scope the week list to that month's demos.
+  let source = demoEntries;
+  if (mo) source = demoEntries.filter(e => demoMonthKeyOf(e) === mo);
+  const weekSet = new Set(source.map(e => e.weekKey).filter(Boolean));
+  if (!mo) weekSet.add(demoCurrentWeekKey());
   const weeks = [...weekSet].sort().reverse(); // newest first
   const prev = sel.value;
   sel.innerHTML = '<option value="">All Weeks</option>' +
     weeks.map(wk => `<option value="${wk}">${demoWeekLabel(wk)}${wk === demoCurrentWeekKey() ? ' · This Week' : ''}</option>`).join('');
-  sel.value = prev || demoCurrentWeekKey();
+  if (prev && weeks.includes(prev)) sel.value = prev;
+  else sel.value = mo ? '' : demoCurrentWeekKey();
+}
+// ── v21.55 — per-Month filter ───────────────────────────────────────────────
+function demoMonthKeyOf(e) {
+  const s = (e && (e.date || e.weekKey) || '');
+  return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
+}
+function demoMonthLabel(mk) {
+  if (!mk) return '';
+  const [y, m] = mk.split('-').map(Number);
+  if (!y || !m) return mk;
+  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+}
+function demoCurrentMonthKey() { return new Date().toISOString().slice(0, 7); }
+function demoPopulateMonthSelect() {
+  const sel = document.getElementById('demoMonthSel');
+  if (!sel) return;
+  const set = new Set(demoEntries.map(demoMonthKeyOf).filter(Boolean));
+  set.add(demoCurrentMonthKey());
+  const months = [...set].sort().reverse(); // newest first
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">All Months</option>' +
+    months.map(mk => `<option value="${mk}">${demoMonthLabel(mk)}${mk === demoCurrentMonthKey() ? ' · This Month' : ''}</option>`).join('');
+  sel.value = (prev && (prev === '' || months.includes(prev))) ? prev : '';
+}
+function demoMonthChanged() {
+  // Picking a month resets the week filter and rescopes the week dropdown.
+  const wsel = document.getElementById('demoWeekSel');
+  if (wsel) wsel.value = '';
+  demoPopulateWeekSelect();
+  renderDemoDashboard();
 }
 function demoPopulateRepSelects() {
   const filter = document.getElementById('demoRepFilter');
@@ -13839,9 +13874,11 @@ function demoCreditsRep(entry, rep) {
   return Array.isArray(entry.supportReps) && entry.supportReps.includes(rep);
 }
 function demoGetFiltered() {
+  const mo     = document.getElementById('demoMonthSel')?.value || '';
   const wk     = document.getElementById('demoWeekSel')?.value || '';
   const rep    = document.getElementById('demoRepFilter')?.value || '';
   return demoEntries.filter(e => {
+    if (mo  && demoMonthKeyOf(e) !== mo) return false;
     if (wk  && e.weekKey !== wk)        return false;
     if (rep && !demoCreditsRep(e, rep)) return false;
     return true;
@@ -13865,6 +13902,16 @@ function demoExpandToCredits(rows) {
 /* ── Main render — calls all sub-renderers ────────────────────── */
 function renderDemoDashboard() {
   const filtered = demoGetFiltered();
+  // reflect the active scope in the bar-chart subtitle
+  const sub = document.getElementById('demoChartSub');
+  if (sub) {
+    const mo  = document.getElementById('demoMonthSel')?.value || '';
+    const wk  = document.getElementById('demoWeekSel')?.value || '';
+    const rep = document.getElementById('demoRepFilter')?.value || '';
+    let scope = wk ? demoWeekLabel(wk) : (mo ? demoMonthLabel(mo) : 'All time');
+    if (rep) scope += ' · ' + rep;
+    sub.textContent = scope + ' · click bar to filter table';
+  }
   renderDemoKpis(filtered);
   renderDemoBarChart(filtered);
   renderDemoFunnel(filtered);
