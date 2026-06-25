@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.51</title>
+<title>CoreV | OxeFit Sales Tracker v21.52</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3811,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.51 · Region-card pipeline reflects the month
+      v21.52 · Last-YR-to-Date range + commit line on same scale
     </div>
   </div>
 </div>
@@ -3884,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.51</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.52</strong></p>
     </div>
   </div>
 </div>
@@ -3956,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.51 · FE</div>
+      <div class="sidebar-version">v21.52 · FE</div>
     </div>
   </aside>
 
@@ -4032,7 +4031,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.51</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.52</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -10934,6 +10933,10 @@ function execMonthsFor(range) {
     for (let m = 0; m <= curMonth; m++) out.push({ year: curYear, month: m });
     return out;
   }
+  if (range === 'lytd') {
+    for (let m = 0; m <= curMonth; m++) out.push({ year: curYear - 1, month: m });
+    return out;
+  }
   const n = range === 'last3' ? 3 : range === 'last6' ? 6 : 1;
   for (let i = n - 1; i >= 0; i--) {
     let y = curYear, m = curMonth - i;
@@ -10946,6 +10949,7 @@ function execRangeLabel(range) {
   return range === 'last3' ? 'Last 3 Months'
        : range === 'last6' ? 'Last 6 Months'
        : range === 'ytd'   ? `${curYear} YTD`
+       : range === 'lytd'  ? `${curYear-1} YTD`
        : `${MONTHS[curMonth]} ${curYear}`;
 }
 
@@ -11089,7 +11093,7 @@ function renderExecDashboard() {
   if (ctrl) {
     ctrl.innerHTML = `
       <div class="exec-range">
-        ${[['current','This Month'],['last3','Last 3'],['last6','Last 6'],['ytd','YTD']].map(([r,l]) =>
+        ${[['current','This Month'],['last3','Last 3'],['last6','Last 6'],['ytd','YTD'],['lytd','Last YR to Date']].map(([r,l]) =>
           `<button class="exec-range-btn ${r===execRange?'active':''}" data-range="${r}" onclick="setExecRange('${r}')">${l}</button>`).join('')}
       </div>
       <button class="exec-export-btn" onclick="execExportCSV()">⤓ Export CSV</button>`;
@@ -11204,7 +11208,6 @@ function renderPipelineByMonthChart(){
   }
   const months=(cache&&Array.isArray(cache.months))?cache.months:new Array(12).fill(0);
   const pmax=Math.max.apply(null, months.concat([1]));
-  const cmax=Math.max.apply(null, commitAvg.concat([1]));
   const pTotal=months.reduce(function(a,b){ return a+(Number(b)||0); },0);
   const labels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const W=720,H=320,padL=8,padR=8,padT=24,padB=42,gap=10;
@@ -11224,15 +11227,15 @@ function renderPipelineByMonthChart(){
     for(let i=0;i<12;i++){
       const cv=Number(commitAvg[i])||0;
       const cx=padL+i*(bw+gap)+bw/2;
-      const cy=padT+plotH-(cmax>0?(cv/cmax)*plotH:0);
+      const cy=padT+plotH-(pmax>0?(cv/pmax)*plotH:0);
       pts.push([cx,cy,cv]);
     }
     svg+='<polyline points="'+pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ')+'" fill="none" stroke="var(--teal)" stroke-width="2"></polyline>';
-    pts.forEach(function(p){ if(p[2]>0) svg+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="var(--teal)"></circle>'; });
+    pts.forEach(function(p){ if(p[2]>0){ svg+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="var(--teal)"></circle>'; svg+='<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-7).toFixed(1)+'" text-anchor="middle" font-size="9" fill="var(--teal)">'+_pbmCompact(p[2])+'</text>'; } });
   }
   const legend='<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12px;margin-bottom:6px;">'+
-    '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#fb923c;border-radius:2px;display:inline-block;"></span>Pipeline (AED) · left axis</span>'+
-    '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;border-top:2px solid var(--teal);display:inline-block;"></span>Avg commit / entry (AED) · right axis'+(haveCommit?(' · peak '+_pbmCompact(cmax)):'')+'</span>'+
+    '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#fb923c;border-radius:2px;display:inline-block;"></span>Pipeline (AED)</span>'+
+    '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;border-top:2px solid var(--teal);display:inline-block;"></span>Avg commit / entry (AED) · same scale</span>'+
     '<span style="margin-left:auto;font-weight:700;color:#fb923c;">Pipeline total: AED '+fmtNum(pTotal)+'</span>'+
   '</div>';
   host.innerHTML=legend+'<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="max-width:100%;">'+svg+'</svg>';
