@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.56</title>
+<title>CoreV | OxeFit Sales Tracker v21.58</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.56 · Closed-Won auto-syncs from HubSpot; total always matches CRM
+      v21.58 · Follow-up Engine grouped by region (Dubai / Abu Dhabi) + region filter
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.56</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.58</strong></p>
     </div>
   </div>
 </div>
@@ -3976,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.56 · FE</div>
+      <div class="sidebar-version">v21.58 · FE</div>
     </div>
   </aside>
 
@@ -4052,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.56</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.58</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.56 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.58 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.56 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.58 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.56 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.58 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.56
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.58
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.56
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.58
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.56 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.58 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.56
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.58
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11401,7 +11401,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.56 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.58 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13858,7 +13858,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.56 — per-Month filter ───────────────────────────────────────────────
+// ── v21.58 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16448,6 +16448,24 @@ let feImportPreview = [];
 let feImportBusy = false;
 let feImportErr = '';
 let feFilterRep = '';
+let feFilterRegion = '';
+// v21.58 — Follow-up Engine can assign/filter to admins & office too
+// (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
+const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
+function feAssignableReps(){
+  const seen = new Set(); const out = [];
+  ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
+  return out;
+}
+// v21.58 — classify a Follow-up Engine assignee into a region/group for the table.
+const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
+function feRegionOf(rep){
+  if (!rep || rep === 'Unassigned') return 'Unassigned';
+  const reg = (typeof regionForRep === 'function') ? regionForRep(rep) : '';
+  if (reg === 'Dubai' || reg === 'Abu Dhabi') return reg;
+  if (typeof DE_OWNERS !== 'undefined' && DE_OWNERS.indexOf(rep) >= 0) return 'Direct Engagement';
+  return 'Office';
+}
 let feFilterStage = '';
 let feDashTab = 'summary';
 
@@ -16605,7 +16623,7 @@ function feOpenAdd(){
       '<div class="fe-field"><label class="fe-lab">Language</label><div class="fe-seg" id="fe-seg-lang">'+
         '<button class="on" data-v="English" onclick="fePickLang(\'English\')">English</button>'+
         '<button data-v="Arabic" onclick="fePickLang(\'Arabic\')">Arabic</button></div></div></div>'+
-    '<div class="fe-field"><label class="fe-lab">Assign to</label><select id="fe-assignee" class="fe-sel"><option value="">Unassigned</option>'+ALL_REPS.map(function(rp){ return '<option value="'+rp+'">'+rp+'</option>'; }).join('')+'</select></div>'+
+    '<div class="fe-field"><label class="fe-lab">Assign to</label><select id="fe-assignee" class="fe-sel"><option value="">Unassigned</option>'+feAssignableReps().map(function(rp){ return '<option value="'+rp+'">'+rp+'</option>'; }).join('')+'</select></div>'+
     '<div class="fe-field"><label class="fe-lab">Notes (what they asked / their goal)</label><textarea id="fe-note" class="fe-ta" rows="2" placeholder="Wants strength + recovery, small villa gym…"></textarea></div>'+
     '<button class="fe-btn" style="width:100%" onclick="feAddLead()">Add lead and build cadence</button>'+
   '</div></div>';
@@ -16758,9 +16776,9 @@ function feRenderDashboard(){
     if(!['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; })) s.due++;
     if(l.stage==='Demo booked') s.booked++; if(l.stage==='Won') s.won++; if(l.stage==='Lost') s.lost++; if(l.stage==='Referral') s.ref++;
   });
-  const order=ALL_REPS.filter(function(r){ return byRep[r]; }).concat(byRep['Unassigned']?['Unassigned']:[]);
+  const order=feAssignableReps().filter(function(r){ return byRep[r]; }).concat(byRep['Unassigned']?['Unassigned']:[]);
   const hdr='<div style="display:flex;font-size:11px;color:var(--text-muted);padding:4px 12px;gap:8px"><div style="flex:1">Sales rep</div><div style="width:48px;text-align:center">Leads</div><div style="width:40px;text-align:center">Due</div><div style="width:48px;text-align:center">Demos</div><div style="width:40px;text-align:center">Won</div><div style="width:40px;text-align:center">Lost</div><div style="width:40px;text-align:center">Ref</div></div>';
-  const body=order.map(function(r){ const s=byRep[r];
+  function feRepRow(r){ const s=byRep[r];
     return '<div class="fe-leadrow" style="margin-bottom:6px;padding:9px 12px;gap:8px" onclick="feSetRepFilter(\''+r+'\')">'+
       '<div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0"><span class="fe-av" style="height:26px;width:26px;font-size:11px">'+(r==='Unassigned'?'?':r.charAt(0).toUpperCase())+'</span><span class="fe-trunc" style="font-weight:600">'+feEsc(r)+'</span></div>'+
       '<div style="width:48px;text-align:center;font-weight:600">'+s.total+'</div>'+
@@ -16769,7 +16787,24 @@ function feRenderDashboard(){
       '<div style="width:40px;text-align:center;color:'+(s.won?'var(--success)':'var(--text-muted)')+'">'+s.won+'</div>'+
       '<div style="width:40px;text-align:center;color:'+(s.lost?'var(--danger)':'var(--text-muted)')+'">'+s.lost+'</div>'+
       '<div style="width:40px;text-align:center;color:'+(s.ref?'#06b6d4':'var(--text-muted)')+'">'+s.ref+'</div>'+
-    '</div>'; }).join('');
+    '</div>'; }
+  // group reps by region, preserving the existing per-region rep order
+  const groups={}; order.forEach(function(r){ const g=feRegionOf(r); (groups[g]=groups[g]||[]).push(r); });
+  const body=FE_REGION_ORDER.filter(function(g){ return groups[g]&&groups[g].length; }).map(function(g){
+    const reps=groups[g];
+    const sub={total:0,due:0,booked:0,won:0,lost:0,ref:0};
+    reps.forEach(function(r){ const s=byRep[r]; sub.total+=s.total; sub.due+=s.due; sub.booked+=s.booked; sub.won+=s.won; sub.lost+=s.lost; sub.ref+=s.ref; });
+    const band='<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin:8px 0 4px;background:var(--navy-mid);border-radius:8px;font-size:12px;gap:8px">'+
+        '<div style="flex:1;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--text)">'+feEsc(g)+'<span class="fe-sub" style="margin-left:6px;text-transform:none;font-weight:500">'+reps.length+' rep'+(reps.length===1?'':'s')+'</span></div>'+
+        '<div style="width:48px;text-align:center;font-weight:700">'+sub.total+'</div>'+
+        '<div style="width:40px;text-align:center;color:'+(sub.due?'var(--warn)':'var(--text-muted)')+'">'+sub.due+'</div>'+
+        '<div style="width:48px;text-align:center">'+sub.booked+'</div>'+
+        '<div style="width:40px;text-align:center;color:'+(sub.won?'var(--success)':'var(--text-muted)')+'">'+sub.won+'</div>'+
+        '<div style="width:40px;text-align:center;color:'+(sub.lost?'var(--danger)':'var(--text-muted)')+'">'+sub.lost+'</div>'+
+        '<div style="width:40px;text-align:center;color:'+(sub.ref?'#06b6d4':'var(--text-muted)')+'">'+sub.ref+'</div>'+
+      '</div>';
+    return band+reps.map(feRepRow).join('');
+  }).join('');
   const grid='<div class="fe-grid">'+
       '<div class="fe-metric"><div class="l">Total leads</div><div class="v">'+followupLeads.length+'</div></div>'+
       '<div class="fe-metric"><div class="l">Action due now</div><div class="v">'+due+'</div></div>'+
@@ -16816,20 +16851,25 @@ function feLeadsTab(now){
   '</select>';
   const repSel='<select class="fe-sel" style="max-width:180px" onchange="feSetRepDirect(this.value)">'+
     '<option value=""'+(feFilterRep===''?' selected':'')+'>All reps</option>'+
-    ALL_REPS.map(function(r){ return '<option value="'+feEsc(r)+'"'+(feFilterRep===r?' selected':'')+'>'+feEsc(r)+'</option>'; }).join('')+
+    feAssignableReps().map(function(r){ return '<option value="'+feEsc(r)+'"'+(feFilterRep===r?' selected':'')+'>'+feEsc(r)+'</option>'; }).join('')+
     '<option value="Unassigned"'+(feFilterRep==='Unassigned'?' selected':'')+'>Unassigned</option>'+
   '</select>';
+  const regionSel='<select class="fe-sel" style="max-width:160px" onchange="feSetRegionFilter(this.value)">'+
+    '<option value=""'+(feFilterRegion===''?' selected':'')+'>All regions</option>'+
+    FE_REGION_ORDER.map(function(g){ return '<option value="'+feEsc(g)+'"'+(feFilterRegion===g?' selected':'')+'>'+feEsc(g)+'</option>'; }).join('')+
+  '</select>';
   let list=followupLeads.slice();
+  if(feFilterRegion) list=list.filter(function(l){ return feRegionOf(l.assignee||'Unassigned')===feFilterRegion; });
   if(feFilterRep) list=list.filter(function(l){ return (l.assignee||'Unassigned')===feFilterRep; });
   if(feFilterStage==='__due') list=list.filter(function(l){ return !['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; }); });
   else if(feFilterStage) list=list.filter(function(l){ return l.stage===feFilterStage; });
-  const clear=(feFilterRep||feFilterStage)?'<button class="fe-sm" onclick="feClearFilters()">Clear</button>':'';
-  const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'+stageSel+repSel+clear+'<span class="fe-sub" style="margin-left:auto">'+list.length+' lead'+(list.length===1?'':'s')+'</span></div>';
+  const clear=(feFilterRep||feFilterStage||feFilterRegion)?'<button class="fe-sm" onclick="feClearFilters()">Clear</button>':'';
+  const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'+stageSel+regionSel+repSel+clear+'<span class="fe-sub" style="margin-left:auto">'+list.length+' lead'+(list.length===1?'':'s')+'</span></div>';
   const rows=list.length
-    ? list.map(function(l){ const na=feNextAction(l,now);
+    ? list.map(function(l){ const na=feNextAction(l,now); const rg=feRegionOf(l.assignee||'Unassigned');
         return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
           '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span></div>'+
+          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+'</div>'+
             '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
           '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
           (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
@@ -16840,7 +16880,8 @@ function feLeadsTab(now){
 function feSetDashTab(t){ feDashTab=t; renderFollowup(); }
 function feSetStageFilter(v){ feFilterStage=v||''; renderFollowup(); }
 function feSetRepDirect(v){ feFilterRep=v||''; renderFollowup(); }
-function feClearFilters(){ feFilterRep=''; feFilterStage=''; renderFollowup(); }
+function feSetRegionFilter(v){ feFilterRegion=v||''; renderFollowup(); }
+function feClearFilters(){ feFilterRep=''; feFilterStage=''; feFilterRegion=''; renderFollowup(); }
 
 /* ---- deletion tombstones (so removed leads don't return via team sync or Sheet import) ---- */
 let feTombstones={};
@@ -16962,7 +17003,7 @@ function feRenderLead(l){
       '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Assigned to</div>'+
         '<select class="fe-sel" style="max-width:240px" onchange="feAssign(\''+l.id+'\',this.value)">'+
           '<option value=""'+(l.assignee?'':' selected')+'>Unassigned</option>'+
-          ALL_REPS.map(function(rp){ return '<option value="'+feEsc(rp)+'"'+(l.assignee===rp?' selected':'')+'>'+feEsc(rp)+'</option>'; }).join('')+
+          feAssignableReps().map(function(rp){ return '<option value="'+feEsc(rp)+'"'+(l.assignee===rp?' selected':'')+'>'+feEsc(rp)+'</option>'; }).join('')+
         '</select></div>'+
       '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Pipeline stage</div>'+
         '<div class="fe-stages">'+FE_STAGES.map(s=>'<button class="fe-stagebtn '+(l.stage===s?'on':'')+'" style="'+(l.stage===s?'color:'+feStageColor(s):'')+'" onclick="feSetStage(\''+l.id+'\',\''+s+'\')">'+s+'</button>').join('')+'</div></div>'+
