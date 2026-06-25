@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.59</title>
+<title>CoreV | OxeFit Sales Tracker v21.60</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.59 · Follow-up Engine: customizable reminder day &amp; time per step
+      v21.60 · Follow-up Engine: re-connection tag + "by when" date per lead
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.59</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.60</strong></p>
     </div>
   </div>
 </div>
@@ -3976,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.59 · FE</div>
+      <div class="sidebar-version">v21.60 · FE</div>
     </div>
   </aside>
 
@@ -4052,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.59</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.60</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.59 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.60 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.59 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.60 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.59 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.60 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.59
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.60
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.59
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.60
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.59 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.60 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.59
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.60
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11401,7 +11401,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.59 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.60 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13858,7 +13858,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.59 — per-Month filter ───────────────────────────────────────────────
+// ── v21.60 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16449,7 +16449,7 @@ let feImportBusy = false;
 let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
-// v21.59 — Follow-up Engine can assign/filter to admins & office too
+// v21.60 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16457,7 +16457,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.59 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.60 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16527,6 +16527,11 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
+// v21.60 — re-connection tag + "by when" date per lead
+function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
+function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
+function feReconnectChip(l, now){ if(!l||!l.reconnect) return ''; const over=feReconnectOverdue(l, now); return '<span class="fe-chip" style="background:'+(over?'var(--danger)':'#06b6d4')+';color:#fff">🔄 '+(l.reconnectBy?((over?'overdue ':'by ')+feShortDate(l.reconnectBy)):'re-connect')+'</span>'; }
 function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--accent)',replied:'var(--success)',skipped:'var(--text-muted)'})[s]||'var(--text-muted)'; }
 
 /* ---- AI key ---- */
@@ -16869,7 +16874,7 @@ function feLeadsTab(now){
     ? list.map(function(l){ const na=feNextAction(l,now); const rg=feRegionOf(l.assignee||'Unassigned');
         return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
           '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+'</div>'+
+          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+feReconnectChip(l,now)+'</div>'+
             '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
           '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
           (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
@@ -16996,7 +17001,7 @@ function feRenderLead(l){
   const head='<button class="fe-back" onclick="feGoDash()">← Pipeline</button>'+
     '<div class="fe-card"><div style="display:flex;gap:12px;align-items:flex-start">'+
       '<div class="fe-av" style="height:44px;width:44px;font-size:15px">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-      '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span></div>'+
+      '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span> '+feReconnectChip(l, Date.now())+'</div>'+
         '<div class="fe-meta">'+(l.company?'<div>'+feEsc(l.company)+'</div>':'')+(l.phone?'<div>'+feEsc(l.phone)+'</div>':'')+(l.email?'<div>'+feEsc(l.email)+'</div>':'')+
           (l.source?'<div style="font-size:12px">Source: '+feEsc(l.source)+'</div>':'')+(l.owner?'<div style="font-size:12px">Owner: '+feEsc(l.owner)+'</div>':'')+
           (l.note?'<div style="font-size:12px"><em>"'+feEsc(l.note)+'"</em></div>':'')+'</div></div></div>'+
@@ -17007,6 +17012,12 @@ function feRenderLead(l){
         '</select></div>'+
       '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Pipeline stage</div>'+
         '<div class="fe-stages">'+FE_STAGES.map(s=>'<button class="fe-stagebtn '+(l.stage===s?'on':'')+'" style="'+(l.stage===s?'color:'+feStageColor(s):'')+'" onclick="feSetStage(\''+l.id+'\',\''+s+'\')">'+s+'</button>').join('')+'</div></div>'+
+      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Re-connection</div>'+
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
+          '<button class="fe-sm" onclick="feToggleReconnect(\''+l.id+'\')" style="'+(l.reconnect?'background:#06b6d4;color:#fff;border-color:transparent':'')+'">'+(l.reconnect?'🔄 Re-connection tagged':'+ Tag for re-connection')+'</button>'+
+          '<label class="fe-sub" style="display:flex;align-items:center;gap:6px">By when <input type="date" class="fe-sel" style="max-width:170px" value="'+feEsc(l.reconnectBy||'')+'" onchange="feSetReconnectBy(\''+l.id+'\',this.value)"></label>'+
+          (l.reconnect&&l.reconnectBy?'<span class="fe-sub" style="color:'+(feReconnectOverdue(l,Date.now())?'var(--danger)':'var(--text-muted)')+'">'+(feReconnectOverdue(l,Date.now())?'Overdue':'Due '+feShortDate(l.reconnectBy))+'</span>':'')+
+        '</div></div>'+
     '</div>'+
     '<div class="fe-rowb"><h3 class="fe-h">Follow-up cadence</h3><span class="fe-sub">7 touches over 12 days</span></div>';
   const steps=l.touches||[];
@@ -17101,7 +17112,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.59 — the reminder day-offset and time of day are user-editable per step.
+// v21.60 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -17183,6 +17194,8 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(l){ l.assignee=rep||''; feStamp(l); feSave(); renderFollowup(); } }
+function feToggleReconnect(id){ const l=feGet(id); if(!l) return; l.reconnect=!l.reconnect; if(l.reconnect && !l.reconnectBy){ const d=new Date(); d.setDate(d.getDate()+7); l.reconnectBy=feDateInput(d); } feStamp(l); feSave(); renderFollowup(); }
+function feSetReconnectBy(id, v){ const l=feGet(id); if(!l) return; l.reconnectBy=v||''; if(v) l.reconnect=true; feStamp(l); feSave(); renderFollowup(); }
 function feSetRepFilter(rep){ feFilterRep=(feFilterRep===rep)?'':rep; if(feFilterRep) feDashTab='leads'; renderFollowup(); }
 function feLinkedIn(id){ const l=feGet(id); if(!l) return; const q=encodeURIComponent([l.name,l.company].filter(Boolean).join(' ')); window.open('https://www.linkedin.com/search/results/people/?keywords='+q,'_blank','noopener'); }
 async function feBrief(id){
