@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.64</title>
+<title>CoreV | OxeFit Sales Tracker v21.65</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.64 · Follow-up Engine: labeled editable Phone/Email/Address boxes + address fix
+      v21.65 · Follow-up Engine: Cold tag adds re-engagement drip after Day 12
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.64</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.65</strong></p>
     </div>
   </div>
 </div>
@@ -3976,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.64 · FE</div>
+      <div class="sidebar-version">v21.65 · FE</div>
     </div>
   </aside>
 
@@ -4052,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.64</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.65</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.64 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.65 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.64 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.65 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.64 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.65 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.64
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.65
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.64
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.65
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.64 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.65 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.64
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.65
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11401,7 +11401,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.64 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.65 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13858,7 +13858,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.64 — per-Month filter ───────────────────────────────────────────────
+// ── v21.65 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16450,7 +16450,7 @@ let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
-// v21.64 — Follow-up Engine can assign/filter to admins & office too
+// v21.65 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16458,7 +16458,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.64 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.65 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16505,7 +16505,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} }
-// v21.64 — clear addresses that were wrongly populated with note text by the old extractor
+// v21.65 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -16533,11 +16533,48 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
+// v21.65 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
+const FE_COLD_CADENCE=[
+  { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
+    msg:{ b2c:"Hi {name}, no pressure at all — just keeping the door open. If the home setup is back on your mind, I can send a fresh 60-second clip. Want me to?",
+          b2b:"Hi {name}, keeping the door open for {company}. If timing has improved, I can share an updated overview built for your space." } },
+  { key:'c2', dayLabel:'Cold · Day 30', when:'~2.5 weeks after', channel:'WhatsApp', coldDays:18, purpose:'New proof point to re-spark interest',
+    msg:{ b2c:"{name}, thought of you — a customer near you just set theirs up in a small corner and loves it. Happy to show how it could fit your space whenever suits.",
+          b2b:"{name}, a facility like {company} recently rolled OxeFit out and members are booking it solid. Worth a quick look when you have a moment?" } },
+  { key:'c3', dayLabel:'Cold · Day 45', when:'~1 month after', channel:'Email', coldDays:33, purpose:'Low-pressure value + easy next step',
+    subject:{ b2c:"Still here whenever you're ready", b2b:"An easy next step for {company}" },
+    msg:{ b2c:"Hi {name},\n\nNo rush on my end — just leaving the door open. Whenever you're ready, a quick 15-minute demo (in person or video) is the easiest way to judge the fit.\n\nHere whenever suits,\nYour OxeFit team",
+          b2b:"Hi {name},\n\nLeaving this here for when timing is better at {company}. A short walkthrough is the easiest way to see the retention angle.\n\nBest,\nYour OxeFit team" } },
+  { key:'c4', dayLabel:'Cold · Day 60', when:'~6.5 weeks after', channel:'WhatsApp', coldDays:48, purpose:'Final soft check-in',
+    msg:{ b2c:"{name}, last gentle check-in from me — should I keep your spot open, or close the file for now? Either is completely fine.",
+          b2b:"{name}, last soft check-in — keep {company} on the list for later, or close this off for now? Either works." } }
+];
+function feGenColdTouches(lead){ const base=Date.parse(lead.coldAt||lead.updatedAt||Date.now())||Date.now(); const v=lead.type==='B2B'?'b2b':'b2c';
+  return FE_COLD_CADENCE.map(function(t){ return { key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
+    scheduledAt:new Date(base+t.coldDays*86400000).toISOString(), status:'pending', cold:true,
+    subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) }; }); }
+function feToggleCold(id){ const l=feGet(id); if(!l) return;
+  l.cold=!l.cold;
+  if(l.cold){
+    l.coldAt=new Date().toISOString();
+    if(!Array.isArray(l.touches)) l.touches=[];
+    const have={}; l.touches.forEach(function(t){ have[t.key]=true; });
+    feGenColdTouches(l).forEach(function(t){ if(!have[t.key]) l.touches.push(t); });   // append after the 12-day cadence
+    feToast('Tagged Cold — added '+FE_COLD_CADENCE.length+' re-engagement steps after Day 12','success');
+  } else {
+    l.touches=(l.touches||[]).filter(function(t){ return !(t.cold && t.status==='pending'); });
+    l.coldAt='';
+    feToast('Cold tag removed','info');
+  }
+  feStamp(l); feSave(); renderFollowup();
+}
+function feColdChip(l){ return (l&&l.cold)?'<span class="fe-chip" style="background:#3b82f6;color:#fff">❄️ Cold</span>':''; }
 function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v21.64 — re-connection tag + "by when" date per lead
+// v21.65 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -16714,7 +16751,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v21.64 — robust extraction of phone / email / address into separate fields
+// v21.65 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 function feNormPhone(s){ s=(s||'').trim(); if(!s) return ''; const d=feDigits(s); if(d.length<7||d.length>15) return '';
   if(/^\+/.test(s)) return '+'+d;
@@ -16898,6 +16935,7 @@ function feLeadsTab(now){
   const stageSel='<select class="fe-sel" style="max-width:180px" onchange="feSetStageFilter(this.value)">'+
     '<option value=""'+(feFilterStage===''?' selected':'')+'>All statuses</option>'+
     '<option value="__due"'+(feFilterStage==='__due'?' selected':'')+'>Action due now</option>'+
+    '<option value="__cold"'+(feFilterStage==='__cold'?' selected':'')+'>❄️ Cold</option>'+
     FE_STAGES.map(function(s){ return '<option value="'+s+'"'+(feFilterStage===s?' selected':'')+'>'+s+'</option>'; }).join('')+
   '</select>';
   const repSel='<select class="fe-sel" style="max-width:180px" onchange="feSetRepDirect(this.value)">'+
@@ -16924,6 +16962,7 @@ function feLeadsTab(now){
   else if(feFilterRecon==='none')     list=list.filter(function(l){ return !l.reconnect; });
   if(feFilterRep) list=list.filter(function(l){ return (l.assignee||'Unassigned')===feFilterRep; });
   if(feFilterStage==='__due') list=list.filter(function(l){ return !['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; }); });
+  else if(feFilterStage==='__cold') list=list.filter(function(l){ return !!l.cold; });
   else if(feFilterStage) list=list.filter(function(l){ return l.stage===feFilterStage; });
   const clear=(feFilterRep||feFilterStage||feFilterRegion||feFilterRecon)?'<button class="fe-sm" onclick="feClearFilters()">Clear</button>':'';
   const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'+stageSel+regionSel+reconSel+repSel+clear+'<span class="fe-sub" style="margin-left:auto">'+list.length+' lead'+(list.length===1?'':'s')+'</span></div>';
@@ -16931,7 +16970,7 @@ function feLeadsTab(now){
     ? list.map(function(l){ const na=feNextAction(l,now); const rg=feRegionOf(l.assignee||'Unassigned');
         return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
           '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+((Array.isArray(l.updates)&&l.updates.length)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📝 '+l.updates.length+'</span>':'')+feReconnectChip(l,now)+'</div>'+
+          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+feColdChip(l)+((Array.isArray(l.updates)&&l.updates.length)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📝 '+l.updates.length+'</span>':'')+feReconnectChip(l,now)+'</div>'+
             '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
           '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
           (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
@@ -17059,7 +17098,7 @@ function feRenderLead(l){
   const head='<button class="fe-back" onclick="feGoDash()">← Pipeline</button>'+
     '<div class="fe-card"><div style="display:flex;gap:12px;align-items:flex-start">'+
       '<div class="fe-av" style="height:44px;width:44px;font-size:15px">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-      '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span> '+feReconnectChip(l, Date.now())+'</div>'+
+      '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span> '+feColdChip(l)+' '+feReconnectChip(l, Date.now())+'</div>'+
         '<div class="fe-meta">'+
           (l.source?'<div style="font-size:12px">Source: '+feEsc(l.source)+'</div>':'')+(l.owner?'<div style="font-size:12px">Owner: '+feEsc(l.owner)+'</div>':'')+
           (l.note?'<div style="font-size:12px"><em>"'+feEsc(l.note)+'"</em></div>':'')+'</div></div></div>'+
@@ -17080,6 +17119,11 @@ function feRenderLead(l){
           '<button class="fe-sm" onclick="feToggleReconnect(\''+l.id+'\')" style="'+(l.reconnect?'background:#06b6d4;color:#fff;border-color:transparent':'')+'">'+(l.reconnect?'🔄 Re-connection tagged':'+ Tag for re-connection')+'</button>'+
           '<label class="fe-sub" style="display:flex;align-items:center;gap:6px">By when <input type="date" class="fe-sel" style="max-width:170px" value="'+feEsc(l.reconnectBy||'')+'" onchange="feSetReconnectBy(\''+l.id+'\',this.value)"></label>'+
           (l.reconnect&&l.reconnectBy?'<span class="fe-sub" style="color:'+(feReconnectOverdue(l,Date.now())?'var(--danger)':'var(--text-muted)')+'">'+(feReconnectOverdue(l,Date.now())?'Overdue':'Due '+feShortDate(l.reconnectBy))+'</span>':'')+
+        '</div></div>'+
+      '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Cold lead</div>'+
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+
+          '<button class="fe-sm" onclick="feToggleCold(\''+l.id+'\')" style="'+(l.cold?'background:#3b82f6;color:#fff;border-color:transparent':'')+'">'+(l.cold?'❄️ Cold — nurture added':'❄️ Mark as Cold')+'</button>'+
+          '<span class="fe-sub">Appends a re-engagement drip after Day 12'+(l.cold&&l.coldAt?(' · since '+feShortDate(l.coldAt)):'')+'</span>'+
         '</div></div>'+
     '</div>'+
     '<div class="fe-rowb"><h3 class="fe-h">Follow-up cadence</h3><span class="fe-sub">7 touches over 12 days</span></div>';
@@ -17188,7 +17232,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.64 — the reminder day-offset and time of day are user-editable per step.
+// v21.65 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -17199,7 +17243,12 @@ function feRemGet(){ const def=feRemDefaults();
 }
 function feRemSave(cfg){ try{ localStorage.setItem(FE_REMINDER_KEY, JSON.stringify(cfg)); }catch(e){} }
 function feReminderDateFor(lead, key){
-  const cfg=feRemGet(); const st=cfg.steps[key]||{day:0,time:'15:00'};
+  const cfg=feRemGet(); const st=cfg.steps[key];
+  if(!st){ // cold / non-cadence step — use its own scheduled date at 3 PM default
+    const t=((lead.touches||[]).find(function(x){ return x.key===key; }));
+    const d=(t&&t.scheduledAt)?new Date(t.scheduledAt):new Date(lead.createdAt||Date.now());
+    d.setHours(15,0,0,0); return d;
+  }
   const base=new Date(lead.createdAt||Date.now());
   const d=new Date(base.getFullYear(), base.getMonth(), base.getDate()+(parseInt(st.day,10)||0));
   const tm=(st.time||'15:00').split(':'); d.setHours(parseInt(tm[0],10)||0, parseInt(tm[1],10)||0, 0, 0);
