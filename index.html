@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.52</title>
+<title>CoreV | OxeFit Sales Tracker v21.53</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3811,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.52 · Last-YR-to-Date range + commit line on same scale
+      v21.53 · Closed-Won read live from HubSpot (by owner) across all ranges
     </div>
   </div>
 </div>
@@ -3883,7 +3884,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.52</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.53</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3956,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.52 · FE</div>
+      <div class="sidebar-version">v21.53 · FE</div>
     </div>
   </aside>
 
@@ -4031,7 +4032,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.52</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.53</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4075,7 +4076,7 @@
         <span class="exec-card-hint" id="pbmStatus">open HubSpot deals · bucketed by close date</span>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-        <button class="btn-secondary" id="pbmRefreshBtn" onclick="refreshPipelineByMonth()" style="font-size:12px;">↻ Refresh from HubSpot</button>
+        <button class="btn-secondary" id="pbmRefreshBtn" onclick="refreshPipelineByMonth()" style="font-size:12px;">↻ Refresh CRM data</button>
       </div>
       <div id="pipelineByMonthChart"></div>
     </div>
@@ -10182,7 +10183,7 @@ async function hubspotFetchDealsForRep(repName) {
         { propertyName: 'hubspot_owner_id', operator: 'EQ', value: ownerId },
         { propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }
       ]}],
-      properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed'],
+      properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed','hubspot_owner_id'],
       sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
       limit: 100
     };
@@ -10214,6 +10215,7 @@ function _mapHsDeal(d) {
     stage   : hsMapStage(d.properties.dealstage),
     rawStage: d.properties.dealstage || '',
     close   : d.properties.closedate || '',
+    ownerId : d.properties.hubspot_owner_id || '',
     prob    : Number(d.properties.hs_deal_stage_probability || 0),
     isClosedWon: isWon,
     isClosed: isClosed
@@ -10225,7 +10227,7 @@ async function hubspotFetchAllDeals() {
   do {
     const body = {
       filterGroups: [{ filters: [{ propertyName: 'dealstage', operator: 'NEQ', value: 'closedlost' }] }],
-      properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed'],
+      properties: ['dealname','amount','dealstage','closedate','pipeline','hs_deal_stage_probability','hs_is_closed_won','hs_is_closed','hubspot_owner_id'],
       sorts: [{ propertyName: 'closedate', direction: 'ASCENDING' }],
       limit: 100
     };
@@ -10959,7 +10961,7 @@ function execAggForMonth(year, month) {
   const md = (typeof allData !== 'undefined' && allData[k]) ? allData[k] : { weeks: [] };
   const blank = () => ({ commit: 0, bestCase: 0, closedWon: 0, forecast: 0, xs1: 0, xp1: 0, pipeline: 0 });
   const teams = { 'Dubai': blank(), 'Abu Dhabi': blank() };
-  const repClosed = {};
+  const repClosedRows = {};
   const pipeSnap = {};
   (md.weeks || []).forEach(w => {
     if (!w) return;
@@ -10971,7 +10973,7 @@ function execAggForMonth(year, month) {
       const xs1    = parseFloat(r.forecastXS1) || 0;
       const xp1    = parseFloat(r.forecastXP1) || 0;
       const sw     = (typeof STAGE_WEIGHTS !== 'undefined' && STAGE_WEIGHTS[r.stage]) || 0;
-      if (r.rep) repClosed[r.rep] = (repClosed[r.rep] || 0) + closed;
+      if (r.rep) repClosedRows[r.rep] = (repClosedRows[r.rep] || 0) + closed;
       if (r.rep && r.hubspotSynced) { const tp = parseFloat(r.truePipeline) || 0; if (tp > 0) pipeSnap[r.rep] = tp; }
       if (!team) return;
       team.commit += commit; team.bestCase += best; team.closedWon += closed;
@@ -10982,6 +10984,20 @@ function execAggForMonth(year, month) {
     let tp = 0; (TEAMS[tn] || []).forEach(rep => { tp += (pipeSnap[rep] || 0); });
     teams[tn].pipeline = tp;
   });
+  // Closed-won — prefer HubSpot CRM truth (won deals by owner) when refreshed.
+  // Falls back to the tracker rows when the CRM cache hasn't been built yet.
+  let repClosed = repClosedRows;
+  const cw = _cwCacheForMonth(k);
+  if (cw) {
+    repClosed = {};
+    teams['Dubai'].closedWon = 0; teams['Abu Dhabi'].closedWon = 0;
+    Object.keys(cw).forEach(rep => {
+      const amt = cw[rep] || 0; if (!amt) return;
+      repClosed[rep] = (repClosed[rep] || 0) + amt;
+      const tn = (typeof regionForRep === 'function') ? regionForRep(rep) : null;
+      if (teams[tn]) teams[tn].closedWon += amt;   // Direct-Engagement reps (no team) still land in repClosed
+    });
+  }
   const total = blank();
   ['commit','bestCase','closedWon','forecast','xs1','xp1','pipeline'].forEach(kk => {
     total[kk] = teams['Dubai'][kk] + teams['Abu Dhabi'][kk];
@@ -11009,6 +11025,7 @@ function computeExecAgg(monthList) {
   ['commit','bestCase','closedWon','forecast','xs1','xp1','pipeline'].forEach(kk => {
     total[kk] = teams['Dubai'][kk] + teams['Abu Dhabi'][kk];
   });
+  total.closedWon = Object.values(repClosed).reduce((s, v) => s + (v || 0), 0); // include all reps (e.g. Direct Engagement)
   return { teams, total, repClosed };
 }
 
@@ -11182,6 +11199,26 @@ const PBM_FY = 2026;
 function _pbmCompact(n){ n=Number(n)||0; const a=Math.abs(n); if(a>=1e9) return (n/1e9).toFixed(1)+'B'; if(a>=1e6) return (n/1e6).toFixed(1)+'M'; if(a>=1e3) return (n/1e3).toFixed(0)+'K'; return String(Math.round(n)); }
 function _pbmLoadCache(){ try{ const r=localStorage.getItem(PIPELINE_BY_MONTH_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
 function _pbmSaveCache(o){ try{ localStorage.setItem(PIPELINE_BY_MONTH_KEY, JSON.stringify(o)); }catch(e){} }
+/* ── Closed-Won truth from HubSpot (by owner → rep × close-month) ───────────
+   The dashboard's Closed Won / Top Performers used to read the tracker's
+   cached per-row closedWon, which under-counts (only what the last sync
+   happened to fetch). This cache is built straight from HubSpot won deals
+   grouped by their owner, so every range (current / YTD / Last YR) reflects
+   the CRM exactly. _cwCacheForMonth returns null when no refresh has run yet
+   (callers then fall back to tracker rows). */
+const CW_BY_REP_KEY = 'oxefit_cw_by_rep_v1';
+function _cwLoad(){ try{ const r=localStorage.getItem(CW_BY_REP_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function _cwSave(o){ try{ localStorage.setItem(CW_BY_REP_KEY, JSON.stringify(o)); }catch(e){} }
+function _cwCacheForMonth(monthKey){
+  const cache=_cwLoad();
+  if(!cache || typeof cache.byRepMonth!=='object' || !cache.byRepMonth) return null;
+  const out={};
+  Object.keys(cache.byRepMonth).forEach(function(rep){
+    const v=cache.byRepMonth[rep] && cache.byRepMonth[rep][monthKey];
+    if(v) out[rep]=v;
+  });
+  return out;   // object (possibly empty) when cache exists → callers override with CRM truth
+}
 function _pbmBucket(deals){ const pbm={}; (deals||[]).forEach(function(d){ if(!d.close) return; const dt=new Date(d.close); if(isNaN(dt)) return; const amt=Number(d.amount)||0; if(!amt) return; const k=dt.getFullYear()+'-'+dt.getMonth(); pbm[k]=(pbm[k]||0)+amt; }); return pbm; }
 function _pbmCommitAvgByMonth(){
   const out=new Array(12).fill(0);
@@ -11251,7 +11288,7 @@ async function refreshPipelineByMonth(){
   const btn=document.getElementById('pbmRefreshBtn'), statusEl=document.getElementById('pbmStatus');
   if(typeof hubspotState==='undefined' || !hubspotState || !hubspotState.accessToken){ try{ showToast('Connect HubSpot first (use the HubSpot chip), then refresh','info'); }catch(_){} return; }
   if(btn){ btn.disabled=true; btn.textContent='Loading…'; }
-  if(statusEl) statusEl.textContent='Fetching open deals from HubSpot…';
+  if(statusEl) statusEl.textContent='Fetching deals from HubSpot…';
   try{
     const deals=await hubspotFetchAllDeals();
     const months=new Array(12).fill(0); let count=0;
@@ -11264,12 +11301,33 @@ async function refreshPipelineByMonth(){
       months[dt.getMonth()]+=amt; count++;
     });
     _pbmSaveCache({ months:months, at:new Date().toISOString(), dealCount:count, fy:PBM_FY });
-    renderPipelineByMonthChart();
-    try{ showToast('Pipeline chart updated — '+count+' open FY'+PBM_FY+' deals','success'); }catch(_){}
+
+    // ── Closed-Won truth: group WON deals by owner → rep × close-month ──────
+    const om=(typeof hsGetOwnerMap==='function')?(hsGetOwnerMap()||{}):{};
+    const ownerToRep={};
+    Object.keys(om).forEach(function(rep){ const id=om[rep]; if(id!=null && id!=='') ownerToRep[String(id)]=rep; });
+    const byRepMonth={}; let wonCount=0, unmapped=0, unmappedAmt=0;
+    (deals||[]).forEach(function(d){
+      if(!d.isClosedWon || !d.close) return;
+      const dt=new Date(d.close); if(isNaN(dt)) return;
+      const amt=Number(d.amount)||0;
+      const rep=ownerToRep[String(d.ownerId)];
+      if(!rep){ unmapped++; unmappedAmt+=amt; return; }   // owner not mapped to a rep
+      const mk=dt.getFullYear()+'-'+dt.getMonth();
+      (byRepMonth[rep]=byRepMonth[rep]||{});
+      byRepMonth[rep][mk]=(byRepMonth[rep][mk]||0)+amt;
+      wonCount++;
+    });
+    _cwSave({ byRepMonth:byRepMonth, at:new Date().toISOString(), wonCount:wonCount, unmapped:unmapped, unmappedAmt:unmappedAmt });
+
+    if(typeof renderExecDashboard==='function') renderExecDashboard(); else renderPipelineByMonthChart();
+    let msg='Synced from HubSpot — '+count+' open · '+wonCount+' won deal'+(wonCount===1?'':'s');
+    if(unmapped) msg+=' · '+unmapped+' won deal'+(unmapped===1?'':'s')+' have no rep mapping';
+    try{ showToast(msg, unmapped?'info':'success'); }catch(_){}
   }catch(e){
     if(statusEl) statusEl.textContent='Could not load: '+(((e&&e.message)||'error')+'').slice(0,90);
-    try{ showToast('Pipeline report: '+(((e&&e.message)||'failed')+'').slice(0,120),'error'); }catch(_){}
-  } finally { if(btn){ btn.disabled=false; btn.textContent='↻ Refresh from HubSpot'; } }
+    try{ showToast('CRM refresh: '+(((e&&e.message)||'failed')+'').slice(0,120),'error'); }catch(_){}
+  } finally { if(btn){ btn.disabled=false; btn.textContent='↻ Refresh CRM data'; } }
 }
 
 // Region for a rep, derived from team membership
