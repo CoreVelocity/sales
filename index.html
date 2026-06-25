@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.62</title>
+<title>CoreV | OxeFit Sales Tracker v21.63</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.62 · Follow-up Engine: per-lead Updates feed (timestamped + author)
+      v21.63 · Follow-up Engine: auto-extract phone / email / address into fields
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.62</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.63</strong></p>
     </div>
   </div>
 </div>
@@ -3976,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.62 · FE</div>
+      <div class="sidebar-version">v21.63 · FE</div>
     </div>
   </aside>
 
@@ -4052,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.62</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.63</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.62 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.63 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.62 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.63 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.62 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.63 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.62
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.63
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.62
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.63
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.62 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.63 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.62
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.63
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11401,7 +11401,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.62 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.63 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13858,7 +13858,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.62 — per-Month filter ───────────────────────────────────────────────
+// ── v21.63 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16450,7 +16450,7 @@ let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
-// v21.62 — Follow-up Engine can assign/filter to admins & office too
+// v21.63 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16458,7 +16458,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.62 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.63 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16528,7 +16528,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v21.62 — re-connection tag + "by when" date per lead
+// v21.63 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -16554,9 +16554,15 @@ function feAddLead(){
     name, company:cf?cf.value.trim():'', type:window._feType||'B2C', language:window._feLang||'English',
     phone:(document.getElementById('fe-phone').value||'').trim(),
     email:(document.getElementById('fe-email').value||'').trim(),
+    address:(document.getElementById('fe-address')?document.getElementById('fe-address').value:'').trim(),
     source:(document.getElementById('fe-source').value||'').trim(),
     note:(document.getElementById('fe-note').value||'').trim(),
     assignee:(document.getElementById('fe-assignee')?document.getElementById('fe-assignee').value:'')||'' };
+  // pull phone/email/address out of whatever was typed (e.g. all pasted into notes)
+  const _ex=feExtractContact([lead.note,lead.phone,lead.email,lead.address].filter(Boolean).join('\n'));
+  if(!lead.email) lead.email=_ex.email;
+  lead.phone=feNormPhone(lead.phone)||_ex.phone||lead.phone;
+  if(!lead.address) lead.address=_ex.address;
   lead.touches=feGenTouches(lead);
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
@@ -16625,6 +16631,7 @@ function feOpenAdd(){
     '<div class="fe-field" id="fe-company-field" style="display:none"><label class="fe-lab">Company</label><input id="fe-company" class="fe-in" placeholder="Gym, hotel, studio…"/></div>'+
     '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Phone</label><input id="fe-phone" class="fe-in" placeholder="+971…"/></div>'+
       '<div class="fe-field"><label class="fe-lab">Email</label><input id="fe-email" class="fe-in" placeholder="name@…"/></div></div>'+
+    '<div class="fe-field"><label class="fe-lab">Address</label><input id="fe-address" class="fe-in" placeholder="Street, area, city…"/></div>'+
     '<div class="fe-two"><div class="fe-field"><label class="fe-lab">Source</label><input id="fe-source" class="fe-in" placeholder="Instagram, referral…"/></div>'+
       '<div class="fe-field"><label class="fe-lab">Language</label><div class="fe-seg" id="fe-seg-lang">'+
         '<button class="on" data-v="English" onclick="fePickLang(\'English\')">English</button>'+
@@ -16698,11 +16705,40 @@ function feParseSimple(raw){
   });
   return out;
 }
+// v21.63 — robust extraction of phone / email / address into separate fields
+function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
+function feNormPhone(s){ s=(s||'').trim(); if(!s) return ''; const d=feDigits(s); if(d.length<7||d.length>15) return '';
+  if(/^\+/.test(s)) return '+'+d;
+  if(/^00/.test(s)) return '+'+d.replace(/^0+/,'');
+  if(d.length>=11 && /^971|^966|^974|^973|^965|^968|^20|^91/.test(d)) return '+'+d;  // common GCC/intl prefixes
+  return d;
+}
+function feFindEmail(blob){ const m=(blob||'').match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/); return m?m[0]:''; }
+function feFindPhone(blob){ const m=(blob||'').match(/\+?\d[\d\s().\-]{6,}\d/g); if(!m) return '';
+  let best='', score=-1;
+  m.forEach(function(c){ const d=feDigits(c); if(d.length<7||d.length>15) return; const sc=d.length+(/\+/.test(c)?2:0); if(sc>score){ score=sc; best=c; } });
+  return feNormPhone(best);
+}
+function feFindAddress(blob){ if(!blob) return '';
+  let t=(''+blob).replace(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g,' ').replace(/\+?\d[\d\s().\-]{6,}\d/g,' ');
+  const segs=t.split(/[\n;]+/).map(function(s){ return s.replace(/\s{2,}/g,' ').trim(); }).filter(Boolean);
+  const kw=/(street|st\.?|road|rd\.?|avenue|ave\.?|villa|building|bldg|tower|apt|apartment|flat|floor|suite|block|area|district|p\.?\s*o\.?\s*box|po box|postal|zip|dubai|abu dhabi|sharjah|ajman|fujairah|ras al|uae|emirates|saudi|riyadh|jeddah|doha|qatar|kuwait|bahrain|oman|muscat)/i;
+  for(const s of segs){ if(kw.test(s) && s.replace(/\s/g,'').length>4) return s; }
+  for(const s of segs){ if(s.indexOf(',')>=0 && s.length>=8) return s; }
+  return '';
+}
+function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
 function feNormalize(o){ o=o||{};
   const txt=((o.type||'')+' '+(o.company||'')+' '+(o.note||'')+' '+(o.name||'')).toLowerCase();
   let type=(o.type||'').toUpperCase();
   if(type!=='B2B'&&type!=='B2C'){ type=/b2b|business|gym|hotel|studio|clinic|company|corporate|reseller|wellness|fitness center/.test(txt)?'B2B':'B2C'; }
-  return { name:(o.name||'').trim(), type, company:(o.company||'').trim(), phone:(o.phone||'').trim(), email:(o.email||'').trim(), source:(o.source||'').trim(), note:(o.note||'').trim(), language:(o.language==='Arabic'?'Arabic':'English') };
+  // Build a blob from every field that might carry contact info (handles mis-mapped
+  // columns, e.g. an email pasted into the phone cell) and pull each part out cleanly.
+  const blob=[o.note,o.phone,o.email,o.address,o.source].filter(Boolean).join('\n');
+  const email=feFindEmail(o.email)||feFindEmail(blob)||'';
+  const phone=feNormPhone(o.phone)||feFindPhone(blob)||'';
+  const address=(o.address||'').trim()||feFindAddress(blob)||'';
+  return { name:(o.name||'').trim(), type, company:(o.company||'').trim(), phone:phone, email:email, address:address, source:(o.source||'').trim(), note:(o.note||'').trim(), language:(o.language==='Arabic'?'Arabic':'English') };
 }
 function feRenderImportPreview(){
   const b2b=feImportPreview.filter(l=>l.type==='B2B').length, b2c=feImportPreview.length-b2b;
@@ -17015,9 +17051,10 @@ function feRenderLead(l){
     '<div class="fe-card"><div style="display:flex;gap:12px;align-items:flex-start">'+
       '<div class="fe-av" style="height:44px;width:44px;font-size:15px">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
       '<div class="fe-grow"><div class="fe-name">'+feEsc(l.name)+' <span class="fe-chip">'+l.type+'</span> <span class="fe-chip">'+feEsc(l.language)+'</span> '+feReconnectChip(l, Date.now())+'</div>'+
-        '<div class="fe-meta">'+(l.company?'<div>'+feEsc(l.company)+'</div>':'')+(l.phone?'<div>'+feEsc(l.phone)+'</div>':'')+(l.email?'<div>'+feEsc(l.email)+'</div>':'')+
+        '<div class="fe-meta">'+(l.company?'<div>'+feEsc(l.company)+'</div>':'')+(l.phone?'<div>📞 '+feEsc(l.phone)+'</div>':'')+(l.email?'<div>✉️ '+feEsc(l.email)+'</div>':'')+(l.address?'<div>📍 '+feEsc(l.address)+'</div>':'')+
           (l.source?'<div style="font-size:12px">Source: '+feEsc(l.source)+'</div>':'')+(l.owner?'<div style="font-size:12px">Owner: '+feEsc(l.owner)+'</div>':'')+
-          (l.note?'<div style="font-size:12px"><em>"'+feEsc(l.note)+'"</em></div>':'')+'</div></div></div>'+
+          (l.note?'<div style="font-size:12px"><em>"'+feEsc(l.note)+'"</em></div>':'')+
+          '<div style="margin-top:6px"><button class="fe-sm" onclick="feReparseContact(\''+l.id+'\')" title="Pull phone, email and address out of the notes and fields">⤓ Extract contact</button></div>'+'</div></div></div>'+
       '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Assigned to</div>'+
         '<select class="fe-sel" style="max-width:240px" onchange="feAssign(\''+l.id+'\',this.value)">'+
           '<option value=""'+(l.assignee?'':' selected')+'>Unassigned</option>'+
@@ -17138,7 +17175,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.62 — the reminder day-offset and time of day are user-editable per step.
+// v21.63 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -17220,6 +17257,18 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(l){ l.assignee=rep||''; feStamp(l); feSave(); renderFollowup(); } }
+function feReparseContact(id){
+  const l=feGet(id); if(!l) return;
+  const blob=[l.note,l.phone,l.email,l.address,l.source].filter(Boolean).join('\n');
+  const ex=feExtractContact(blob);
+  const found=[];
+  if(ex.email && ex.email!==l.email){ l.email=ex.email; found.push('email'); }
+  const np=feNormPhone(l.phone)||ex.phone;
+  if(np && np!==l.phone){ l.phone=np; found.push('phone'); }
+  if(ex.address && !l.address){ l.address=ex.address; found.push('address'); }
+  if(!found.length){ feToast('Nothing new to extract','info'); return; }
+  feStamp(l); feSave(); renderFollowup(); feToast('Extracted: '+found.join(', '),'success');
+}
 function feAddUpdate(id){
   const l=feGet(id); if(!l) return;
   const el=document.getElementById('fe-update-input');
@@ -17347,13 +17396,14 @@ function feSheetToLeads(aoa){
     var iName=pick(['full name','lead name','contact name','name','client','lead','contact']);
     var iType=pick(['type','segment','category','b2b','b2c']);
     var iSource=pick(['source','channel','origin','campaign','lead source']);
+    var iAddress=pick(['address','location','street','area','city','district','region']);
     var iNote=pick(['note','comment','remark','detail','requirement','interest','message']);
     for(var r2=hi+1;r2<rows.length;r2++){ var row=rows[r2];
       var g=function(ix){ return ix>=0?(row[ix]||''):''; };
       var name=g(iName);
       if(!name && iName<0){ for(var c2=0;c2<row.length;c2++){ if(row[c2]){ name=row[c2]; break; } } }
       if(!name) continue;
-      leads.push(feNormalize({ name:name, email:g(iEmail), phone:g(iPhone), company:g(iCompany), type:g(iType), source:g(iSource), note:g(iNote) }));
+      leads.push(feNormalize({ name:name, email:g(iEmail), phone:g(iPhone), company:g(iCompany), type:g(iType), source:g(iSource), address:g(iAddress), note:g(iNote) }));
     }
   } else {
     rows.forEach(function(row){ if(row[0]) leads.push(feNormalize({ name:row[0], phone:row[1], email:row[2], company:row[3], source:row[4], note:row.slice(5).join(' ') })); });
