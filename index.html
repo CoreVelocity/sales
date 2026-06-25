@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.58</title>
+<title>CoreV | OxeFit Sales Tracker v21.59</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.58 · Follow-up Engine grouped by region (Dubai / Abu Dhabi) + region filter
+      v21.59 · Follow-up Engine: customizable reminder day &amp; time per step
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.58</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.59</strong></p>
     </div>
   </div>
 </div>
@@ -3976,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.58 · FE</div>
+      <div class="sidebar-version">v21.59 · FE</div>
     </div>
   </aside>
 
@@ -4052,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.58</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.59</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.58 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.59 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.58 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.59 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.58 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.59 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.58
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.59
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.58
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.59
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.58 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.59 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.58
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.59
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11401,7 +11401,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.58 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.59 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13858,7 +13858,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.58 — per-Month filter ───────────────────────────────────────────────
+// ── v21.59 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16449,7 +16449,7 @@ let feImportBusy = false;
 let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
-// v21.58 — Follow-up Engine can assign/filter to admins & office too
+// v21.59 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16457,7 +16457,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.58 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.59 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -17018,7 +17018,7 @@ function feRenderLead(l){
     wf=feClosureBanner(l)+'<div class="fe-sub" style="margin:14px 0 8px">Workflow history</div>'+steps.map(function(t){ return feRenderDoneStep(l,t,true); }).join('');
   } else {
     const pct=steps.length?Math.round(doneCount/steps.length*100):0;
-    wf+='<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Follow-up workflow</h3><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="fe-sm" onclick="feSetReminders(\''+l.id+'\')" title="Create 3 PM Outlook reminders for the upcoming steps">🔔 3 PM reminders</button><span class="fe-sub">'+(activeIndex>=0?('Step '+(activeIndex+1)+' of '+steps.length):'All steps done')+'</span></div></div>';
+    wf+='<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Follow-up workflow</h3><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="fe-sm" onclick="feSetReminders(\''+l.id+'\')" title="Create Outlook reminders for the upcoming steps on your schedule">🔔 Set Outlook reminders</button><button class="fe-sm" onclick="feOpenReminderSettings()" title="Customize the reminder day &amp; time per step">⚙︎ Schedule</button><span class="fe-sub">'+(activeIndex>=0?('Step '+(activeIndex+1)+' of '+steps.length):'All steps done')+'</span></div></div>';
     wf+='<div style="height:6px;background:var(--navy-mid);border-radius:999px;overflow:hidden;margin-bottom:14px"><div style="height:100%;width:'+pct+'%;background:var(--teal);transition:width .25s"></div></div>';
     steps.forEach(function(t,idx){
       if(activeIndex<0 || idx<activeIndex) wf+=feRenderDoneStep(l,t,false);
@@ -17100,7 +17100,55 @@ function feRenderLockedStep(l,t){
 function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===k)?null:k; renderFollowup(); }
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
-/* ---- 3 PM Outlook reminders (reuses the app's Microsoft sign-in) ---- */
+/* ---- Customizable Outlook reminders (per-step day & time) ---- */
+// v21.59 — the reminder day-offset and time of day are user-editable per step.
+const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
+function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
+function feRemGet(){ const def=feRemDefaults();
+  try{ const raw=JSON.parse(localStorage.getItem(FE_REMINDER_KEY)||'null');
+    if(raw&&raw.steps){ FE_CADENCE.forEach(function(c){ const s=raw.steps[c.key]; if(s){ def.steps[c.key]={ day:(s.day!=null?(parseInt(s.day,10)||0):def.steps[c.key].day), time:(typeof s.time==='string'&&/^\d{1,2}:\d{2}$/.test(s.time)?s.time:def.steps[c.key].time) }; } }); }
+  }catch(e){}
+  return def;
+}
+function feRemSave(cfg){ try{ localStorage.setItem(FE_REMINDER_KEY, JSON.stringify(cfg)); }catch(e){} }
+function feReminderDateFor(lead, key){
+  const cfg=feRemGet(); const st=cfg.steps[key]||{day:0,time:'15:00'};
+  const base=new Date(lead.createdAt||Date.now());
+  const d=new Date(base.getFullYear(), base.getMonth(), base.getDate()+(parseInt(st.day,10)||0));
+  const tm=(st.time||'15:00').split(':'); d.setHours(parseInt(tm[0],10)||0, parseInt(tm[1],10)||0, 0, 0);
+  return d;
+}
+function feOpenReminderSettings(){
+  const cfg=feRemGet();
+  const rows=FE_CADENCE.map(function(c){ const st=cfg.steps[c.key]||{day:0,time:'15:00'};
+    return '<div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px">'+
+      '<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">'+feEsc(c.dayLabel)+' · '+feEsc(c.channel)+'</div><div class="fe-sub fe-trunc">'+feEsc(c.purpose)+'</div></div>'+
+      '<div style="width:62px"><label class="fe-lab">Day</label><input class="fe-in" type="number" min="0" id="ferm-day-'+c.key+'" value="'+(parseInt(st.day,10)||0)+'"></div>'+
+      '<div style="width:104px"><label class="fe-lab">Time</label><input class="fe-in" type="time" id="ferm-time-'+c.key+'" value="'+feEsc(st.time||'15:00')+'"></div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('fe-modal-root').innerHTML=
+   '<div class="fe-overlay" onclick="if(event.target===this)feCloseModal()"><div class="fe-modal">'+
+     '<div class="fe-rowb" style="margin-bottom:6px"><h3 class="fe-h">Reminder schedule</h3><button class="fe-x" onclick="feCloseModal()">&times;</button></div>'+
+     '<p class="fe-sub" style="margin:0 0 12px">“Day” = days after a lead is created. “Time” = when the Outlook reminder fires. Applies next time you tap “Set Outlook reminders” on a lead.</p>'+
+     rows+
+     '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="fe-sm" onclick="feSaveReminderSettings()" style="background:var(--brand-grad);color:#fff;border-color:transparent">Save schedule</button><button class="fe-sm" onclick="feResetReminderSettings()">Reset to default</button><button class="fe-sm" onclick="feCloseModal()">Cancel</button></div>'+
+   '</div></div>';
+}
+function feSaveReminderSettings(){
+  const cfg={steps:{}};
+  FE_CADENCE.forEach(function(c){
+    const dEl=document.getElementById('ferm-day-'+c.key), tEl=document.getElementById('ferm-time-'+c.key);
+    const day=Math.max(0, parseInt(dEl&&dEl.value,10)||0);
+    const time=(tEl&&/^\d{1,2}:\d{2}$/.test(tEl.value))?tEl.value:'15:00';
+    cfg.steps[c.key]={day:day, time:time};
+  });
+  feRemSave(cfg); feCloseModal(); feToast('Reminder schedule saved','success');
+  if(typeof renderFollowup==='function') renderFollowup();
+}
+function feResetReminderSettings(){ try{ localStorage.removeItem(FE_REMINDER_KEY); }catch(e){} feOpenReminderSettings(); feToast('Reset to default cadence','info'); }
+
+/* ---- Outlook reminder creation (reuses the app's Microsoft sign-in) ---- */
 function feLocalISOnoZ(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes())+':00'; }
 async function feGetCalToken(){
   if(typeof msalInstance==='undefined' || !msalInstance || typeof msalAccount==='undefined' || !msalAccount) throw new Error('Sign in with your Microsoft account first (top-right of the app).');
@@ -17108,8 +17156,8 @@ async function feGetCalToken(){
   try{ return (await msalInstance.acquireTokenSilent(req)).accessToken; }
   catch(e){ try{ return (await msalInstance.acquireTokenPopup(req)).accessToken; } catch(pe){ try{ await msalInstance.acquireTokenRedirect(req); }catch(re){} throw pe; } }
 }
-async function feCreateReminderEvent(tok, lead, t){
-  const d=new Date(t.scheduledAt); d.setHours(15,0,0,0);   // 3:00 PM local on the step's date
+async function feCreateReminderEvent(tok, lead, t, when){
+  const d=(when instanceof Date && !isNaN(when)) ? when : (function(){ const x=new Date(t.scheduledAt); x.setHours(15,0,0,0); return x; })();
   const startISO=feLocalISOnoZ(d); const endISO=feLocalISOnoZ(new Date(d.getTime()+30*60000));
   const tz=(typeof Intl!=='undefined' && Intl.DateTimeFormat && Intl.DateTimeFormat().resolvedOptions().timeZone)||'UTC';
   const subject='Follow-up: '+lead.name+' — '+t.dayLabel+' ('+t.channel+')';
@@ -17123,13 +17171,13 @@ async function feSetReminders(id){
   const l=feGet(id); if(!l) return;
   const pending=(l.touches||[]).filter(function(t){ return t.status==='pending'; });
   if(!pending.length){ feToast('No upcoming steps to set reminders for','info'); return; }
-  feToast('Adding '+pending.length+' reminder(s) at 3 PM…','info');
+  feToast('Adding '+pending.length+' Outlook reminder(s)…','info');
   try{
     const tok=await feGetCalToken();
     let n=0;
-    for(let i=0;i<pending.length;i++){ await feCreateReminderEvent(tok, l, pending[i]); const tt=l.touches.find(function(x){ return x.key===pending[i].key; }); if(tt) tt.reminderSet=true; n++; }
+    for(let i=0;i<pending.length;i++){ const when=feReminderDateFor(l, pending[i].key); await feCreateReminderEvent(tok, l, pending[i], when); const tt=l.touches.find(function(x){ return x.key===pending[i].key; }); if(tt) tt.reminderSet=true; n++; }
     feStamp(l); feSave(); renderFollowup();
-    feToast('Added '+n+' Outlook reminder(s) at 3 PM on each step date','success');
+    feToast('Added '+n+' Outlook reminder(s) on your schedule','success');
   }catch(e){ feToast('Reminders: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); }
 }
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
