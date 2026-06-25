@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.55</title>
+<title>CoreV | OxeFit Sales Tracker v21.56</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.55 · Demo Tracker: filter by Month and by Sales Rep
+      v21.56 · Closed-Won auto-syncs from HubSpot; total always matches CRM
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.55</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.56</strong></p>
     </div>
   </div>
 </div>
@@ -3976,7 +3976,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.55 · FE</div>
+      <div class="sidebar-version">v21.56 · FE</div>
     </div>
   </aside>
 
@@ -4052,7 +4052,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.55</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.56</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6192,7 +6192,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.55 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.56 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6775,12 +6775,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.55 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.56 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.55 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.56 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7125,7 +7125,7 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.55
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.56
       meta : remote._meta || null
     };
   }
@@ -7195,7 +7195,7 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.55
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.56
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7419,7 +7419,7 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.55 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.56 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
   return env;
 }
@@ -7456,7 +7456,7 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.55
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.56
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11161,8 +11161,9 @@ function execAggForMonth(year, month) {
   const md = (typeof allData !== 'undefined' && allData[k]) ? allData[k] : { weeks: [] };
   const blank = () => ({ commit: 0, bestCase: 0, closedWon: 0, forecast: 0, xs1: 0, xp1: 0, pipeline: 0 });
   const teams = { 'Dubai': blank(), 'Abu Dhabi': blank() };
-  const repClosedRows = {};
   const pipeSnap = {};
+  const closedByRep = {};   // MAX closed-won per rep across the month's weeks
+  const repTeam = {};
   (md.weeks || []).forEach(w => {
     if (!w) return;
     w.forEach(r => {
@@ -11173,12 +11174,21 @@ function execAggForMonth(year, month) {
       const xs1    = parseFloat(r.forecastXS1) || 0;
       const xp1    = parseFloat(r.forecastXP1) || 0;
       const sw     = (typeof STAGE_WEIGHTS !== 'undefined' && STAGE_WEIGHTS[r.stage]) || 0;
-      if (r.rep) repClosedRows[r.rep] = (repClosedRows[r.rep] || 0) + closed;
+      // Closed-won is a month-to-date snapshot written into week 0 (other weeks
+      // are meant to be cleared). Take the MAX per rep across weeks rather than
+      // summing, so a stale duplicate in another week can't double/triple-count.
+      if (r.rep) { closedByRep[r.rep] = Math.max(closedByRep[r.rep] || 0, closed); repTeam[r.rep] = r.team; }
       if (r.rep && r.hubspotSynced) { const tp = parseFloat(r.truePipeline) || 0; if (tp > 0) pipeSnap[r.rep] = tp; }
       if (!team) return;
-      team.commit += commit; team.bestCase += best; team.closedWon += closed;
+      team.commit += commit; team.bestCase += best;
       team.forecast += (commit + best) * sw; team.xs1 += xs1; team.xp1 += xp1;
     });
+  });
+  const repClosedRows = {};
+  Object.keys(closedByRep).forEach(rep => {
+    const amt = closedByRep[rep]; if (!amt) return;
+    repClosedRows[rep] = amt;
+    if (teams[repTeam[rep]]) teams[repTeam[rep]].closedWon += amt;
   });
   ['Dubai', 'Abu Dhabi'].forEach(tn => {
     let tp = 0; (TEAMS[tn] || []).forEach(rep => { tp += (pipeSnap[rep] || 0); });
@@ -11354,7 +11364,7 @@ function renderExecDashboard() {
     teamRow('Dubai', teams['Dubai']) + teamRow('Abu Dhabi', teams['Abu Dhabi']);
 
   // Top performers
-  const reps = Object.entries(repClosed).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const reps = Object.entries(repClosed).filter(([k,v]) => v > 0 && k !== '(Unassigned)').sort((a,b) => b[1]-a[1]).slice(0,5);
   const topEl = document.getElementById('execTopReps');
   if (!reps.length) {
     topEl.innerHTML = `<div class="exec-empty">No closed-won recorded yet for ${rangeLbl}.</div>`;
@@ -11391,6 +11401,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.56 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -11484,10 +11495,11 @@ function renderPipelineByMonthChart(){
     statusEl.textContent=parts.join(' · ');
   }
 }
-async function refreshPipelineByMonth(){
+async function refreshPipelineByMonth(opts){
+  const silent = !!(opts && opts.silent);
   const btn=document.getElementById('pbmRefreshBtn'), statusEl=document.getElementById('pbmStatus');
-  if(typeof hubspotState==='undefined' || !hubspotState || !hubspotState.accessToken){ try{ showToast('Connect HubSpot first (use the HubSpot chip), then refresh','info'); }catch(_){} return; }
-  if(btn){ btn.disabled=true; btn.textContent='Loading…'; }
+  if(typeof hubspotState==='undefined' || !hubspotState || !hubspotState.accessToken){ if(!silent){ try{ showToast('Connect HubSpot first (use the HubSpot chip), then refresh','info'); }catch(_){} } return; }
+  if(!silent && btn){ btn.disabled=true; btn.textContent='Loading…'; }
   if(statusEl) statusEl.textContent='Fetching deals from HubSpot…';
   try{
     const deals=await hubspotFetchAllDeals();
@@ -11502,7 +11514,10 @@ async function refreshPipelineByMonth(){
     });
     _pbmSaveCache({ months:months, at:new Date().toISOString(), dealCount:count, fy:PBM_FY });
 
-    // ── Closed-Won truth: group WON deals by owner → rep × close-month ──────
+    // ── Closed-Won truth: EVERY won deal, grouped by owner → rep × close-month.
+    //    Deals whose owner isn't mapped to a rep go to '(Unassigned)' so the
+    //    dashboard TOTAL always equals HubSpot — the admin can attribute them
+    //    later by completing the owner mapping. ────────────────────────────────
     const om=(typeof hsGetOwnerMap==='function')?(hsGetOwnerMap()||{}):{};
     const ownerToRep={};
     Object.keys(om).forEach(function(rep){ const id=om[rep]; if(id!=null && id!=='') ownerToRep[String(id)]=rep; });
@@ -11511,8 +11526,8 @@ async function refreshPipelineByMonth(){
       if(!d.isClosedWon || !d.close) return;
       const dt=new Date(d.close); if(isNaN(dt)) return;
       const amt=Number(d.amount)||0;
-      const rep=ownerToRep[String(d.ownerId)];
-      if(!rep){ unmapped++; unmappedAmt+=amt; return; }   // owner not mapped to a rep
+      let rep=ownerToRep[String(d.ownerId)];
+      if(!rep){ rep='(Unassigned)'; unmapped++; unmappedAmt+=amt; }
       const mk=dt.getFullYear()+'-'+dt.getMonth();
       (byRepMonth[rep]=byRepMonth[rep]||{});
       byRepMonth[rep][mk]=(byRepMonth[rep][mk]||0)+amt;
@@ -11521,13 +11536,33 @@ async function refreshPipelineByMonth(){
     _cwSave({ byRepMonth:byRepMonth, at:new Date().toISOString(), wonCount:wonCount, unmapped:unmapped, unmappedAmt:unmappedAmt });
 
     if(typeof renderExecDashboard==='function') renderExecDashboard(); else renderPipelineByMonthChart();
-    let msg='Synced from HubSpot — '+count+' open · '+wonCount+' won deal'+(wonCount===1?'':'s');
-    if(unmapped) msg+=' · '+unmapped+' won deal'+(unmapped===1?'':'s')+' have no rep mapping';
-    try{ showToast(msg, unmapped?'info':'success'); }catch(_){}
+    const attr = unmapped ? (' · '+unmapped+' won unattributed (map owners to assign)') : '';
+    if(statusEl) statusEl.textContent = count+' open · '+wonCount+' won deals'+attr;
+    if(!silent){
+      let msg='Synced from HubSpot — '+count+' open · '+wonCount+' won deal'+(wonCount===1?'':'s');
+      if(unmapped) msg+=' · '+unmapped+' unattributed (counted under "(Unassigned)")';
+      try{ showToast(msg, unmapped?'info':'success'); }catch(_){}
+    }
   }catch(e){
     if(statusEl) statusEl.textContent='Could not load: '+(((e&&e.message)||'error')+'').slice(0,90);
-    try{ showToast('CRM refresh: '+(((e&&e.message)||'failed')+'').slice(0,120),'error'); }catch(_){}
-  } finally { if(btn){ btn.disabled=false; btn.textContent='↻ Refresh CRM data'; } }
+    if(!silent){ try{ showToast('CRM refresh: '+(((e&&e.message)||'failed')+'').slice(0,120),'error'); }catch(_){} }
+  } finally { if(!silent && btn){ btn.disabled=false; btn.textContent='↻ Refresh CRM data'; } }
+}
+// Auto-pull CRM closed-won/pipeline when the dashboard opens, so the numbers
+// reflect HubSpot without a manual click. Throttled to once per 10 minutes.
+let _crmAutoBusy = false, _crmLastAttempt = 0;
+function maybeAutoRefreshCRM(){
+  try{
+    if(_crmAutoBusy) return;
+    if(typeof hubspotState==='undefined' || !hubspotState || !hubspotState.accessToken) return;
+    const cache=(typeof _cwLoad==='function')?_cwLoad():null;
+    const at=cache && cache.at ? Date.parse(cache.at) : 0;
+    const now=Date.now();
+    if(now-at < 600000) return;               // cache fresh enough
+    if(now-_crmLastAttempt < 600000) return;  // don't hammer on repeated failures
+    _crmLastAttempt=now; _crmAutoBusy=true;
+    Promise.resolve(refreshPipelineByMonth({silent:true})).catch(function(){}).then(function(){ _crmAutoBusy=false; });
+  }catch(_){ _crmAutoBusy=false; }
 }
 
 // Region for a rep, derived from team membership
@@ -13823,7 +13858,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.55 — per-Month filter ───────────────────────────────────────────────
+// ── v21.56 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
