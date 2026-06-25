@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.49</title>
+<title>CoreV | OxeFit Sales Tracker v21.50</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3810,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.49 · Pipeline-by-close-month bar chart (FY2026)
+      v21.50 · Commit-avg line on chart + tracker pipeline = this month
     </div>
   </div>
 </div>
@@ -3883,7 +3883,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.49</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.50</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3955,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.49 · FE</div>
+      <div class="sidebar-version">v21.50 · FE</div>
     </div>
   </aside>
 
@@ -4031,7 +4031,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.49</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.50</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -9130,14 +9130,20 @@ function renderKPIs() {
   if (cwEl) cwEl.textContent = 'AED ' + fmtNum(totClosedWon);
   const cwSub = document.getElementById('kpiClosedWonSub');
   if (cwSub) cwSub.textContent = `${closingReps} rep${closingReps===1?'':'s'} closing this week`;
-  // Total Pipeline KPI (HubSpot-sourced — sum of all open deals owned by reps)
+  // Total Pipeline KPI — v21.50: reflect ONLY the displayed month's pipeline
+  // (open deals whose HubSpot close date falls in the viewed month).
   const tpEl    = document.getElementById('kpiTotalPipeline');
   const tpSubEl = document.getElementById('kpiTotalPipelineSub');
   if (tpEl) {
-    if (anyCrmSynced && totTruePipeline > 0) {
+    const _mk = getMonthKey(curYear, curMonth);
+    const _hasPBM = rows.some(r => r && r.pipelineByMonth);
+    const tpMonth = rows.reduce((s,r)=> s + ((r.pipelineByMonth && parseFloat(r.pipelineByMonth[_mk]))||0), 0);
+    if (anyCrmSynced && _hasPBM) {
+      tpEl.textContent = 'AED ' + fmtNum(tpMonth);
+      if (tpSubEl) tpSubEl.textContent = `HubSpot · closing ${MONTHS[curMonth]} ${curYear}`;
+    } else if (anyCrmSynced && totTruePipeline > 0) {
       tpEl.textContent = 'AED ' + fmtNum(totTruePipeline);
-      const syncedReps = rows.filter(r => r.hubspotSynced).length;
-      if (tpSubEl) tpSubEl.textContent = `HubSpot · ${syncedReps} rep${syncedReps===1?'':'s'} synced`;
+      if (tpSubEl) tpSubEl.textContent = `HubSpot · all open · re-sync for ${MONTHS[curMonth]} only`;
     } else {
       tpEl.textContent = 'AED 0';
       if (tpSubEl) tpSubEl.textContent = 'Sync HubSpot to populate';
@@ -10357,6 +10363,7 @@ function hubspotApplyCrmTotalsForRep(repName, dealsForRep) {
   if (curRow) {
     if (!(curRow.locked && currentRole !== 'admin')) {
       curRow.truePipeline   = truePipeline;
+      curRow.pipelineByMonth= _pbmBucket(open);   // v21.50 — open pipeline by close-month
       curRow.hubspotSynced  = true;
       curRow.hubspotSyncedAt= nowIso;
       curRow.updatedAt      = nowIso;   // v15.0 — stamp so CRM data survives the merge
@@ -10535,6 +10542,7 @@ function hubspotApplySelected() {
   //  • truePipeline = sum of ALL open deals (basis for Pipeline Coverage Ratio)
   //    — applied to the CURRENTLY VIEWED week (it's a "now" snapshot).
   row.truePipeline   = allOpen.reduce((s,d) => s + (d.amount||0), 0);
+  row.pipelineByMonth= _pbmBucket(allOpen);   // v21.50 — open pipeline by close-month
   row.hubspotSynced  = true;
   row.hubspotSyncedAt= new Date().toISOString();
 
@@ -11167,37 +11175,71 @@ const PBM_FY = 2026;
 function _pbmCompact(n){ n=Number(n)||0; const a=Math.abs(n); if(a>=1e9) return (n/1e9).toFixed(1)+'B'; if(a>=1e6) return (n/1e6).toFixed(1)+'M'; if(a>=1e3) return (n/1e3).toFixed(0)+'K'; return String(Math.round(n)); }
 function _pbmLoadCache(){ try{ const r=localStorage.getItem(PIPELINE_BY_MONTH_KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
 function _pbmSaveCache(o){ try{ localStorage.setItem(PIPELINE_BY_MONTH_KEY, JSON.stringify(o)); }catch(e){} }
+function _pbmBucket(deals){ const pbm={}; (deals||[]).forEach(function(d){ if(!d.close) return; const dt=new Date(d.close); if(isNaN(dt)) return; const amt=Number(d.amount)||0; if(!amt) return; const k=dt.getFullYear()+'-'+dt.getMonth(); pbm[k]=(pbm[k]||0)+amt; }); return pbm; }
+function _pbmCommitAvgByMonth(){
+  const out=new Array(12).fill(0);
+  if(typeof allData==='undefined') return out;
+  for(let m=0;m<12;m++){
+    const md=allData[getMonthKey(PBM_FY,m)];
+    if(!md||!md.weeks) continue;
+    let sum=0,cnt=0;
+    md.weeks.forEach(function(w){ if(!w) return; w.forEach(function(r){ const c=parseFloat(r.commitValue)||0; if(c>0){ sum+=c; cnt++; } }); });
+    out[m]=cnt?(sum/cnt):0;
+  }
+  return out;
+}
 function renderPipelineByMonthChart(){
   const host=document.getElementById('pipelineByMonthChart'); if(!host) return;
   const statusEl=document.getElementById('pbmStatus');
   const cache=_pbmLoadCache();
-  if(!cache || !Array.isArray(cache.months)){
+  const commitAvg=_pbmCommitAvgByMonth();
+  const haveCommit=commitAvg.some(function(v){ return v>0; });
+  const havePipe=!!(cache && Array.isArray(cache.months) && cache.months.some(function(v){ return v>0; }));
+  if(!havePipe && !haveCommit){
     host.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No data yet — click “Refresh from HubSpot” to pull open deals and build the FY'+PBM_FY+' pipeline chart.</div>';
     return;
   }
-  const months=cache.months;
-  const max=Math.max.apply(null, months.concat([1]));
-  const total=months.reduce(function(a,b){ return a+(Number(b)||0); },0);
+  const months=(cache&&Array.isArray(cache.months))?cache.months:new Array(12).fill(0);
+  const pmax=Math.max.apply(null, months.concat([1]));
+  const cmax=Math.max.apply(null, commitAvg.concat([1]));
+  const pTotal=months.reduce(function(a,b){ return a+(Number(b)||0); },0);
   const labels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const W=720,H=300,padL=8,padR=8,padT=28,padB=42,gap=10;
+  const W=720,H=320,padL=8,padR=8,padT=24,padB=42,gap=10;
   const plotW=W-padL-padR, plotH=H-padT-padB, bw=(plotW-gap*11)/12;
   let svg='';
   for(let i=0;i<12;i++){
     const v=Number(months[i])||0;
-    const h=max>0?(v/max)*plotH:0;
+    const h=pmax>0?(v/pmax)*plotH:0;
     const x=padL+i*(bw+gap), y=padT+plotH-h;
-    svg+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(h,0).toFixed(1)+'" rx="3" fill="#fb923c" opacity="'+(v>0?'0.92':'0.16')+'"></rect>';
-    if(v>0) svg+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-6).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text)">'+_pbmCompact(v)+'</text>';
+    svg+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(h,0).toFixed(1)+'" rx="3" fill="#fb923c" opacity="'+(v>0?'0.9':'0.16')+'"></rect>';
+    if(v>0) svg+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-6).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fb923c">'+_pbmCompact(v)+'</text>';
     svg+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(padT+plotH+16).toFixed(1)+'" text-anchor="middle" font-size="11" fill="var(--text-muted)">'+labels[i]+'</text>';
   }
   svg+='<line x1="'+padL+'" y1="'+(padT+plotH).toFixed(1)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH).toFixed(1)+'" stroke="var(--border)" stroke-width="1"></line>';
-  host.innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;flex-wrap:wrap;gap:8px;">'+
-      '<div style="font-size:13px;color:var(--text-muted);">Open pipeline by expected close month · FY'+PBM_FY+' (Jan–Dec)</div>'+
-      '<div style="font-size:13px;font-weight:700;color:#fb923c;">Total: AED '+fmtNum(total)+'</div>'+
-    '</div>'+
-    '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="max-width:100%;">'+svg+'</svg>';
-  if(statusEl) statusEl.textContent=(cache.dealCount!=null?(cache.dealCount+' open deals · '):'')+'updated '+(cache.at?new Date(cache.at).toLocaleString():'—');
+  if(haveCommit){
+    const pts=[];
+    for(let i=0;i<12;i++){
+      const cv=Number(commitAvg[i])||0;
+      const cx=padL+i*(bw+gap)+bw/2;
+      const cy=padT+plotH-(cmax>0?(cv/cmax)*plotH:0);
+      pts.push([cx,cy,cv]);
+    }
+    svg+='<polyline points="'+pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' ')+'" fill="none" stroke="var(--teal)" stroke-width="2"></polyline>';
+    pts.forEach(function(p){ if(p[2]>0) svg+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="var(--teal)"></circle>'; });
+  }
+  const legend='<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12px;margin-bottom:6px;">'+
+    '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:#fb923c;border-radius:2px;display:inline-block;"></span>Pipeline (AED) · left axis</span>'+
+    '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:14px;border-top:2px solid var(--teal);display:inline-block;"></span>Avg commit / entry (AED) · right axis'+(haveCommit?(' · peak '+_pbmCompact(cmax)):'')+'</span>'+
+    '<span style="margin-left:auto;font-weight:700;color:#fb923c;">Pipeline total: AED '+fmtNum(pTotal)+'</span>'+
+  '</div>';
+  host.innerHTML=legend+'<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet" style="max-width:100%;">'+svg+'</svg>';
+  if(statusEl){
+    const parts=[];
+    if(cache&&cache.dealCount!=null) parts.push(cache.dealCount+' open deals');
+    if(cache&&cache.at) parts.push('pipeline updated '+new Date(cache.at).toLocaleDateString());
+    parts.push('avg commit from tracker entries');
+    statusEl.textContent=parts.join(' · ');
+  }
 }
 async function refreshPipelineByMonth(){
   const btn=document.getElementById('pbmRefreshBtn'), statusEl=document.getElementById('pbmStatus');
