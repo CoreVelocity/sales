@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.50</title>
+<title>CoreV | OxeFit Sales Tracker v21.51</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3810,7 +3811,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.50 · Commit-avg line on chart + tracker pipeline = this month
+      v21.51 · Region-card pipeline reflects the month
     </div>
   </div>
 </div>
@@ -3883,7 +3884,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.50</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.51</strong></p>
     </div>
   </div>
 </div>
@@ -3955,7 +3956,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.50 · FE</div>
+      <div class="sidebar-version">v21.51 · FE</div>
     </div>
   </aside>
 
@@ -4031,7 +4032,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.50</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.51</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -7790,24 +7791,26 @@ function renderCommitPanel() {
       if (r.hubspotSynced) t.syncedReps.add(r.rep);
     });
   });
-  // Per-team Total Pipeline (HubSpot): for each rep, take the LATEST non-zero
-  // truePipeline snapshot across the month (don't sum — each weekly snapshot
-  // represents the same CRM state at sync time).
+  // Per-team Total Pipeline (HubSpot) — v21.51: reflect the DISPLAYED MONTH's
+  // pipeline (open deals closing in curMonth) via the per-row pipelineByMonth
+  // buckets; fall back to the all-open snapshot for rows synced before buckets existed.
+  const _mk = getMonthKey(curYear, curMonth);
   ['Dubai', 'Abu Dhabi'].forEach(teamName => {
     let teamTP = 0;
     TEAMS[teamName].forEach(repName => {
-      let latestTP = 0;
+      let monthTP = 0, allTP = 0, sawPBM = false;
       md.weeks.forEach((w, wi) => {
         if (!w) return;
-        if (wi > curWeek) return;   // v21.48 — snapshot up to and including the displayed week
+        if (wi > curWeek) return;   // snapshot up to and including the displayed week
         w.forEach(r => {
           if (r.rep === repName && r.hubspotSynced) {
-            const tp = parseFloat(r.truePipeline) || 0;
-            if (tp > 0) latestTP = tp; // overwrites with most recent week's snapshot
+            const all = parseFloat(r.truePipeline) || 0;
+            if (all > 0) allTP = all;
+            if (r.pipelineByMonth) { sawPBM = true; monthTP = parseFloat(r.pipelineByMonth[_mk]) || 0; }
           }
         });
       });
-      teamTP += latestTP;
+      teamTP += sawPBM ? monthTP : allTP;
     });
     agg[teamName].truePipeline = teamTP;
   });
@@ -7830,7 +7833,7 @@ function renderCommitPanel() {
         <div><div class="commit-metric-label">Total Forecast</div><div class="commit-metric-value accent">${fmtNum(d.forecast)||'0'}</div></div>
         <div><div class="commit-metric-label">Best Case</div><div class="commit-metric-value">${fmtNum(d.bestCase)||'0'}</div></div>
         <div><div class="commit-metric-label">Closed (Win)</div><div class="commit-metric-value won">${fmtNum(d.closedWon)||'0'}</div></div>
-        <div><div class="commit-metric-label">Total Pipeline <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value">${d.truePipeline ? fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? '0' : '—')}</div></div>
+        <div><div class="commit-metric-label">Pipeline · ${MONTHS[curMonth]} <span style="font-size:8px;color:#fb923c;font-weight:700;background:rgba(251,146,60,0.15);padding:1px 4px;border-radius:3px;letter-spacing:0.5px;vertical-align:middle;">HS</span></div><div class="commit-metric-value">${d.truePipeline ? fmtNum(d.truePipeline) : (d.syncedReps && d.syncedReps.size ? '0' : '—')}</div></div>
         <div><div class="commit-metric-label">XS1</div><div class="commit-metric-value">${fmtNum(d.xs1)||'0'}</div></div>
         <div><div class="commit-metric-label">XP1</div><div class="commit-metric-value">${fmtNum(d.xp1)||'0'}</div></div>
         <div title="Quotes generated this month"><div class="commit-metric-label">Quotes</div><div class="commit-metric-value accent">${d.quotes||0}</div></div>
