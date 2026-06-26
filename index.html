@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.71</title>
+<title>CoreV | OxeFit Sales Tracker v21.72</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3815,7 +3815,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.71 · Follow-up Engine: typing no longer wiped by background sync
+      v21.72 · Follow-up Engine: media library (images + video links) shuffled into messages
     </div>
   </div>
 </div>
@@ -3933,6 +3933,27 @@
       <div id="waSenderStatus" class="settings-note" style="margin-top:6px;"></div>
     </div>
 
+    <div class="settings-block" id="settingsMediaSection" style="display:none;">
+      <div class="settings-block-title">Media Library (shuffled into messages)</div>
+      <p class="settings-note">Upload images and add video links here. The Follow-up Engine shuffles them randomly across follow-up steps. On a WhatsApp send, a <strong>link is appended to the message</strong>; a shuffled <strong>image downloads</strong> so the rep can attach it. Syncs to the whole team. Keep it lean — large/many images can slow the team sync (videos should be links, not uploads).</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;">
+        <div style="flex:1;min-width:140px;"><label class="settings-note" style="display:block;margin:0 0 4px;">Video label</label><input id="mediaVidLabel" type="text" placeholder="e.g. 30-sec demo" style="width:100%;"></div>
+        <div style="flex:2;min-width:200px;"><label class="settings-note" style="display:block;margin:0 0 4px;">Video link (YouTube/Drive/CDN)</label><input id="mediaVidUrl" type="url" placeholder="https://…" style="width:100%;"></div>
+        <button class="btn btn-primary" onclick="feMediaAddVideo()">Add video</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;">
+        <div style="flex:1;min-width:140px;"><label class="settings-note" style="display:block;margin:0 0 4px;">Image label (optional)</label><input id="mediaImgLabel" type="text" placeholder="e.g. before/after" style="width:100%;"></div>
+        <div style="flex:2;min-width:200px;"><label class="settings-note" style="display:block;margin:0 0 4px;">Image link (optional)</label><input id="mediaImgUrl" type="url" placeholder="https://…" style="width:100%;"></div>
+        <button class="btn btn-ghost" onclick="feMediaAddImageUrl()">Add image link</button>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label class="btn btn-primary" style="cursor:pointer;display:inline-block;">⬆ Upload images<input type="file" accept="image/*" multiple style="display:none;" onchange="feMediaUploadImages(this)"></label>
+        <span class="settings-note" style="margin-left:8px;">Images are compressed automatically.</span>
+      </div>
+      <div id="mediaList"></div>
+      <div id="mediaStatus" class="settings-note" style="margin-top:6px;"></div>
+    </div>
+
     <div class="settings-block">
       <div class="settings-block-title">Appearance</div>
       <p class="settings-note">Current theme: <strong id="settingsThemeLabel">Light</strong>. Use the toggle at the bottom of the side menu to switch between light and dark mode at any time.</p>
@@ -3940,7 +3961,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.71</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.72</strong></p>
     </div>
   </div>
 </div>
@@ -4012,7 +4033,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.71 · FE</div>
+      <div class="sidebar-version">v21.72 · FE</div>
     </div>
   </aside>
 
@@ -4088,7 +4109,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.71</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.72</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6228,7 +6249,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.71 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.72 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6811,12 +6832,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.71 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.72 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.71 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.72 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7161,8 +7182,9 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.71
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.71
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.72
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.72
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.72
       meta : remote._meta || null
     };
   }
@@ -7232,8 +7254,9 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.71
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.71
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.72
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.72
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.72
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7457,10 +7480,12 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.71 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.72 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v21.71 — team-shared AI key (newest-wins by `at`)
+  // v21.72 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
+  // v21.72 — shared media library (newest-wins by `at`)
+  try { env.media = feMediaLoad(); } catch(_){}
   return env;
 }
 
@@ -7496,8 +7521,9 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.71
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.71
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.72
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.72
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.72
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11044,6 +11070,7 @@ function openSettings() {
   if (currentRole === 'admin') renderManageRepsPanel();
   if (typeof renderAISettings === 'function') renderAISettings();
   if (typeof renderWaSettings === 'function') renderWaSettings();
+  if (typeof renderMediaSettings === 'function') renderMediaSettings();
   document.getElementById('settingsModal').classList.add('open');
 }
 
@@ -11444,7 +11471,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.71 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.72 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13901,7 +13928,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.71 — per-Month filter ───────────────────────────────────────────────
+// ── v21.72 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16493,7 +16520,7 @@ let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
-// v21.71 — Follow-up Engine can assign/filter to admins & office too
+// v21.72 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16501,7 +16528,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.71 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.72 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16548,7 +16575,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} }
-// v21.71 — clear addresses that were wrongly populated with note text by the old extractor
+// v21.72 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -16576,7 +16603,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v21.71 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v21.72 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -16617,7 +16644,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v21.71 — re-connection tag + "by when" date per lead
+// v21.72 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -16628,7 +16655,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v21.71 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v21.72 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -16665,7 +16692,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v21.71 — per-rep WhatsApp: each rep stores their own number locally; the
+// v21.72 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -16675,14 +16702,112 @@ function renderWaSettings(){
   const i=document.getElementById('waSenderInput'); if(i && !i.value) i.value=feWaNumber();
   const st=document.getElementById('waSenderStatus'); if(st){ const n=feWaNumber(); st.textContent=n?('Your WhatsApp: '+n):'No number set — you can still send; it uses whichever WhatsApp is active on your device.'; }
 }
+function renderMediaSettings(){
+  const sec=document.getElementById('settingsMediaSection');
+  if(sec) sec.style.display=(currentRole==='admin')?'block':'none';
+  const list=document.getElementById('mediaList'); if(!list) return;
+  const items=feMediaItems();
+  list.innerHTML = items.length ? items.map(function(m){
+    const thumb=(m.kind==='image')
+      ? '<img src="'+feEsc(m.data||m.url||'')+'" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">'
+      : '<div style="width:40px;height:40px;border-radius:6px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--navy-mid)">🎬</div>';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;margin:6px 0;background:var(--card)">'+
+      thumb+
+      '<div style="flex:1;min-width:0"><div class="fe-trunc" style="font-weight:600">'+feEsc(m.label||'')+' <span class="settings-note" style="font-weight:500">· '+m.kind+(m.url?' link':' stored')+'</span></div>'+
+        (m.url?'<div class="settings-note fe-trunc" style="margin:0">'+feEsc(m.url)+'</div>':'')+'</div>'+
+      '<button class="btn btn-ghost" style="color:var(--danger);padding:2px 10px" onclick="feMediaRemove(\''+m.id+'\')">Remove</button>'+
+    '</div>';
+  }).join('') : '<div class="settings-note">No media yet. Upload images or add a video link above.</div>';
+  const st=document.getElementById('mediaStatus'); if(st){ st.textContent=items.length+' item(s) · ~'+Math.round(feMediaSizeBytes()/1024)+' KB stored'+(feMediaSizeBytes()>2500000?' · large, may slow sync':''); }
+}
 function feWhatsApp(id, key){
   const l=feGet(id); if(!l) return;
   const num=feDigits(l.phone||'');
   if(!num){ feToast('No phone number on this lead — add one under Contact details','error'); return; }
   const t=(l.touches||[]).find(function(x){ return x.key===key; });
-  const text=t?((t.subject?(t.subject+'\n\n'):'')+(t.message||'')):'';
+  let text=t?((t.subject?(t.subject+'\n\n'):'')+(t.message||'')):'';
+  // attach shuffled media
+  if(t){ feTouchMedia(t); const m=feMediaById(t.mediaId);
+    if(m && !t.mediaNone){
+      if(m.url){ text+='\n\n📎 '+(m.label||(m.kind==='video'?'Video':'Media'))+': '+m.url; }
+      else if(m.kind==='image' && m.data){ feDownloadDataUrl(m.data, (m.label||'image')+'.jpg'); feToast('Image saved to downloads — attach it in WhatsApp','info'); }
+      try{ feStamp(l); feSave(); }catch(e){}
+    }
+  }
   const url='whatsapp://send?phone='+num+(text?('&text='+encodeURIComponent(text)):'');
   const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
+
+/* ── v21.72 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+   Images are stored compressed (small base64); videos are hosted links. The
+   library syncs to the team (newest-wins). On a WhatsApp send the engine
+   appends a shuffled video/link, or downloads a shuffled image to attach. */
+const MEDIA_KEY='oxefit_media_library_v1';
+let _feLastMediaId=null;
+function feMediaLoad(){ try{ const r=JSON.parse(localStorage.getItem(MEDIA_KEY)||'null'); return (r&&Array.isArray(r.items))?r:{items:[],at:null}; }catch(e){ return {items:[],at:null}; } }
+function feMediaItems(){ return feMediaLoad().items||[]; }
+function feMediaById(id){ return id?feMediaItems().find(function(m){ return m.id===id; }):null; }
+function feMediaSaveLocal(items, at){ try{ localStorage.setItem(MEDIA_KEY, JSON.stringify({items:items||[], at:at||new Date().toISOString()})); }catch(e){ feToast('Could not save — media library may be too large','error'); } }
+function feMediaSizeBytes(){ try{ return (localStorage.getItem(MEDIA_KEY)||'').length; }catch(e){ return 0; } }
+function feMediaPersistAndSync(items){ feMediaSaveLocal(items, new Date().toISOString()); try{ if(typeof scheduleOneDriveSync==='function') scheduleOneDriveSync(); }catch(e){} renderMediaSettings(); }
+function feMediaAddVideo(){
+  const lab=document.getElementById('mediaVidLabel'), u=document.getElementById('mediaVidUrl');
+  const url=(u&&u.value||'').trim(); const label=(lab&&lab.value||'').trim()||'Video';
+  if(!/^https?:\/\//i.test(url)){ feToast('Enter a valid https:// video link','error'); return; }
+  const items=feMediaItems(); items.push({ id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), kind:'video', label:label, url:url });
+  feMediaPersistAndSync(items); if(lab) lab.value=''; if(u) u.value=''; feToast('Video link added','success');
+}
+function feMediaAddImageUrl(){
+  const lab=document.getElementById('mediaImgLabel'), u=document.getElementById('mediaImgUrl');
+  const url=(u&&u.value||'').trim(); const label=(lab&&lab.value||'').trim()||'Image';
+  if(!/^https?:\/\//i.test(url)){ feToast('Enter a valid https:// image link','error'); return; }
+  const items=feMediaItems(); items.push({ id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), kind:'image', label:label, url:url });
+  feMediaPersistAndSync(items); if(lab) lab.value=''; if(u) u.value=''; feToast('Image link added','success');
+}
+function feCompressImage(file, cb){
+  const reader=new FileReader();
+  reader.onload=function(){ const img=new Image(); img.onload=function(){
+    const max=1024; let w=img.width,h=img.height; if(w>max||h>max){ if(w>=h){ h=Math.round(h*max/w); w=max; } else { w=Math.round(w*max/h); h=max; } }
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h);
+    try{ cb(cv.toDataURL('image/jpeg',0.7)); }catch(e){ cb(null); }
+  }; img.onerror=function(){ cb(null); }; img.src=reader.result; };
+  reader.onerror=function(){ cb(null); }; reader.readAsDataURL(file);
+}
+function feMediaUploadImages(input){
+  const files=input&&input.files?Array.from(input.files):[]; if(!files.length) return;
+  let pending=files.length; const items=feMediaItems();
+  files.forEach(function(f){ if(!/^image\//.test(f.type)){ pending--; return; }
+    feCompressImage(f, function(data){ if(data){ items.push({ id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), kind:'image', label:(f.name||'image').replace(/\.[^.]+$/,'').slice(0,40), data:data }); }
+      if(--pending<=0){ const approx=JSON.stringify({items:items}).length;
+        if(approx>4200000){ feToast('Too large — remove some images (keep the library under ~4 MB)','error'); renderMediaSettings(); return; }
+        feMediaPersistAndSync(items); feToast('Added image(s) to the library','success'); if(approx>2500000) feToast('Heads-up: media library is getting large and may slow team sync','info');
+      }
+    });
+  });
+  try{ input.value=''; }catch(e){}
+}
+function feMediaRemove(mid){ const items=feMediaItems().filter(function(m){ return m.id!==mid; }); feMediaPersistAndSync(items); }
+function feAdoptMedia(env){ if(!env||!env.media||!Array.isArray(env.media.items)) return; const remoteAt=env.media.at?Date.parse(env.media.at):0; const localAt=Date.parse(feMediaLoad().at||'')||0; if(remoteAt>localAt){ feMediaSaveLocal(env.media.items, env.media.at); } }
+// shuffle: random, no immediate repeat
+function feNextMediaId(excludeId){ const items=feMediaItems(); if(!items.length) return null; if(items.length===1) return items[0].id; let pick; let guard=0; do{ pick=items[Math.floor(Math.random()*items.length)].id; guard++; }while((pick===excludeId)&&guard<12); return pick; }
+function feTouchMedia(t){ if(!t) return; if(t.mediaNone) return; if(t.mediaId && feMediaById(t.mediaId)) return; const id=feNextMediaId(_feLastMediaId); if(id){ t.mediaId=id; _feLastMediaId=id; } }
+function feReshuffleMedia(id,key){ const l=feGet(id); const t=l&&(l.touches||[]).find(function(x){ return x.key===key; }); if(!t) return; t.mediaNone=false; t.mediaId=feNextMediaId(t.mediaId||_feLastMediaId); _feLastMediaId=t.mediaId; feStamp(l); feSave(); renderFollowup(); }
+function feClearStepMedia(id,key){ const l=feGet(id); const t=l&&(l.touches||[]).find(function(x){ return x.key===key; }); if(!t) return; t.mediaNone=true; t.mediaId=null; feStamp(l); feSave(); renderFollowup(); }
+function feMediaStripHtml(l,t){
+  const items=feMediaItems(); if(!items.length) return '';
+  if(t.mediaNone){ return '<div class="fe-actions" style="margin-top:6px"><span class="fe-sub">No media on this step</span><button class="fe-sm" style="margin-left:auto" onclick="feReshuffleMedia(\''+l.id+'\',\''+t.key+'\')">🔀 Add media</button></div>'; }
+  feTouchMedia(t); const m=feMediaById(t.mediaId); if(!m) return '';
+  const thumb=(m.kind==='image')
+    ? '<img src="'+feEsc(m.data||m.url||'')+'" alt="" style="width:46px;height:46px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">'
+    : '<div style="width:46px;height:46px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--navy-mid);font-size:20px">🎬</div>';
+  return '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px;border:1px dashed var(--border);border-radius:10px">'+
+    thumb+
+    '<div style="flex:1;min-width:0"><div class="fe-trunc" style="font-weight:600;font-size:13px">'+feEsc(m.label||(m.kind==='video'?'Video':'Image'))+'</div>'+
+      '<div class="fe-sub fe-trunc">'+(m.url?('🔗 appended to message'):(m.kind==='image'?'⬇ downloads to attach on send':''))+'</div></div>'+
+    '<button class="fe-sm" title="Shuffle media" onclick="feReshuffleMedia(\''+l.id+'\',\''+t.key+'\')">🔀</button>'+
+    '<button class="fe-sm" title="Remove media from this step" onclick="feClearStepMedia(\''+l.id+'\',\''+t.key+'\')">✕</button>'+
+  '</div>';
 }
 
 /* ---- mutations ---- */
@@ -16709,7 +16834,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v21.71 — only Ahmed and Gladys may mark a lead as Lost
+// v21.72 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -16851,7 +16976,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v21.71 — robust extraction of phone / email / address into separate fields
+// v21.72 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17316,6 +17441,7 @@ function feRenderActiveStep(l,t){
     '<p class="fe-purpose">'+feEsc(t.purpose)+'</p>'+
     (t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
     body+
+    feMediaStripHtml(l,t)+
     '<div class="fe-actions"><button class="fe-sm" '+(busy?'disabled':'')+' onclick="feTune(\''+l.id+'\',\''+t.key+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(busy?'Tuning…':'Tune with AI')+'</button>'+
       '<button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button>'+
       '<button class="fe-sm" onclick="feWhatsApp(\''+l.id+'\',\''+t.key+'\')" style="color:#22c55e;border-color:#22c55e" title="Open WhatsApp Business with this message pre-filled">🟢 WhatsApp</button>'+
@@ -17356,7 +17482,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.71 — the reminder day-offset and time of day are user-editable per step.
+// v21.72 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
