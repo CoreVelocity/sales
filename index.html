@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.72</title>
+<title>CoreV | OxeFit Sales Tracker v21.73</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3815,7 +3815,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.72 · Follow-up Engine: media library (images + video links) shuffled into messages
+      v21.73 · Agency leads: auto-route by Emirate → assign → notify rep
     </div>
   </div>
 </div>
@@ -3961,7 +3961,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.72</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.73</strong></p>
     </div>
   </div>
 </div>
@@ -4033,7 +4033,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.72 · FE</div>
+      <div class="sidebar-version">v21.73 · FE</div>
     </div>
   </aside>
 
@@ -4109,7 +4109,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.72</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.73</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -6249,7 +6249,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.72 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.73 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6832,12 +6832,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.72 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.73 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.72 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.73 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7182,9 +7182,10 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.72
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.72
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.72
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.73
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.73
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.73
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v21.73
       meta : remote._meta || null
     };
   }
@@ -7254,9 +7255,10 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.72
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.72
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.72
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.73
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.73
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.73
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.73
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7480,12 +7482,14 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.72 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.73 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v21.72 — team-shared AI key (newest-wins by `at`)
+  // v21.73 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v21.72 — shared media library (newest-wins by `at`)
+  // v21.73 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
+  // v21.73 — rep notifications (merge by id)
+  try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
   return env;
 }
 
@@ -7521,9 +7525,10 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.72
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.72
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.72
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.73
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.73
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.73
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.73
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11471,7 +11476,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.72 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.73 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13928,7 +13933,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.72 — per-Month filter ───────────────────────────────────────────────
+// ── v21.73 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16520,7 +16525,7 @@ let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
-// v21.72 — Follow-up Engine can assign/filter to admins & office too
+// v21.73 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16528,7 +16533,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.72 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.73 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16574,8 +16579,8 @@ const FE_CADENCE = [
           b2b:"{name}, I don't want to keep chasing if now isn't right — should I close this off, or keep {company} on the list for later? Either's completely fine." } }
 ];
 
-function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} }
-// v21.72 — clear addresses that were wrongly populated with note text by the old extractor
+function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
+// v21.73 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -16603,7 +16608,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v21.72 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v21.73 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -16644,7 +16649,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v21.72 — re-connection tag + "by when" date per lead
+// v21.73 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -16655,7 +16660,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v21.72 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v21.73 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -16692,7 +16697,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v21.72 — per-rep WhatsApp: each rep stores their own number locally; the
+// v21.73 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -16739,7 +16744,7 @@ function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v21.72 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v21.73 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -16834,7 +16839,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v21.72 — only Ahmed and Gladys may mark a lead as Lost
+// v21.73 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -16976,7 +16981,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v21.72 — robust extraction of phone / email / address into separate fields
+// v21.73 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17011,6 +17016,13 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
+// v21.73 — map a free-text Emirate/Location to a routing region
+function feEmirateToRegion(text){
+  const t=(' '+(text||'')+' ').toLowerCase();
+  if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
+  if(/\b(dubai|\bdxb\b|jumeirah|marina|deira|bur dubai|business bay|\bjbr\b|downtown|al barsha|tecom|jvc|jlt|silicon oasis|mirdif|karama|satwa|al quoz|dubai hills|palm jumeirah|international city|discovery gardens|motor city|arabian ranches|damac|emaar)\b/.test(t)) return 'Dubai';
+  return '';
+}
 function feNormalize(o){ o=o||{};
   const txt=((o.type||'')+' '+(o.company||'')+' '+(o.note||'')+' '+(o.name||'')).toLowerCase();
   let type=(o.type||'').toUpperCase();
@@ -17021,7 +17033,9 @@ function feNormalize(o){ o=o||{};
   const email=feFindEmail(o.email)||feFindEmail(blob)||'';
   const phone=feNormPhone(o.phone)||feFindPhone(blob)||'';
   const address=(o.address||'').trim()||feFindAddress(blob)||'';
-  return { name:(o.name||'').trim(), type, company:(o.company||'').trim(), phone:phone, email:email, address:address, source:(o.source||'').trim(), note:(o.note||'').trim(), language:(o.language==='Arabic'?'Arabic':'English') };
+  const emirate=(o.emirate||'').trim();
+  const region=feEmirateToRegion(emirate)||feEmirateToRegion(address)||feEmirateToRegion(o.note)||'';
+  return { name:(o.name||'').trim(), type, company:(o.company||'').trim(), phone:phone, email:email, address:address, emirate:emirate, region:region, source:(o.source||'').trim(), note:(o.note||'').trim(), language:(o.language==='Arabic'?'Arabic':'English') };
 }
 function feRenderImportPreview(){
   const b2b=feImportPreview.filter(l=>l.type==='B2B').length, b2c=feImportPreview.length-b2b;
@@ -17088,6 +17102,7 @@ function feRenderDashboard(){
     '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
     '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div>';
   const topbar='<div class="fe-rowb"><h3 class="fe-h">Follow-up Engine</h3>'+actions+'</div>';
+  const banner=feNotifBanner();
   let dupCount=0; try{ feDupGroups().forEach(function(g){ dupCount+=g.leads.length-1; }); }catch(e){}
   const tabs='<div class="fe-stages" style="margin-bottom:16px">'+
     '<button class="fe-stagebtn '+(feDashTab!=='leads'&&feDashTab!=='dupes'?'on':'')+'" onclick="feSetDashTab(\'summary\')">Summary</button>'+
@@ -17100,11 +17115,11 @@ function feRenderDashboard(){
       '<div style="display:flex;gap:8px;justify-content:center"><button class="fe-btn" onclick="feOpenAdd()">+ Add a lead</button>'+
       '<button class="fe-ghost" onclick="feImportFromDrive()">From Google Drive</button>'+
       '<button class="fe-ghost" onclick="feOpenImport()">Import a list</button></div></div>';
-    return topbar+tabs+empty;
+    return topbar+banner+tabs+empty;
   }
 
-  if(feDashTab==='leads') return topbar+tabs+feLeadsTab(now);
-  if(feDashTab==='dupes') return topbar+tabs+feDupesTab();
+  if(feDashTab==='leads') return topbar+banner+tabs+feLeadsTab(now);
+  if(feDashTab==='dupes') return topbar+banner+tabs+feDupesTab();
 
   const byRep={};
   followupLeads.forEach(function(l){ const r=l.assignee||'Unassigned'; if(!byRep[r]) byRep[r]={total:0,due:0,booked:0,won:0,lost:0,ref:0};
@@ -17177,13 +17192,14 @@ function feRenderDashboard(){
           '<button class="fe-sm" onclick="fePinClear()">Unpin</button>'+
         '</div></div>'
     : '<div class="fe-card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px"><span class="fe-sub" style="flex:1;min-width:160px">Pin a Google Sheet and new rows import automatically.</span><button class="fe-sm" onclick="fePinSheetPicker()">Pin a Google Sheet</button></div>';
-  return topbar+tabs+sheetBar+grid+repBlock+lostBlock;
+  return topbar+banner+tabs+sheetBar+grid+repBlock+lostBlock;
 }
 function feLeadsTab(now){
   const stageSel='<select class="fe-sel" style="max-width:180px" onchange="feSetStageFilter(this.value)">'+
     '<option value=""'+(feFilterStage===''?' selected':'')+'>All statuses</option>'+
     '<option value="__due"'+(feFilterStage==='__due'?' selected':'')+'>Action due now</option>'+
     '<option value="__cold"'+(feFilterStage==='__cold'?' selected':'')+'>❄️ Cold</option>'+
+    '<option value="__route"'+(feFilterStage==='__route'?' selected':'')+'>🧭 Needs routing</option>'+
     FE_STAGES.map(function(s){ return '<option value="'+s+'"'+(feFilterStage===s?' selected':'')+'>'+s+'</option>'; }).join('')+
   '</select>';
   const repSel='<select class="fe-sel" style="max-width:180px" onchange="feSetRepDirect(this.value)">'+
@@ -17211,6 +17227,7 @@ function feLeadsTab(now){
   if(feFilterRep) list=list.filter(function(l){ return (l.assignee||'Unassigned')===feFilterRep; });
   if(feFilterStage==='__due') list=list.filter(function(l){ return !['Won','Lost'].includes(l.stage)&&l.touches.some(function(t){ return t.status==='pending'&&Date.parse(t.scheduledAt)<=now; }); });
   else if(feFilterStage==='__cold') list=list.filter(function(l){ return !!l.cold; });
+  else if(feFilterStage==='__route') list=list.filter(function(l){ return l.routeNeeded && !l.assignee; });
   else if(feFilterStage) list=list.filter(function(l){ return l.stage===feFilterStage; });
   const clear=(feFilterRep||feFilterStage||feFilterRegion||feFilterRecon)?'<button class="fe-sm" onclick="feClearFilters()">Clear</button>':'';
   const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">'+stageSel+regionSel+reconSel+repSel+clear+'<span class="fe-sub" style="margin-left:auto">'+list.length+' lead'+(list.length===1?'':'s')+'</span></div>';
@@ -17218,7 +17235,7 @@ function feLeadsTab(now){
     ? list.map(function(l){ const na=feNextAction(l,now); const rg=feRegionOf(l.assignee||'Unassigned');
         return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
           '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+feColdChip(l)+((Array.isArray(l.updates)&&l.updates.length)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📝 '+l.updates.length+'</span>':'')+feReconnectChip(l,now)+'</div>'+
+          '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+(l.routeNeeded&&!l.assignee?'<span class="fe-chip" style="background:var(--warn);color:#000">🧭 Route</span>':'')+feColdChip(l)+((Array.isArray(l.updates)&&l.updates.length)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📝 '+l.updates.length+'</span>':'')+feReconnectChip(l,now)+'</div>'+
             '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
           '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
           (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
@@ -17334,12 +17351,13 @@ async function feSyncSheet(silent){
     parsed.forEach(function(p){ const k=feLeadKey(p); if(!k||existing[k]||seen[k]||tomb[k]) return; seen[k]=true; fresh.push(p); });
     if(fresh.length){
       const now=Date.now(), owner=(typeof currentUser!=='undefined'?currentUser:'')||'';
-      const made=fresh.map(function(p,idx){ const lead={ id:(now+idx).toString(36)+Math.random().toString(36).slice(2,6), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New', owner:owner, name:p.name, company:p.company, type:p.type, language:p.language, phone:p.phone, email:p.email, source:p.source||'Google Sheet', note:p.note, assignee:'' }; lead.touches=feGenTouches(lead); return lead; });
+      const made=fresh.map(function(p,idx){ const lead={ id:(now+idx).toString(36)+Math.random().toString(36).slice(2,6), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), stage:'New', owner:owner, name:p.name, company:p.company, type:p.type, language:p.language, phone:p.phone, email:p.email, address:p.address||'', emirate:p.emirate||'', region:p.region||'', source:p.source||'Agency (Google Sheet)', note:p.note, assignee:'' }; lead.touches=feGenTouches(lead); const rep=feAutoAssign(lead); if(rep) feNotify(rep, lead, 'assigned'); return lead; });
       followupLeads=made.concat(followupLeads); feSave();
+      const routed=made.filter(function(l){ return l.assignee; }).length, nr=made.length-routed;
     }
     feLastSyncSet(new Date().toISOString());
     feSyncing=false; renderFollowup();
-    if(!silent || fresh.length) feToast(fresh.length?('Imported '+fresh.length+' new lead'+(fresh.length===1?'':'s')+' from the sheet'):'Up to date — no new leads','success');
+    if(!silent || fresh.length) feToast(fresh.length?('Imported '+fresh.length+' lead'+(fresh.length===1?'':'s')+(typeof routed!=='undefined'?(' · '+routed+' auto-routed'+(nr?(' · '+nr+' need routing'):'')):'')):'Up to date — no new leads','success');
   }catch(e){ feSyncing=false; if(!silent) feToast('Sync: '+(((e&&e.message)||'failed')+'').slice(0,140),'error'); renderFollowup(); }
 }
 function feRenderLead(l){
@@ -17354,6 +17372,7 @@ function feRenderLead(l){
         '<div class="fe-field"><label class="fe-lab">Phone</label><input class="fe-in" type="tel" value="'+feEsc(l.phone||'')+'" onchange="feSetField(\''+l.id+'\',\'phone\',this.value)" placeholder="+971…"></div>'+
         '<div class="fe-field"><label class="fe-lab">Email</label><input class="fe-in" type="email" value="'+feEsc(l.email||'')+'" onchange="feSetField(\''+l.id+'\',\'email\',this.value)" placeholder="name@…"></div>'+
         '<div class="fe-field"><label class="fe-lab">Address</label><input class="fe-in" value="'+feEsc(l.address||'')+'" onchange="feSetField(\''+l.id+'\',\'address\',this.value)" placeholder="Street, area, city…"></div>'+
+        '<div class="fe-field"><label class="fe-lab">Emirate / Location'+(l.region?(' · routed to '+feEsc(l.region)):(l.routeNeeded?' · needs routing':''))+'</label><input class="fe-in" value="'+feEsc(l.emirate||'')+'" onchange="feSetEmirate(\''+l.id+'\',this.value)" placeholder="Dubai / Abu Dhabi…"></div>'+
         '<div class="fe-field" style="margin-bottom:0"><label class="fe-lab">Company</label><input class="fe-in" value="'+feEsc(l.company||'')+'" onchange="feSetField(\''+l.id+'\',\'company\',this.value)" placeholder="Gym, hotel, studio…"></div></div>'+
       '<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div class="fe-sub" style="margin-bottom:8px">Assigned to</div>'+
         '<select class="fe-sel" style="max-width:240px" onchange="feAssign(\''+l.id+'\',this.value)">'+
@@ -17482,7 +17501,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.72 — the reminder day-offset and time of day are user-editable per step.
+// v21.73 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -17568,8 +17587,45 @@ async function feSetReminders(id){
 }
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
-function feAssign(id, rep){ const l=feGet(id); if(l){ l.assignee=rep||''; feStamp(l); feSave(); renderFollowup(); } }
+function feAssign(id, rep){ const l=feGet(id); if(l){ const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); } feStamp(l); feSave(); renderFollowup(); } }
+/* ── v21.73 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
+let feNotifs=[];
+function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
+function feNotifsSaveLocal(){ try{ feNotifs=feNotifs.slice(-300); localStorage.setItem(FE_NOTIF_KEY, JSON.stringify(feNotifs)); }catch(e){} }
+function feNotifsSave(){ feNotifsSaveLocal(); try{ if(typeof scheduleOneDriveSync==='function') scheduleOneDriveSync(); }catch(e){} }
+function mergeNotifsById(a,b){ const m={}; (a||[]).concat(b||[]).forEach(function(n){ if(!n||!n.id) return; const ex=m[n.id]; if(!ex){ m[n.id]=Object.assign({},n); } else { ex.read=ex.read||n.read; if(n.readAt&&(!ex.readAt||n.readAt>ex.readAt)) ex.readAt=n.readAt; } }); return Object.keys(m).map(function(k){ return m[k]; }).sort(function(x,y){ return Date.parse(y.at)-Date.parse(x.at); }); }
+function feAdoptNotifs(env){ if(!env||!Array.isArray(env.notifications)) return; feNotifs=mergeNotifsById(feNotifs, env.notifications); feNotifsSaveLocal(); }
+function feNotify(forRep, lead, kind){ if(!forRep||!lead) return; feNotifs.push({ id:'n'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), at:new Date().toISOString(), forRep:forRep, leadId:lead.id, leadName:lead.name||'(lead)', region:lead.region||'', kind:kind||'assigned', read:false }); feNotifsSave(); }
+function feMyNotifs(){ const me=(typeof currentUser!=='undefined'?currentUser:'')||''; return feNotifs.filter(function(n){ return n.forRep===me; }); }
+function feUnreadCount(){ return feMyNotifs().filter(function(n){ return !n.read; }).length; }
+function feMarkNotifRead(id){ const n=feNotifs.find(function(x){ return x.id===id; }); if(n&&!n.read){ n.read=true; n.readAt=new Date().toISOString(); feNotifsSave(); } }
+function feMarkAllNotifsRead(){ let ch=false; feMyNotifs().forEach(function(n){ if(!n.read){ n.read=true; n.readAt=new Date().toISOString(); ch=true; } }); if(ch){ feNotifsSave(); renderFollowup(); } }
+function feOpenNotif(id, leadId){ feMarkNotifRead(id); feOpenLead(leadId); }
+function feNotifBanner(){
+  const mine=feMyNotifs().filter(function(n){ return !n.read; });
+  if(!mine.length) return '';
+  const items=mine.slice(0,6).map(function(n){
+    return '<button class="fe-leadrow" style="margin:4px 0;padding:8px 10px" onclick="feOpenNotif(\''+n.id+'\',\''+n.leadId+'\')">'+
+      '<div class="fe-grow"><div class="fe-name fe-trunc"><span class="fe-trunc">'+feEsc(n.leadName)+'</span>'+(n.region?'<span class="fe-chip">'+feEsc(n.region)+'</span>':'')+'</div>'+
+      '<div class="fe-sub fe-trunc">New lead assigned to you · '+feFmt(n.at)+'</div></div><span class="fe-pill" style="color:var(--teal)">Open</span></button>';
+  }).join('');
+  return '<div style="border:1px solid var(--teal);background:rgba(20,184,166,.08);border-radius:12px;padding:10px 12px;margin-bottom:14px">'+
+    '<div class="fe-rowb" style="margin-bottom:6px"><strong style="color:var(--text)">🔔 '+mine.length+' new lead'+(mine.length===1?'':'s')+' assigned to you</strong>'+
+    '<button class="fe-sm" onclick="feMarkAllNotifsRead()">Mark all read</button></div>'+items+'</div>';
+}
+function feRot(region){ try{ const k='oxefit_fe_rot_'+region; const v=parseInt(localStorage.getItem(k)||'0',10)||0; localStorage.setItem(k, String(v+1)); return v; }catch(e){ return 0; } }
+function feAutoAssign(lead){
+  const region=lead.region||feEmirateToRegion(lead.emirate||lead.address||lead.note)||'';
+  lead.region=region;
+  if(region && TEAMS[region] && TEAMS[region].length){
+    const reps=TEAMS[region]; const rep=reps[feRot(region)%reps.length];
+    lead.assignee=rep; lead.autoAssigned=true; lead.routeNeeded=false; return rep;
+  }
+  lead.routeNeeded=true; return '';
+}
 function feSetField(id, field, val){ const l=feGet(id); if(!l) return; val=(val||'').trim(); if(field==='phone' && val){ val=feNormPhone(val)||val; } l[field]=val; feStamp(l); feSave(); }
+function feSetEmirate(id, val){ const l=feGet(id); if(!l) return; l.emirate=(val||'').trim(); const region=feEmirateToRegion(l.emirate)||feEmirateToRegion(l.address)||''; l.region=region; if(region && !l.assignee){ const rep=feAutoAssign(l); if(rep && rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); } feStamp(l); feSave(); renderFollowup(); }
 function feReparseContact(id){
   const l=feGet(id); if(!l) return;
   const blob=[l.note,l.phone,l.email,l.address,l.source].filter(Boolean).join('\n');
@@ -17709,14 +17765,15 @@ function feSheetToLeads(aoa){
     var iName=pick(['full name','lead name','contact name','name','client','lead','contact']);
     var iType=pick(['type','segment','category','b2b','b2c']);
     var iSource=pick(['source','channel','origin','campaign','lead source']);
-    var iAddress=pick(['address','location','street','area','city','district','region']);
+    var iEmirate=pick(['emirate','emirates','location','city','region']);
+    var iAddress=pick(['address','street','area','district']);
     var iNote=pick(['note','comment','remark','detail','requirement','interest','message']);
     for(var r2=hi+1;r2<rows.length;r2++){ var row=rows[r2];
       var g=function(ix){ return ix>=0?(row[ix]||''):''; };
       var name=g(iName);
       if(!name && iName<0){ for(var c2=0;c2<row.length;c2++){ if(row[c2]){ name=row[c2]; break; } } }
       if(!name) continue;
-      leads.push(feNormalize({ name:name, email:g(iEmail), phone:g(iPhone), company:g(iCompany), type:g(iType), source:g(iSource), address:g(iAddress), note:g(iNote) }));
+      leads.push(feNormalize({ name:name, email:g(iEmail), phone:g(iPhone), company:g(iCompany), type:g(iType), source:g(iSource), emirate:g(iEmirate), address:g(iAddress), note:g(iNote) }));
     }
   } else {
     rows.forEach(function(row){ if(row[0]) leads.push(feNormalize({ name:row[0], phone:row[1], email:row[2], company:row[3], source:row[4], note:row.slice(5).join(' ') })); });
