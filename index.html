@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.74</title>
+<title>CoreV | OxeFit Sales Tracker v21.75</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -3815,7 +3815,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.74 · Import review: checkboxes, select all/none, sort by date/name
+      v21.75 · Marketing Leads (renamed) · new Cold Call tab: Excel import/export, auto-route &amp; assign · Marketing tab removed
     </div>
   </div>
 </div>
@@ -3904,7 +3904,7 @@
 
     <div class="settings-block" id="settingsAISection" style="display:none;">
       <div class="settings-block-title">AI assistant (Anthropic)</div>
-      <p class="settings-note">Powers “AI Heads-up” and AI message tuning in the Follow-up Engine. Enter the team key once here and it syncs to every rep — they won’t be asked for a key. <strong>Security note:</strong> the key is shared in the team file and stored in each rep’s browser; anyone on the team could read it. Rotate it in the Anthropic console if it leaks.</p>
+      <p class="settings-note">Powers “AI Heads-up” and AI message tuning in Marketing Leads. Enter the team key once here and it syncs to every rep — they won’t be asked for a key. <strong>Security note:</strong> the key is shared in the team file and stored in each rep’s browser; anyone on the team could read it. Rotate it in the Anthropic console if it leaks.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
         <div style="flex:1;min-width:220px;">
           <label class="settings-note" style="display:block;margin:0 0 4px;">Anthropic API key (sk-ant-…)</label>
@@ -3922,7 +3922,7 @@
 
     <div class="settings-block" id="settingsWaSection">
       <div class="settings-block-title">WhatsApp (your number)</div>
-      <p class="settings-note">Each rep sets their own number here. The “Send on WhatsApp” buttons in the Follow-up Engine open the <strong>WhatsApp Business app</strong> to the lead with that step’s message pre-filled — sent from whichever WhatsApp account is active on your device. Stored only on your device. (Desktop reps need WhatsApp Desktop installed for the app link to open.)</p>
+      <p class="settings-note">Each rep sets their own number here. The “Send on WhatsApp” buttons in Marketing Leads open the <strong>WhatsApp Business app</strong> to the lead with that step’s message pre-filled — sent from whichever WhatsApp account is active on your device. Stored only on your device. (Desktop reps need WhatsApp Desktop installed for the app link to open.)</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
         <div style="flex:1;min-width:200px;">
           <label class="settings-note" style="display:block;margin:0 0 4px;">My WhatsApp number (with country code)</label>
@@ -3935,7 +3935,7 @@
 
     <div class="settings-block" id="settingsMediaSection" style="display:none;">
       <div class="settings-block-title">Media Library (shuffled into messages)</div>
-      <p class="settings-note">Upload images and add video links here. The Follow-up Engine shuffles them randomly across follow-up steps. On a WhatsApp send, a <strong>link is appended to the message</strong>; a shuffled <strong>image downloads</strong> so the rep can attach it. Syncs to the whole team. Keep it lean — large/many images can slow the team sync (videos should be links, not uploads).</p>
+      <p class="settings-note">Upload images and add video links here. Marketing Leads shuffles them randomly across follow-up steps. On a WhatsApp send, a <strong>link is appended to the message</strong>; a shuffled <strong>image downloads</strong> so the rep can attach it. Syncs to the whole team. Keep it lean — large/many images can slow the team sync (videos should be links, not uploads).</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px;">
         <div style="flex:1;min-width:140px;"><label class="settings-note" style="display:block;margin:0 0 4px;">Video label</label><input id="mediaVidLabel" type="text" placeholder="e.g. 30-sec demo" style="width:100%;"></div>
         <div style="flex:2;min-width:200px;"><label class="settings-note" style="display:block;margin:0 0 4px;">Video link (YouTube/Drive/CDN)</label><input id="mediaVidUrl" type="url" placeholder="https://…" style="width:100%;"></div>
@@ -3961,7 +3961,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.74</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.75</strong></p>
     </div>
   </div>
 </div>
@@ -4004,11 +4004,11 @@
       <button class="nav-item" data-tab="requests" onclick="switchTab('requests')" title="Event &amp; On-site Demo Requests">
         <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg></span><span class="nav-label">Requests</span><span class="nav-badge" id="requestsBadge" style="display:none;">0</span>
       </button>
-      <button class="nav-item" data-tab="followup" onclick="switchTab('followup')" title="Follow-up Engine">
-        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span class="nav-label">Follow-up Engine</span>
+      <button class="nav-item" data-tab="followup" onclick="switchTab('followup')" title="Marketing Leads">
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span class="nav-label">Marketing Leads</span>
       </button>
-      <button class="nav-item" data-tab="marketing" onclick="switchTab('marketing')" title="Marketing">
-        <span class="nav-ico"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span class="nav-label">Marketing</span>
+      <button class="nav-item" data-tab="coldcall" onclick="switchTab('coldcall')" title="Cold Call">
+        <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span class="nav-label">Cold Call</span>
       </button>
       <button class="nav-item" data-tab="quotes" onclick="switchTab('quotes')" title="Quotes &amp; Products">
         <span class="nav-ico"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v16l3-2 2 2 2-2 2 2 3-2V5a2 2 0 0 0-2-2z"/><line x1="8" y1="9" x2="14" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg></span><span class="nav-label">Quotes</span>
@@ -4033,7 +4033,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.74 · FE</div>
+      <div class="sidebar-version">v21.75</div>
     </div>
   </aside>
 
@@ -4109,7 +4109,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.74</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.75</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4780,53 +4780,10 @@
   </div>
 
   <!-- MARKETING CONSUMER PERFORMANCE VIEW -->
-  <div class="tab-view" id="view-marketing">
-    <div class="gdrive-panel">
-      <div class="gdrive-head">
-        <div>
-          <div class="gdrive-title">Marketing Consumer Performance</div>
-          <div class="gdrive-sub">Live dashboards, reports and analytics from the Marketing team's Google Drive folder.</div>
-        </div>
-        <div class="gdrive-actions">
-          <div class="gdrive-chip" id="gdChip"><div class="gd-dot"></div><span id="gdChipText">Not connected</span></div>
-          <button class="gdrive-btn ghost" onclick="gdRefresh()" id="gdRefreshBtn" style="display:none;">↻ Refresh</button>
-          <button class="gdrive-btn ghost" onclick="gdDisconnect()" id="gdDisconnectBtn" style="display:none;">Disconnect</button>
-          <button class="gdrive-btn" onclick="gdSignIn()" id="gdSignInBtn">Sign in with Google</button>
-        </div>
-      </div>
-
-      <div class="gdrive-config-card" id="gdConfigNotice" style="display:none;">
-        <strong>⚙ Google Drive not configured.</strong> Open this HTML and set
-        <code>GDRIVE_CONFIG.clientId</code> and <code>GDRIVE_CONFIG.apiKey</code> at the top of the script.
-        Steps:
-        <ol style="margin:8px 0 0 18px; padding:0;">
-          <li>Go to <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--accent-glow);">Google Cloud Console</a> → APIs &amp; Services → Credentials.</li>
-          <li>Create an <strong>OAuth 2.0 Client ID</strong> (type: Web application). Add this page's URL to Authorized JavaScript origins.</li>
-          <li>Create an <strong>API key</strong> (restrict to Google Drive API).</li>
-          <li>Enable the <strong>Google Drive API</strong> and the <strong>Picker API</strong>.</li>
-          <li>Paste both values into <code>GDRIVE_CONFIG</code>, save, refresh.</li>
-        </ol>
-      </div>
-
-      <div class="gdrive-breadcrumb" id="gdBreadcrumb" style="display:none;">
-        <a onclick="gdGoRoot()">🏠 Marketing Drive</a>
-        <span id="gdBreadcrumbPath"></span>
-      </div>
-
-      <div id="gdFiles">
-        <div class="gdrive-empty">
-          Sign in with Google to load the Marketing Consumer Performance dashboards from Drive.
-        </div>
-      </div>
-
-      <div class="gdrive-viewer-wrap" id="gdViewerWrap" style="display:none;">
-        <div class="gdrive-viewer-empty" id="gdViewerEmpty">Select a file above to preview it here.</div>
-        <iframe id="gdViewer" style="display:none;" allow="autoplay"></iframe>
-      </div>
-
-      <div class="mkt-dash" id="gdDashboard" style="display:none;"></div>
-    </div>
-  </div><!-- /#view-marketing -->
+  <div class="tab-view" id="view-coldcall">
+    <div id="cc-root"></div>
+    <div id="cc-modal-root"></div>
+  </div><!-- /#view-coldcall -->
 
   <!-- ░░░ QUOTES & PRODUCTS (v20.7) ░░░ -->
   <div class="tab-view" id="view-quotes">
@@ -5303,6 +5260,59 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
+      /* v21.75 — Cold Call reuses Follow-up styling */
+      #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
+      #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+      #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
+      #view-coldcall .fe-btn{background:var(--brand-grad);color:#fff;border:none;border-radius:9px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;}
+      #view-coldcall .fe-btn:hover{filter:brightness(1.05);}
+      #view-coldcall .fe-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:8px 13px;font-size:14px;cursor:pointer;}
+      #view-coldcall .fe-ghost:hover{background:var(--card-hover);}
+      #view-coldcall .fe-sm{font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
+      #view-coldcall .fe-sm:hover{background:var(--card-hover);}
+      #view-coldcall .fe-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
+      @media(max-width:640px){#view-coldcall .fe-grid{grid-template-columns:repeat(2,1fr);}}
+      #view-coldcall .fe-metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+      #view-coldcall .fe-metric .l{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+      #view-coldcall .fe-metric .v{font-size:24px;font-weight:700;color:var(--text);}
+      #view-coldcall .fe-leadrow{width:100%;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;}
+      #view-coldcall .fe-leadrow:hover{background:var(--card-hover);}
+      #view-coldcall .fe-av{height:36px;width:36px;border-radius:50%;background:var(--navy-mid);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex-shrink:0;}
+      #view-coldcall .fe-grow{flex:1;min-width:0;}
+      #view-coldcall .fe-name{font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text);}
+      #view-coldcall .fe-trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      #view-coldcall .fe-sub{font-size:12px;color:var(--text-muted);}
+      #view-coldcall .fe-chip{font-size:11px;border-radius:5px;padding:2px 6px;background:var(--navy-mid);color:var(--text-muted);}
+      #view-coldcall .fe-pill{font-size:11px;border-radius:999px;padding:3px 9px;background:var(--navy-mid);white-space:nowrap;}
+      #view-coldcall .fe-due{height:8px;width:8px;border-radius:50%;background:var(--warn);flex-shrink:0;}
+      #view-coldcall .fe-empty{background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:40px;text-align:center;color:var(--text-muted);}
+      #view-coldcall .fe-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+      #view-coldcall .fe-touch{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+      #view-coldcall .fe-touch .hh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+      #view-coldcall .fe-purpose{font-size:12px;color:var(--text-muted);margin:0 0 8px;}
+      #view-coldcall .fe-msg{font-size:14px;color:var(--text);white-space:pre-wrap;background:var(--navy-mid);border-radius:9px;padding:12px;cursor:text;}
+      #view-coldcall .fe-msg:hover{background:var(--card-hover);}
+      #view-coldcall textarea.fe-ta,#view-coldcall input.fe-in,#view-coldcall select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
+      #view-coldcall .fe-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;}
+      #view-coldcall .fe-right{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
+      #view-coldcall .fe-back{background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;margin-bottom:14px;padding:0;}
+      #view-coldcall .fe-back:hover{color:var(--text);}
+      #view-coldcall .fe-stages{display:flex;flex-wrap:wrap;gap:6px;}
+      #view-coldcall .fe-stagebtn{font-size:12px;border-radius:999px;padding:6px 12px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
+      #view-coldcall .fe-stagebtn.on{border-color:transparent;box-shadow:0 0 0 1px var(--teal);color:var(--text);}
+      #view-coldcall .fe-meta{font-size:14px;color:var(--text-muted);margin-top:4px;}
+      #view-coldcall .fe-meta div{margin:1px 0;}
+      #view-coldcall .fe-err{color:var(--danger);font-size:12px;margin-top:8px;}
+      #cc-modal-root .fe-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;}
+      #cc-modal-root .fe-modal{background:var(--card);color:var(--text);width:100%;max-width:560px;border-radius:16px;padding:20px;max-height:92vh;overflow:auto;border:1px solid var(--border);}
+      #cc-modal-root .fe-field{margin-bottom:12px;}
+      #cc-modal-root .fe-lab{font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;}
+      #cc-modal-root .fe-seg{display:flex;gap:8px;}
+      #cc-modal-root .fe-seg button{flex:1;font-size:14px;border-radius:9px;padding:9px;border:1px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;}
+      #cc-modal-root .fe-seg button.on{background:var(--brand-grad);color:#fff;border-color:transparent;}
+      #cc-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+      #cc-modal-root input.fe-in,#cc-modal-root textarea.fe-ta,#cc-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
+      #cc-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
     </style>
     <div class="fe-wrap">
       <div id="fe-root"></div>
@@ -6249,7 +6259,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.74 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.75 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6832,12 +6842,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.74 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.75 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.74 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.75 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7182,10 +7192,12 @@ function parseEnvelope(remote) {
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.74
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.74
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.74
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v21.74
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.75
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.75
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.75
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v21.75
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v21.75
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v21.75
       meta : remote._meta || null
     };
   }
@@ -7255,10 +7267,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.74
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.74
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.74
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.74
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.75
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.75
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.75
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.75
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v21.75
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7482,14 +7495,16 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) env.termtemplates = _lastRemoteTermTemplates;
   if (typeof paymentTerms !== 'undefined' && paymentTerms) env.paymentterms = paymentTerms;
   else if (_lastRemotePaymentTerms) env.paymentterms = _lastRemotePaymentTerms;
-  // v21.74 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.75 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v21.74 — team-shared AI key (newest-wins by `at`)
+  // v21.75 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v21.74 — shared media library (newest-wins by `at`)
+  // v21.75 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v21.74 — rep notifications (merge by id)
+  // v21.75 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
+  // v21.75 — cold calls (merge by id) + tombstones
+  try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
 
@@ -7525,10 +7540,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.74
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.74
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.74
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.74
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.75
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.75
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.75
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.75
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v21.75
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !termTemplates || !Object.keys(termTemplates).length)) { termTemplates = r.env.termtemplates; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || (!paymentTerms || ((!paymentTerms.full || !paymentTerms.full.length) && (!paymentTerms.installment || !paymentTerms.installment.length))))) { paymentTerms = r.env.paymentterms; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -11476,7 +11492,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.74 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.75 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -11772,8 +11788,8 @@ const TAB_HEADINGS = {
   performance: 'Sales Rep Performance',
   demos:       'Demo Tracker',
   requests:    'Event & On-site Demo Requests',
-  followup:    'Follow-up Engine',
-  marketing:   'Marketing Consumer Performance',
+  followup:    'Marketing Leads',
+  coldcall:    'Cold Call',
   quotes:      'Quotes & Products',
   'deal-rules':'Deal Ownership & CRM Rules',
   guidelines:  'Guidelines'
@@ -11789,11 +11805,6 @@ function switchTab(tabName) {
   const heading = document.getElementById('topbarHeading');
   if (heading) heading.textContent = TAB_HEADINGS[tabName] || '';
   closeSidebar();   // collapse mobile drawer after navigating
-  if (tabName === 'marketing') {
-    gdEnsureInit();         // lazy-init Google APIs on first visit
-    gdRestoreFromCache();   // re-open the last viewed file if any
-    if (typeof renderMarketingDashboard === 'function') renderMarketingDashboard(); // restore imported data dashboard
-  }
   if (tabName === 'performance') {
     renderPerformance();
   }
@@ -11811,6 +11822,9 @@ function switchTab(tabName) {
   }
   if (tabName === 'followup') {
     renderFollowup();
+  }
+  if (tabName === 'coldcall') {
+    if (typeof ccRender === 'function') ccRender();
   }
 }
 
@@ -13933,7 +13947,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.74 — per-Month filter ───────────────────────────────────────────────
+// ── v21.75 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -16525,7 +16539,7 @@ let feImportErr = '';
 let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
-// v21.74 — Follow-up Engine can assign/filter to admins & office too
+// v21.75 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16533,7 +16547,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.74 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.75 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16580,7 +16594,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v21.74 — clear addresses that were wrongly populated with note text by the old extractor
+// v21.75 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -16608,7 +16622,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v21.74 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v21.75 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -16649,7 +16663,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v21.74 — re-connection tag + "by when" date per lead
+// v21.75 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -16660,7 +16674,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v21.74 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v21.75 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -16697,7 +16711,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v21.74 — per-rep WhatsApp: each rep stores their own number locally; the
+// v21.75 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -16744,7 +16758,7 @@ function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v21.74 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v21.75 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -16839,7 +16853,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v21.74 — only Ahmed and Gladys may mark a lead as Lost
+// v21.75 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -16981,7 +16995,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v21.74 — robust extraction of phone / email / address into separate fields
+// v21.75 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17016,7 +17030,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v21.74 — map a free-text Emirate/Location to a routing region
+// v21.75 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -17135,7 +17149,7 @@ function feRenderDashboard(){
     '<button class="fe-ghost" onclick="feImportFromDrive()">Google Drive</button>'+
     '<button class="fe-ghost" onclick="feOpenImport()">Import list</button>'+
     '<button class="fe-btn" onclick="feOpenAdd()">+ New lead</button></div>';
-  const topbar='<div class="fe-rowb"><h3 class="fe-h">Follow-up Engine</h3>'+actions+'</div>';
+  const topbar='<div class="fe-rowb"><h3 class="fe-h">Marketing Leads</h3>'+actions+'</div>';
   const banner=feNotifBanner();
   let dupCount=0; try{ feDupGroups().forEach(function(g){ dupCount+=g.leads.length-1; }); }catch(e){}
   const tabs='<div class="fe-stages" style="margin-bottom:16px">'+
@@ -17535,7 +17549,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.74 — the reminder day-offset and time of day are user-editable per step.
+// v21.75 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -17622,7 +17636,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(l){ const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); } feStamp(l); feSave(); renderFollowup(); } }
-/* ── v21.74 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v21.75 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -17860,12 +17874,238 @@ async function feDriveSearch(term){
   }catch(e){ box.innerHTML='<div class="fe-err">'+feEsc((e&&e.message)||'Search error')+'</div>'; }
 }
 
+/* ════════════════════════════════════════════════════════════════
+   COLD CALL MODULE (v21.75) — Excel import/export, assign across reps,
+   FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
+   feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
+════════════════════════════════════════════════════════════════ */
+const CC_KEY='oxefit_coldcalls_v1', CC_TOMB_KEY='oxefit_coldcalls_deleted';
+const CC_STATUSES=['New','Called','No answer','Callback','Interested','Not interested','Converted','Dropped'];
+let coldCalls=[]; let ccTombstones={};
+let ccFilterStatus='', ccFilterRep='', ccFilterRegion='';
+let ccImportPreview=[], ccImportSort='orig';
+function ccEsc(s){ return (typeof feEsc==='function')?feEsc(s):String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function ccToast(m,t){ if(typeof showToast==='function') showToast(m,t); }
+function ccLoad(){ try{ const r=localStorage.getItem(CC_KEY); coldCalls=r?JSON.parse(r):[]; if(!Array.isArray(coldCalls)) coldCalls=[]; }catch(e){ coldCalls=[]; } try{ const t=localStorage.getItem(CC_TOMB_KEY); ccTombstones=t?JSON.parse(t):{}; }catch(e){ ccTombstones={}; } }
+function ccSaveLocal(){ try{ localStorage.setItem(CC_KEY, JSON.stringify(coldCalls)); }catch(e){} try{ localStorage.setItem(CC_TOMB_KEY, JSON.stringify(ccTombstones)); }catch(e){} }
+function ccSave(){ ccSaveLocal(); try{ if(typeof scheduleOneDriveSync==='function') scheduleOneDriveSync(); }catch(e){} }
+function ccStamp(e){ if(e) e.updatedAt=new Date().toISOString(); }
+function ccGet(id){ return coldCalls.find(function(c){ return c.id===id; }); }
+function ccMergeById(localArr, remoteArr, tomb){ const by={}; (localArr||[]).concat(remoteArr||[]).forEach(function(c){ if(!c||!c.id) return; if(tomb&&tomb[c.id]) return; const ex=by[c.id]; if(!ex){ by[c.id]=c; } else { const a=Date.parse(ex.updatedAt||0)||0, b=Date.parse(c.updatedAt||0)||0; if(b>=a) by[c.id]=c; } }); return Object.keys(by).map(function(k){ return by[k]; }); }
+function ccAdopt(env){ if(!env) return; if(env.coldcalls_deleted&&typeof env.coldcalls_deleted==='object'){ Object.keys(env.coldcalls_deleted).forEach(function(id){ if(!ccTombstones[id]) ccTombstones[id]=env.coldcalls_deleted[id]; }); } if(Array.isArray(env.coldcalls)){ coldCalls=ccMergeById(coldCalls, env.coldcalls, ccTombstones).filter(function(c){ return !ccTombstones[c.id]; }); ccSaveLocal(); const v=document.getElementById('view-coldcall'); if(v && v.classList.contains('active')) ccRender(); } }
+function ccRot(region){ try{ const k='oxefit_cc_rot_'+region; const v=parseInt(localStorage.getItem(k)||'0',10)||0; localStorage.setItem(k,String(v+1)); return v; }catch(e){ return 0; } }
+function ccAutoAssign(entry){ const region=entry.region||feEmirateToRegion(entry.emirate||entry.address||entry.note||'')||''; entry.region=region; if(region && TEAMS[region] && TEAMS[region].length){ const reps=TEAMS[region]; entry.assignee=reps[ccRot(region)%reps.length]; entry.routeNeeded=false; return entry.assignee; } entry.routeNeeded=true; return ''; }
+function ccAssign(id,rep){ const c=ccGet(id); if(c){ c.assignee=rep||''; if(rep) c.routeNeeded=false; ccStamp(c); ccSave(); ccRender(); } }
+function ccSetStatus(id,st){ const c=ccGet(id); if(c){ c.status=st; if(st==='Called'||st==='No answer'){ c.attempts=(c.attempts||0)+1; c.lastCallAt=new Date().toISOString(); } ccStamp(c); ccSave(); ccRender(); } }
+function ccLogAttempt(id){ const c=ccGet(id); if(c){ c.attempts=(c.attempts||0)+1; c.lastCallAt=new Date().toISOString(); if(c.status==='New') c.status='Called'; ccStamp(c); ccSave(); ccRender(); } }
+function ccRemove(id){ const c=ccGet(id); if(!c) return; ccTombstones[id]={at:new Date().toISOString()}; coldCalls=coldCalls.filter(function(x){ return x.id!==id; }); ccSave(); ccRender(); }
+function ccStatusColor(st){ return {'New':'var(--text-muted)','Called':'var(--accent)','No answer':'var(--warn)','Callback':'var(--gold)','Interested':'var(--teal)','Not interested':'var(--danger)','Converted':'var(--success)','Dropped':'var(--text-muted)'}[st]||'var(--text-muted)'; }
+function ccCloseModal(){ const m=document.getElementById('cc-modal-root'); if(m) m.innerHTML=''; }
+
+function ccOpenAdd(){
+  document.getElementById('cc-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)ccCloseModal()"><div class="fe-modal" style="max-width:460px">'+
+    '<div class="fe-rowb" style="margin-bottom:12px"><h3 class="fe-h">New cold call</h3><button class="fe-x" onclick="ccCloseModal()">&times;</button></div>'+
+    '<div class="fe-field"><label class="fe-lab">Name</label><input class="fe-in" id="ccAddName" placeholder="Contact name"></div>'+
+    '<div class="fe-field"><label class="fe-lab">Phone</label><input class="fe-in" id="ccAddPhone" placeholder="+9715…"></div>'+
+    '<div class="fe-field"><label class="fe-lab">Company (optional)</label><input class="fe-in" id="ccAddCompany" placeholder="Gym, hotel, studio…"></div>'+
+    '<div class="fe-field"><label class="fe-lab">Emirate / Location</label><input class="fe-in" id="ccAddEmirate" placeholder="Dubai / Abu Dhabi…"></div>'+
+    '<div class="fe-field"><label class="fe-lab">Note (optional)</label><input class="fe-in" id="ccAddNote" placeholder="Context…"></div>'+
+    '<div class="fe-actions" style="margin-top:10px"><button class="fe-btn" onclick="ccAddSave()">Add &amp; auto-assign</button><button class="fe-sm" onclick="ccCloseModal()">Cancel</button></div>'+
+  '</div></div>';
+}
+function ccAddSave(){
+  const g=function(id){ return (document.getElementById(id)||{}).value||''; };
+  const name=g('ccAddName').trim(); if(!name){ ccToast('Enter a name','error'); return; }
+  const ph=(typeof feNormPhone==='function'?feNormPhone(g('ccAddPhone')):'')||g('ccAddPhone').trim();
+  const e={ id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(),
+    name:name, phone:ph, email:'', company:g('ccAddCompany').trim(), emirate:g('ccAddEmirate').trim(), region:'', assignee:'', status:'New', attempts:0, lastCallAt:'', note:g('ccAddNote').trim(), source:'Manual' };
+  ccAutoAssign(e); coldCalls.unshift(e); ccSave(); ccCloseModal(); ccRender();
+  ccToast(e.assignee?('Added — assigned to '+e.assignee):'Added — needs routing','success');
+}
+
+function ccOpenImport(){
+  document.getElementById('cc-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)ccCloseModal()"><div class="fe-modal">'+
+    '<div class="fe-rowb" style="margin-bottom:10px"><h3 class="fe-h">Import cold-call list</h3><button class="fe-x" onclick="ccCloseModal()">&times;</button></div>'+
+    '<p class="fe-sub" style="margin:0 0 12px">Upload an Excel/CSV file, or paste rows. Include Name, Phone, and Emirate/Location columns so calls auto-route to Dubai / Abu Dhabi reps.</p>'+
+    '<label class="fe-btn" style="cursor:pointer;display:inline-block;margin-bottom:12px">⬆ Choose Excel / CSV file<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="ccImportFile(this)"></label>'+
+    '<div class="fe-sub" style="margin-bottom:6px">— or paste rows —</div>'+
+    '<textarea class="fe-in" id="ccPaste" style="width:100%;min-height:120px" placeholder="Name, Phone, Company, Emirate&#10;Sara, +9715…, Fit Studio, Dubai"></textarea>'+
+    '<div class="fe-actions" style="margin-top:10px"><button class="fe-btn" onclick="ccImportPaste()">Preview paste</button><button class="fe-sm" onclick="ccCloseModal()">Cancel</button></div>'+
+  '</div></div>';
+}
+function ccRowsToEntries(aoa){
+  let objs=[]; try{ objs=feSheetToLeads(aoa)||[]; }catch(e){ objs=[]; }
+  return objs.map(function(p,i){ return { _ord:i, _sel:true, name:p.name||'', phone:p.phone||'', email:p.email||'', company:p.company||'', emirate:p.emirate||'', region:p.region||'', note:p.note||'', date:p.date||'', source:'Excel' }; }).filter(function(x){ return x.name; });
+}
+function ccImportFile(input){
+  const f=input&&input.files&&input.files[0]; if(!f){ return; }
+  const reader=new FileReader();
+  reader.onload=function(){ try{
+    const data=new Uint8Array(reader.result); const wb=XLSX.read(data,{type:'array'});
+    let aoa=[]; wb.SheetNames.forEach(function(sn){ const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:''}); aoa=aoa.concat(rows); });
+    ccImportPreview=ccRowsToEntries(aoa);
+    if(!ccImportPreview.length){ ccToast('No rows with a name found in that file','error'); return; }
+    ccRenderImportPreview();
+  }catch(e){ ccToast('Could not read that file','error'); } };
+  reader.onerror=function(){ ccToast('Could not read that file','error'); };
+  reader.readAsArrayBuffer(f);
+}
+function ccImportPaste(){
+  const raw=((document.getElementById('ccPaste')||{}).value||'').trim();
+  if(!raw){ ccToast('Paste some rows first','info'); return; }
+  const aoa=raw.split(/\r?\n/).map(function(line){ return line.split(/\t|,|;|\|/).map(function(c){ return c.trim(); }); });
+  const firstLow=aoa[0].join('|').toLowerCase();
+  if(!/name|phone|mobile|email|company|emirate|location/.test(firstLow)){ aoa.unshift(['name','phone','company','emirate']); }
+  ccImportPreview=ccRowsToEntries(aoa);
+  if(!ccImportPreview.length){ ccToast('Could not find any rows','error'); return; }
+  ccRenderImportPreview();
+}
+function ccImportDateVal(l){ const d=Date.parse(l&&l.date); return isNaN(d)?null:d; }
+function ccImportDateStr(l){ const v=ccImportDateVal(l); if(v==null) return ''; try{ return new Date(v).toLocaleDateString(undefined,{day:'numeric',month:'short'}); }catch(e){ return ''; } }
+function ccImportApplySort(){ if(ccImportSort==='name'){ ccImportPreview.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); }); return; } if(ccImportSort==='date_asc'||ccImportSort==='date_desc'){ const dir=ccImportSort==='date_asc'?1:-1; ccImportPreview.sort(function(a,b){ const av=ccImportDateVal(a),bv=ccImportDateVal(b); if(av==null&&bv==null) return (a._ord||0)-(b._ord||0); if(av==null) return 1; if(bv==null) return -1; return (av-bv)*dir; }); return; } ccImportPreview.sort(function(a,b){ return (a._ord||0)-(b._ord||0); }); }
+function ccImportSetSort(v){ ccImportSort=v||'orig'; ccRenderImportPreview(); }
+function ccImportToggle(i,ch){ if(ccImportPreview[i]) ccImportPreview[i]._sel=!!ch; const sel=ccImportPreview.filter(function(l){ return l._sel!==false; }).length; const btn=document.getElementById('ccImportBtn'); if(btn){ btn.textContent='Import '+sel+' selected'; btn.disabled=!sel; } }
+function ccImportSelectAll(v){ ccImportPreview.forEach(function(l){ l._sel=!!v; }); ccRenderImportPreview(); }
+function ccRenderImportPreview(){
+  ccImportApplySort();
+  const total=ccImportPreview.length, sel=ccImportPreview.filter(function(l){ return l._sel!==false; }).length;
+  const rows=ccImportPreview.map(function(l,i){ const dt=ccImportDateStr(l);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">'+
+      '<input type="checkbox" '+(l._sel!==false?'checked':'')+' onchange="ccImportToggle('+i+',this.checked)" style="width:16px;height:16px;flex:none;cursor:pointer">'+
+      '<div class="fe-grow"><div class="fe-name fe-trunc" style="font-size:14px"><span class="fe-trunc">'+ccEsc(l.name||'(no name)')+'</span>'+(l.company?'<span class="fe-chip">'+ccEsc(l.company)+'</span>':'')+(l.region?'<span class="fe-chip">'+ccEsc(l.region)+'</span>':(l.emirate?'<span class="fe-chip" style="background:var(--warn);color:#000">🧭 '+ccEsc(l.emirate)+'</span>':''))+(dt?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+ccEsc(dt)+'</span>':'')+'</div>'+
+        '<div class="fe-sub fe-trunc">'+([l.phone,l.email].filter(Boolean).map(ccEsc).join(' · ')||'&nbsp;')+'</div></div>'+
+      '<button class="fe-sm" onclick="ccImportPreview.splice('+i+',1);ccRenderImportPreview()" title="Remove">&times;</button>'+
+    '</div>';
+  }).join('');
+  document.getElementById('cc-modal-root').innerHTML=
+  '<div class="fe-overlay" onclick="if(event.target===this)ccCloseModal()"><div class="fe-modal">'+
+    '<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Review '+total+' cold call'+(total===1?'':'s')+'</h3><button class="fe-x" onclick="ccCloseModal()">&times;</button></div>'+
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">'+
+      '<button class="fe-sm" onclick="ccImportSelectAll(true)">Select all</button>'+
+      '<button class="fe-sm" onclick="ccImportSelectAll(false)">Select none</button>'+
+      '<label class="fe-sub" style="display:flex;align-items:center;gap:6px;margin-left:auto">Sort'+
+        '<select class="fe-sel" style="width:auto" onchange="ccImportSetSort(this.value)">'+
+          '<option value="orig"'+(ccImportSort==='orig'?' selected':'')+'>Original order</option>'+
+          '<option value="date_desc"'+(ccImportSort==='date_desc'?' selected':'')+'>Date (newest)</option>'+
+          '<option value="date_asc"'+(ccImportSort==='date_asc'?' selected':'')+'>Date (oldest)</option>'+
+          '<option value="name"'+(ccImportSort==='name'?' selected':'')+'>Name (A–Z)</option>'+
+        '</select></label>'+
+    '</div>'+
+    '<div style="max-height:46vh;overflow:auto;margin-bottom:14px">'+rows+'</div>'+
+    '<div class="fe-actions"><button class="fe-btn" id="ccImportBtn" '+(sel?'':'disabled')+' onclick="ccConfirmImport()">Import '+sel+' selected</button>'+
+      '<button class="fe-sm" onclick="ccOpenImport()">Back</button></div>'+
+  '</div></div>';
+}
+function ccConfirmImport(){
+  const chosen=ccImportPreview.filter(function(l){ return l._sel!==false; });
+  if(!chosen.length){ ccToast('Select at least one','info'); return; }
+  const now=Date.now();
+  const made=chosen.map(function(p,idx){ const e={ id:'c'+(now+idx).toString(36)+Math.random().toString(36).slice(2,6), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(),
+    name:p.name, phone:p.phone||'', email:p.email||'', company:p.company||'', emirate:p.emirate||'', region:p.region||'', assignee:'', status:'New', attempts:0, lastCallAt:'', note:p.note||'', source:p.source||'Excel' };
+    ccAutoAssign(e); return e; });
+  coldCalls=made.concat(coldCalls); ccSave();
+  const routed=made.filter(function(e){ return e.assignee; }).length, nr=made.length-routed;
+  ccImportPreview=[]; ccCloseModal(); ccRender();
+  ccToast('Imported '+made.length+' · '+routed+' auto-routed'+(nr?(' · '+nr+' need routing'):''),'success');
+}
+
+function ccExportExcel(){
+  const list=ccFiltered();
+  if(!list.length){ ccToast('Nothing to export','info'); return; }
+  const head=['Name','Phone','Email','Company','Emirate','Region','Assigned rep','Status','Attempts','Last call','Note','Created'];
+  const aoa=[head].concat(list.map(function(c){ return [c.name||'', c.phone||'', c.email||'', c.company||'', c.emirate||'', c.region||'', c.assignee||'', c.status||'', c.attempts||0, c.lastCallAt?new Date(c.lastCallAt).toLocaleString():'', c.note||'', c.createdAt?new Date(c.createdAt).toLocaleDateString():'']; }));
+  try{ const ws=XLSX.utils.aoa_to_sheet(aoa); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Cold Calls'); XLSX.writeFile(wb,'cold-calls-'+new Date().toISOString().slice(0,10)+'.xlsx'); ccToast('Exported '+list.length+' cold call'+(list.length===1?'':'s'),'success'); }
+  catch(e){ ccToast('Export failed','error'); }
+}
+
+function ccAssignableReps(){ try{ return (typeof feAssignableReps==='function')?feAssignableReps():(ALL_REPS||[]); }catch(e){ return ALL_REPS||[]; } }
+function ccRegionOf(rep){ try{ return (typeof feRegionOf==='function')?feRegionOf(rep):'Unassigned'; }catch(e){ return 'Unassigned'; } }
+function ccFiltered(){
+  let list=coldCalls.slice();
+  if(ccFilterStatus==='__route') list=list.filter(function(c){ return c.routeNeeded && !c.assignee; });
+  else if(ccFilterStatus) list=list.filter(function(c){ return c.status===ccFilterStatus; });
+  if(ccFilterRep) list=list.filter(function(c){ return (c.assignee||'')===ccFilterRep; });
+  if(ccFilterRegion) list=list.filter(function(c){ return (c.region||ccRegionOf(c.assignee))===ccFilterRegion; });
+  return list;
+}
+function ccSetFilterStatus(v){ ccFilterStatus=v; ccRender(); }
+function ccSetFilterRep(v){ ccFilterRep=v; ccRender(); }
+function ccSetFilterRegion(v){ ccFilterRegion=v; ccRender(); }
+function ccRender(){
+  const root=document.getElementById('cc-root'); if(!root) return;
+  const ae=document.activeElement;
+  if(ae && (ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.tagName==='SELECT') && ae.closest && ae.closest('#view-coldcall')){ return; }
+  const total=coldCalls.length;
+  const assigned=coldCalls.filter(function(c){ return c.assignee; }).length;
+  const called=coldCalls.filter(function(c){ return (c.attempts||0)>0 || ['Called','No answer','Callback','Interested','Not interested','Converted'].indexOf(c.status)>=0; }).length;
+  const interested=coldCalls.filter(function(c){ return c.status==='Interested'; }).length;
+  const callback=coldCalls.filter(function(c){ return c.status==='Callback'; }).length;
+  const converted=coldCalls.filter(function(c){ return c.status==='Converted'; }).length;
+  const needRoute=coldCalls.filter(function(c){ return c.routeNeeded && !c.assignee; }).length;
+  const actions='<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="fe-ghost" onclick="ccOpenImport()">⬆ Import Excel</button>'+
+    '<button class="fe-ghost" onclick="ccExportExcel()">⬇ Export Excel</button>'+
+    '<button class="fe-btn" onclick="ccOpenAdd()">+ New call</button></div>';
+  const topbar='<div class="fe-rowb"><h3 class="fe-h">Cold Call</h3>'+actions+'</div>';
+
+  if(!total){
+    root.innerHTML=topbar+'<div class="fe-empty"><p style="font-weight:600;color:var(--text)">No cold calls yet.</p>'+
+      '<p class="fe-sub" style="margin:4px 0 16px">Import an Excel/CSV list — calls auto-route to Dubai / Abu Dhabi reps by emirate.</p>'+
+      '<div style="display:flex;gap:8px;justify-content:center"><button class="fe-btn" onclick="ccOpenImport()">⬆ Import Excel</button><button class="fe-ghost" onclick="ccOpenAdd()">+ Add one</button></div></div>';
+    return;
+  }
+  const kpi=function(lab,val,col){ return '<div class="fe-metric"><div class="l">'+lab+'</div><div class="v" style="color:'+(col||'var(--text)')+'">'+val+'</div></div>'; };
+  const kpis='<div class="fe-grid" style="margin-bottom:14px">'+kpi('Total',total)+kpi('Assigned',assigned,'var(--accent)')+kpi('Called',called,'var(--teal)')+kpi('Interested',interested,'var(--teal)')+kpi('Callbacks',callback,'var(--gold)')+kpi('Converted',converted,'var(--success)')+(needRoute?kpi('Need routing',needRoute,'var(--warn)'):'')+'</div>';
+
+  const byRep={}; coldCalls.forEach(function(c){ const r=c.assignee||'Unassigned'; (byRep[r]=byRep[r]||{total:0,called:0,interested:0,conv:0}); byRep[r].total++; if((c.attempts||0)>0) byRep[r].called++; if(c.status==='Interested') byRep[r].interested++; if(c.status==='Converted') byRep[r].conv++; });
+  const bands=[['Dubai','Dubai'],['Abu Dhabi','Abu Dhabi'],['Direct Engagement','Direct Engagement'],['Office','Office'],['Unassigned','Unassigned']];
+  let repTable='<div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">'+
+    '<div style="display:flex;font-size:11px;color:var(--text-muted);padding:6px 12px;gap:8px;background:var(--navy-mid)"><div style="flex:1">Sales rep</div><div style="width:52px;text-align:center">Calls</div><div style="width:52px;text-align:center">Dialed</div><div style="width:64px;text-align:center">Interested</div><div style="width:64px;text-align:center">Converted</div></div>';
+  bands.forEach(function(band){ const reps=Object.keys(byRep).filter(function(r){ return (r==='Unassigned'?'Unassigned':ccRegionOf(r))===band[1]; }).sort(); if(!reps.length) return;
+    repTable+='<div style="padding:5px 12px;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--text-muted);background:rgba(255,255,255,.02)">'+band[0].toUpperCase()+'</div>';
+    reps.forEach(function(r){ const s=byRep[r]; repTable+='<button class="fe-leadrow" style="width:100%;border-radius:0;border-left:0;border-right:0" onclick="ccSetFilterRep('+JSON.stringify(r).replace(/"/g,'&quot;')+')">'+
+      '<div class="fe-grow"><div class="fe-name fe-trunc">'+ccEsc(r)+'</div></div>'+
+      '<div style="width:52px;text-align:center">'+s.total+'</div><div style="width:52px;text-align:center;color:var(--teal)">'+s.called+'</div><div style="width:64px;text-align:center;color:var(--teal)">'+s.interested+'</div><div style="width:64px;text-align:center;color:var(--success)">'+s.conv+'</div></button>'; });
+  });
+  repTable+='</div>';
+
+  const statusOpts=['<option value="">All statuses</option>','<option value="__route"'+(ccFilterStatus==='__route'?' selected':'')+'>🧭 Needs routing</option>'].concat(CC_STATUSES.map(function(s){ return '<option value="'+s+'"'+(ccFilterStatus===s?' selected':'')+'>'+s+'</option>'; })).join('');
+  const repOpts=['<option value="">All reps</option>'].concat(ccAssignableReps().map(function(r){ return '<option value="'+ccEsc(r)+'"'+(ccFilterRep===r?' selected':'')+'>'+ccEsc(r)+'</option>'; })).join('');
+  const regionOpts=['<option value="">All regions</option>'].concat(['Dubai','Abu Dhabi'].map(function(r){ return '<option value="'+r+'"'+(ccFilterRegion===r?' selected':'')+'>'+r+'</option>'; })).join('');
+  const filters='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'+
+    '<select class="fe-sel" onchange="ccSetFilterStatus(this.value)">'+statusOpts+'</select>'+
+    '<select class="fe-sel" onchange="ccSetFilterRep(this.value)">'+repOpts+'</select>'+
+    '<select class="fe-sel" onchange="ccSetFilterRegion(this.value)">'+regionOpts+'</select>'+
+    ((ccFilterStatus||ccFilterRep||ccFilterRegion)?'<button class="fe-sm" onclick="ccFilterStatus=\'\';ccFilterRep=\'\';ccFilterRegion=\'\';ccRender()">Clear</button>':'')+'</div>';
+
+  const list=ccFiltered();
+  const repSel=function(c){ return '<select class="fe-sel" style="max-width:150px" onchange="ccAssign(\''+c.id+'\',this.value)"><option value="">— assign —</option>'+ccAssignableReps().map(function(r){ return '<option value="'+ccEsc(r)+'"'+(c.assignee===r?' selected':'')+'>'+ccEsc(r)+'</option>'; }).join('')+'</select>'; };
+  const stSel=function(c){ return '<select class="fe-sel" style="max-width:140px;color:'+ccStatusColor(c.status)+'" onchange="ccSetStatus(\''+c.id+'\',this.value)">'+CC_STATUSES.map(function(s){ return '<option value="'+s+'"'+(c.status===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select>'; };
+  const rows=list.map(function(c){
+    const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,''));
+    return '<div class="fe-leadrow" style="align-items:flex-start;flex-wrap:wrap;gap:8px">'+
+      '<div class="fe-grow" style="min-width:180px"><div class="fe-name fe-trunc"><span class="fe-trunc">'+ccEsc(c.name)+'</span>'+(c.company?'<span class="fe-chip">'+ccEsc(c.company)+'</span>':'')+(c.region?'<span class="fe-chip">'+ccEsc(c.region)+'</span>':'')+(c.routeNeeded&&!c.assignee?'<span class="fe-chip" style="background:var(--warn);color:#000">🧭 Route</span>':'')+((c.attempts||0)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📞 '+c.attempts+'</span>':'')+'</div>'+
+        '<div class="fe-sub fe-trunc">'+([c.phone,c.email].filter(Boolean).map(ccEsc).join(' · ')||'&nbsp;')+(c.emirate?(' · '+ccEsc(c.emirate)):'')+'</div></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+
+        stSel(c)+repSel(c)+
+        (num?'<a class="fe-sm" href="tel:'+num+'" onclick="ccLogAttempt(\''+c.id+'\')" title="Call">📞</a>':'')+
+        (num?'<button class="fe-sm" style="color:#22c55e;border-color:#22c55e" onclick="ccWhatsApp(\''+c.id+'\')" title="WhatsApp">🟢</button>':'')+
+        '<button class="fe-sm" onclick="ccRemove(\''+c.id+'\')" title="Remove">🗑</button>'+
+      '</div></div>';
+  }).join('');
+  root.innerHTML=topbar+kpis+repTable+filters+'<div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">'+list.length+' call'+(list.length===1?'':'s')+'</div>'+(rows||'<div class="fe-empty"><p class="fe-sub">No calls match these filters.</p></div>');
+}
+function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
+
 loadLocal();
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
-loadFollowups(); // Follow-up Engine
+loadFollowups(); // Follow-up Engine → Marketing Leads
+try{ ccLoad(); }catch(e){}   // v21.75 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
