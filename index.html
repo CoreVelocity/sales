@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v21.93</title>
+<title>CoreV | OxeFit Sales Tracker v21.94</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2814,7 +2815,7 @@
   body[data-role="viewer"] .office-only,
   body[data-role="rep"]    .office-only-th,
   body[data-role="viewer"] .office-only-th { display: none !important; }
-  /* v21.93 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
+  /* v21.94 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
   body[data-role="viewer"] .demo-actions-th { display: none !important; }
 
   /* ════════════ SALES REP PERFORMANCE ════════════ */
@@ -3817,7 +3818,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v21.93 · Fixed quote PDF header — replaced the table running-header (caused big top gap) with a clean static header/footer
+      v21.94 · Quotes: NEW International Quote (Ahmed only) — USD pricing, no VAT, final destination, air-freight delivery &amp; intl terms
     </div>
   </div>
 </div>
@@ -3963,7 +3964,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.93</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v21.94</strong></p>
     </div>
   </div>
 </div>
@@ -4035,7 +4036,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v21.93</div>
+      <div class="sidebar-version">v21.94</div>
     </div>
   </aside>
 
@@ -4111,7 +4112,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.93</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v21.94</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4921,6 +4922,7 @@
               <option value="Rejected">Rejected</option>
             </select>
             <button class="prod-add-btn" id="newQuoteBtn" onclick="startNewQuote()">+ New Quote</button>
+            <button class="prod-add-btn" id="newIntlQuoteBtn" onclick="startNewInternationalQuote()" style="display:none;background:#0e7490;">🌍 New International Quote</button>
           </div>
         </div>
         <div class="prod-table-wrap">
@@ -4968,12 +4970,14 @@
                     <option value="">— Select ship window —</option>
                     <option value="1-2 days">1-2 days</option>
                     <option value="1-2 weeks">1-2 weeks</option>
+                    <option value="1-2 weeks via Air Freight">1-2 weeks via Air Freight</option>
                     <option value="4-6 weeks">4-6 weeks</option>
                     <option value="6-8 weeks">6-8 weeks</option>
                   </select>
                 </div>
-                <div class="qb-field"></div>
+                <div class="qb-field" id="qbDestField" style="display:none;"><label>🌍 Final Destination</label><input type="text" id="qbDestination" placeholder="e.g. Riyadh, Saudi Arabia"></div>
               </div>
+              <div id="qbIntlNote" style="display:none;margin-top:4px;padding:8px 10px;border-radius:8px;background:rgba(14,116,144,.12);border:1px solid rgba(14,116,144,.4);font-size:12px;">🌍 <strong>International quote</strong> — prices are in <strong>USD</strong> (converted from AED at the 3.6725 peg), VAT is removed, and international terms &amp; air-freight delivery apply.</div>
             </section>
             <section class="qb-card">
               <h4 class="qb-card-title">Associated Deal <span class="qb-sub">— open deals only (excludes closed won / lost)</span></h4>
@@ -5088,7 +5092,7 @@
                   <span>One-time discount</span>
                   <span class="qb-disc-input">AED <input type="number" id="qbDiscount" min="0" step="0.01" value="0" oninput="recalcQuoteTotals()"></span>
                 </div>
-                <div class="qb-tot-row"><span>VAT (5%)</span><strong id="qbVatAmount">AED 0.00</strong></div>
+                <div class="qb-tot-row"><span id="qbVatLabel">VAT (5%)</span><strong id="qbVatAmount">AED 0.00</strong></div>
                 <div class="qb-tot-row qb-tot-grand"><span>Total</span><strong id="qbGrandTotal">AED 0.00</strong></div>
               </div>
             </section>
@@ -5263,7 +5267,7 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-      /* v21.93 — Cold Call reuses Follow-up styling */
+      /* v21.94 — Cold Call reuses Follow-up styling */
       #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
       #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
       #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
@@ -6262,7 +6266,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v21.93 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v21.94 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6302,7 +6306,7 @@ function applyRosterObj(r){
       if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
     });
   }
-  // v21.93 — never let the old-spelling SSO aliases become a rep's assignment address
+  // v21.94 — never let the old-spelling SSO aliases become a rep's assignment address
   if (REP_TO_EMAIL['Hussean'] === 'hussein@core-velocity.com') REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
   if (REP_TO_EMAIL['Milena']  === 'milene@core-velocity.com')  REP_TO_EMAIL['Milena']  = 'milena@core-velocity.com';
   recomputeAllReps();
@@ -6478,7 +6482,7 @@ const OFFICE_ADMIN = 'Gladys';
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
 );
-// v21.93 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
+// v21.94 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
 // name→email reverse map. Pin renamed reps to their canonical current addresses so
 // assignment emails go to the right inbox.
 REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
@@ -6853,12 +6857,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v21.93 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v21.94 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v21.93 — drop empty placeholder rows for reps no longer on the roster.
+  // v21.94 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7202,15 +7206,15 @@ function parseEnvelope(remote) {
       products: Array.isArray(remote.products) ? remote.products : undefined,        // v21.45 — fix: sync product catalog to all users
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
-      termtemplates_at: remote.termtemplates_at || undefined,  // v21.93
+      termtemplates_at: remote.termtemplates_at || undefined,  // v21.94
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      paymentterms_at: remote.paymentterms_at || undefined,  // v21.93
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.93
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.93
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.93
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v21.93
-      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v21.93
-      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v21.93
+      paymentterms_at: remote.paymentterms_at || undefined,  // v21.94
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v21.94
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v21.94
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v21.94
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v21.94
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v21.94
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v21.94
       meta : remote._meta || null
     };
   }
@@ -7280,11 +7284,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.93
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.93
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.93
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.93
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v21.93
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.94
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.94
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.94
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.94
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v21.94
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7508,15 +7512,15 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) { env.termtemplates = _lastRemoteTermTemplates; env.termtemplates_at = _termTemplatesAt || null; }
   if (typeof paymentTerms !== 'undefined' && paymentTerms) { env.paymentterms = paymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
   else if (_lastRemotePaymentTerms) { env.paymentterms = _lastRemotePaymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
-  // v21.93 — editable roster rides along (newest-wins by `at` on adoption)
+  // v21.94 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v21.93 — team-shared AI key (newest-wins by `at`)
+  // v21.94 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v21.93 — shared media library (newest-wins by `at`)
+  // v21.94 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v21.93 — rep notifications (merge by id)
+  // v21.94 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
-  // v21.93 — cold calls (merge by id) + tombstones
+  // v21.94 — cold calls (merge by id) + tombstones
   try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
@@ -7553,11 +7557,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.93
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.93
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.93
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.93
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v21.93
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v21.94
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v21.94
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v21.94
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v21.94
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v21.94
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -7894,7 +7898,7 @@ async function launchApp(alreadyAuthed) {
   startAutoRefresh();
   renderHubspotChip();
   renderAll();
-  try{ feHandleEngageLink(); }catch(_){}   // v21.93 — capture engage-link click → stamp engagement start
+  try{ feHandleEngageLink(); }catch(_){}   // v21.94 — capture engage-link click → stamp engagement start
 }
 
 /* ════════════════════════════════════════
@@ -11506,7 +11510,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.93 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v21.94 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -11892,6 +11896,8 @@ function renderQuotesTab() {
   // form is admin-only
   const form = document.getElementById('prodForm');
   if (form) form.style.display = canEditProducts() ? '' : 'none';
+  const intlBtn = document.getElementById('newIntlQuoteBtn');
+  if (intlBtn) intlBtn.style.display = (currentUser === 'Ahmed') ? '' : 'none';
   renderProductsTable();
   populateTermTypeSelect();
   // quotes: default to list view (hide builder)
@@ -12071,6 +12077,18 @@ const QUOTE_BANK_DEFAULT = {
   currency: 'AED'
 };
 // Default purchase terms (from the CoreV template)
+const USD_PER_AED = 0.2723; // AED is pegged to USD at 3.6725 (1 AED ≈ 0.2723 USD)
+function intlDefaultTerms() {
+  return [
+    { label: 'Agreement', detail: 'Unless the parties have previously entered into a separate written agreement, this quotation is subject to the terms & conditions at https://www.core-velocity.com/corev-commercial-terms-and-policies' },
+    { label: 'Currency', detail: 'All prices are quoted in US Dollars (USD) and are exclusive of destination duties, import taxes and customs clearance charges.' },
+    { label: 'Price Includes', detail: '3 YEAR APEX Annual Membership – Unlimited Usage, All Content, NO Profiles or Cloud Data Tracking' },
+    { label: 'Delivery', detail: 'Estimated delivery within 1-2 weeks via Air Freight to the stated final destination, subject to stock and carrier availability.' },
+    { label: 'Duties & Taxes', detail: 'All import duties, VAT/GST and customs clearance at the destination country are the responsibility of the buyer.' },
+    { label: 'Plus Warranty', detail: '36 months warranty on parts & labour. Details: https://www.oxefit.com/corev/terms-policies/plus-warranty' },
+    { label: 'Payment Terms', detail: '1. 100% advance payment via international bank transfer prior to dispatch. 2. Non-refundable and non-cancellable order.' }
+  ];
+}
 function quoteDefaultTerms() {
   return [
     { label: 'Agreement', detail: 'Unless the parties have previously entered into a separate written agreement, this quotation is subject to the terms & conditions at https://www.core-velocity.com/corev-commercial-terms-and-policies' },
@@ -12448,11 +12466,11 @@ function renderQuotesList() {
     const tr = document.createElement('tr');
     const st = q.status || 'Draft';
     tr.innerHTML =
-      `<td><a class="quote-name-link" onclick="openQuote('${q.id}')">${escapeHtml(q.name || 'Untitled')}</a></td>` +
+      `<td><a class="quote-name-link" onclick="openQuote('${q.id}')">${escapeHtml(q.name || 'Untitled')}</a>${q.international ? ' <span style="font-size:10px;font-weight:700;color:#0e7490;">🌍 USD</span>' : ''}</td>` +
       `<td class="m-hide" style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.reference || '—')}</td>` +
       `<td class="m-hide">${escapeHtml((q.buyer && q.buyer.name) || '—')}</td>` +
       `<td class="m-hide" style="font-size:11.5px;">${escapeHtml(q.dealName || '—')}</td>` +
-      `<td class="prod-num">${fmtMoney(q.total)}</td>` +
+      `<td class="prod-num">${q.international ? 'USD ' : ''}${fmtMoney(q.total)}</td>` +
       `<td><span class="quote-status-badge ${quoteStatusClass(st)}">${st}</span></td>` +
       `<td class="m-hide" style="font-size:11.5px;">${q.expiresAt ? quoteFmtDate(q.expiresAt) : '—'}</td>` +
       `<td class="prod-actions-col">` +
@@ -12482,7 +12500,12 @@ function quoteGenReference() {
 }
 
 /* ── New / open / close builder ───────────────────────────────────── */
-function startNewQuote() {
+function startNewInternationalQuote() {
+  if (currentUser !== 'Ahmed') { showToast('International quotes are available to Ahmed only', 'error'); return; }
+  startNewQuote(true);
+}
+function startNewQuote(intl) {
+  intl = !!intl;
   const now = new Date();
   const exp = new Date(now.getTime() + 14 * 86400000);
   // sender defaults to the initiating rep
@@ -12496,18 +12519,22 @@ function startNewQuote() {
     company: { id: '', name: '' },
     sender: { name: currentUser || '', email: meEmail || '', phone: '+971', title: 'Sales Executive' },
     lineItems: [],
-    discount: 0, vatRate: 5,
+    discount: 0, vatRate: intl ? 0 : 5,
     schedule: [{ pct: 100, when: 'On placing the order' }],
-    payBank: true, bank: { ...QUOTE_BANK_DEFAULT },
+    payBank: true, bank: { ...QUOTE_BANK_DEFAULT, currency: intl ? 'USD' : (QUOTE_BANK_DEFAULT.currency || 'AED') },
     payLink: false, paymentLink: '',
-    terms: quoteDefaultTerms(),
-    comments: 'Thank you for your business!',
+    terms: intl ? intlDefaultTerms() : quoteDefaultTerms(),
+    comments: intl ? 'Thank you for your business! This is an international quotation — all prices are in USD and exclusive of destination duties and taxes.' : 'Thank you for your business!',
     signName: '', signImg: '',
     status: 'Draft',
     ownerUser: currentUser,
     createdAt: now.toISOString(),
     expiresAt: exp.toISOString().slice(0, 10),
-    shipDate: '1-2 days'
+    shipDate: intl ? '1-2 weeks via Air Freight' : '1-2 days',
+    international: intl,
+    currency: intl ? 'USD' : 'AED',
+    fxRate: intl ? USD_PER_AED : 1,
+    destination: ''
   };
   openQuoteBuilderUI();
 }
@@ -12534,6 +12561,11 @@ function openQuoteBuilderUI() {
   document.getElementById('qbName').value = q.name || '';
   document.getElementById('qbExpires').value = q.expiresAt || '';
   document.getElementById('qbShipDate').value = q.shipDate || '';
+  const _intl = !!q.international;
+  const _dest = document.getElementById('qbDestination'); if (_dest) _dest.value = q.destination || '';
+  const _df = document.getElementById('qbDestField'); if (_df) _df.style.display = _intl ? '' : 'none';
+  const _in = document.getElementById('qbIntlNote'); if (_in) _in.style.display = _intl ? '' : 'none';
+  const _rl = document.getElementById('qbRefLabel'); if (_rl && _intl) _rl.textContent = 'Ref: ' + q.reference + '  ·  🌍 INTERNATIONAL (USD)';
   // combobox display values reflect current selection
   qbComboSetValue('deal'); qbComboSetValue('contact'); qbComboSetValue('company');
   // v21.11 — label CRM buttons for team-wide (admins) vs own (reps)
@@ -12697,14 +12729,16 @@ function qbRenderReview() {
     row('Reference', escapeHtml(q.reference)) +
     row('Expires', quoteFmtDate(q.expiresAt)) +
     row('Ship date', escapeHtml(q.shipDate)) +
+    (q.international && q.destination ? row('🌍 Destination', escapeHtml(q.destination)) : '') +
+    (q.international ? row('Currency', 'USD (international — no VAT)') : '') +
     row('Deal', escapeHtml(q.dealName)) +
     row('Buyer', escapeHtml((q.buyer && q.buyer.name) || '') + (q.company && q.company.name ? ' — ' + escapeHtml(q.company.name) : '')) +
     row('Prepared by', escapeHtml((q.sender && q.sender.name) || '')) +
     row('Line items', (q.lineItems || []).length + ' item(s)') +
-    row('Subtotal', 'AED ' + fmtMoney(q.subtotal || 0)) +
-    ((q.discount || 0) > 0 ? row('Discount', '(AED ' + fmtMoney(q.discount) + ')') : '') +
-    row('VAT (5%)', 'AED ' + fmtMoney(q.vatAmount || 0)) +
-    row('Total', 'AED ' + fmtMoney(q.total || 0)) +
+    row('Subtotal', (q.international ? 'USD ' : 'AED ') + fmtMoney(q.subtotal || 0)) +
+    ((q.discount || 0) > 0 ? row('Discount', '(' + (q.international ? 'USD ' : 'AED ') + fmtMoney(q.discount) + ')') : '') +
+    ((q.vatRate || 0) > 0 ? row('VAT (' + q.vatRate + '%)', 'AED ' + fmtMoney(q.vatAmount || 0)) : '') +
+    row('Total', (q.international ? 'USD ' : 'AED ') + fmtMoney(q.total || 0)) +
     row('Payment schedule', escapeHtml(schedTxt));
 }
 
@@ -12880,7 +12914,9 @@ function qbHideProductResults() {
 function qbAddLineItemById(id) {
   const p = productEntries.find(x => x.id === id);
   if (!p) return;
-  _currentQuote.lineItems.push({ productId: p.id, sku: p.sku, desc: p.desc, lineType: p.lineType || '', qty: 1, unitPrice: Number(p.unitPrice) || 0 });
+  const _raw = Number(p.unitPrice) || 0;
+  const _price = _currentQuote.international ? Math.round(_raw * (_currentQuote.fxRate || USD_PER_AED) * 100) / 100 : _raw;
+  _currentQuote.lineItems.push({ productId: p.id, sku: p.sku, desc: p.desc, lineType: p.lineType || '', qty: 1, unitPrice: _price });
   const inp = document.getElementById('qbProductSearch');
   if (inp) inp.value = '';
   const res = document.getElementById('qbProductResults');
@@ -12917,17 +12953,20 @@ function renderQbItems() {
 }
 function recalcQuoteTotals() {
   if (!_currentQuote) return;
+  const intl = !!_currentQuote.international;
+  const sym = intl ? 'USD ' : 'AED ';
   const subtotal = _currentQuote.lineItems.reduce((s, it) => s + (it.qty || 0) * (it.unitPrice || 0), 0);
   const discount = Math.max(0, parseFloat(document.getElementById('qbDiscount').value) || 0);
-  const vatRate = 5;   // v21.1 — VAT is fixed at 5%, not user-editable
+  const vatRate = intl ? 0 : 5;   // international quotes carry no VAT
   const taxable = Math.max(0, subtotal - discount);
   const vatAmount = taxable * vatRate / 100;
   const total = taxable + vatAmount;
   _currentQuote.discount = discount; _currentQuote.vatRate = vatRate;
   _currentQuote.subtotal = subtotal; _currentQuote.vatAmount = vatAmount; _currentQuote.total = total;
-  document.getElementById('qbSubtotal').textContent = 'AED ' + fmtMoney(subtotal);
-  document.getElementById('qbVatAmount').textContent = 'AED ' + fmtMoney(vatAmount);
-  document.getElementById('qbGrandTotal').textContent = 'AED ' + fmtMoney(total);
+  document.getElementById('qbSubtotal').textContent = sym + fmtMoney(subtotal);
+  document.getElementById('qbVatAmount').textContent = intl ? 'No VAT (international)' : (sym + fmtMoney(vatAmount));
+  const _vl = document.getElementById('qbVatLabel'); if (_vl) _vl.textContent = intl ? 'VAT' : 'VAT (5%)';
+  document.getElementById('qbGrandTotal').textContent = sym + fmtMoney(total);
   // keep the Submit button label in sync with the discount (auto-approve vs approval)
   const _sb = document.getElementById('qbSubmitBtn');
   if (_sb && _sb.style.display !== 'none') _sb.textContent = discount > 0 ? '📤 Submit for Approval' : '✓ Approve & Publish (no discount)';
@@ -13049,6 +13088,7 @@ function qbCollect() {
   q.name = document.getElementById('qbName').value.trim();
   q.expiresAt = document.getElementById('qbExpires').value;
   q.shipDate = document.getElementById('qbShipDate').value;
+  const _dest = document.getElementById('qbDestination'); if (_dest) q.destination = _dest.value.trim();
   q.buyer.name = document.getElementById('qbBuyerName').value.trim();
   q.buyer.email = document.getElementById('qbBuyerEmail').value.trim();
   q.buyer.phone = document.getElementById('qbBuyerPhone').value.trim();
@@ -13071,7 +13111,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
-  q.terms = resolveQuoteTermsFlat(q);   // v21.9 — terms are fixed per product Type
+  q.terms = q.international ? intlDefaultTerms() : resolveQuoteTermsFlat(q);   // v21.9 — terms fixed per product Type; international uses its own set
   return q;
 }
 function saveQuote() {
@@ -13151,11 +13191,12 @@ function _quoteEmailHtml(q, intro) {
     row('Quote', q.name) + row('Reference', q.reference) +
     row('Buyer', ((q.buyer && q.buyer.name) || '') + (q.company && q.company.name ? ' — ' + q.company.name : '')) +
     row('Prepared by', (q.sender && q.sender.name) || q.ownerUser) +
-    row('Total', 'AED ' + fmtMoney(q.total || 0)) + row('Expires', quoteFmtDate(q.expiresAt)) +
+    (q.international && q.destination ? row('Destination', q.destination) : '') +
+    row('Total', (q.international ? 'USD ' : 'AED ') + fmtMoney(q.total || 0)) + row('Expires', quoteFmtDate(q.expiresAt)) +
     `</table><p style="color:#64748b;font-size:12px;">Open the CoreV Sales Tracker → Quotes to review.</p></div>`;
 }
 function _quoteEmailText(q, intro) {
-  return `${intro}\n\nQuote: ${q.name}\nReference: ${q.reference}\nBuyer: ${(q.buyer && q.buyer.name) || '-'}\nTotal: AED ${fmtMoney(q.total || 0)}\nExpires: ${quoteFmtDate(q.expiresAt)}\n\nOpen the CoreV Sales Tracker → Quotes to review.`;
+  return `${intro}\n\nQuote: ${q.name}\nReference: ${q.reference}\nBuyer: ${(q.buyer && q.buyer.name) || '-'}\nTotal: ${(q.international ? 'USD ' : 'AED ')}${fmtMoney(q.total || 0)}\nExpires: ${quoteFmtDate(q.expiresAt)}\n\nOpen the CoreV Sales Tracker → Quotes to review.`;
 }
 
 // A quote "applies a discount" if the one-time discount is > 0
@@ -13329,7 +13370,7 @@ async function hsCreateNativeQuote(q) {
     hs_status: 'DRAFT',
     hs_language: 'en',
     hs_locale: 'en-US',
-    hs_currency: (q.bank && q.bank.currency) || 'AED'
+    hs_currency: q.international ? 'USD' : ((q.bank && q.bank.currency) || 'AED')
   };
   if (q.expiresAt) props.hs_expiration_date = q.expiresAt;           // 'YYYY-MM-DD'
   const assoc = [];
@@ -13399,7 +13440,7 @@ function deleteQuote(id) {
 
 /* ── Preview / print ──────────────────────────────────────────────── */
 function buildQuotePreviewHTML(q) {
-  const money = n => 'AED' + fmtMoney(n);
+  const money = n => (q.international ? 'USD ' : 'AED') + fmtMoney(n);
   const itemsRows = q.lineItems.map(it =>
     `<tr>` +
       `<td><div class="qp-item-sku">${escapeHtml(it.sku || '')}</div>${escapeHtml(it.desc || '')}</td>` +
@@ -13417,7 +13458,10 @@ function buildQuotePreviewHTML(q) {
     `<div class="qp-muted" style="margin-top:12px;">Reference: ${escapeHtml(q.reference)}</div>` +
     `<div class="qp-muted">Quote created: ${quoteFmtDate(q.createdAt)}</div>` +
     `<div class="qp-muted">Quote expires: ${quoteFmtDate(q.expiresAt)}</div>` +
-    (q.shipDate ? `<div class="qp-muted">Ship date: ${escapeHtml(q.shipDate)}</div>` : '');
+    (q.international && q.destination ? `<div class="qp-muted" style="margin-top:8px;"><strong>Final destination:</strong> ${escapeHtml(q.destination)}</div>` : '') +
+    (q.shipDate ? `<div class="qp-muted">${q.international ? 'Delivery' : 'Ship date'}: ${escapeHtml(q.shipDate)}</div>` : '') +
+    (q.international ? `<div class="qp-muted"><strong>Currency: USD</strong> · duties &amp; import taxes excluded</div>` : '');
+  const _origShipLine = '';
   const sellerBlock =
     `<h5>${escapeHtml(QUOTE_SELLER.name)}</h5>` +
     QUOTE_SELLER.addrLines.map(l => `<div class="qp-muted">${escapeHtml(l)}</div>`).join('') +
@@ -13464,6 +13508,7 @@ function buildQuotePreviewHTML(q) {
     <div class="qp-runhead"><span class="qp-runhead-meta">QUOTE · ${escapeHtml(q.reference || '')}</span></div>
     <img class="qp-logo-img" src="${QUOTE_LOGO_URI}" alt="OXEFIT by CORE">
     <div class="qp-title">${escapeHtml(q.name || 'Quote')}</div>
+    ${q.international ? `<div style="text-align:center;margin:-22px 0 26px;font-size:12px;font-weight:700;letter-spacing:1px;color:#0e7490;">🌍 INTERNATIONAL QUOTATION · PRICES IN USD${q.destination ? ' · ' + escapeHtml(q.destination.toUpperCase()) : ''}</div>` : ''}
     <div class="qp-cols">
       <div class="qp-col">${buyerBlock}</div>
       <div class="qp-col">${sellerBlock}</div>
@@ -13478,7 +13523,7 @@ function buildQuotePreviewHTML(q) {
     <div class="qp-summary">
       <div class="qp-srow"><span>One-time subtotal</span><span>${money(q.subtotal||0)}</span></div>
       ${(q.discount||0) > 0 ? `<div class="qp-srow"><span>One-time discount</span><span>(${money(q.discount||0)})</span></div>` : ''}
-      <div class="qp-srow"><span>VAT (${q.vatRate||5}%)</span><span>${money(q.vatAmount||0)}</span></div>
+      ${(q.vatRate||0) > 0 ? `<div class="qp-srow"><span>VAT (${q.vatRate}%)</span><span>${money(q.vatAmount||0)}</span></div>` : ''}
       <div class="qp-srow qp-sgrand"><span>Total</span><span>${money(q.total||0)}</span></div>
     </div>
     <div class="qp-page2">
@@ -14033,7 +14078,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v21.93 — per-Month filter ───────────────────────────────────────────────
+// ── v21.94 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -14408,7 +14453,7 @@ function openDemoModal(prefilledId) {
   demoApplyRepLock(!isManager);
   document.getElementById('demoModal').classList.add('open');
 }
-/* v21.93 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
+/* v21.94 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
 function demoApplyRepLock(lock) {
   ['demoFormDate','demoFormRep','demoFormClient','demoFormType','demoFormLocation','demoFormProduct'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.disabled = !!lock;
@@ -16664,8 +16709,8 @@ let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
 let feFilterName = '';
-// v21.93 — reps see only leads assigned to (or owned by) them; admins/office see all
-// v21.93 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
+// v21.94 — reps see only leads assigned to (or owned by) them; admins/office see all
+// v21.94 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
 const FE_SEE_ALL_USERS=['Fatima'];
 function feCanSeeAllLeads(){ return currentRole==='admin' || currentRole==='office' || FE_SEE_ALL_USERS.indexOf((typeof currentUser!=='undefined'?currentUser:'')||'')>=0; }
 function feVisibleLeads(){
@@ -16673,7 +16718,7 @@ function feVisibleLeads(){
   const u=(typeof currentUser!=='undefined'?currentUser:'')||'';
   return followupLeads.filter(function(l){ return (l.assignee||'')===u || (l.owner||'')===u; });
 }
-// v21.93 — Follow-up Engine can assign/filter to admins & office too
+// v21.94 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16681,7 +16726,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v21.93 — classify a Follow-up Engine assignee into a region/group for the table.
+// v21.94 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -16728,7 +16773,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v21.93 — clear addresses that were wrongly populated with note text by the old extractor
+// v21.94 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -16750,7 +16795,7 @@ function mergeFollowupsById(localArr, remoteArr){
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
 function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
 function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-/* ── v21.93 — assign→engage timing, assignment email, engage-link capture ── */
+/* ── v21.94 — assign→engage timing, assignment email, engage-link capture ── */
 function feFmtDur(ms){ if(ms==null||isNaN(ms)||ms<0) return ''; const m=Math.round(ms/60000); if(m<1) return 'under a minute'; if(m<60) return m+' min'; const h=Math.floor(m/60), rm=m%60; if(h<24) return h+'h'+(rm?(' '+rm+'m'):''); const d=Math.floor(h/24), rh=h%24; return d+'d'+(rh?(' '+rh+'h'):''); }
 function feEngageChip(l){
   if(!l||!l.assignedAt) return '';
@@ -16811,7 +16856,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v21.93 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v21.94 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -16852,7 +16897,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v21.93 — re-connection tag + "by when" date per lead
+// v21.94 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -16863,7 +16908,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v21.93 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v21.94 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -16900,7 +16945,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v21.93 — per-rep WhatsApp: each rep stores their own number locally; the
+// v21.94 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -16980,7 +17025,7 @@ async function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v21.93 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v21.94 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -17075,7 +17120,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v21.93 — only Ahmed and Gladys may mark a lead as Lost
+// v21.94 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -17217,7 +17262,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v21.93 — robust extraction of phone / email / address into separate fields
+// v21.94 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17252,7 +17297,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v21.93 — map a free-text Emirate/Location to a routing region
+// v21.94 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -17799,7 +17844,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v21.93 — the reminder day-offset and time of day are user-editable per step.
+// v21.94 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -17886,7 +17931,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(!l) return; const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; l.assignedAt=new Date().toISOString(); l.engagedAt=''; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); feStamp(l); feSave(); renderFollowup(); feEmailAssignment(l, rep); return; } feStamp(l); feSave(); renderFollowup(); }
-/* ── v21.93 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v21.94 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -18134,7 +18179,7 @@ async function feDriveSearch(term){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   COLD CALL MODULE (v21.93) — Excel import/export, assign across reps,
+   COLD CALL MODULE (v21.94) — Excel import/export, assign across reps,
    FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
    feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
 ════════════════════════════════════════════════════════════════ */
@@ -18471,13 +18516,13 @@ function ccRender(){
 function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 
 loadLocal();
-try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v21.93 — capture engage-link before MSAL redirect
+try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v21.94 — capture engage-link before MSAL redirect
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadFollowups(); // Follow-up Engine → Marketing Leads
-try{ ccLoad(); }catch(e){}   // v21.93 — Cold Call module
+try{ ccLoad(); }catch(e){}   // v21.94 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
