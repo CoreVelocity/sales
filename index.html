@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v23.1</title>
+<title>CoreV | OxeFit Sales Tracker v23.2</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2814,7 +2814,7 @@
   body[data-role="viewer"] .office-only,
   body[data-role="rep"]    .office-only-th,
   body[data-role="viewer"] .office-only-th { display: none !important; }
-  /* v23.1 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
+  /* v23.2 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
   body[data-role="viewer"] .demo-actions-th { display: none !important; }
 
   /* ════════════ SALES REP PERFORMANCE ════════════ */
@@ -3819,7 +3819,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v23.1 · Rep Report: added Forecast Accuracy, Commit Variance &amp; Total Pipeline — report now spans from the rep's join month
+      v23.2 · Rep Report: weighted rubric (total 200) with performance bands (Low→Exceeding) + evaluation methodology printed in the PDF
     </div>
   </div>
 </div>
@@ -3965,7 +3965,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v23.1</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v23.2</strong></p>
     </div>
   </div>
 </div>
@@ -4037,7 +4037,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v23.1</div>
+      <div class="sidebar-version">v23.2</div>
     </div>
   </aside>
 
@@ -4113,7 +4113,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v23.1</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v23.2</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -5271,7 +5271,7 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-      /* v23.1 — Cold Call reuses Follow-up styling */
+      /* v23.2 — Cold Call reuses Follow-up styling */
       #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
       #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
       #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
@@ -6270,7 +6270,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v23.1 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v23.2 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6313,7 +6313,7 @@ function applyRosterObj(r){
       if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
     });
   }
-  // v23.1 — never let the old-spelling SSO aliases become a rep's assignment address
+  // v23.2 — never let the old-spelling SSO aliases become a rep's assignment address
   if (REP_TO_EMAIL['Hussean'] === 'hussein@core-velocity.com') REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
   if (REP_TO_EMAIL['Milena']  === 'milene@core-velocity.com')  REP_TO_EMAIL['Milena']  = 'milena@core-velocity.com';
   if (r.meta && typeof r.meta === 'object') {
@@ -6512,7 +6512,7 @@ const OFFICE_ADMIN = 'Gladys';
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
 );
-// v23.1 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
+// v23.2 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
 // name→email reverse map. Pin renamed reps to their canonical current addresses so
 // assignment emails go to the right inbox.
 REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
@@ -6887,12 +6887,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v23.1 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v23.2 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v23.1 — drop empty placeholder rows for reps no longer on the roster.
+  // v23.2 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7236,15 +7236,15 @@ function parseEnvelope(remote) {
       products: Array.isArray(remote.products) ? remote.products : undefined,        // v21.45 — fix: sync product catalog to all users
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
-      termtemplates_at: remote.termtemplates_at || undefined,  // v23.1
+      termtemplates_at: remote.termtemplates_at || undefined,  // v23.2
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      paymentterms_at: remote.paymentterms_at || undefined,  // v23.1
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v23.1
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v23.1
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v23.1
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v23.1
-      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v23.1
-      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v23.1
+      paymentterms_at: remote.paymentterms_at || undefined,  // v23.2
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v23.2
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v23.2
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v23.2
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v23.2
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v23.2
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v23.2
       meta : remote._meta || null
     };
   }
@@ -7314,11 +7314,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v23.1
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v23.1
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v23.1
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v23.1
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v23.1
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v23.2
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v23.2
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v23.2
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v23.2
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v23.2
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7542,15 +7542,15 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) { env.termtemplates = _lastRemoteTermTemplates; env.termtemplates_at = _termTemplatesAt || null; }
   if (typeof paymentTerms !== 'undefined' && paymentTerms) { env.paymentterms = paymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
   else if (_lastRemotePaymentTerms) { env.paymentterms = _lastRemotePaymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
-  // v23.1 — editable roster rides along (newest-wins by `at` on adoption)
+  // v23.2 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v23.1 — team-shared AI key (newest-wins by `at`)
+  // v23.2 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v23.1 — shared media library (newest-wins by `at`)
+  // v23.2 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v23.1 — rep notifications (merge by id)
+  // v23.2 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
-  // v23.1 — cold calls (merge by id) + tombstones
+  // v23.2 — cold calls (merge by id) + tombstones
   try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
@@ -7587,11 +7587,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v23.1
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v23.1
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v23.1
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v23.1
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v23.1
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v23.2
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v23.2
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v23.2
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v23.2
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v23.2
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -7928,7 +7928,7 @@ async function launchApp(alreadyAuthed) {
   startAutoRefresh();
   renderHubspotChip();
   renderAll();
-  try{ feHandleEngageLink(); }catch(_){}   // v23.1 — capture engage-link click → stamp engagement start
+  try{ feHandleEngageLink(); }catch(_){}   // v23.2 — capture engage-link click → stamp engagement start
 }
 
 /* ════════════════════════════════════════
@@ -11540,7 +11540,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v23.1 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v23.2 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13181,7 +13181,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
-  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v23.1 — international keeps the normal editable terms plus Currency/Delivery/Duties
+  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v23.2 — international keeps the normal editable terms plus Currency/Delivery/Duties
   return q;
 }
 function saveQuote() {
@@ -14176,7 +14176,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v23.1 — per-Month filter ───────────────────────────────────────────────
+// ── v23.2 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -14551,7 +14551,7 @@ function openDemoModal(prefilledId) {
   demoApplyRepLock(!isManager);
   document.getElementById('demoModal').classList.add('open');
 }
-/* v23.1 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
+/* v23.2 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
 function demoApplyRepLock(lock) {
   ['demoFormDate','demoFormRep','demoFormClient','demoFormType','demoFormLocation','demoFormProduct'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.disabled = !!lock;
@@ -16234,6 +16234,37 @@ function _monthsFromJoin(joinDate){
   while((y<ey || (y===ey && mo<=em)) && guard<240){ list.push({year:y, month:mo}); mo++; if(mo>11){mo=0;y++;} guard++; }
   return list.length ? list : getPerfMonths();
 }
+// Map a 0..1 overall score into a performance band (replaces the raw /100 score)
+function scoreBand(pct){
+  if(pct>=0.90) return {label:'Exceeding', color:'#059669'};
+  if(pct>=0.75) return {label:'Achievable', color:'#16a34a'};
+  if(pct>=0.60) return {label:'Towards achievement', color:'#ca8a04'};
+  if(pct>=0.40) return {label:'Moderate performance', color:'#ea580c'};
+  return {label:'Low performance', color:'#dc2626'};
+}
+// Weighted scoring rubric — total 200
+function computeRepRubric(perf, meta, monthsN){
+  const dTarget = Math.max(1, monthsN*4), dealTarget = Math.max(1, monthsN*4);
+  const g = perf.totals.goal || 0;
+  const fDemos   = Math.min(1, (perf.demoStats.total||0)/dTarget);
+  const fConv    = perf.demoStats.convRate!=null ? perf.demoStats.convRate : 0;
+  const fCov     = perf.pcr!=null ? Math.min(1, perf.pcr/4) : 0;
+  const fTotPipe = g>0 ? Math.min(1, perf.totals.pipeline/(4*g)) : 0;
+  const fClosed  = g>0 ? Math.min(1, perf.totals.closed/g) : 0;
+  const fDeals   = (meta.dealsAdded!=null) ? Math.min(1, meta.dealsAdded/dealTarget) : 0;
+  const fAcc     = perf.accuracy||0;
+  const comps=[
+    ['Demos achieved',10,fDemos,(perf.demoStats.total||0)+' of '+dTarget+' target'],
+    ['Demo → Sale conversion',25,fConv,Math.round(fConv*100)+'%'],
+    ['Pipeline coverage (≥ 4×)',50,fCov,(perf.pcr!=null?perf.pcr.toFixed(2)+'×':'—')],
+    ['Total pipeline (avg 4×/mo)',20,fTotPipe,fmtAED(perf.totals.pipeline)+' of '+fmtAED(4*g)],
+    ['Deals closed (vs target)',50,fClosed,fmtAED(perf.totals.closed)+' of '+fmtAED(g)],
+    ['Deals generated',20,fDeals,(meta.dealsAdded!=null?(meta.dealsAdded+' of '+dealTarget+' target'):'no data entered')],
+    ['Forecast accuracy',25,fAcc,Math.round(fAcc*100)+'%']
+  ];
+  const total = comps.reduce((s,c)=> s + c[2]*c[1], 0);
+  return { comps, total, max:200, band: scoreBand(total/200) };
+}
 function _tenureText(joinDate){
   if(!joinDate) return '—';
   const d=new Date(joinDate); if(isNaN(d)) return '—';
@@ -16317,6 +16348,8 @@ async function generateRepReportPdf(rep){
       kpi('Outreach', (m.outreach!=null?m.outreach:'—'), 'messages (HubSpot)'),
       kpi('Contacts built', (m.contacts!=null?m.contacts:'—'), '(HubSpot)')
     ].join('');
+    const rubric = computeRepRubric(perf, m, months.length || 1);
+    const scoreRows = rubric.comps.map(function(c){ const pts=c[2]*c[1]; return '<tr><td style="padding:5px 8px;border-bottom:1px solid #eef2f7;">'+c[0]+'</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #eef2f7;color:#64748b;">'+c[1]+'</td><td style="padding:5px 8px;text-align:right;border-bottom:1px solid #eef2f7;color:#475569;">'+c[3]+'</td><td style="padding:5px 8px;text-align:right;border-bottom:1px solid #eef2f7;font-weight:700;">'+pts.toFixed(1)+'</td></tr>'; }).join('');
     const html='<div style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1e3a8a;padding-bottom:10px;margin-bottom:14px;">'
       +   '<div><div style="font-size:22px;font-weight:800;">Sales Performance Report</div><div style="font-size:13px;color:#475569;">'+escapeHtml(rep)+(perf.team?' · '+perf.team:'')+'</div></div>'
@@ -16331,7 +16364,17 @@ async function generateRepReportPdf(rep){
       +   '<thead><tr style="background:#eef2ff;color:#1e3a8a;"><th style="text-align:left;padding:6px 8px;">Month</th><th style="text-align:right;padding:6px 8px;">Target</th><th style="text-align:right;padding:6px 8px;">Closed</th><th style="text-align:right;padding:6px 8px;">Pipeline (closing)</th><th style="text-align:right;padding:6px 8px;">Coverage</th></tr></thead>'
       +   '<tbody>'+rowsHtml+'</tbody>'
       + '</table>'
-      + '<div style="margin-top:12px;font-size:12px;color:#475569;">Overall performance score: <b style="color:#0f172a;font-size:14px;">'+(perf.score!=null?perf.score:'—')+' / 100</b></div>'
+      + '<div style="margin-top:16px;display:flex;align-items:center;gap:14px;" class="qp-srow">'
+      +   '<div style="background:'+rubric.band.color+';color:#fff;padding:11px 20px;border-radius:10px;font-weight:800;font-size:17px;">'+rubric.band.label+'</div>'
+      +   '<div style="font-size:12px;color:#475569;">Weighted score <b style="color:#0f172a;font-size:15px;">'+rubric.total.toFixed(0)+' / '+rubric.max+'</b> &nbsp;('+Math.round(rubric.total/rubric.max*100)+'%)</div>'
+      + '</div>'
+      + '<div style="font-size:13px;font-weight:800;color:#1e3a8a;margin:16px 0 6px;">How performance is evaluated</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+      +   '<thead><tr style="background:#eef2ff;color:#1e3a8a;"><th style="text-align:left;padding:6px 8px;">Criteria</th><th style="text-align:center;padding:6px 8px;">Weight</th><th style="text-align:right;padding:6px 8px;">Actual</th><th style="text-align:right;padding:6px 8px;">Points</th></tr></thead>'
+      +   '<tbody>'+scoreRows+'</tbody>'
+      +   '<tfoot><tr style="font-weight:800;background:#f8fafc;"><td style="padding:6px 8px;">Total</td><td style="padding:6px 8px;text-align:center;">'+rubric.max+'</td><td></td><td style="padding:6px 8px;text-align:right;">'+rubric.total.toFixed(0)+'</td></tr></tfoot>'
+      + '</table>'
+      + '<div style="font-size:10.5px;color:#64748b;margin-top:8px;line-height:1.55;"><b>Bands:</b> Low performance &lt;40% · Moderate 40–60% · Towards achievement 60–75% · Achievable 75–90% · Exceeding ≥90%.<br><b>Method:</b> each criterion earns its weight × how close the rep is to target (capped at 100%). Pipeline coverage &amp; total pipeline target <b>4×</b> the goal; demos &amp; deals generated target <b>4 per active month</b>; conversion, forecast accuracy &amp; deals-closed are measured against their own 100%.</div>'
       + '<div style="margin-top:20px;border-top:1px solid #e2e8f0;padding-top:8px;font-size:10px;color:#94a3b8;text-align:center;">CoreV · OxeFit Sales Tracker · Generated '+new Date().toLocaleDateString('en-GB')+'</div>'
       + '</div>';
     const hostEl=document.createElement('div');
@@ -16953,8 +16996,8 @@ let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
 let feFilterName = '';
-// v23.1 — reps see only leads assigned to (or owned by) them; admins/office see all
-// v23.1 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
+// v23.2 — reps see only leads assigned to (or owned by) them; admins/office see all
+// v23.2 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
 const FE_SEE_ALL_USERS=['Fatima'];
 function feCanSeeAllLeads(){ return currentRole==='admin' || currentRole==='office' || FE_SEE_ALL_USERS.indexOf((typeof currentUser!=='undefined'?currentUser:'')||'')>=0; }
 function feVisibleLeads(){
@@ -16962,7 +17005,7 @@ function feVisibleLeads(){
   const u=(typeof currentUser!=='undefined'?currentUser:'')||'';
   return followupLeads.filter(function(l){ return (l.assignee||'')===u || (l.owner||'')===u; });
 }
-// v23.1 — Follow-up Engine can assign/filter to admins & office too
+// v23.2 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -16970,7 +17013,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v23.1 — classify a Follow-up Engine assignee into a region/group for the table.
+// v23.2 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -17018,7 +17061,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v23.1 — clear addresses that were wrongly populated with note text by the old extractor
+// v23.2 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -17055,7 +17098,7 @@ function mergeFollowupsById(localArr, remoteArr){
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
 function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
 function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-/* ── v23.1 — assign→engage timing, assignment email, engage-link capture ── */
+/* ── v23.2 — assign→engage timing, assignment email, engage-link capture ── */
 function feFmtDur(ms){ if(ms==null||isNaN(ms)||ms<0) return ''; const m=Math.round(ms/60000); if(m<1) return 'under a minute'; if(m<60) return m+' min'; const h=Math.floor(m/60), rm=m%60; if(h<24) return h+'h'+(rm?(' '+rm+'m'):''); const d=Math.floor(h/24), rh=h%24; return d+'d'+(rh?(' '+rh+'h'):''); }
 function feEngageChip(l){
   if(!l||!l.assignedAt) return '';
@@ -17116,7 +17159,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v23.1 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v23.2 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -17157,7 +17200,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v23.1 — re-connection tag + "by when" date per lead
+// v23.2 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -17168,7 +17211,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v23.1 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v23.2 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -17205,7 +17248,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v23.1 — per-rep WhatsApp: each rep stores their own number locally; the
+// v23.2 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -17285,7 +17328,7 @@ async function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v23.1 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v23.2 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -17380,7 +17423,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v23.1 — only Ahmed and Gladys may mark a lead as Lost
+// v23.2 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -17522,7 +17565,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v23.1 — robust extraction of phone / email / address into separate fields
+// v23.2 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17557,7 +17600,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v23.1 — map a free-text Emirate/Location to a routing region
+// v23.2 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -18116,7 +18159,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v23.1 — the reminder day-offset and time of day are user-editable per step.
+// v23.2 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -18203,7 +18246,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(!l) return; const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; l.assignedAt=new Date().toISOString(); l.engagedAt=''; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); feStamp(l); feSave(); renderFollowup(); feEmailAssignment(l, rep); return; } feStamp(l); feSave(); renderFollowup(); }
-/* ── v23.1 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v23.2 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -18454,7 +18497,7 @@ async function feDriveSearch(term){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   COLD CALL MODULE (v23.1) — Excel import/export, assign across reps,
+   COLD CALL MODULE (v23.2) — Excel import/export, assign across reps,
    FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
    feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
 ════════════════════════════════════════════════════════════════ */
@@ -18797,13 +18840,13 @@ function ccRender(){
 function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 
 loadLocal();
-try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v23.1 — capture engage-link before MSAL redirect
+try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v23.2 — capture engage-link before MSAL redirect
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadFollowups(); // Follow-up Engine → Marketing Leads
-try{ ccLoad(); }catch(e){}   // v23.1 — Cold Call module
+try{ ccLoad(); }catch(e){}   // v23.2 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
