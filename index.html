@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v23.8</title>
+<title>CoreV | OxeFit Sales Tracker v24.0</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2814,7 +2814,7 @@
   body[data-role="viewer"] .office-only,
   body[data-role="rep"]    .office-only-th,
   body[data-role="viewer"] .office-only-th { display: none !important; }
-  /* v23.8 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
+  /* v24.0 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
   body[data-role="viewer"] .demo-actions-th { display: none !important; }
 
   /* ════════════ SALES REP PERFORMANCE ════════════ */
@@ -3819,7 +3819,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v23.8 · Quote: optional Buyer VAT ID field in creation — prints in the buyer block on the PDF when provided
+      v24.0 · Payments &amp; Receipts is now Ahmed-only — hidden and blocked for all sales reps (button + every action guarded)
     </div>
   </div>
 </div>
@@ -3965,7 +3965,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v23.8</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.0</strong></p>
     </div>
   </div>
 </div>
@@ -4037,7 +4037,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v23.8</div>
+      <div class="sidebar-version">v24.0</div>
     </div>
   </aside>
 
@@ -4113,7 +4113,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v23.8</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.0</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4952,6 +4952,7 @@
             <button class="prod-row-btn del" id="qbRejectBtn" style="display:none;" onclick="rejectQuote()">✕ Reject</button>
             <button class="prod-add-btn" id="qbDownloadBtn" style="display:none;" onclick="exportQuotePDF()">⤓ Download</button>
             <button class="prod-add-btn" id="qbPublishBtn" style="display:none;" onclick="publishCurrentQuote()">⇪ Publish to HubSpot</button>
+            <button class="prod-add-btn" id="qbReceiptBtn" style="display:none;background:#0e7490;" onclick="openPaymentsModal()">💵 Payments &amp; Receipts</button>
           </div>
         </div>
 
@@ -5276,7 +5277,7 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-      /* v23.8 — Cold Call reuses Follow-up styling */
+      /* v24.0 — Cold Call reuses Follow-up styling */
       #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
       #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
       #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
@@ -6275,7 +6276,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v23.8 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v24.0 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6318,7 +6319,7 @@ function applyRosterObj(r){
       if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
     });
   }
-  // v23.8 — never let the old-spelling SSO aliases become a rep's assignment address
+  // v24.0 — never let the old-spelling SSO aliases become a rep's assignment address
   if (REP_TO_EMAIL['Hussean'] === 'hussein@core-velocity.com') REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
   if (REP_TO_EMAIL['Milena']  === 'milene@core-velocity.com')  REP_TO_EMAIL['Milena']  = 'milena@core-velocity.com';
   if (r.meta && typeof r.meta === 'object') {
@@ -6517,7 +6518,7 @@ const OFFICE_ADMIN = 'Gladys';
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
 );
-// v23.8 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
+// v24.0 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
 // name→email reverse map. Pin renamed reps to their canonical current addresses so
 // assignment emails go to the right inbox.
 REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
@@ -6892,12 +6893,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v23.8 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v24.0 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v23.8 — drop empty placeholder rows for reps no longer on the roster.
+  // v24.0 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7241,15 +7242,15 @@ function parseEnvelope(remote) {
       products: Array.isArray(remote.products) ? remote.products : undefined,        // v21.45 — fix: sync product catalog to all users
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
-      termtemplates_at: remote.termtemplates_at || undefined,  // v23.8
+      termtemplates_at: remote.termtemplates_at || undefined,  // v24.0
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      paymentterms_at: remote.paymentterms_at || undefined,  // v23.8
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v23.8
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v23.8
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v23.8
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v23.8
-      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v23.8
-      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v23.8
+      paymentterms_at: remote.paymentterms_at || undefined,  // v24.0
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.0
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.0
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.0
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.0
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.0
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.0
       meta : remote._meta || null
     };
   }
@@ -7319,11 +7320,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v23.8
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v23.8
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v23.8
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v23.8
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v23.8
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.0
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.0
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.0
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.0
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.0
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7547,15 +7548,15 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) { env.termtemplates = _lastRemoteTermTemplates; env.termtemplates_at = _termTemplatesAt || null; }
   if (typeof paymentTerms !== 'undefined' && paymentTerms) { env.paymentterms = paymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
   else if (_lastRemotePaymentTerms) { env.paymentterms = _lastRemotePaymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
-  // v23.8 — editable roster rides along (newest-wins by `at` on adoption)
+  // v24.0 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v23.8 — team-shared AI key (newest-wins by `at`)
+  // v24.0 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v23.8 — shared media library (newest-wins by `at`)
+  // v24.0 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v23.8 — rep notifications (merge by id)
+  // v24.0 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
-  // v23.8 — cold calls (merge by id) + tombstones
+  // v24.0 — cold calls (merge by id) + tombstones
   try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
@@ -7592,11 +7593,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v23.8
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v23.8
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v23.8
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v23.8
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v23.8
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.0
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.0
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.0
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.0
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.0
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -7933,7 +7934,7 @@ async function launchApp(alreadyAuthed) {
   startAutoRefresh();
   renderHubspotChip();
   renderAll();
-  try{ feHandleEngageLink(); }catch(_){}   // v23.8 — capture engage-link click → stamp engagement start
+  try{ feHandleEngageLink(); }catch(_){}   // v24.0 — capture engage-link click → stamp engagement start
 }
 
 /* ════════════════════════════════════════
@@ -11545,7 +11546,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v23.8 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.0 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13189,7 +13190,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
-  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v23.8 — international keeps the normal editable terms plus Currency/Delivery/Duties
+  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.0 — international keeps the normal editable terms plus Currency/Delivery/Duties
   return q;
 }
 function saveQuote() {
@@ -13397,6 +13398,7 @@ function updateQuoteButtons() {
   show('qbPublishBtn', canPub);
   const pubBtn = document.getElementById('qbPublishBtn');
   if (pubBtn) pubBtn.textContent = published ? (updated ? '⇪ Re-push update to HubSpot' : '⇪ Re-publish to HubSpot') : '⇪ Publish to HubSpot';
+  show('qbReceiptBtn', (approved || published) && currentUser === 'Ahmed');   // Ahmed only
 }
 /* ── Publish an approved quote to HubSpot (attach PDF to the deal) ── */
 function ensureHtml2Pdf() {
@@ -13540,6 +13542,127 @@ function deleteQuote(id) {
 }
 
 /* ── Preview / print ──────────────────────────────────────────────── */
+/* ═══════════ Payments & Receipts ═══════════ */
+function _quoteReceived(q){ return (q.payments||[]).reduce((s,p)=> s + (parseFloat(p.amount)||0), 0); }
+function _quoteCurr(q){ return q.international ? 'USD' : 'AED'; }
+function openPaymentsModal(){
+  if(currentUser !== 'Ahmed'){ showToast('Payments & Receipts are restricted to Ahmed','error'); return; }
+  if(!_currentQuote){ showToast('Open a quote first','info'); return; }
+  try{ qbCollect(); }catch(e){}
+  const q=_currentQuote, cur=_quoteCurr(q);
+  const total=q.total||0, received=_quoteReceived(q), balance=Math.max(0, total-received);
+  const esc=s=>escapeHtml(String(s==null?'':s));
+  const payList=(q.payments||[]).map(function(p){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;margin:6px 0;">'
+      +'<div style="font-size:12px;"><b>'+cur+' '+fmtMoney(p.amount)+'</b> · '+esc(p.method||'')+'<div style="color:#64748b;font-size:11px;">'+esc(p.receiptNo)+' · '+quoteFmtDate(p.date)+(p.reference?' · Ref '+esc(p.reference):'')+'</div></div>'
+      +'<div style="display:flex;gap:6px;"><button onclick="generateReceiptPdf(\''+q.id+'\',\''+p.id+'\')" style="padding:5px 10px;border:1px solid #0e7490;color:#0e7490;background:#fff;border-radius:7px;cursor:pointer;font-size:12px;">⤓ Receipt</button>'
+      +'<button onclick="deletePayment(\''+p.id+'\')" title="Remove" style="padding:5px 9px;border:1px solid #fecaca;color:#dc2626;background:#fff;border-radius:7px;cursor:pointer;font-size:12px;">✕</button></div>'
+      +'</div>';
+  }).join('') || '<div style="font-size:12px;color:#94a3b8;padding:6px 0;">No payments recorded yet.</div>';
+  const host=document.createElement('div'); host.id='paymentsOverlay';
+  host.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  host.innerHTML='<div style="background:#fff;border-radius:14px;max-width:540px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow:auto;">'
+    +'<h3 style="margin:0 0 4px;color:#0f172a;">💵 Payments &amp; Receipts — '+esc(q.name||'Quote')+'</h3>'
+    +'<div style="display:flex;gap:10px;margin:10px 0 14px;font-size:12px;">'
+    +'<div style="flex:1;background:#f1f5f9;border-radius:8px;padding:8px 10px;"><div style="color:#64748b;">Quote total</div><div style="font-weight:800;font-size:15px;">'+cur+' '+fmtMoney(total)+'</div></div>'
+    +'<div style="flex:1;background:#ecfdf5;border-radius:8px;padding:8px 10px;"><div style="color:#64748b;">Received</div><div style="font-weight:800;font-size:15px;color:#16a34a;">'+cur+' '+fmtMoney(received)+'</div></div>'
+    +'<div style="flex:1;background:'+(balance>0?'#fef2f2':'#ecfdf5')+';border-radius:8px;padding:8px 10px;"><div style="color:#64748b;">Balance</div><div style="font-weight:800;font-size:15px;color:'+(balance>0?'#dc2626':'#16a34a')+';">'+cur+' '+fmtMoney(balance)+'</div></div>'
+    +'</div>'
+    +'<div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:4px;">Recorded payments</div>'+payList
+    +'<div style="border-top:1px solid #e2e8f0;margin:14px 0 10px;"></div>'
+    +'<div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:8px;">Record a new payment</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:8px;"><div style="flex:1;"><label style="font-size:11px;color:#64748b;">Amount ('+cur+')</label><input type="number" id="payAmount" min="0" step="0.01" value="'+(balance>0?balance:'')+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div>'
+    +'<div style="flex:1;"><label style="font-size:11px;color:#64748b;">Date</label><input type="date" id="payDate" value="'+new Date().toISOString().slice(0,10)+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div></div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:8px;"><div style="flex:1;"><label style="font-size:11px;color:#64748b;">Method</label><select id="payMethod" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"><option>Bank Transfer</option><option>Credit Card</option><option>Cash</option><option>Cheque</option><option>Online / Link</option></select></div>'
+    +'<div style="flex:1;"><label style="font-size:11px;color:#64748b;">Reference / Txn no.</label><input type="text" id="payRef" placeholder="optional" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div></div>'
+    +'<div style="margin-bottom:12px;"><label style="font-size:11px;color:#64748b;">Note</label><input type="text" id="payNote" placeholder="optional" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div>'
+    +'<div style="display:flex;gap:8px;justify-content:flex-end;"><button onclick="closePaymentsModal()" style="padding:8px 14px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;">Close</button>'
+    +'<button onclick="recordPayment()" style="padding:8px 14px;border:none;border-radius:8px;background:#0e7490;color:#fff;font-weight:600;cursor:pointer;">Record &amp; Generate Receipt</button></div>'
+    +'</div>';
+  document.body.appendChild(host);
+}
+function closePaymentsModal(){ const h=document.getElementById('paymentsOverlay'); if(h) h.remove(); }
+function deletePayment(pid){
+  if(currentUser !== 'Ahmed'){ showToast('Restricted to Ahmed','error'); return; }
+  const q=_currentQuote; if(!q||!Array.isArray(q.payments)) return;
+  if(!confirm('Remove this payment record?')) return;
+  q.payments=q.payments.filter(function(p){ return p.id!==pid; });
+  _persistCurrentQuote(); closePaymentsModal(); openPaymentsModal();
+}
+function recordPayment(){
+  if(currentUser !== 'Ahmed'){ showToast('Payments & Receipts are restricted to Ahmed','error'); return; }
+  const q=_currentQuote; if(!q) return;
+  const amount=parseFloat(document.getElementById('payAmount').value)||0;
+  if(amount<=0){ showToast('Enter a payment amount','error'); return; }
+  const date=document.getElementById('payDate').value||new Date().toISOString().slice(0,10);
+  const method=document.getElementById('payMethod').value;
+  const reference=document.getElementById('payRef').value.trim();
+  const note=document.getElementById('payNote').value.trim();
+  if(!Array.isArray(q.payments)) q.payments=[];
+  const seq=q.payments.length+1;
+  const receiptNo='RCPT-'+(q.reference||'Q')+'-'+String(seq).padStart(2,'0');
+  const pid='pay_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  q.payments.push({ id:pid, receiptNo:receiptNo, amount:amount, date:date, method:method, reference:reference, note:note, by:currentUser, at:new Date().toISOString() });
+  _persistCurrentQuote();
+  showToast('Payment recorded — generating receipt…','success');
+  closePaymentsModal();
+  generateReceiptPdf(q.id, pid);
+}
+function buildReceiptHTML(q, p){
+  const cur=_quoteCurr(q), money=n=>cur+' '+fmtMoney(n);
+  const total=q.total||0, received=_quoteReceived(q), balance=Math.max(0, total-received);
+  const vatRate=q.vatRate||0;
+  const buyerName=(q.company&&q.company.name)||(q.buyer&&q.buyer.name)||'—';
+  return '<div style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;">'
+    +'<style>table{table-layout:fixed;}td,th{overflow-wrap:anywhere;}</style>'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e3a8a;padding-bottom:10px;margin-bottom:18px;">'
+    +'<div><div style="font-size:24px;font-weight:800;letter-spacing:0.5px;">PAYMENT RECEIPT</div><div style="font-size:12px;color:#475569;margin-top:2px;">'+escapeHtml(p.receiptNo)+' &nbsp;·&nbsp; '+quoteFmtDate(p.date)+'</div></div>'
+    +'<img src="'+QUOTE_LOGO_URI+'" style="height:44px;"></div>'
+    +'<div style="display:flex;gap:24px;margin-bottom:18px;font-size:12.5px;line-height:1.5;">'
+    +'<div style="flex:1;"><div style="font-weight:700;color:#1e3a8a;margin-bottom:3px;">Received from</div>'+escapeHtml(buyerName)+((q.buyer&&q.buyer.name&&q.company&&q.company.name)?'<br>'+escapeHtml(q.buyer.name):'')+((q.buyer&&q.buyer.email)?'<br>'+escapeHtml(q.buyer.email):'')+((q.buyer&&q.buyer.vat)?'<br>VAT ID: '+escapeHtml(q.buyer.vat):'')+'</div>'
+    +'<div style="flex:1;"><div style="font-weight:700;color:#1e3a8a;margin-bottom:3px;">Received by</div>'+escapeHtml(QUOTE_SELLER.name)+'<br>'+QUOTE_SELLER.addrLines.map(escapeHtml).join('<br>')+'<br><b>VAT Reg. No: '+escapeHtml(QUOTE_SELLER.vat)+'</b></div>'
+    +'</div>'
+    +'<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;">'
+    +'<div style="font-size:13px;color:#065f46;font-weight:700;">Amount received</div><div style="font-size:26px;font-weight:800;color:#047857;">'+money(p.amount)+'</div></div>'
+    +'<table style="border-collapse:collapse;font-size:12.5px;width:100%;margin-bottom:16px;">'
+    +'<colgroup><col style="width:34%"><col style="width:66%"></colgroup>'
+    +'<tr><td style="padding:5px 8px;color:#64748b;">Against quote</td><td style="padding:5px 8px;">'+escapeHtml(q.name||'')+' ('+escapeHtml(q.reference||'')+')</td></tr>'
+    +(q.dealName?'<tr><td style="padding:5px 8px;color:#64748b;">Deal</td><td style="padding:5px 8px;">'+escapeHtml(q.dealName)+'</td></tr>':'')
+    +'<tr><td style="padding:5px 8px;color:#64748b;">Payment method</td><td style="padding:5px 8px;">'+escapeHtml(p.method||'')+'</td></tr>'
+    +(p.reference?'<tr><td style="padding:5px 8px;color:#64748b;">Reference / Txn no.</td><td style="padding:5px 8px;">'+escapeHtml(p.reference)+'</td></tr>':'')
+    +(p.note?'<tr><td style="padding:5px 8px;color:#64748b;">Note</td><td style="padding:5px 8px;">'+escapeHtml(p.note)+'</td></tr>':'')
+    +'</table>'
+    +'<table style="border-collapse:collapse;font-size:12.5px;width:55%;margin-left:45%;">'
+    +'<tr><td style="padding:4px 8px;color:#64748b;text-align:right;">Quote total</td><td style="padding:4px 8px;text-align:right;">'+money(total)+'</td></tr>'
+    +'<tr><td style="padding:4px 8px;color:#64748b;text-align:right;">Total received to date</td><td style="padding:4px 8px;text-align:right;color:#16a34a;">'+money(received)+'</td></tr>'
+    +'<tr style="font-weight:800;"><td style="padding:6px 8px;text-align:right;border-top:1px solid #cbd5e1;">Balance due</td><td style="padding:6px 8px;text-align:right;border-top:1px solid #cbd5e1;color:'+(balance>0?'#dc2626':'#16a34a')+';">'+money(balance)+'</td></tr>'
+    +'</table>'
+    +'<div style="margin-top:18px;font-size:11px;color:#64748b;line-height:1.5;">'+(balance<=0?'This receipt confirms the account for the above quote is settled in full.':'This receipt confirms the amount received above; a balance of '+money(balance)+' remains due.')+(vatRate>0?' The amount is inclusive of '+vatRate+'% VAT.':'')+'</div>'
+    +'<div style="margin-top:28px;border-top:1px solid #e2e8f0;padding-top:8px;font-size:10px;color:#94a3b8;text-align:center;">'+escapeHtml(QUOTE_SELLER.name)+' · VAT '+escapeHtml(QUOTE_SELLER.vat)+' · '+QUOTE_SELLER.addrLines.map(escapeHtml).join(', ')+'</div>'
+    +'</div>';
+}
+async function generateReceiptPdf(quoteId, paymentId){
+  try{
+    if(currentUser !== 'Ahmed'){ showToast('Receipts are restricted to Ahmed','error'); return; }
+    let q=(typeof quoteEntries!=='undefined'?quoteEntries:[]).find(x=>x.id===quoteId);
+    if(!q && _currentQuote && _currentQuote.id===quoteId) q=_currentQuote;
+    if(!q){ showToast('Quote not found','error'); return; }
+    const p=(q.payments||[]).find(x=>x.id===paymentId);
+    if(!p){ showToast('Payment not found','error'); return; }
+    showToast('Generating receipt…','info');
+    await ensureHtml2Pdf();
+    const hostEl=document.createElement('div'); hostEl.style.cssText='position:fixed;left:-10000px;top:0;';
+    const doc=document.createElement('div'); doc.style.cssText='width:794px;padding:0 12mm;box-sizing:border-box;background:#fff;';
+    doc.innerHTML=buildReceiptHTML(q,p);
+    hostEl.appendChild(doc); document.body.appendChild(hostEl);
+    const fname='Receipt - '+(q.name||'Quote')+' - '+p.receiptNo+'.pdf';
+    try{
+      await html2pdf().set({ margin:[12,0,14,0], filename:fname, image:{type:'jpeg',quality:0.95}, html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy']} }).from(doc).save();
+      showToast('Receipt downloaded','success');
+    } finally { hostEl.remove(); }
+  }catch(e){ showToast('Receipt failed: '+(e.message||e),'error'); }
+}
+/* ═══════════ end payments ═══════════ */
 function buildQuotePreviewHTML(q) {
   const money = n => (q.international ? 'USD ' : 'AED') + fmtMoney(n);
   const itemsRows = q.lineItems.map(it =>
@@ -14185,7 +14308,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v23.8 — per-Month filter ───────────────────────────────────────────────
+// ── v24.0 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -14560,7 +14683,7 @@ function openDemoModal(prefilledId) {
   demoApplyRepLock(!isManager);
   document.getElementById('demoModal').classList.add('open');
 }
-/* v23.8 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
+/* v24.0 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
 function demoApplyRepLock(lock) {
   ['demoFormDate','demoFormRep','demoFormClient','demoFormType','demoFormLocation','demoFormProduct'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.disabled = !!lock;
@@ -17036,8 +17159,8 @@ let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
 let feFilterName = '';
-// v23.8 — reps see only leads assigned to (or owned by) them; admins/office see all
-// v23.8 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
+// v24.0 — reps see only leads assigned to (or owned by) them; admins/office see all
+// v24.0 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
 const FE_SEE_ALL_USERS=['Fatima'];
 function feCanSeeAllLeads(){ return currentRole==='admin' || currentRole==='office' || FE_SEE_ALL_USERS.indexOf((typeof currentUser!=='undefined'?currentUser:'')||'')>=0; }
 function feVisibleLeads(){
@@ -17045,7 +17168,7 @@ function feVisibleLeads(){
   const u=(typeof currentUser!=='undefined'?currentUser:'')||'';
   return followupLeads.filter(function(l){ return (l.assignee||'')===u || (l.owner||'')===u; });
 }
-// v23.8 — Follow-up Engine can assign/filter to admins & office too
+// v24.0 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -17053,7 +17176,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v23.8 — classify a Follow-up Engine assignee into a region/group for the table.
+// v24.0 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -17101,7 +17224,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v23.8 — clear addresses that were wrongly populated with note text by the old extractor
+// v24.0 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -17138,7 +17261,7 @@ function mergeFollowupsById(localArr, remoteArr){
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
 function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
 function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-/* ── v23.8 — assign→engage timing, assignment email, engage-link capture ── */
+/* ── v24.0 — assign→engage timing, assignment email, engage-link capture ── */
 function feFmtDur(ms){ if(ms==null||isNaN(ms)||ms<0) return ''; const m=Math.round(ms/60000); if(m<1) return 'under a minute'; if(m<60) return m+' min'; const h=Math.floor(m/60), rm=m%60; if(h<24) return h+'h'+(rm?(' '+rm+'m'):''); const d=Math.floor(h/24), rh=h%24; return d+'d'+(rh?(' '+rh+'h'):''); }
 function feEngageChip(l){
   if(!l||!l.assignedAt) return '';
@@ -17199,7 +17322,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v23.8 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v24.0 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -17240,7 +17363,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v23.8 — re-connection tag + "by when" date per lead
+// v24.0 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -17251,7 +17374,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v23.8 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v24.0 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -17288,7 +17411,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v23.8 — per-rep WhatsApp: each rep stores their own number locally; the
+// v24.0 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -17368,7 +17491,7 @@ async function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v23.8 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v24.0 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -17463,7 +17586,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v23.8 — only Ahmed and Gladys may mark a lead as Lost
+// v24.0 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -17605,7 +17728,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v23.8 — robust extraction of phone / email / address into separate fields
+// v24.0 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17640,7 +17763,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v23.8 — map a free-text Emirate/Location to a routing region
+// v24.0 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -18199,7 +18322,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v23.8 — the reminder day-offset and time of day are user-editable per step.
+// v24.0 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -18286,7 +18409,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(!l) return; const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; l.assignedAt=new Date().toISOString(); l.engagedAt=''; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); feStamp(l); feSave(); renderFollowup(); feEmailAssignment(l, rep); return; } feStamp(l); feSave(); renderFollowup(); }
-/* ── v23.8 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v24.0 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -18537,7 +18660,7 @@ async function feDriveSearch(term){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   COLD CALL MODULE (v23.8) — Excel import/export, assign across reps,
+   COLD CALL MODULE (v24.0) — Excel import/export, assign across reps,
    FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
    feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
 ════════════════════════════════════════════════════════════════ */
@@ -18880,13 +19003,13 @@ function ccRender(){
 function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 
 loadLocal();
-try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v23.8 — capture engage-link before MSAL redirect
+try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.0 — capture engage-link before MSAL redirect
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadFollowups(); // Follow-up Engine → Marketing Leads
-try{ ccLoad(); }catch(e){}   // v23.8 — Cold Call module
+try{ ccLoad(); }catch(e){}   // v24.0 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
