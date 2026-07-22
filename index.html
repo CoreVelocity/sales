@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v24.2</title>
+<title>CoreV | OxeFit Sales Tracker v24.3</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2814,7 +2814,7 @@
   body[data-role="viewer"] .office-only,
   body[data-role="rep"]    .office-only-th,
   body[data-role="viewer"] .office-only-th { display: none !important; }
-  /* v24.2 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
+  /* v24.3 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
   body[data-role="viewer"] .demo-actions-th { display: none !important; }
 
   /* ════════════ SALES REP PERFORMANCE ════════════ */
@@ -3820,7 +3820,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v24.2 · After a receipt is generated the quote is BOOKED — locked from any edits (Ahmed can still collect further payments)
+      v24.3 · Fixed commit/best-case deal value dropping when a picked deal closes or leaves the open list — values now persist on the row
     </div>
   </div>
 </div>
@@ -3966,7 +3966,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.2</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.3</strong></p>
     </div>
   </div>
 </div>
@@ -4038,7 +4038,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v24.2</div>
+      <div class="sidebar-version">v24.3</div>
     </div>
   </aside>
 
@@ -4114,7 +4114,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.2</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.3</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -5278,7 +5278,7 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-      /* v24.2 — Cold Call reuses Follow-up styling */
+      /* v24.3 — Cold Call reuses Follow-up styling */
       #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
       #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
       #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
@@ -6277,7 +6277,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v24.2 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v24.3 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6320,7 +6320,7 @@ function applyRosterObj(r){
       if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
     });
   }
-  // v24.2 — never let the old-spelling SSO aliases become a rep's assignment address
+  // v24.3 — never let the old-spelling SSO aliases become a rep's assignment address
   if (REP_TO_EMAIL['Hussean'] === 'hussein@core-velocity.com') REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
   if (REP_TO_EMAIL['Milena']  === 'milene@core-velocity.com')  REP_TO_EMAIL['Milena']  = 'milena@core-velocity.com';
   if (r.meta && typeof r.meta === 'object') {
@@ -6519,7 +6519,7 @@ const OFFICE_ADMIN = 'Gladys';
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
 );
-// v24.2 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
+// v24.3 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
 // name→email reverse map. Pin renamed reps to their canonical current addresses so
 // assignment emails go to the right inbox.
 REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
@@ -6894,12 +6894,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v24.2 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v24.3 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v24.2 — drop empty placeholder rows for reps no longer on the roster.
+  // v24.3 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7243,15 +7243,15 @@ function parseEnvelope(remote) {
       products: Array.isArray(remote.products) ? remote.products : undefined,        // v21.45 — fix: sync product catalog to all users
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
-      termtemplates_at: remote.termtemplates_at || undefined,  // v24.2
+      termtemplates_at: remote.termtemplates_at || undefined,  // v24.3
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      paymentterms_at: remote.paymentterms_at || undefined,  // v24.2
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.2
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.2
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.2
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.2
-      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.2
-      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.2
+      paymentterms_at: remote.paymentterms_at || undefined,  // v24.3
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.3
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.3
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.3
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.3
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.3
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.3
       meta : remote._meta || null
     };
   }
@@ -7321,11 +7321,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.2
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.2
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.2
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.2
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.2
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.3
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.3
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.3
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.3
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.3
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7549,15 +7549,15 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) { env.termtemplates = _lastRemoteTermTemplates; env.termtemplates_at = _termTemplatesAt || null; }
   if (typeof paymentTerms !== 'undefined' && paymentTerms) { env.paymentterms = paymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
   else if (_lastRemotePaymentTerms) { env.paymentterms = _lastRemotePaymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
-  // v24.2 — editable roster rides along (newest-wins by `at` on adoption)
+  // v24.3 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v24.2 — team-shared AI key (newest-wins by `at`)
+  // v24.3 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v24.2 — shared media library (newest-wins by `at`)
+  // v24.3 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v24.2 — rep notifications (merge by id)
+  // v24.3 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
-  // v24.2 — cold calls (merge by id) + tombstones
+  // v24.3 — cold calls (merge by id) + tombstones
   try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
@@ -7594,11 +7594,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.2
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.2
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.2
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.2
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.2
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.3
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.3
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.3
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.3
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.3
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -7935,7 +7935,7 @@ async function launchApp(alreadyAuthed) {
   startAutoRefresh();
   renderHubspotChip();
   renderAll();
-  try{ feHandleEngageLink(); }catch(_){}   // v24.2 — capture engage-link click → stamp engagement start
+  try{ feHandleEngageLink(); }catch(_){}   // v24.3 — capture engage-link click → stamp engagement start
 }
 
 /* ════════════════════════════════════════
@@ -8935,8 +8935,21 @@ function makeDealPickerCell(ri, slot, row, editable) {
     // Sticky header showing running total of the current selection
     const headerBar = document.createElement('div');
     headerBar.className = 'dp-multi-header';
+    const dealsField = slot === 'commit' ? 'commitDeals' : 'bestCaseDeals';
+    // Resolve the selected deal ids into {id,name,amount,stage}. Prefer the live open-deals
+    // list; if a selected deal is no longer in it (closed / re-assigned / beyond fetch), fall
+    // back to the value we saved on the row so its amount is never lost. (v24.3 fix)
+    const resolvePicked = (rowObj) => {
+      const live = {}; deals.forEach(d => { live[d.id] = d; });
+      const prev = {}; ((rowObj && rowObj[dealsField]) || []).forEach(d => { if (d && d.id) prev[d.id] = d; });
+      return Array.from(selectedIds).map(id => {
+        const L = live[id]; if (L) return { id: id, name: L.name, amount: Number(L.amount) || 0, stage: L.stage };
+        const P = prev[id]; if (P) return { id: id, name: P.name, amount: Number(P.amount) || 0, stage: P.stage || '' };
+        return null;
+      }).filter(Boolean);
+    };
     const updateHeader = () => {
-      const picked = deals.filter(d => selectedIds.has(d.id));
+      const picked = resolvePicked(row);
       const count  = picked.length;
       const total  = picked.reduce((s,d) => s + (Number(d.amount)||0), 0);
       headerBar.innerHTML =
@@ -9015,13 +9028,14 @@ function makeDealPickerCell(ri, slot, row, editable) {
     const commitSelection = () => {
       const r = getCurWeekRows()[ri];
       if (!r) return;
-      const picked = deals.filter(d => selectedIds.has(d.id));
+      const picked = resolvePicked(r);
       const total  = picked.reduce((s,d) => s + (Number(d.amount)||0), 0);
       const names  = picked.map(d => d.name).join(', ');
 
       r[textField]  = names;
       r[valueField] = total || '';
       r[idsField]   = picked.map(d => d.id);
+      r[dealsField] = picked.map(d => ({ id:d.id, name:d.name, amount:Number(d.amount)||0, stage:d.stage||'' }));   // persist values so they survive deal status changes
       // Keep legacy single-id field aligned with the FIRST selection so any
       // older read paths (export, dashboard) still see something sensible.
       r[idField]    = picked.length ? picked[0].id : '';
@@ -11547,7 +11561,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.2 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.3 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13192,7 +13206,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
-  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.2 — international keeps the normal editable terms plus Currency/Delivery/Duties
+  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.3 — international keeps the normal editable terms plus Currency/Delivery/Duties
   return q;
 }
 function saveQuote() {
@@ -14348,7 +14362,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v24.2 — per-Month filter ───────────────────────────────────────────────
+// ── v24.3 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -14723,7 +14737,7 @@ function openDemoModal(prefilledId) {
   demoApplyRepLock(!isManager);
   document.getElementById('demoModal').classList.add('open');
 }
-/* v24.2 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
+/* v24.3 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
 function demoApplyRepLock(lock) {
   ['demoFormDate','demoFormRep','demoFormClient','demoFormType','demoFormLocation','demoFormProduct'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.disabled = !!lock;
@@ -17199,8 +17213,8 @@ let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
 let feFilterName = '';
-// v24.2 — reps see only leads assigned to (or owned by) them; admins/office see all
-// v24.2 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
+// v24.3 — reps see only leads assigned to (or owned by) them; admins/office see all
+// v24.3 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
 const FE_SEE_ALL_USERS=['Fatima'];
 function feCanSeeAllLeads(){ return currentRole==='admin' || currentRole==='office' || FE_SEE_ALL_USERS.indexOf((typeof currentUser!=='undefined'?currentUser:'')||'')>=0; }
 function feVisibleLeads(){
@@ -17208,7 +17222,7 @@ function feVisibleLeads(){
   const u=(typeof currentUser!=='undefined'?currentUser:'')||'';
   return followupLeads.filter(function(l){ return (l.assignee||'')===u || (l.owner||'')===u; });
 }
-// v24.2 — Follow-up Engine can assign/filter to admins & office too
+// v24.3 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -17216,7 +17230,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v24.2 — classify a Follow-up Engine assignee into a region/group for the table.
+// v24.3 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -17264,7 +17278,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v24.2 — clear addresses that were wrongly populated with note text by the old extractor
+// v24.3 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -17301,7 +17315,7 @@ function mergeFollowupsById(localArr, remoteArr){
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
 function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
 function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-/* ── v24.2 — assign→engage timing, assignment email, engage-link capture ── */
+/* ── v24.3 — assign→engage timing, assignment email, engage-link capture ── */
 function feFmtDur(ms){ if(ms==null||isNaN(ms)||ms<0) return ''; const m=Math.round(ms/60000); if(m<1) return 'under a minute'; if(m<60) return m+' min'; const h=Math.floor(m/60), rm=m%60; if(h<24) return h+'h'+(rm?(' '+rm+'m'):''); const d=Math.floor(h/24), rh=h%24; return d+'d'+(rh?(' '+rh+'h'):''); }
 function feEngageChip(l){
   if(!l||!l.assignedAt) return '';
@@ -17362,7 +17376,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v24.2 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v24.3 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -17403,7 +17417,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v24.2 — re-connection tag + "by when" date per lead
+// v24.3 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -17414,7 +17428,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v24.2 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v24.3 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -17451,7 +17465,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v24.2 — per-rep WhatsApp: each rep stores their own number locally; the
+// v24.3 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -17531,7 +17545,7 @@ async function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v24.2 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v24.3 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -17626,7 +17640,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v24.2 — only Ahmed and Gladys may mark a lead as Lost
+// v24.3 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -17768,7 +17782,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v24.2 — robust extraction of phone / email / address into separate fields
+// v24.3 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17803,7 +17817,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v24.2 — map a free-text Emirate/Location to a routing region
+// v24.3 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -18362,7 +18376,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v24.2 — the reminder day-offset and time of day are user-editable per step.
+// v24.3 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -18449,7 +18463,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(!l) return; const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; l.assignedAt=new Date().toISOString(); l.engagedAt=''; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); feStamp(l); feSave(); renderFollowup(); feEmailAssignment(l, rep); return; } feStamp(l); feSave(); renderFollowup(); }
-/* ── v24.2 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v24.3 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -18700,7 +18714,7 @@ async function feDriveSearch(term){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   COLD CALL MODULE (v24.2) — Excel import/export, assign across reps,
+   COLD CALL MODULE (v24.3) — Excel import/export, assign across reps,
    FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
    feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
 ════════════════════════════════════════════════════════════════ */
@@ -19043,13 +19057,13 @@ function ccRender(){
 function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 
 loadLocal();
-try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.2 — capture engage-link before MSAL redirect
+try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.3 — capture engage-link before MSAL redirect
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadFollowups(); // Follow-up Engine → Marketing Leads
-try{ ccLoad(); }catch(e){}   // v24.2 — Cold Call module
+try{ ccLoad(); }catch(e){}   // v24.3 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
