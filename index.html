@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v24.4</title>
+<title>CoreV | OxeFit Sales Tracker v24.6</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2814,7 +2814,7 @@
   body[data-role="viewer"] .office-only,
   body[data-role="rep"]    .office-only-th,
   body[data-role="viewer"] .office-only-th { display: none !important; }
-  /* v24.4 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
+  /* v24.6 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
   body[data-role="viewer"] .demo-actions-th { display: none !important; }
 
   /* ════════════ SALES REP PERFORMANCE ════════════ */
@@ -3820,7 +3820,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v24.4 · Design refresh — unified brand palette (Navy · Electric/Hyper Blue · Aqua · Coral) applied across every tab via the core design tokens
+      v24.6 · Marketing Leads: WhatsApp sends and "Sent/Replied → next" now log date, time and who did it — shown on the step and lead row
     </div>
   </div>
 </div>
@@ -3966,7 +3966,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.4</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.6</strong></p>
     </div>
   </div>
 </div>
@@ -4038,7 +4038,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v24.4</div>
+      <div class="sidebar-version">v24.6</div>
     </div>
   </aside>
 
@@ -4114,7 +4114,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.4</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.6</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -5278,7 +5278,7 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-      /* v24.4 — Cold Call reuses Follow-up styling */
+      /* v24.6 — Cold Call reuses Follow-up styling */
       #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
       #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
       #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
@@ -6277,7 +6277,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v24.4 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v24.6 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6320,7 +6320,7 @@ function applyRosterObj(r){
       if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
     });
   }
-  // v24.4 — never let the old-spelling SSO aliases become a rep's assignment address
+  // v24.6 — never let the old-spelling SSO aliases become a rep's assignment address
   if (REP_TO_EMAIL['Hussean'] === 'hussein@core-velocity.com') REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
   if (REP_TO_EMAIL['Milena']  === 'milene@core-velocity.com')  REP_TO_EMAIL['Milena']  = 'milena@core-velocity.com';
   if (r.meta && typeof r.meta === 'object') {
@@ -6519,7 +6519,7 @@ const OFFICE_ADMIN = 'Gladys';
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
 );
-// v24.4 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
+// v24.6 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
 // name→email reverse map. Pin renamed reps to their canonical current addresses so
 // assignment emails go to the right inbox.
 REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
@@ -6894,12 +6894,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v24.4 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v24.6 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v24.4 — drop empty placeholder rows for reps no longer on the roster.
+  // v24.6 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7243,15 +7243,15 @@ function parseEnvelope(remote) {
       products: Array.isArray(remote.products) ? remote.products : undefined,        // v21.45 — fix: sync product catalog to all users
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
-      termtemplates_at: remote.termtemplates_at || undefined,  // v24.4
+      termtemplates_at: remote.termtemplates_at || undefined,  // v24.6
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      paymentterms_at: remote.paymentterms_at || undefined,  // v24.4
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.4
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.4
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.4
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.4
-      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.4
-      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.4
+      paymentterms_at: remote.paymentterms_at || undefined,  // v24.6
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.6
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.6
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.6
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.6
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.6
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.6
       meta : remote._meta || null
     };
   }
@@ -7321,11 +7321,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.4
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.4
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.4
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.4
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.4
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.6
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.6
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.6
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.6
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.6
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7549,15 +7549,15 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) { env.termtemplates = _lastRemoteTermTemplates; env.termtemplates_at = _termTemplatesAt || null; }
   if (typeof paymentTerms !== 'undefined' && paymentTerms) { env.paymentterms = paymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
   else if (_lastRemotePaymentTerms) { env.paymentterms = _lastRemotePaymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
-  // v24.4 — editable roster rides along (newest-wins by `at` on adoption)
+  // v24.6 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v24.4 — team-shared AI key (newest-wins by `at`)
+  // v24.6 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v24.4 — shared media library (newest-wins by `at`)
+  // v24.6 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v24.4 — rep notifications (merge by id)
+  // v24.6 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
-  // v24.4 — cold calls (merge by id) + tombstones
+  // v24.6 — cold calls (merge by id) + tombstones
   try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
@@ -7594,11 +7594,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.4
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.4
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.4
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.4
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.4
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.6
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.6
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.6
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.6
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.6
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -7935,7 +7935,7 @@ async function launchApp(alreadyAuthed) {
   startAutoRefresh();
   renderHubspotChip();
   renderAll();
-  try{ feHandleEngageLink(); }catch(_){}   // v24.4 — capture engage-link click → stamp engagement start
+  try{ feHandleEngageLink(); }catch(_){}   // v24.6 — capture engage-link click → stamp engagement start
 }
 
 /* ════════════════════════════════════════
@@ -8938,7 +8938,7 @@ function makeDealPickerCell(ri, slot, row, editable) {
     const dealsField = slot === 'commit' ? 'commitDeals' : 'bestCaseDeals';
     // Resolve the selected deal ids into {id,name,amount,stage}. Prefer the live open-deals
     // list; if a selected deal is no longer in it (closed / re-assigned / beyond fetch), fall
-    // back to the value we saved on the row so its amount is never lost. (v24.4 fix)
+    // back to the value we saved on the row so its amount is never lost. (v24.6 fix)
     const resolvePicked = (rowObj) => {
       const live = {}; deals.forEach(d => { live[d.id] = d; });
       const prev = {}; ((rowObj && rowObj[dealsField]) || []).forEach(d => { if (d && d.id) prev[d.id] = d; });
@@ -11561,7 +11561,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.4 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.6 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -13206,7 +13206,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
-  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.4 — international keeps the normal editable terms plus Currency/Delivery/Duties
+  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.6 — international keeps the normal editable terms plus Currency/Delivery/Duties
   return q;
 }
 function saveQuote() {
@@ -14362,7 +14362,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v24.4 — per-Month filter ───────────────────────────────────────────────
+// ── v24.6 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -14737,7 +14737,7 @@ function openDemoModal(prefilledId) {
   demoApplyRepLock(!isManager);
   document.getElementById('demoModal').classList.add('open');
 }
-/* v24.4 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
+/* v24.6 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
 function demoApplyRepLock(lock) {
   ['demoFormDate','demoFormRep','demoFormClient','demoFormType','demoFormLocation','demoFormProduct'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.disabled = !!lock;
@@ -17213,8 +17213,8 @@ let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
 let feFilterName = '';
-// v24.4 — reps see only leads assigned to (or owned by) them; admins/office see all
-// v24.4 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
+// v24.6 — reps see only leads assigned to (or owned by) them; admins/office see all
+// v24.6 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
 const FE_SEE_ALL_USERS=['Fatima'];
 function feCanSeeAllLeads(){ return currentRole==='admin' || currentRole==='office' || FE_SEE_ALL_USERS.indexOf((typeof currentUser!=='undefined'?currentUser:'')||'')>=0; }
 function feVisibleLeads(){
@@ -17222,7 +17222,7 @@ function feVisibleLeads(){
   const u=(typeof currentUser!=='undefined'?currentUser:'')||'';
   return followupLeads.filter(function(l){ return (l.assignee||'')===u || (l.owner||'')===u; });
 }
-// v24.4 — Follow-up Engine can assign/filter to admins & office too
+// v24.6 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -17230,7 +17230,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v24.4 — classify a Follow-up Engine assignee into a region/group for the table.
+// v24.6 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -17278,7 +17278,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v24.4 — clear addresses that were wrongly populated with note text by the old extractor
+// v24.6 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -17315,7 +17315,7 @@ function mergeFollowupsById(localArr, remoteArr){
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
 function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
 function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-/* ── v24.4 — assign→engage timing, assignment email, engage-link capture ── */
+/* ── v24.6 — assign→engage timing, assignment email, engage-link capture ── */
 function feFmtDur(ms){ if(ms==null||isNaN(ms)||ms<0) return ''; const m=Math.round(ms/60000); if(m<1) return 'under a minute'; if(m<60) return m+' min'; const h=Math.floor(m/60), rm=m%60; if(h<24) return h+'h'+(rm?(' '+rm+'m'):''); const d=Math.floor(h/24), rh=h%24; return d+'d'+(rh?(' '+rh+'h'):''); }
 function feEngageChip(l){
   if(!l||!l.assignedAt) return '';
@@ -17376,7 +17376,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v24.4 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v24.6 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -17417,7 +17417,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v24.4 — re-connection tag + "by when" date per lead
+// v24.6 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -17428,7 +17428,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v24.4 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v24.6 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -17465,7 +17465,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v24.4 — per-rep WhatsApp: each rep stores their own number locally; the
+// v24.6 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -17512,6 +17512,11 @@ async function feWhatsApp(id, key){
   const num=feDigits(l.phone||'');
   if(!num){ feToast('No phone number on this lead — add one under Contact details','error'); return; }
   const t=(l.touches||[]).find(function(x){ return x.key===key; });
+  // Log WHEN WhatsApp was triggered so reps can see what was sent and when
+  const _waAt=new Date().toISOString(), _waBy=(typeof currentUser!=='undefined'&&currentUser)?currentUser:'';
+  if(t){ t.waAt=_waAt; t.waBy=_waBy; t.waCount=(t.waCount||0)+1; }
+  l.lastWhatsAppAt=_waAt;
+  try{ feStamp(l); feSave(); }catch(e){}
   let text=t?((t.subject?(t.subject+'\n\n'):'')+(t.message||'')):'';
   // (b) optional showroom address — rep-selected (Dubai / Abu Dhabi / both)
   if(l.showroom){ const sr=feShowroomLine(l); if(sr) text+='\n\n'+sr; }
@@ -17545,7 +17550,7 @@ async function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v24.4 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v24.6 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -17640,7 +17645,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v24.4 — only Ahmed and Gladys may mark a lead as Lost
+// v24.6 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -17657,7 +17662,8 @@ function feOpenLostModal(id){
 }
 function feSetLost(id, reason){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); feCloseModal(); return; } const l=feGet(id); if(l){ l.stage='Lost'; l.lostReason=reason||''; feStamp(l); feSave(); } feCloseModal(); renderFollowup(); }
 function feMark(id,key,status){ const l=feGet(id); if(!l) return; const tt=l.touches.find(x=>x.key===key); if(!tt) return;
-  if(status==='skipped'&&tt.status==='skipped') tt.status='pending'; else tt.status=status;
+  if(status==='skipped'&&tt.status==='skipped'){ tt.status='pending'; tt.markedAt=''; }
+  else { tt.status=status; tt.markedAt=new Date().toISOString(); tt.markedBy=(typeof currentUser!=='undefined'&&currentUser)?currentUser:''; }
   if(status==='sent'&&l.stage==='New') l.stage='Contacted';
   if(status==='replied'&&(l.stage==='New'||l.stage==='Contacted')) l.stage='Engaged';
   feStamp(l); feSave(); renderFollowup(); }
@@ -17782,7 +17788,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v24.4 — robust extraction of phone / email / address into separate fields
+// v24.6 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17817,7 +17823,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v24.4 — map a free-text Emirate/Location to a routing region
+// v24.6 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -18088,7 +18094,7 @@ function feLeadsTab(now){
     ? list.map(function(l){ const na=feNextAction(l,now); const rg=feRegionOf(l.assignee||'Unassigned');
         return '<button class="fe-leadrow" onclick="feOpenLead(\''+l.id+'\')">'+
           '<div class="fe-av">'+(l.type==='B2B'?'B':(feFirst(l.name)[0]||'·').toUpperCase())+'</div>'+
-          '<div class="fe-grow"><div class="fe-name fe-trunc">'+(l.priority?'<span style="color:var(--gold)">★ </span>':'')+'<span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+(l.routeNeeded&&!l.assignee?'<span class="fe-chip" style="background:var(--warn);color:#000">🧭 Route</span>':'')+feEngageChip(l)+feColdChip(l)+((Array.isArray(l.updates)&&l.updates.length)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📝 '+l.updates.length+'</span>':'')+feReconnectChip(l,now)+'</div>'+
+          '<div class="fe-grow"><div class="fe-name fe-trunc">'+(l.priority?'<span style="color:var(--gold)">★ </span>':'')+'<span class="fe-trunc">'+feEsc(l.name)+'</span><span class="fe-chip">'+l.type+'</span>'+(rg!=='Unassigned'?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">'+feEsc(rg)+'</span>':'')+(l.routeNeeded&&!l.assignee?'<span class="fe-chip" style="background:var(--warn);color:#000">🧭 Route</span>':'')+feEngageChip(l)+feColdChip(l)+(l.lastWhatsAppAt?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--teal)" title="WhatsApp last opened '+feFmt(l.lastWhatsAppAt)+'">🟢 '+(typeof feShortDate==='function'?feShortDate(l.lastWhatsAppAt):'')+'</span>':'')+((Array.isArray(l.updates)&&l.updates.length)?'<span class="fe-chip" style="background:var(--navy-mid);color:var(--text-muted)">📝 '+l.updates.length+'</span>':'')+feReconnectChip(l,now)+'</div>'+
             '<div class="fe-sub fe-trunc">'+(l.assignee?'👤 '+feEsc(l.assignee)+' · ':'')+(l.company?feEsc(l.company)+' · ':'')+feEsc(na.label)+(na.when?' · '+na.when:'')+((l.stage==='Lost'&&l.lostReason)?' · '+feEsc(l.lostReason):'')+'</div></div>'+
           '<span class="fe-pill" style="color:'+feStageColor(l.stage)+'">'+l.stage+'</span>'+
           (na.due?'<span class="fe-due" title="Touch due"></span>':'')+
@@ -18299,16 +18305,36 @@ function feRenderLead(l){
   '</div>';
   const _updates = Array.isArray(l.updates) ? l.updates.slice().sort(function(a,b){ return Date.parse(b.at)-Date.parse(a.at); }) : [];
   const updatesList = _updates.length
-    ? _updates.map(function(u){ return '<div style="padding:8px 0;border-bottom:1px solid var(--border)">'+
-        '<div style="font-size:13px;white-space:pre-wrap;word-break:break-word">'+feEsc(u.text)+'</div>'+
-        '<div class="fe-sub" style="font-size:11px;margin-top:3px">'+(u.by?('👤 '+feEsc(u.by)+' · '):'')+feFmt(u.at)+'</div>'+
-      '</div>'; }).join('')
-    : '<div class="fe-sub">No updates yet. Post the first one below.</div>';
+    ? _updates.map(function(u,i){
+        const who=(u.by||'').trim(), ini=(who?who[0]:'·').toUpperCase();
+        return '<div style="display:flex;gap:10px;padding:0 0 '+(i===_updates.length-1?'0':'14px')+';position:relative">'+
+          '<div style="flex:none;display:flex;flex-direction:column;align-items:center">'+
+            '<div class="fe-av" style="height:30px;width:30px;font-size:12px;flex:none">'+feEsc(ini)+'</div>'+
+            (i===_updates.length-1?'':'<div style="flex:1;width:2px;background:var(--border);margin-top:4px"></div>')+
+          '</div>'+
+          '<div style="flex:1;min-width:0;background:var(--navy-mid);border:1px solid var(--border);border-radius:10px;padding:9px 12px">'+
+            '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:4px">'+
+              '<span style="font-weight:600;font-size:12.5px;color:var(--text)">'+feEsc(who||'Unknown')+'</span>'+
+              '<span class="fe-sub" style="font-size:11px">'+feFmt(u.at)+'</span>'+
+            '</div>'+
+            '<div style="font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere">'+feEsc(u.text)+'</div>'+
+          '</div>'+
+        '</div>';
+      }).join('')
+    : '<div class="fe-sub" style="text-align:center;padding:14px 0;border:1px dashed var(--border);border-radius:10px">No updates yet — post the first one above.</div>';
+  const _draft = feUpdateDrafts[l.id] || '';
+  const _dw = feWordCount(_draft);
   const updatesCard='<div class="fe-card">'+
-    '<div class="fe-rowb" style="margin-bottom:8px"><h3 class="fe-h">Updates</h3><span class="fe-sub">'+_updates.length+' update'+(_updates.length===1?'':'s')+'</span></div>'+
-    '<textarea id="fe-update-input" class="fe-ta" rows="2" placeholder="Add an update… (e.g. Called — asked for pricing, deciding next week)"></textarea>'+
-    '<div style="display:flex;justify-content:flex-end;margin:8px 0 10px"><button class="fe-sm" onclick="feAddUpdate(\''+l.id+'\')" style="background:var(--brand-grad);color:#fff;border-color:transparent">+ Add update</button></div>'+
-    updatesList+
+    '<div class="fe-rowb" style="margin-bottom:10px"><h3 class="fe-h">Updates</h3><span class="fe-sub">'+_updates.length+' update'+(_updates.length===1?'':'s')+'</span></div>'+
+    '<div style="border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--navy-mid)">'+
+      '<textarea id="fe-update-input" class="fe-ta" rows="4" style="width:100%;min-height:86px;resize:vertical;background:var(--input-bg)" placeholder="Write an update — what happened, what the client said, and the next step… (up to '+FE_UPDATE_MAX_WORDS+' words)" oninput="feUpdateDraft(\''+l.id+'\',this.value)" onkeydown="feUpdateKey(event,\''+l.id+'\')">'+feEsc(_draft)+'</textarea>'+
+      '<div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">'+
+        '<span class="fe-sub" id="fe-upd-count" style="font-size:11px;color:'+(_dw>FE_UPDATE_MAX_WORDS?'var(--danger)':'var(--text-muted)')+'">'+_dw+' / '+FE_UPDATE_MAX_WORDS+' words</span>'+
+        '<span class="fe-sub" style="font-size:11px;opacity:.7">Ctrl + Enter to post</span>'+
+        '<button class="fe-sm" onclick="feAddUpdate(\''+l.id+'\')" style="margin-left:auto;background:var(--brand-grad);color:#fff;border-color:transparent;font-weight:600">Post update</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="margin-top:14px">'+updatesList+'</div>'+
   '</div>';
   return head+assignCard+showroomCard+briefCard+updatesCard+wf+'<div style="margin-top:16px;text-align:center"><button class="fe-sm" style="color:var(--danger)" onclick="feDeleteLead(\''+l.id+'\')">Delete this lead</button></div>';
 }
@@ -18335,6 +18361,7 @@ function feRenderActiveStep(l,t){
     '<p class="fe-purpose">'+feEsc(t.purpose)+'</p>'+
     (t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
     body+
+    (t.waAt?'<div class="fe-sub" style="font-size:11px;margin-top:6px;color:var(--teal)">🟢 WhatsApp opened '+feFmt(t.waAt)+(t.waBy?(' · '+feEsc(t.waBy)):'')+((t.waCount||0)>1?(' · '+t.waCount+'×'):'')+'</div>':'')+
     feMediaStripHtml(l,t)+
     '<div class="fe-actions"><button class="fe-sm" '+(busy?'disabled':'')+' onclick="feTune(\''+l.id+'\',\''+t.key+'\')" style="color:#8b5cf6;border-color:#8b5cf6">✦ '+(busy?'Tuning…':'Tune with AI')+'</button>'+
       '<button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button>'+
@@ -18354,10 +18381,15 @@ function feRenderDoneStep(l,t,history){
       '<span style="font-size:13px;font-weight:600">'+t.dayLabel+'</span>'+
       '<span class="fe-pill" style="color:'+chanColor+'">'+t.channel+'</span>'+
       '<span class="fe-pill" style="color:'+feStatusColor(t.status)+(t.status==='skipped'?';text-decoration:line-through':'')+'">'+stxt+'</span>'+
+      (t.markedAt?'<span class="fe-sub" style="font-size:11px">'+feFmt(t.markedAt)+'</span>':'')+
       '<span class="fe-sub" style="margin-left:auto">'+(expanded?'▲':'▼')+'</span></div>';
   if(expanded){
     h+=(t.subject?'<div class="fe-sub" style="margin-bottom:4px">Subject: '+feEsc(t.subject)+'</div>':'')+
        '<div class="fe-msg" style="cursor:default">'+feEsc(t.message)+'</div>'+
+       '<div class="fe-sub" style="font-size:11px;margin-top:6px;line-height:1.6">'+
+         (t.waAt?('🟢 WhatsApp opened '+feFmt(t.waAt)+(t.waBy?(' by '+feEsc(t.waBy)):'')+((t.waCount||0)>1?(' · '+t.waCount+'×'):'')+'<br>'):'')+
+         (t.markedAt?('✓ Marked <b>'+feEsc(stxt)+'</b> '+feFmt(t.markedAt)+(t.markedBy?(' by '+feEsc(t.markedBy)):'')):'')+
+       '</div>'+
        (history?'':'<div class="fe-actions"><button class="fe-sm" onclick="feCopy(\''+l.id+'\',\''+t.key+'\')">Copy</button><button class="fe-sm" onclick="feWhatsApp(\''+l.id+'\',\''+t.key+'\')" style="color:#22c55e;border-color:#22c55e" title="Open WhatsApp Business with this message">🟢 WhatsApp</button><div class="fe-right"><button class="fe-sm" onclick="feUndoStep(\''+l.id+'\',\''+t.key+'\')">Undo this step</button></div></div>');
   }
   return h+'</div>';
@@ -18376,7 +18408,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v24.4 — the reminder day-offset and time of day are user-editable per step.
+// v24.6 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -18463,7 +18495,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(!l) return; const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; l.assignedAt=new Date().toISOString(); l.engagedAt=''; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); feStamp(l); feSave(); renderFollowup(); feEmailAssignment(l, rep); return; } feStamp(l); feSave(); renderFollowup(); }
-/* ── v24.4 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v24.6 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -18513,17 +18545,30 @@ function feReparseContact(id){
   if(!found.length){ feToast('Nothing new to extract','info'); return; }
   feStamp(l); feSave(); renderFollowup(); feToast('Extracted: '+found.join(', '),'success');
 }
+const FE_UPDATE_MAX_WORDS = 100;
+// Drafts are held per-lead so a background team-sync re-render can never wipe what's being typed.
+const feUpdateDrafts = {};
+function feWordCount(s){ return String(s||'').trim() ? String(s).trim().split(/\s+/).filter(Boolean).length : 0; }
+function feUpdateDraft(id, val){
+  feUpdateDrafts[id] = val || '';
+  const n = feWordCount(val), el = document.getElementById('fe-upd-count');
+  if (el){ el.textContent = n + ' / ' + FE_UPDATE_MAX_WORDS + ' words'; el.style.color = n > FE_UPDATE_MAX_WORDS ? 'var(--danger)' : 'var(--text-muted)'; }
+}
+function feUpdateKey(ev, id){ if ((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter'){ ev.preventDefault(); feAddUpdate(id); } }
 function feAddUpdate(id){
   const l=feGet(id); if(!l) return;
   const el=document.getElementById('fe-update-input');
-  const text=((el&&el.value)||'').trim();
-  if(!text){ feToast('Type an update first','info'); return; }
+  const text=((el&&el.value)||feUpdateDrafts[id]||'').trim();
+  if(!text){ feToast('Write an update first','info'); return; }
+  const words=feWordCount(text);
+  if(words>FE_UPDATE_MAX_WORDS){ feToast('Update is '+words+' words — please shorten it to '+FE_UPDATE_MAX_WORDS+' or fewer','error'); return; }
   if(!Array.isArray(l.updates)) l.updates=[];
   l.updates.push({ id:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), at:new Date().toISOString(), by:(typeof currentUser!=='undefined'&&currentUser)?currentUser:'', text:text });
   feStamp(l); feSave();
+  delete feUpdateDrafts[id];
   if(el){ el.value=''; try{ el.blur(); }catch(e){} }   // clear + blur so the typing-guard doesn't defer the re-render
   renderFollowup();
-  feToast('Update added','success');
+  feToast('Update posted','success');
 }
 function feTogglePriority(id){ const l=feGet(id); if(!l) return; l.priority=!l.priority; feStamp(l); feSave(); renderFollowup(); feToast(l.priority?'Marked as priority ★':'Priority removed','success'); }
 function feToggleReconnect(id){ const l=feGet(id); if(!l) return; l.reconnect=!l.reconnect; if(l.reconnect && !l.reconnectBy){ const d=new Date(); d.setDate(d.getDate()+7); l.reconnectBy=feDateInput(d); } feStamp(l); feSave(); renderFollowup(); }
@@ -18714,7 +18759,7 @@ async function feDriveSearch(term){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   COLD CALL MODULE (v24.4) — Excel import/export, assign across reps,
+   COLD CALL MODULE (v24.6) — Excel import/export, assign across reps,
    FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
    feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
 ════════════════════════════════════════════════════════════════ */
@@ -19057,13 +19102,13 @@ function ccRender(){
 function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 
 loadLocal();
-try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.4 — capture engage-link before MSAL redirect
+try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.6 — capture engage-link before MSAL redirect
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadFollowups(); // Follow-up Engine → Marketing Leads
-try{ ccLoad(); }catch(e){}   // v24.4 — Cold Call module
+try{ ccLoad(); }catch(e){}   // v24.6 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
