@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CoreV | OxeFit Sales Tracker v24.7</title>
+<title>CoreV | OxeFit Sales Tracker v24.8</title>
 
 <!-- v19.0 — apply saved/system theme BEFORE first paint to avoid flash -->
 <script>
@@ -2814,7 +2814,7 @@
   body[data-role="viewer"] .office-only,
   body[data-role="rep"]    .office-only-th,
   body[data-role="viewer"] .office-only-th { display: none !important; }
-  /* v24.7 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
+  /* v24.8 — demo Actions column: visible to reps (for Edit), hidden only for viewers */
   body[data-role="viewer"] .demo-actions-th { display: none !important; }
 
   /* ════════════ SALES REP PERFORMANCE ════════════ */
@@ -3820,7 +3820,7 @@
     </div>
 
     <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--input-bg); font-size:10px; color:var(--text-muted); letter-spacing:0.5px; text-transform:uppercase;">
-      v24.7 · Quotes: new "Approved by" column (shows approver or Auto-approved) · edits after approval now require re-approval before download
+      v24.8 · Quotes: NEW Tax Invoice — generate a branded TAX INVOICE from a finalized quote (same SKUs/discount/VAT), download or email (Ahmed only)
     </div>
   </div>
 </div>
@@ -3966,7 +3966,7 @@
 
     <div class="settings-block">
       <div class="settings-block-title">About</div>
-      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.7</strong></p>
+      <p class="settings-note">CoreV | OxeFit Sales Tracker · <strong>v24.8</strong></p>
     </div>
   </div>
 </div>
@@ -4038,7 +4038,7 @@
         <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-ico moon">☾</span>
       </button>
-      <div class="sidebar-version">v24.7</div>
+      <div class="sidebar-version">v24.8</div>
     </div>
   </aside>
 
@@ -4114,7 +4114,7 @@
   <div class="content">
     <section class="exec-hero">
       <div>
-        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.7</span></div>
+        <div class="exec-hero-eyebrow">CoreV · OxeFit Sales <span id="execVersion" style="display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:11px;color:var(--text-muted);vertical-align:middle">v24.8</span></div>
         <h1 class="exec-hero-title" id="execGreeting">Executive Dashboard</h1>
         <p class="exec-hero-sub" id="execHeroSub">A live, single-screen view of the team's pipeline, commitments, performance and operations for the selected month.</p>
       </div>
@@ -4954,6 +4954,7 @@
             <button class="prod-add-btn" id="qbDownloadBtn" style="display:none;" onclick="exportQuotePDF()">⤓ Download</button>
             <button class="prod-add-btn" id="qbPublishBtn" style="display:none;" onclick="publishCurrentQuote()">⇪ Publish to HubSpot</button>
             <button class="prod-add-btn" id="qbReceiptBtn" style="display:none;background:#0e7490;" onclick="openPaymentsModal()">💵 Payments &amp; Receipts</button>
+            <button class="prod-add-btn" id="qbInvoiceBtn" style="display:none;background:#1d0fd3;" onclick="openInvoiceDialog()">🧾 Tax Invoice</button>
           </div>
         </div>
 
@@ -5278,7 +5279,7 @@
       #fe-modal-root .fe-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
       #fe-modal-root input.fe-in,#fe-modal-root textarea.fe-ta,#fe-modal-root select.fe-sel{font-family:inherit;font-size:14px;width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 11px;background:var(--input-bg);color:var(--text);}
       #fe-modal-root .fe-x{background:none;border:none;font-size:22px;line-height:1;color:var(--text-muted);cursor:pointer;}
-      /* v24.7 — Cold Call reuses Follow-up styling */
+      /* v24.8 — Cold Call reuses Follow-up styling */
       #view-coldcall .fe-wrap{max-width:920px;margin:0 auto;}
       #view-coldcall .fe-rowb{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
       #view-coldcall .fe-h{margin:0;font-size:16px;font-weight:600;color:var(--text);}
@@ -6277,7 +6278,7 @@ const ALL_REPS = Object.values(TEAMS).flat();
 // Names that should never appear in Demo Tracker per-rep results (cc'd / admins, not demo deliverers)
 const DEMO_EXCLUDE = new Set(['Gladys', 'Ahmed', 'Sami', 'Kamal']);
 
-/* ── v24.7 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
+/* ── v24.8 — EDITABLE ROSTER (admin can add / remove sales reps) ──────────
    TEAMS / ALL_REPS above are the built-in defaults. An admin can edit the
    roster from Settings → Manage Sales Reps. Edits are mutated IN PLACE (so
    every existing reference to TEAMS / ALL_REPS stays valid), persisted to
@@ -6320,7 +6321,7 @@ function applyRosterObj(r){
       if (email && name) { REP_EMAILS[email] = name; REP_TO_EMAIL[name] = email; }
     });
   }
-  // v24.7 — never let the old-spelling SSO aliases become a rep's assignment address
+  // v24.8 — never let the old-spelling SSO aliases become a rep's assignment address
   if (REP_TO_EMAIL['Hussean'] === 'hussein@core-velocity.com') REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
   if (REP_TO_EMAIL['Milena']  === 'milene@core-velocity.com')  REP_TO_EMAIL['Milena']  = 'milena@core-velocity.com';
   if (r.meta && typeof r.meta === 'object') {
@@ -6519,7 +6520,7 @@ const OFFICE_ADMIN = 'Gladys';
 const REP_TO_EMAIL = Object.fromEntries(
   Object.entries(REP_EMAILS).map(([email, name]) => [name, email])
 );
-// v24.7 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
+// v24.8 — the old-spelling SSO aliases above (hussein@, milene@) must NOT win the
 // name→email reverse map. Pin renamed reps to their canonical current addresses so
 // assignment emails go to the right inbox.
 REP_TO_EMAIL['Hussean'] = 'hussean@core-velocity.com';
@@ -6894,12 +6895,12 @@ function migrateBuyerSignalKeys(data) {
 function loadLocal() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw) { try { allData = JSON.parse(raw); } catch(e){} }
-  try { loadRosterLocal(); } catch(_) {}   // v24.7 — apply any admin roster edits before first render
+  try { loadRosterLocal(); } catch(_) {}   // v24.8 — apply any admin roster edits before first render
   // Self-heal stale rep names from the v15.2 rename, persist once.
   if (migrateRenamedRepsInData(allData)) { try { saveLocal(); } catch(_) {} }
   // v15.9 — migrate buyer-signal key rename, persist once.
   if (migrateBuyerSignalKeys(allData)) { try { saveLocal(); } catch(_) {} }
-  // v24.7 — drop empty placeholder rows for reps no longer on the roster.
+  // v24.8 — drop empty placeholder rows for reps no longer on the roster.
   try { if (pruneOrphanEmptyRows()) saveLocal(); } catch(_) {}
 }
 function getMonthKey(y,m) { return `${y}-${m}`; }
@@ -7243,15 +7244,15 @@ function parseEnvelope(remote) {
       products: Array.isArray(remote.products) ? remote.products : undefined,        // v21.45 — fix: sync product catalog to all users
       quotes: Array.isArray(remote.quotes) ? remote.quotes : undefined,              // v21.45 — fix: sync quotes to all users
       termtemplates: (remote.termtemplates && typeof remote.termtemplates === 'object') ? remote.termtemplates : undefined,  // v21.45
-      termtemplates_at: remote.termtemplates_at || undefined,  // v24.7
+      termtemplates_at: remote.termtemplates_at || undefined,  // v24.8
       paymentterms: (remote.paymentterms && typeof remote.paymentterms === 'object') ? remote.paymentterms : undefined,      // v21.45
-      paymentterms_at: remote.paymentterms_at || undefined,  // v24.7
-      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.7
-      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.7
-      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.7
-      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.7
-      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.7
-      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.7
+      paymentterms_at: remote.paymentterms_at || undefined,  // v24.8
+      roster: (remote.roster && typeof remote.roster === 'object') ? remote.roster : undefined,   // v24.8
+      ai: (remote.ai && typeof remote.ai === 'object') ? remote.ai : undefined,   // v24.8
+      media: (remote.media && typeof remote.media === 'object') ? remote.media : undefined,   // v24.8
+      notifications: Array.isArray(remote.notifications) ? remote.notifications : undefined,   // v24.8
+      coldcalls: Array.isArray(remote.coldcalls) ? remote.coldcalls : undefined,   // v24.8
+      coldcalls_deleted: (remote.coldcalls_deleted && typeof remote.coldcalls_deleted==='object') ? remote.coldcalls_deleted : undefined,   // v24.8
       meta : remote._meta || null
     };
   }
@@ -7321,11 +7322,11 @@ async function downloadFromOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.7
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.7
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.7
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.7
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.7
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.8
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.8
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.8
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.8
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.8
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
     saveLocal();
@@ -7549,15 +7550,15 @@ function buildEnvelope() {
   else if (_lastRemoteTermTemplates) { env.termtemplates = _lastRemoteTermTemplates; env.termtemplates_at = _termTemplatesAt || null; }
   if (typeof paymentTerms !== 'undefined' && paymentTerms) { env.paymentterms = paymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
   else if (_lastRemotePaymentTerms) { env.paymentterms = _lastRemotePaymentTerms; env.paymentterms_at = _paymentTermsAt || null; }
-  // v24.7 — editable roster rides along (newest-wins by `at` on adoption)
+  // v24.8 — editable roster rides along (newest-wins by `at` on adoption)
   try { env.roster = rosterCurrentObj(); } catch(_){}
-  // v24.7 — team-shared AI key (newest-wins by `at`)
+  // v24.8 — team-shared AI key (newest-wins by `at`)
   try { env.ai = { key: feKey(), model: feModel(), at: localStorage.getItem(AI_AT_LS)||null }; } catch(_){}
-  // v24.7 — shared media library (newest-wins by `at`)
+  // v24.8 — shared media library (newest-wins by `at`)
   try { env.media = feMediaLoad(); } catch(_){}
-  // v24.7 — rep notifications (merge by id)
+  // v24.8 — rep notifications (merge by id)
   try { env.notifications = (typeof feNotifs!=='undefined'?feNotifs:[]); } catch(_){}
-  // v24.7 — cold calls (merge by id) + tombstones
+  // v24.8 — cold calls (merge by id) + tombstones
   try { env.coldcalls = (typeof coldCalls!=='undefined'?coldCalls:[]); env.coldcalls_deleted = (typeof ccTombstones!=='undefined'?ccTombstones:{}); } catch(_){}
   return env;
 }
@@ -7594,11 +7595,11 @@ async function uploadToOneDrive() {
     if (r.env && Array.isArray(r.env.products)) { _lastRemoteProducts = r.env.products; if (typeof productEntries !== 'undefined' && (!(typeof canEditProducts==='function' && canEditProducts()) || !productEntries.length)) { productEntries = r.env.products; try { saveProductsLocal(); } catch(e){} } }
     if (r.env && Array.isArray(r.env.quotes)) { _lastRemoteQuotes = r.env.quotes; if (typeof quoteEntries !== 'undefined') { quoteEntries = mergeQuotesById(quoteEntries, r.env.quotes); try { saveQuotesLocal(); } catch(e){} } }
     if (r.env && typeof feAdoptRemoteFollowups==='function') feAdoptRemoteFollowups(r.env);
-    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.7
-    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.7
-    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.7
-    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.7
-    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.7
+    if (r.env && typeof adoptRemoteRoster==='function') adoptRemoteRoster(r.env);   // v24.8
+    if (r.env && typeof feAdoptAI==='function') feAdoptAI(r.env);   // v24.8
+    if (r.env && typeof feAdoptMedia==='function') feAdoptMedia(r.env);   // v24.8
+    if (r.env && typeof feAdoptNotifs==='function') feAdoptNotifs(r.env);   // v24.8
+    if (r.env && typeof ccAdopt==='function') ccAdopt(r.env);   // v24.8
     if (r.env && r.env.termtemplates && typeof r.env.termtemplates === 'object') { _lastRemoteTermTemplates = r.env.termtemplates; if (typeof termTemplates !== 'undefined') { termTemplates = mergeTermsObj(termTemplates, _termTemplatesAt, r.env.termtemplates, r.env.termtemplates_at); if (_termsTime(r.env.termtemplates_at) > _termsTime(_termTemplatesAt)) _termTemplatesAt = r.env.termtemplates_at; try { saveTermTemplatesLocal(); } catch(e){} } }
     if (r.env && r.env.paymentterms && typeof r.env.paymentterms === 'object') { _lastRemotePaymentTerms = r.env.paymentterms; if (typeof paymentTerms !== 'undefined') { paymentTerms = mergeTermsObj(paymentTerms, _paymentTermsAt, r.env.paymentterms, r.env.paymentterms_at); if (_termsTime(r.env.paymentterms_at) > _termsTime(_paymentTermsAt)) _paymentTermsAt = r.env.paymentterms_at; try { savePaymentTermsLocal(); } catch(e){} } }
         saveLocal();
@@ -7935,7 +7936,7 @@ async function launchApp(alreadyAuthed) {
   startAutoRefresh();
   renderHubspotChip();
   renderAll();
-  try{ feHandleEngageLink(); }catch(_){}   // v24.7 — capture engage-link click → stamp engagement start
+  try{ feHandleEngageLink(); }catch(_){}   // v24.8 — capture engage-link click → stamp engagement start
 }
 
 /* ════════════════════════════════════════
@@ -8938,7 +8939,7 @@ function makeDealPickerCell(ri, slot, row, editable) {
     const dealsField = slot === 'commit' ? 'commitDeals' : 'bestCaseDeals';
     // Resolve the selected deal ids into {id,name,amount,stage}. Prefer the live open-deals
     // list; if a selected deal is no longer in it (closed / re-assigned / beyond fetch), fall
-    // back to the value we saved on the row so its amount is never lost. (v24.7 fix)
+    // back to the value we saved on the row so its amount is never lost. (v24.8 fix)
     const resolvePicked = (rowObj) => {
       const live = {}; deals.forEach(d => { live[d.id] = d; });
       const prev = {}; ((rowObj && rowObj[dealsField]) || []).forEach(d => { if (d && d.id) prev[d.id] = d; });
@@ -11561,7 +11562,7 @@ function renderExecDashboard() {
   updateRequestsBadge();
   renderExecPublishedQuotes();
   renderPipelineByMonthChart();
-  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.7 — keep closed-won in sync with HubSpot automatically
+  if (typeof maybeAutoRefreshCRM === 'function') maybeAutoRefreshCRM();   // v24.8 — keep closed-won in sync with HubSpot automatically
 }
 
 /* ---- v21.49 — Total Pipeline by close-month bar chart (FY2026, from HubSpot) ---- */
@@ -12545,7 +12546,7 @@ function renderQuotesList() {
     const st = q.status || 'Draft';
     const disp = quoteDisplayStatus(q);
     tr.innerHTML =
-      `<td><a class="quote-name-link" onclick="openQuote('${q.id}')">${escapeHtml(q.name || 'Untitled')}</a>${q.international ? ' <span style="font-size:10px;font-weight:700;color:#0e7490;">🌍 USD</span>' : ''}</td>` +
+      `<td><a class="quote-name-link" onclick="openQuote('${q.id}')">${escapeHtml(q.name || 'Untitled')}</a>${q.international ? ' <span style="font-size:10px;font-weight:700;color:#0e7490;">🌍 USD</span>' : ''}${q.invoice ? ` <span style="font-size:10px;font-weight:700;color:#1d0fd3;" title="Tax Invoice ${escapeHtml(q.invoice.number || '')}">🧾 INV ${escapeHtml(q.invoice.number || '')}</span>` : ''}</td>` +
       `<td class="m-hide" style="font-size:11px;color:var(--text-muted);">${escapeHtml(q.reference || '—')}</td>` +
       `<td class="m-hide">${escapeHtml((q.buyer && q.buyer.name) || '—')}</td>` +
       `<td class="m-hide" style="font-size:11.5px;">${escapeHtml(q.dealName || '—')}</td>` +
@@ -13207,7 +13208,7 @@ function qbCollect() {
     currency: document.getElementById('qbBankCurrency').value.trim() || 'AED'
   };
   recalcQuoteTotals();
-  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.7 — international keeps the normal editable terms plus Currency/Delivery/Duties
+  q.terms = q.international ? applyIntlTerms(resolveQuoteTermsFlat(q)) : resolveQuoteTermsFlat(q);   // v24.8 — international keeps the normal editable terms plus Currency/Delivery/Duties
   return q;
 }
 function saveQuote() {
@@ -13438,6 +13439,7 @@ function updateQuoteButtons() {
   const pubBtn = document.getElementById('qbPublishBtn');
   if (pubBtn) pubBtn.textContent = published ? (updated ? '⇪ Re-push update to HubSpot' : '⇪ Re-publish to HubSpot') : '⇪ Publish to HubSpot';
   show('qbReceiptBtn', (approved || published || booked) && !modified && currentUser === 'Ahmed');   // Ahmed only
+  show('qbInvoiceBtn', (approved || published || booked) && !modified && currentUser === 'Ahmed');   // Tax invoice — Ahmed only
   // Re-approval notice
   let note = document.getElementById('qbReapproveNote');
   if (modified) {
@@ -13728,6 +13730,139 @@ async function generateReceiptPdf(quoteId, paymentId){
   }catch(e){ showToast('Receipt failed: '+(e.message||e),'error'); }
 }
 /* ═══════════ end payments ═══════════ */
+/* ═══════════ TAX INVOICE ═══════════ */
+const INVOICE_SEQ_KEY = 'oxefit_invoice_seq';
+const INVOICE_TRN = QUOTE_SELLER.vat;   // TRN on the tax invoice
+function _nextInvoiceNo(){ let n=1125; try{ n=parseInt(localStorage.getItem(INVOICE_SEQ_KEY)||'1125',10)||1125; }catch(e){} return n+1; }
+function _bumpInvoiceNo(used){ try{ const cur=parseInt(localStorage.getItem(INVOICE_SEQ_KEY)||'1125',10)||1125; const u=parseInt(used,10)||cur; if(u>cur) localStorage.setItem(INVOICE_SEQ_KEY, String(u)); }catch(e){} }
+function openInvoiceDialog(){
+  if(currentUser !== 'Ahmed'){ showToast('Tax invoicing is restricted to Ahmed','error'); return; }
+  if(!_currentQuote){ showToast('Open a quote first','info'); return; }
+  const q=_currentQuote; const esc=s=>escapeHtml(String(s==null?'':s));
+  const inv=q.invoice||{};
+  const today=new Date().toISOString().slice(0,10);
+  const num=inv.number||_nextInvoiceNo();
+  const host=document.createElement('div'); host.id='invoiceOverlay';
+  host.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  host.innerHTML='<div style="background:#fff;border-radius:14px;max-width:480px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow:auto;">'
+    +'<h3 style="margin:0 0 4px;color:#0f172a;">🧾 Tax Invoice — '+esc(q.name||'Quote')+'</h3>'
+    +'<p style="margin:0 0 14px;font-size:12.5px;color:#64748b;">Generates a TAX INVOICE from this quote — same SKUs, discount and VAT. Confirm the details below.</p>'
+    +'<div style="display:flex;gap:8px;margin-bottom:10px;"><div style="flex:1;"><label style="font-size:11px;color:#64748b;">Invoice no.</label><input type="text" id="invNo" value="'+esc(num)+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div>'
+    +'<div style="flex:1;"><label style="font-size:11px;color:#64748b;">Invoice date</label><input type="date" id="invDate" value="'+esc(inv.date||today)+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div></div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:10px;"><div style="flex:1;"><label style="font-size:11px;color:#64748b;">Due date</label><input type="date" id="invDue" value="'+esc(inv.dueDate||today)+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div>'
+    +'<div style="flex:1;"><label style="font-size:11px;color:#64748b;">Terms</label><input type="text" id="invTerms" value="'+esc(inv.terms||'Due on receipt')+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div></div>'
+    +'<div style="margin-bottom:14px;"><label style="font-size:11px;color:#64748b;">Payment terms</label><input type="text" id="invPay" value="'+esc(inv.paymentTerms||'100% on invoice')+'" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box;"></div>'
+    +'<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;"><button onclick="closeInvoiceDialog()" style="padding:8px 14px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;cursor:pointer;">Cancel</button>'
+    +'<button onclick="emailInvoice()" style="padding:8px 14px;border:1px solid #1d0fd3;color:#1d0fd3;border-radius:8px;background:#fff;font-weight:600;cursor:pointer;">✉ Email to buyer</button>'
+    +'<button onclick="submitInvoice()" style="padding:8px 14px;border:none;border-radius:8px;background:#1d0fd3;color:#fff;font-weight:600;cursor:pointer;">Generate &amp; Download</button></div>'
+    +'</div>';
+  document.body.appendChild(host);
+}
+function closeInvoiceDialog(){ const h=document.getElementById('invoiceOverlay'); if(h) h.remove(); }
+function _collectInvoice(){
+  const q=_currentQuote; if(!q) return null;
+  const val=id=>{ const el=document.getElementById(id); return el?el.value.trim():''; };
+  const number=val('invNo')||String(_nextInvoiceNo());
+  q.invoice={ number:number, date:val('invDate'), dueDate:val('invDue'), terms:val('invTerms')||'Due on receipt', paymentTerms:val('invPay')||'100% on invoice', at:new Date().toISOString(), by:currentUser };
+  _bumpInvoiceNo(number);
+  try{ _persistCurrentQuote(); }catch(e){}
+  return q.invoice;
+}
+function submitInvoice(){ if(currentUser!=='Ahmed') return; const inv=_collectInvoice(); if(!inv) return; closeInvoiceDialog(); if(typeof renderQuotesList==='function') renderQuotesList(); generateInvoicePdf(_currentQuote.id); }
+async function emailInvoice(){
+  if(currentUser!=='Ahmed') return;
+  const inv=_collectInvoice(); if(!inv) return; const q=_currentQuote;
+  const to=(q.buyer&&q.buyer.email)||''; if(!to){ showToast('No buyer email on this quote','error'); return; }
+  closeInvoiceDialog();
+  const cur=_quoteCurr(q);
+  const intro='Please find your TAX INVOICE '+inv.number+' from Core Velocity (OxeFit) for '+escapeHtml(q.name||'')+', total '+cur+' '+fmtMoney(q.total||0)+'. Bank transfer details are on the invoice.';
+  const html='<div style="font-family:Arial,sans-serif;color:#0f172a;"><p>Dear '+escapeHtml((q.buyer&&q.buyer.name)||'Customer')+',</p><p>'+intro+'</p><p>Kind regards,<br>'+escapeHtml(QUOTE_SELLER.name)+'<br>VAT '+escapeHtml(QUOTE_SELLER.vat)+'</p></div>';
+  const plain='Dear '+((q.buyer&&q.buyer.name)||'Customer')+',\n\nTAX INVOICE '+inv.number+' from Core Velocity (OxeFit) for '+(q.name||'')+', total '+cur+' '+fmtMoney(q.total||0)+'.\n\nKind regards,\n'+QUOTE_SELLER.name;
+  showToast('Emailing invoice notice to buyer…','info');
+  const sent=await notifyByEmail(to, 'TAX INVOICE '+inv.number+' — '+(q.name||'Core Velocity'), html, plain);
+  showToast(sent?'Invoice email sent to '+to:'Mail client opened (attach the downloaded PDF)','success');
+  generateInvoicePdf(q.id);
+}
+function buildInvoiceHTML(q){
+  const inv=q.invoice||{}; const cur=_quoteCurr(q); const money=n=>cur+' '+fmtMoney(n);
+  const subtotal=q.subtotal||0, discount=q.discount||0, vatRate=q.vatRate||0, vatAmount=q.vatAmount||0, total=q.total||0;
+  const taxable=Math.max(0, subtotal-discount);
+  const taxLabel=vatRate>0?('SR Standard Rated ('+vatRate+'%)'):'Zero Rated';
+  const rows=(q.lineItems||[]).map(function(it,i){
+    return '<tr>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;vertical-align:top;">'+(i+1)+'</td>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;vertical-align:top;"><b>'+escapeHtml(it.sku||'')+'</b></td>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;vertical-align:top;color:#475569;">'+escapeHtml(it.desc||'')+'</td>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;">'+(it.qty||0)+'</td>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;">'+money(it.unitPrice||0)+'</td>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;">'+money((it.qty||0)*(it.unitPrice||0))+'</td>'
+      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;color:#64748b;font-size:9.5px;">'+taxLabel+'</td>'
+      +'</tr>';
+  }).join('');
+  const buyerName=(q.company&&q.company.name)||(q.buyer&&q.buyer.name)||'';
+  const billBlock='<div style="font-size:11.5px;line-height:1.55;">'
+    +((q.buyer&&q.buyer.name)?'<b>'+escapeHtml(q.buyer.name)+'</b><br>':'')
+    +(buyerName?escapeHtml(buyerName)+'<br>':'')
+    +((q.buyer&&q.buyer.vat)?'VAT ID # '+escapeHtml(q.buyer.vat)+'<br>':'')
+    +((q.buyer&&q.buyer.address)?escapeHtml(q.buyer.address)+'<br>':'')
+    +(q.destination?escapeHtml(q.destination):'United Arab Emirates')
+    +'</div>';
+  return '<div style="font-family:Arial,Helvetica,sans-serif;color:#0f172a;font-size:12px;">'
+    +'<style>*{box-sizing:border-box;}table{table-layout:fixed;width:100%;border-collapse:collapse;}td,th{overflow-wrap:anywhere;word-break:break-word;}</style>'
+    // header
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">'
+    +'<div style="flex:1;"><div style="font-size:22px;font-weight:800;color:#1d0fd3;letter-spacing:0.5px;">TAX INVOICE</div>'
+    +'<div style="font-weight:700;margin-top:6px;">'+escapeHtml(QUOTE_SELLER.name)+'</div>'
+    +'<div style="font-size:11px;color:#475569;line-height:1.5;">Company Reg. No. TRN # '+escapeHtml(INVOICE_TRN)+'<br>'+QUOTE_SELLER.addrLines.map(escapeHtml).join(', ')+'<br>info@core-velocity.com · www.oxefit.com/mena</div></div>'
+    +'<img src="'+QUOTE_LOGO_URI+'" style="height:48px;">'
+    +'</div>'
+    // bill/ship band
+    +'<div style="display:flex;gap:24px;background:#eef2ff;border-radius:8px;padding:12px 14px;margin-bottom:14px;">'
+    +'<div style="flex:1;"><div style="font-weight:700;color:#1e3a8a;font-size:11px;margin-bottom:4px;">BILL TO</div>'+billBlock+'</div>'
+    +'<div style="flex:1;"><div style="font-weight:700;color:#1e3a8a;font-size:11px;margin-bottom:4px;">SHIP TO</div>'+billBlock+'</div>'
+    +'</div>'
+    // invoice details
+    +'<div style="display:flex;gap:24px;margin-bottom:14px;font-size:11.5px;">'
+    +'<div style="flex:1;"><div style="font-weight:700;color:#1e3a8a;margin-bottom:3px;">Invoice details</div>'
+    +'Invoice no.: <b>'+escapeHtml(inv.number||'')+'</b><br>Terms: '+escapeHtml(inv.terms||'Due on receipt')+'<br>Invoice date: '+quoteFmtDate(inv.date)+'<br>Due date: '+quoteFmtDate(inv.dueDate)+'</div>'
+    +'<div style="flex:1;text-align:right;"><div style="color:#64748b;">Payment Terms</div><div style="font-weight:600;">'+escapeHtml(inv.paymentTerms||'100% on invoice')+'</div></div>'
+    +'</div>'
+    // line items
+    +'<table style="font-size:11px;margin-bottom:10px;"><colgroup><col style="width:4%"><col style="width:20%"><col style="width:28%"><col style="width:7%"><col style="width:14%"><col style="width:15%"><col style="width:12%"></colgroup>'
+    +'<thead><tr style="background:#122036;color:#fff;"><th style="text-align:left;padding:7px 6px;">#</th><th style="text-align:left;padding:7px 6px;">Product / SKU</th><th style="text-align:left;padding:7px 6px;">Description</th><th style="text-align:right;padding:7px 6px;">Qty</th><th style="text-align:right;padding:7px 6px;">Rate</th><th style="text-align:right;padding:7px 6px;">Amount</th><th style="text-align:right;padding:7px 6px;">Tax</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table>'
+    // bank + totals
+    +'<div style="display:flex;gap:20px;margin-top:8px;">'
+    +'<div style="flex:1;font-size:11px;color:#475569;line-height:1.6;"><b style="color:#0f172a;">Bank details</b><br>Account Name: '+escapeHtml(QUOTE_BANK_DEFAULT.customer)+'<br>Account No.: '+escapeHtml(QUOTE_BANK_DEFAULT.account)+'<br>IBAN: '+escapeHtml(QUOTE_BANK_DEFAULT.iban)+'<br>Bank: '+escapeHtml(QUOTE_BANK_DEFAULT.bank)+'<br>Country: Dubai, United Arab Emirates</div>'
+    +'<div style="width:46%;font-size:12px;">'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#64748b;">Subtotal</span><span>'+money(subtotal)+'</span></div>'
+    +(discount>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#64748b;">Discount</span><span>-'+money(discount)+'</span></div>':'')
+    +(vatRate>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:#64748b;">VAT @ '+vatRate+'% on '+money(taxable)+'</span><span>'+money(vatAmount)+'</span></div>':'')
+    +'<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #122036;margin-top:4px;font-weight:800;font-size:15px;"><span>Total</span><span>'+money(total)+'</span></div>'
+    +'</div></div>'
+    +'<div style="margin-top:22px;border-top:1px solid #e2e8f0;padding-top:8px;font-size:9.5px;color:#94a3b8;text-align:center;">'+escapeHtml(QUOTE_SELLER.name)+' · TRN '+escapeHtml(INVOICE_TRN)+' · '+QUOTE_SELLER.addrLines.map(escapeHtml).join(', ')+'</div>'
+    +'</div>';
+}
+async function generateInvoicePdf(quoteId){
+  try{
+    if(currentUser!=='Ahmed'){ showToast('Tax invoicing is restricted to Ahmed','error'); return; }
+    let q=(typeof quoteEntries!=='undefined'?quoteEntries:[]).find(x=>x.id===quoteId);
+    if(!q && _currentQuote && _currentQuote.id===quoteId) q=_currentQuote;
+    if(!q || !q.invoice){ showToast('Invoice details missing','error'); return; }
+    showToast('Generating tax invoice…','info');
+    await ensureHtml2Pdf();
+    const hostEl=document.createElement('div'); hostEl.style.cssText='position:fixed;left:-10000px;top:0;';
+    const doc=document.createElement('div'); doc.style.cssText='width:794px;padding:0 12mm;box-sizing:border-box;background:#fff;';
+    doc.innerHTML=buildInvoiceHTML(q);
+    hostEl.appendChild(doc); document.body.appendChild(hostEl);
+    const fname='TAX INVOICE '+q.invoice.number+' - '+(q.name||'Quote')+'.pdf';
+    try{
+      await html2pdf().set({ margin:[12,0,14,0], filename:fname, image:{type:'jpeg',quality:0.95}, html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, pagebreak:{mode:['css','legacy'],avoid:['tr']} }).from(doc).save();
+      showToast('Tax invoice '+q.invoice.number+' downloaded','success');
+    } finally { hostEl.remove(); }
+  }catch(e){ showToast('Invoice failed: '+(e.message||e),'error'); }
+}
+/* ═══════════ end tax invoice ═══════════ */
 function buildQuotePreviewHTML(q) {
   const money = n => (q.international ? 'USD ' : 'AED') + fmtMoney(n);
   const itemsRows = q.lineItems.map(it =>
@@ -14388,7 +14523,7 @@ function demoPopulateWeekSelect() {
   if (prev && weeks.includes(prev)) sel.value = prev;
   else sel.value = mo ? '' : demoCurrentWeekKey();
 }
-// ── v24.7 — per-Month filter ───────────────────────────────────────────────
+// ── v24.8 — per-Month filter ───────────────────────────────────────────────
 function demoMonthKeyOf(e) {
   const s = (e && (e.date || e.weekKey) || '');
   return s.length >= 7 ? s.slice(0, 7) : '';   // 'YYYY-MM'
@@ -14763,7 +14898,7 @@ function openDemoModal(prefilledId) {
   demoApplyRepLock(!isManager);
   document.getElementById('demoModal').classList.add('open');
 }
-/* v24.7 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
+/* v24.8 — when a rep opens the modal, lock identifying fields; leave Outcome, Deal ID & Notes editable */
 function demoApplyRepLock(lock) {
   ['demoFormDate','demoFormRep','demoFormClient','demoFormType','demoFormLocation','demoFormProduct'].forEach(function(id){
     const el = document.getElementById(id); if (el) el.disabled = !!lock;
@@ -17239,8 +17374,8 @@ let feFilterRep = '';
 let feFilterRegion = '';
 let feFilterRecon = '';
 let feFilterName = '';
-// v24.7 — reps see only leads assigned to (or owned by) them; admins/office see all
-// v24.7 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
+// v24.8 — reps see only leads assigned to (or owned by) them; admins/office see all
+// v24.8 — plus named exceptions who can see every Marketing Lead (e.g. Fatima)
 const FE_SEE_ALL_USERS=['Fatima'];
 function feCanSeeAllLeads(){ return currentRole==='admin' || currentRole==='office' || FE_SEE_ALL_USERS.indexOf((typeof currentUser!=='undefined'?currentUser:'')||'')>=0; }
 function feVisibleLeads(){
@@ -17248,7 +17383,7 @@ function feVisibleLeads(){
   const u=(typeof currentUser!=='undefined'?currentUser:'')||'';
   return followupLeads.filter(function(l){ return (l.assignee||'')===u || (l.owner||'')===u; });
 }
-// v24.7 — Follow-up Engine can assign/filter to admins & office too
+// v24.8 — Follow-up Engine can assign/filter to admins & office too
 // (Ahmed, Sami, Kamal, Gladys) in addition to the sales roster.
 const FE_EXTRA_REPS = ['Ahmed', 'Sami', 'Kamal', 'Gladys'];
 function feAssignableReps(){
@@ -17256,7 +17391,7 @@ function feAssignableReps(){
   ALL_REPS.concat(FE_EXTRA_REPS).forEach(function(r){ if (r && !seen.has(r)) { seen.add(r); out.push(r); } });
   return out;
 }
-// v24.7 — classify a Follow-up Engine assignee into a region/group for the table.
+// v24.8 — classify a Follow-up Engine assignee into a region/group for the table.
 const FE_REGION_ORDER = ['Dubai', 'Abu Dhabi', 'Direct Engagement', 'Office', 'Unassigned'];
 function feRegionOf(rep){
   if (!rep || rep === 'Unassigned') return 'Unassigned';
@@ -17304,7 +17439,7 @@ const FE_CADENCE = [
 ];
 
 function loadFollowups(){ try{ const r=localStorage.getItem(FOLLOWUPS_KEY); followupLeads=r?JSON.parse(r):[]; if(!Array.isArray(followupLeads)) followupLeads=[]; }catch(e){ followupLeads=[]; } try{ feLoadTombstones(); }catch(e){} try{ feMigrateContacts(); }catch(e){} try{ feNotifsLoad(); }catch(e){} }
-// v24.7 — clear addresses that were wrongly populated with note text by the old extractor
+// v24.8 — clear addresses that were wrongly populated with note text by the old extractor
 function feMigrateContacts(){ let changed=false;
   (followupLeads||[]).forEach(function(l){ if(!l||!l.address) return;
     const a=String(l.address);
@@ -17341,7 +17476,7 @@ function mergeFollowupsById(localArr, remoteArr){
 function feFirst(n){ return (n||'there').trim().split(' ')[0]; }
 function feResolve(s, lead){ return (s||'').split('{name}').join(feFirst(lead.name)).split('{company}').join(lead.company?lead.company:'your team'); }
 function feFmt(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }catch(e){ return ''; } }
-/* ── v24.7 — assign→engage timing, assignment email, engage-link capture ── */
+/* ── v24.8 — assign→engage timing, assignment email, engage-link capture ── */
 function feFmtDur(ms){ if(ms==null||isNaN(ms)||ms<0) return ''; const m=Math.round(ms/60000); if(m<1) return 'under a minute'; if(m<60) return m+' min'; const h=Math.floor(m/60), rm=m%60; if(h<24) return h+'h'+(rm?(' '+rm+'m'):''); const d=Math.floor(h/24), rh=h%24; return d+'d'+(rh?(' '+rh+'h'):''); }
 function feEngageChip(l){
   if(!l||!l.assignedAt) return '';
@@ -17402,7 +17537,7 @@ function feGenTouches(lead){ const base=Date.parse(lead.createdAt); const v=lead
   return FE_CADENCE.map(t=>({ key:t.key, dayLabel:t.dayLabel, when:t.when, channel:t.channel, purpose:t.purpose,
     scheduledAt:new Date(base+t.offsetMinutes*60000).toISOString(), status:'pending',
     subject:t.subject?feResolve(t.subject[v]||t.subject.b2c, lead):null, message:feResolve(t.msg[v]||t.msg.b2c, lead) })); }
-// v24.7 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
+// v24.8 — COLD tag: when a rep marks a lead Cold, append a re-engagement drip
 // that runs AFTER the 12-day cadence (Day 20 → Day 60), anchored to when it went cold.
 const FE_COLD_CADENCE=[
   { key:'c1', dayLabel:'Cold · Day 20', when:'~1 week after going cold', channel:'WhatsApp', coldDays:8, purpose:'Soft re-open — keep the door open',
@@ -17443,7 +17578,7 @@ function feGet(id){ return followupLeads.find(l=>l.id===id); }
 function feStamp(l){ if(l) l.updatedAt=new Date().toISOString(); }
 
 function feStageColor(s){ return ({'New':'var(--text-muted)','Contacted':'var(--accent)','Engaged':'#8b5cf6','Demo booked':'var(--gold)','Won':'var(--success)','Lost':'var(--danger)','Referral':'#06b6d4'})[s]||'var(--text-muted)'; }
-// v24.7 — re-connection tag + "by when" date per lead
+// v24.8 — re-connection tag + "by when" date per lead
 function feDateInput(d){ function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 function feShortDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }catch(e){ return s||''; } }
 function feReconnectOverdue(l, now){ if(!l||!l.reconnect||!l.reconnectBy) return false; const t=Date.parse(l.reconnectBy+'T23:59:59'); return !isNaN(t) && t < (now||Date.now()); }
@@ -17454,7 +17589,7 @@ function feStatusColor(s){ return ({pending:'var(--text-muted)',sent:'var(--acce
 const AI_KEY_LS='oxefit_anthropic_key', AI_MODEL_LS='oxefit_anthropic_model', AI_AT_LS='oxefit_anthropic_at';
 function feKey(){ return localStorage.getItem(AI_KEY_LS)||''; }
 function feModel(){ return localStorage.getItem(AI_MODEL_LS)||'claude-sonnet-4-6'; }
-// v24.7 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
+// v24.8 — team-shared AI key: set once by an admin, synced to everyone via the envelope.
 function feSaveAIKey(key, model){
   key=(key||'').trim(); model=(model||'').trim()||'claude-sonnet-4-6';
   if(key) localStorage.setItem(AI_KEY_LS, key); else localStorage.removeItem(AI_KEY_LS);
@@ -17491,7 +17626,7 @@ function feSetKey(){
   if(currentRole==='admin'){ try{ openSettings(); }catch(e){} feToast('Set the team AI key in Settings → AI assistant','info'); }
   else { feToast('AI isn’t set up yet — ask your admin to add the team key in Settings → AI assistant','info'); }
 }
-// v24.7 — per-rep WhatsApp: each rep stores their own number locally; the
+// v24.8 — per-rep WhatsApp: each rep stores their own number locally; the
 // "Send on WhatsApp" buttons open the WhatsApp Business app to the lead with
 // the step message pre-filled.
 function feWaNumber(){ return localStorage.getItem('oxefit_wa_sender')||''; }
@@ -17576,7 +17711,7 @@ async function feWhatsApp(id, key){
 }
 function feDownloadDataUrl(dataUrl, filename){ try{ const a=document.createElement('a'); a.href=dataUrl; a.download=filename||'download'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){} }
 
-/* ── v24.7 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
+/* ── v24.8 — MEDIA LIBRARY (admin-curated images + video links, shuffled into messages) ──
    Images are stored compressed (small base64); videos are hosted links. The
    library syncs to the team (newest-wins). On a WhatsApp send the engine
    appends a shuffled video/link, or downloads a shuffled image to attach. */
@@ -17671,7 +17806,7 @@ function feAddLead(){
   followupLeads.unshift(lead); feSave(); feCloseModal();
   feSelectedId=lead.id; feView='lead'; renderFollowup();
 }
-// v24.7 — only Ahmed and Gladys may mark a lead as Lost
+// v24.8 — only Ahmed and Gladys may mark a lead as Lost
 const FE_LOST_AUTHORIZED = ['Ahmed', 'Gladys'];
 function feCanMarkLost(){ return FE_LOST_AUTHORIZED.indexOf(typeof currentUser!=='undefined'?currentUser:'')>=0; }
 function feSetStage(id,stage){ if(stage==='Lost'){ if(!feCanMarkLost()){ feToast('Only Ahmed or Gladys can mark a lead as Lost','error'); return; } feOpenLostModal(id); return; } const l=feGet(id); if(l){ l.stage=stage; feStamp(l); feSave(); renderFollowup(); } }
@@ -17814,7 +17949,7 @@ function feParseSimple(raw){
   });
   return out;
 }
-// v24.7 — robust extraction of phone / email / address into separate fields
+// v24.8 — robust extraction of phone / email / address into separate fields
 function feDigits(s){ return (s||'').replace(/[^\d]/g,''); }
 // Excel/CSV often render long phone cells in scientific notation (e.g. 9.71501E+11).
 // Expand that back to a plain integer string BEFORE pulling digits, so we don't
@@ -17849,7 +17984,7 @@ function feFindAddress(blob){ if(!blob) return '';
   return '';
 }
 function feExtractContact(blob){ return { email:feFindEmail(blob), phone:feFindPhone(blob), address:feFindAddress(blob) }; }
-// v24.7 — map a free-text Emirate/Location to a routing region
+// v24.8 — map a free-text Emirate/Location to a routing region
 function feEmirateToRegion(text){
   const t=(' '+(text||'')+' ').toLowerCase();
   if(/\b(abu\s*dhabi|abudhabi|\bauh\b|al\s*ain|yas\b|saadiyat|mussafah|musaffah|khalifa city|reem island|corniche abu|mbz|mohammed bin zayed|al raha|shakhbout|bani yas|al shamkha|madinat zayed|ruwais|liwa)\b/.test(t)) return 'Abu Dhabi';
@@ -18434,7 +18569,7 @@ function feToggleExpand(id,key){ const k=id+':'+key; feExpandKey=(feExpandKey===
 function feUndoStep(id,key){ const l=feGet(id); const t=l&&l.touches.find(function(x){ return x.key===key; }); if(t){ t.status='pending'; feStamp(l); feExpandKey=null; feSave(); renderFollowup(); } }
 
 /* ---- Customizable Outlook reminders (per-step day & time) ---- */
-// v24.7 — the reminder day-offset and time of day are user-editable per step.
+// v24.8 — the reminder day-offset and time of day are user-editable per step.
 const FE_REMINDER_KEY='oxefit_followup_reminders_v1';
 function feRemDefaults(){ const steps={}; FE_CADENCE.forEach(function(c){ steps[c.key]={ day:Math.round((c.offsetMinutes||0)/1440), time:'15:00' }; }); return { steps:steps }; }
 function feRemGet(){ const def=feRemDefaults();
@@ -18521,7 +18656,7 @@ async function feSetReminders(id){
 function feOpenLead(id){ feSelectedId=id; feView='lead'; feEditKey=null; renderFollowup(); }
 function feGoDash(){ feView='dashboard'; renderFollowup(); }
 function feAssign(id, rep){ const l=feGet(id); if(!l) return; const prev=l.assignee; l.assignee=rep||''; if(rep && rep!==prev){ l.routeNeeded=false; l.assignedAt=new Date().toISOString(); l.engagedAt=''; if(rep!==((typeof currentUser!=='undefined')?currentUser:'')) feNotify(rep, l, 'assigned'); feStamp(l); feSave(); renderFollowup(); feEmailAssignment(l, rep); return; } feStamp(l); feSave(); renderFollowup(); }
-/* ── v24.7 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
+/* ── v24.8 — Agency lead flow: auto-route by Emirate → assign → notify rep ── */
 const FE_NOTIF_KEY='oxefit_fe_notifs_v1';
 let feNotifs=[];
 function feNotifsLoad(){ try{ const r=JSON.parse(localStorage.getItem(FE_NOTIF_KEY)||'[]'); feNotifs=Array.isArray(r)?r:[]; }catch(e){ feNotifs=[]; } return feNotifs; }
@@ -18785,7 +18920,7 @@ async function feDriveSearch(term){
 }
 
 /* ════════════════════════════════════════════════════════════════
-   COLD CALL MODULE (v24.7) — Excel import/export, assign across reps,
+   COLD CALL MODULE (v24.8) — Excel import/export, assign across reps,
    FE-style dashboard. Reuses feEmirateToRegion / TEAMS / feAssignableReps /
    feRegionOf / feSheetToLeads / XLSX / feEsc / showToast.
 ════════════════════════════════════════════════════════════════ */
@@ -19128,13 +19263,13 @@ function ccRender(){
 function ccWhatsApp(id){ const c=ccGet(id); if(!c) return; const num=(typeof feDigits==='function'?feDigits(c.phone||''):(c.phone||'').replace(/[^0-9]/g,'')); if(!num){ ccToast('No phone number','error'); return; } const text='Hi '+(c.name||'')+', this is OxeFit — is now a good time for a quick chat?'; const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(text); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 
 loadLocal();
-try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.7 — capture engage-link before MSAL redirect
+try{ const _eid=(typeof feParseEngageId==='function')?feParseEngageId():''; if(_eid) localStorage.setItem('oxefit_pending_engage', _eid); }catch(_){}  // v24.8 — capture engage-link before MSAL redirect
 loadDemos();   // v13.7 — needed for Sales Rep Performance scoring even before Demo Tracker tab is opened
 loadRequests(); // v19.1 — Event / On-site Demo requests
 loadProducts(); // v20.7 — product catalog for Quotes
 loadQuotes();   // v20.8 — saved quotes
 loadFollowups(); // Follow-up Engine → Marketing Leads
-try{ ccLoad(); }catch(e){}   // v24.7 — Cold Call module
+try{ ccLoad(); }catch(e){}   // v24.8 — Cold Call module
 loadTermTemplates(); // v21.9 — per-Type purchase terms library
 loadPaymentTerms(); // v21.12 — payment terms by schedule
 hsLoadTokens();
