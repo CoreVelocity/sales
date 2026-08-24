@@ -13939,17 +13939,28 @@ function buildInvoiceHTML(q){
   const subtotal=q.subtotal||0, discount=q.discount||0, vatRate=q.vatRate||0, vatAmount=q.vatAmount||0, total=q.total||0;
   const taxable=Math.max(0, subtotal-discount);
   const taxLabel=vatRate>0?('SR Standard Rated ('+vatRate+'%)'):'Zero Rated';
+  const _icol=(w,align,extra)=>'width:'+w+';padding:7px 8px;'+(align?('text-align:'+align+';'):'')+'overflow-wrap:anywhere;'+(extra||'');
   const rows=(q.lineItems||[]).map(function(it,i){
-    return '<tr>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;vertical-align:top;">'+(i+1)+'</td>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;vertical-align:top;"><b>'+escapeHtml(it.sku||'')+'</b></td>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;vertical-align:top;color:#475569;">'+escapeHtml(it.desc||'')+'</td>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;">'+(it.qty||0)+'</td>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;">'+money(it.unitPrice||0)+'</td>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;">'+money((it.qty||0)*(it.unitPrice||0))+'</td>'
-      +'<td style="padding:7px 6px;border-bottom:1px solid #eef2f7;text-align:right;vertical-align:top;color:#64748b;font-size:9.5px;">'+taxLabel+'</td>'
-      +'</tr>';
+    return '<div style="display:flex;border-bottom:1px solid #eef2f7;page-break-inside:avoid;break-inside:avoid;font-size:11px;">'
+      +'<div style="'+_icol('5%')+'">'+(i+1)+'</div>'
+      +'<div style="'+_icol('20%')+'"><b>'+escapeHtml(it.sku||'')+'</b></div>'
+      +'<div style="'+_icol('29%',null,'color:#475569;')+'">'+escapeHtml(it.desc||'')+'</div>'
+      +'<div style="'+_icol('7%','right')+'">'+(it.qty||0)+'</div>'
+      +'<div style="'+_icol('13%','right')+'">'+money(it.unitPrice||0)+'</div>'
+      +'<div style="'+_icol('14%','right')+'">'+money((it.qty||0)*(it.unitPrice||0))+'</div>'
+      +'<div style="'+_icol('12%','right','color:#64748b;font-size:9.5px;')+'">'+taxLabel+'</div>'
+    +'</div>';
   }).join('');
+  const itemsBlock='<div style="border:1px solid #e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:10px;">'
+    +'<div style="display:flex;background:#122036;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.3px;">'
+      +'<div style="width:5%;padding:7px 8px;">#</div>'
+      +'<div style="width:20%;padding:7px 8px;">Product / SKU</div>'
+      +'<div style="width:29%;padding:7px 8px;">Description</div>'
+      +'<div style="width:7%;padding:7px 8px;text-align:right;">Qty</div>'
+      +'<div style="width:13%;padding:7px 8px;text-align:right;">Rate</div>'
+      +'<div style="width:14%;padding:7px 8px;text-align:right;">Amount</div>'
+      +'<div style="width:12%;padding:7px 8px;text-align:right;">Tax</div>'
+    +'</div>'+(rows||'<div style="padding:8px;color:#94a3b8;font-size:11px;">No line items</div>')+'</div>';
   const buyerName=(q.company&&q.company.name)||(q.buyer&&q.buyer.name)||'';
   const billBlock='<div style="font-size:11.5px;line-height:1.55;">'
     +((q.buyer&&q.buyer.name)?'<b>'+escapeHtml(q.buyer.name)+'</b><br>':'')
