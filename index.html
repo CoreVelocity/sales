@@ -14237,11 +14237,18 @@ function quoteApprovedByLabel(q) {
   return '✓ ' + by + (q.approvedAt ? (' · ' + quoteFmtDate(q.approvedAt)) : '');
 }
 // True when an approved/published quote has been edited since it was approved → needs re-approval
+// Signature of the fields that approval actually governs (pricing). Re-saves, syncs,
+// previews, payments, receipts and invoices must NOT count as "modified since approval".
+function _quoteFinSig(q) {
+  if (!q) return '';
+  const items = (q.lineItems || []).map(function(it){ return (it.sku||'') + ':' + (it.qty||0) + ':' + (it.unitPrice||0); }).join('|');
+  return [parseFloat(q.discount)||0, parseFloat(q.subtotal)||0, parseFloat(q.total)||0, items].join('~');
+}
 function quoteModifiedSinceApproval(q) {
   if (!q) return false;
-  if (q.status === 'Approved')  return !!(q.approvedAt  && q.updatedAt && (Date.parse(q.updatedAt)||0) > (Date.parse(q.approvedAt)||0)  + 1500);
-  if (q.status === 'Published') return !!(q.publishedAt && q.updatedAt && (Date.parse(q.updatedAt)||0) > (Date.parse(q.publishedAt)||0) + 1500);
-  return false;
+  if (q.status !== 'Approved' && q.status !== 'Published') return false;
+  if (!q.approvedSig) return false;                  // legacy/older approvals (no snapshot) → trust the approval
+  return _quoteFinSig(q) !== q.approvedSig;           // only a real pricing change re-opens approval
 }
 function quotePrintAllowed() { return !!(_currentQuote && (_currentQuote.status === 'Approved' || _currentQuote.status === 'Published' || _currentQuote.status === 'Booked') && !quoteModifiedSinceApproval(_currentQuote)); }
 function updatePreviewPrintGate() {
